@@ -6,6 +6,7 @@ import "modern-normalize/modern-normalize.css";
 import { CSSInterpolation } from "@emotion/serialize";
 import smoothscroll from "smoothscroll-polyfill";
 import { MetaMaskProvider } from "metamask-react";
+import { AuthProvider } from "../components/AuthProvider/";
 
 declare module "@emotion/react" {
   export interface Theme {
@@ -208,9 +209,11 @@ const App = ({ Component, pageProps }: AppProps) => {
       </Head>
 
       <MetaMaskProvider>
-        <ThemeProvider theme={theme}>
-          <Component {...pageProps} />
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider theme={theme}>
+            <Component {...pageProps} />
+          </ThemeProvider>
+        </AuthProvider>
       </MetaMaskProvider>
     </Fragment>
   );

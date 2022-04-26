@@ -3,10 +3,11 @@ import { FC, useEffect, useState } from "react";
 import Button from "../Button";
 import MetamaskButton from "../MetamaskButton";
 import store from "store";
+import { useRouter } from "next/router";
 
 const MetaMaskLogin: FC = () => {
   const { status, ethereum, account } = useMetaMask();
-
+  const router = useRouter()
   const [
     { account: signedAccount, expiry, signature, signing },
     setSignature,
@@ -83,7 +84,9 @@ const MetaMaskLogin: FC = () => {
     );
   }
 
-  return <Button>Signed</Button>;
+  router.push('/dashboard')
+
+  return <Button>Logged in</Button>;
 };
 
 export default MetaMaskLogin;
