@@ -33,8 +33,8 @@ const Home: NextPage = () => {
           paddingTop: theme.spacing(26),
           paddingBottom: theme.spacing(6.5),
           backgroundColor: "#0A0A0A",
-          backgroundImage:
-            "url(https://s3.amazonaws.com/img.playingarts.com/www/static/home_bg.jpg)",
+          // backgroundImage:
+          //   "url(https://s3.amazonaws.com/img.playingarts.com/www/static/home_bg.jpg)",
           backgroundSize: "cover",
         })}
       >
@@ -70,8 +70,6 @@ const Home: NextPage = () => {
                 component={Link}
                 href="https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter"
                 Icon={Twitter}
-                // style={{, color: "#fffff", marginRight: "20px"}}
-
                 css={(theme) => ({
                   background: "rgb(72, 155, 233)",
                   marginRight: theme.spacing(1),

@@ -17,7 +17,7 @@ const Nav: FC<HTMLAttributes<HTMLElement>> = ({ ...props }) => {
       {...props}
       css={(theme) => ({
         background: colord(theme.colors.text_title_dark)
-          .alpha(0.95)
+          .alpha(1)
           .toRgbString(),
         borderRadius: theme.spacing(1),
         borderTopRightRadius: 0,

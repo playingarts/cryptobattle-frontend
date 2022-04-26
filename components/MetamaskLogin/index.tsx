@@ -70,8 +70,15 @@ const MetaMaskLogin: FC = () => {
     };
 
     return (
-      <Button loading={signing} onClick={requestSignature}>
-        {signing ? "signing" : "sign"}
+      <Button
+        css={() => ({
+          background: "rgb(248, 157, 53)",
+          color: "#fff",
+        })}
+        loading={signing}
+        onClick={requestSignature}
+      >
+        {signing ? "signing" : "sign with metamask"}
       </Button>
     );
   }
