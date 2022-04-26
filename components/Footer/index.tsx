@@ -12,7 +12,6 @@ import { socialLinks } from "../../source/consts";
 import Instagram from "../Icons/Instagram";
 import Facebook from "../Icons/Facebook";
 import Behance from "../Icons/Behance";
-import StoreButtons from "../StoreButtons";
 
 const Footer: FC<HTMLAttributes<HTMLDivElement>> = (props) => (
   <div

@@ -1,6 +1,5 @@
 import { NextPage } from "next";
 import Layout from "../components/Layout";
-import Grid from "../components/Grid";
 import Text from "../components/Text";
 
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
@@ -9,7 +8,7 @@ import MetamaskLogin from "../components/MetamaskLogin/";
 
 import { useMetaMask } from 'metamask-react';
 
-function truncateMiddle(word) {
+function truncateMiddle(word: string) {
   const tooLongChars = 19; // arbitrary
 
   if (word.length < tooLongChars) {

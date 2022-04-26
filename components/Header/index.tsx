@@ -22,11 +22,9 @@ export interface Props extends HTMLAttributes<HTMLElement> {
 
 const Header: FC<Props> = ({
   palette,
-  customShopButton,
   altNav,
   showAltNav,
   noNav,
-  deckId,
   isCardPage,
   ...props
 }) => {

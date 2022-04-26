@@ -1,4 +1,4 @@
-import { FC, Fragment, useEffect } from "react";
+import { FC, useEffect } from "react";
 import Layout from "../../../components/Layout";
 import Header, { Props as HeaderProps } from "../../../components/Header";
 import Footer from "../../../components/Footer";
