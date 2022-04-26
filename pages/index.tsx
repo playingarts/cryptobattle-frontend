@@ -1,30 +1,26 @@
 import { NextPage } from "next";
 import Layout from "../components/Layout";
-import Hero from "../components/Hero";
-import { withApollo } from "../source/apollo";
+// import Hero from "../components/Hero";
+// import { withApollo } from "../source/apollo";
 import Grid from "../components/Grid";
-import Esquire from "../components/Icons/Esquire";
-import FastCompany from "../components/Icons/FastCompany";
-import CreativeBloq from "../components/Icons/CreativeBloq";
-import DigitalArts from "../components/Icons/DigitalArts";
-import Quote from "../components/Quote";
+// import Esquire from "../components/Icons/Esquire";
+// import FastCompany from "../components/Icons/FastCompany";
+// import CreativeBloq from "../components/Icons/CreativeBloq";
+// import DigitalArts from "../components/Icons/DigitalArts";
+// import Quote from "../components/Quote";
 import Text from "../components/Text";
 import Link from "../components/Link";
 import Button from "../components/Button";
 import Twitter from "../components/Icons/Twitter";
-import Discord from "../components/Icons/Discord";
-import Play from "../components/Icons/Play";
-import Itunes from "../components/Icons/Itunes";
-import Spotify from "../components/Icons/Spotify";
+// import Discord from "../components/Icons/Discord";
+// import Play from "../components/Icons/Play";
+// import Itunes from "../components/Icons/Itunes";
+// import Spotify from "../components/Icons/Spotify";
+import Line from "../components/Line";
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
-import Kickstarter from "../components/Icons/Kickstarter";
 import Arrowed from "../components/Arrowed";
-import StatBlock from "../components/StatBlock";
-import ComposedCardOfTheDay from "../components/_composed/CardOfTheDay";
-import { socialLinks } from "../source/consts";
-import CutoutChevron from "../components/Icons/CutoutChevron";
-import BrowseCollection from "../components/_composed/BrowseCollection";
-import BlockTitle from "../components/BlockTitle";
+
+import MetamaskLogin from "../components/MetamaskLogin/";
 
 const Home: NextPage = () => {
   return (
@@ -36,37 +32,62 @@ const Home: NextPage = () => {
           overflow: "hidden",
           paddingTop: theme.spacing(26),
           paddingBottom: theme.spacing(6.5),
+          backgroundColor: "#0A0A0A",
           backgroundImage:
             "url(https://s3.amazonaws.com/img.playingarts.com/www/static/home_bg.jpg)",
           backgroundSize: "cover",
         })}
       >
         <Grid>
-          <div css={{ gridColumn: "2 / span 6" }}>
-            <Text component="h1" css={{ margin: 0 }}>
-              Collective Art Project
-            </Text>
-            <Text variant="body3">
-              For creative people who are into art, playing cards and sometimes
-              magic.
-            </Text>
-            <Button
-              component={Link}
-              href={{
-                query: {
-                  scrollIntoView: "[data-id='block-about']",
-                  scrollIntoViewBehavior: "smooth",
-                },
-              }}
-              shallow={true}
-              scroll={false}
-              Icon={CutoutChevron}
-            />
+          <div css={{ gridColumn: "0 / span 6" }}>
+            <div css={{ width: "400px", height: "400px" }}></div>
           </div>
-          <Hero css={{ gridColumn: "8 / span 5" }} />
+
+          <div css={{ gridColumn: "8 / span 5" }}>
+            <Text component="h1" css={{ margin: "1px", fontSize: "40px" }}>
+              Go head to head with opponents in turn-based play-2-earn card
+              battle.
+            </Text>
+
+            <Text
+              component={Link}
+              variant="label"
+              href="/"
+              css={(theme) => ({
+                opacity: 0.7,
+                marginTop: theme.spacing(6),
+                paddingTop: theme.spacing(6),
+              })}
+            >
+              <Arrowed>About the game</Arrowed>
+            </Text>
+
+            <Line spacing={2} />
+            <Text variant="body2">ready to play? log in with:</Text>
+
+            <div style={{ display: "flex", justifyContent: "start" }}>
+              <Button
+                component={Link}
+                href="https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter"
+                Icon={Twitter}
+                // style={{, color: "#fffff", marginRight: "20px"}}
+
+                css={(theme) => ({
+                  background: "rgb(72, 155, 233)",
+                  marginRight: theme.spacing(1),
+                  color: "#fff",
+                })}
+              >
+                Twitter
+              </Button>
+
+              <MetamaskLogin />
+            </div>
+          </div>
+          {/* <Hero css={{ gridColumn: "8 / span 5" }} /> */}
         </Grid>
       </Layout>
-
+      {/* 
       <Layout
         css={(theme) => ({
           background: theme.colors.page_bg_light_gray,
@@ -352,9 +373,9 @@ const Home: NextPage = () => {
             at the same time. The colors are vibrant. A wonderful price of art.”
           </Quote>
         </Grid>
-      </Layout>
+      </Layout> */}
     </ComposedGlobalLayout>
   );
 };
 
-export default withApollo(Home);
+export default Home;
