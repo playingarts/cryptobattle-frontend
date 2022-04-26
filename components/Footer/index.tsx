@@ -18,26 +18,27 @@ const Footer: FC<HTMLAttributes<HTMLDivElement>> = (props) => (
   <div
     {...props}
     css={(theme) => ({
-      background: theme.colors.page_bg_light_gray,
+      background: theme.colors.page_bg_dark,
+      color: "#fff",
       borderRadius: theme.spacing(1),
     })}
-  >
+  ><Line spacing={10}></Line>
     <Grid>
       <div
         css={(theme) => ({
-          gridColumn: "span 7",
+          gridColumn: "span 6",
           opacity: 0.5,
-          color: theme.colors.text_subtitle_dark,
+          color: theme.colors.text_subtitle_light,
         })}
       >
         <Text variant="h6" component="h2" css={{ margin: 0 }}>
           playing arts project
         </Text>
-        <Text variant="body0">
+        {/* <Text variant="body0">
           All rights reserved. Any artwork displayed on this website may not be
           reproduced or used in any manner whatsoever without the express
           written permission of Digital Abstracts or their respective owners.
-        </Text>
+        </Text> */}
         <Text
           variant="body0"
           css={{
@@ -47,14 +48,15 @@ const Footer: FC<HTMLAttributes<HTMLDivElement>> = (props) => (
           © 2012—2021 Digital Abstracts SL Privacy statement Patent Pending
         </Text>
       </div>
-      <Line vertical={true} spacing={0} />
+      {/* <Line vertical={true} spacing={0} /> */}
       <nav
         css={(theme) => ({
           display: "flex",
           flexWrap: "wrap",
-          gridColumn: "span 4",
-          color: theme.colors.text_subtitle_dark,
+          gridColumn: "span 6",
+          color: theme.colors.text_subtitle_light,
           opacity: 0.5,
+          justifyContent: "end",
         })}
       >
         {[
@@ -95,12 +97,7 @@ const Footer: FC<HTMLAttributes<HTMLDivElement>> = (props) => (
             Icon={Icon}
           />
         ))}
-        <StoreButtons
-          css={{ alignSelf: "flex-end" }}
-          ButtonProps={{
-            variant: "bordered",
-          }}
-        />
+
       </nav>
     </Grid>
   </div>

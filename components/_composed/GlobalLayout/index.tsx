@@ -58,7 +58,8 @@ const ComposedGlobalLayout: FC<
   }, [query, replace, scrollIntoView, scrollIntoViewBehavior]);
 
   return (
-    <Fragment>
+    <div         style={{ background: '#0a0a0a', minHeight: '100vh' }}
+    >
       <Header
         css={(theme) => ({
           position: "fixed",
@@ -81,6 +82,7 @@ const ComposedGlobalLayout: FC<
         noNav={noNav}
         palette={palette}
         isCardPage={isCardPage}
+        
       />
 
       {children}
@@ -98,7 +100,7 @@ const ComposedGlobalLayout: FC<
           })}
         />
       </Layout>
-    </Fragment>
+    </div>
   );
 };
 

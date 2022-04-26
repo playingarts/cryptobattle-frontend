@@ -2,13 +2,13 @@ import { FC, HTMLAttributes, useEffect, useState } from "react";
 import throttle from "just-throttle";
 import LogoIcon from "../Icons/Logo";
 import MenuIcon from "../Icons/Menu";
-import Nav from "../Nav";
-import Text from "../Text";
-import Button from "../Button";
-import Bag from "../Icons/Bag";
+// import Nav from "../Nav";
+// import Text from "../Text";
+// import Button from "../Button";
+// import Bag from "../Icons/Bag";
 import Link from "../Link";
-import { useDeck } from "../../hooks/deck";
-import MetamaskButton from "../MetamaskButton";
+// import { useDeck } from "../../hooks/deck";
+// import MetamaskButton from "../MetamaskButton";
 
 export interface Props extends HTMLAttributes<HTMLElement> {
   palette?: "gradient";
@@ -30,7 +30,7 @@ const Header: FC<Props> = ({
   isCardPage,
   ...props
 }) => {
-  const { deck } = useDeck({ variables: { slug: deckId } });
+  // const { deck } = useDeck({ variables: { slug: deckId } });
 
   const [expanded, setExpanded] = useState(true);
   const [hovered, setHovered] = useState(false);
@@ -112,43 +112,7 @@ const Header: FC<Props> = ({
             marginTop: "0.5em",
           }}
         >
-          <Text
-            variant="h5"
-            component={Link}
-            href="/"
-            css={(theme) => ({
-              position: "absolute",
-              transform: "translateY(-50%)",
-              transition: theme.transitions.normal("transform"),
-            })}
-            style={{
-              transform: `translateY(${
-                deck && (((isCardPage || showAltNav) && "-250%") || "-50%")
-              })`,
-            }}
-          >
-            Playing Arts
-          </Text>
-
-          {deck && (
-            <Text
-              variant="h5"
-              component={Link}
-              href={`/${deckId}`}
-              css={(theme) => ({
-                position: "absolute",
-                transform: "translateY(0)",
-                transition: theme.transitions.normal("transform"),
-              })}
-              style={{
-                transform: `translateY(${
-                  ((isCardPage || showAltNav) && "-50%") || "200%"
-                })`,
-              }}
-            >
-              {deck.title}
-            </Text>
-          )}
+          PLAYINGARTS
         </div>
 
         <div
@@ -188,7 +152,7 @@ const Header: FC<Props> = ({
           </div>
         )}
 
-        <MetamaskButton
+        {/* <MetamaskButton
           noLabel={true}
           backgroundColor={palette === "gradient" ? "dark_gray" : "white"}
           textColor={palette === "gradient" ? "white" : "dark_gray"}
@@ -210,10 +174,10 @@ const Header: FC<Props> = ({
               Shop
             </Button>
           )}
-        </div>
+        </div> */}
       </div>
 
-      {!noNav && (
+      {/* {!noNav && (
         <Nav
           css={(theme) => [
             {
@@ -229,8 +193,8 @@ const Header: FC<Props> = ({
               transform: `translate3d(0, ${theme.spacing(6)}px, 0)`,
             },
           ]}
-        />
-      )}
+        /> */}
+      {/* )} */}
     </header>
   );
 };

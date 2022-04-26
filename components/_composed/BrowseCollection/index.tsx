@@ -28,7 +28,7 @@ const BrowseCollection: FC<HTMLAttributes<HTMLElement>> = (props) => {
               borderRadius: theme.spacing(2),
               backgroundSize: "cover",
               backgroundPosition: "50% 50%",
-              backgroundColor: theme.colors.page_bg_light_gray,
+              backgroundColor: theme.colors.page_bg_dark,
               transition: theme.transitions.fast("background-color"),
               "&:hover": {
                 backgroundColor: theme.colors.white,

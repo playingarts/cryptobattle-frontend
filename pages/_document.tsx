@@ -45,12 +45,12 @@ export const Links = () => (
 );
 
 const Document = () => (
-  <Html lang="en">
+  <Html style={{height: '100%'}} lang="en">
     <Head>
       <Links />
     </Head>
 
-    <body>
+    <body style={{height: '100%'}}>
       <Main />
       <NextScript />
     </body>
