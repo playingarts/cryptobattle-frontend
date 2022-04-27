@@ -84,7 +84,7 @@ const MetaMaskLogin: FC = () => {
     );
   }
 
-  router.push('/dashboard')
+  // router.push('/dashboard')
 
   return <Button>Logged in</Button>;
 };

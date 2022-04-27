@@ -11,10 +11,10 @@ const AuthProvider = ({ children }: { children: any }) => {
   const { accessToken } = router.query;
  
   useEffect(() => {
+    const isLoggedInCookie = () => (localStorage.getItem("accessToken") !== null || localStorage.getItem("signature")) ? true : false
+    isLoggedInCookie() ?  router.push("/dashboard") : null
 
     authCheck(router.asPath);
-
-    // on route change start - hide page content by setting authorized to false
     const hideContent = () => setAuthorized(false);
     router.events.on("routeChangeStart", hideContent);
 
@@ -28,8 +28,10 @@ const AuthProvider = ({ children }: { children: any }) => {
       }
       if (accessToken) {
         localStorage.setItem("accessToken", accessToken as string);
-        router.push("/dashboard")
+        // router.push("/dashboard")
       }
+
+   
     }
 
     // unsubscribe from events in useEffect return function
@@ -42,15 +44,17 @@ const AuthProvider = ({ children }: { children: any }) => {
   }, [router.isReady]);
 
   function authCheck(url: string) {
-    const isLoggedInCookie = () => localStorage.getItem("accessToken") !== null || localStorage.getItem("signature")
+    const isLoggedInCookie = () => (localStorage.getItem("accessToken") !== null || localStorage.getItem("signature")) ? true : false
 
     // redirect to login page if accessing a private page and not logged in
     const publicPaths = ["/", "/401"];
     const path = url.split("?")[0];
     console.log(isLoggedInCookie(), "authCheck loaded");
+    console.log(path)
+    // setAuthorized(true);
 
+    // return 
     if (!isLoggedInCookie() && !publicPaths.includes(path)) {
-      console.log(isLoggedInCookie);
       setAuthorized(false);
       router.push({
         pathname: "/401",

@@ -75,10 +75,8 @@ const ComposedGlobalLayout: FC<
             width: "100%",
           },
         })}
-        deckId={deckId}
         altNav={altNav}
         showAltNav={showAltNav}
-        customShopButton={customShopButton}
         noNav={noNav}
         palette={palette}
         isCardPage={isCardPage}

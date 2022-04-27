@@ -12,11 +12,9 @@ import Link from "../Link";
 
 export interface Props extends HTMLAttributes<HTMLElement> {
   palette?: "gradient";
-  customShopButton?: JSX.Element;
   altNav?: JSX.Element;
   showAltNav?: boolean;
   noNav?: boolean;
-  deckId?: string;
   isCardPage?: boolean;
 }
 
