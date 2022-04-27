@@ -1,13 +1,10 @@
 import { useMetaMask } from "metamask-react";
 import { FC, useEffect, useState } from "react";
 import Button from "../Button";
-import MetamaskButton from "../MetamaskButton";
 import store from "store";
-import { useRouter } from "next/router";
 
 const MetaMaskLogin: FC = () => {
-  const { status, ethereum, account } = useMetaMask();
-  const router = useRouter()
+  const {  ethereum, account, connect } = useMetaMask();
   const [
     { account: signedAccount, expiry, signature, signing },
     setSignature,
@@ -34,34 +31,24 @@ const MetaMaskLogin: FC = () => {
     store.set("signature", { expiry, signature, account });
   }, [account, signature, expiry, signedAccount]);
 
-  if (!account || status !== "connected") {
-    return (
-      <MetamaskButton
-        textColor="white"
-        backgroundColor="orange"
-        css={(theme) => ({
-          background: "rgb(248, 157, 53)",
-          color: "#fff",
-          marginRight: theme.spacing(2),
-        })}
-        notConnected="Connect MetaMask"
-        unavailable="Install"
-      />
-    );
-  }
+
   if (account !== signedAccount) {
-    const requestSignature = () => {
+
+    const requestSignature = async () => {
       setSignature((prev) => ({ ...prev, signing: true }));
 
+      const address: string= (await ethereum.enable())[0];
+      connect()
+      console.log(account);
       ethereum
         .request({
           method: "personal_sign",
-          params: ["Play Crypto battle", account],
+          params: ["Play Crypto battle", address],
         })
         .then((signature: string) => {
           console.log(signature);
           setSignature({
-            account,
+            account: address,
             expiry: Date.now() + 1000 * 60 * 60,
             signature,
             signing: false,

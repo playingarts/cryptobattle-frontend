@@ -28,10 +28,7 @@ const AuthProvider = ({ children }: { children: any }) => {
       }
       if (accessToken) {
         localStorage.setItem("accessToken", accessToken as string);
-        // router.push("/dashboard")
       }
-
-   
     }
 
     // unsubscribe from events in useEffect return function
