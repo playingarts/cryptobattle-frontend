@@ -9,9 +9,7 @@ const ComposedGlobalLayout: FC<
     HeaderProps,
     | "altNav"
     | "showAltNav"
-    | "customShopButton"
     | "noNav"
-    | "deckId"
     | "palette"
     | "isCardPage"
   >
@@ -19,8 +17,6 @@ const ComposedGlobalLayout: FC<
   noNav,
   altNav,
   showAltNav,
-  customShopButton,
-  deckId,
   palette,
   children,
   isCardPage,
@@ -58,8 +54,7 @@ const ComposedGlobalLayout: FC<
   }, [query, replace, scrollIntoView, scrollIntoViewBehavior]);
 
   return (
-    <div         style={{ background: '#0a0a0a', minHeight: '100vh' }}
-    >
+    <div style={{ background: "#0a0a0a", minHeight: "100vh" }}>
       <Header
         css={(theme) => ({
           position: "fixed",
@@ -80,7 +75,6 @@ const ComposedGlobalLayout: FC<
         noNav={noNav}
         palette={palette}
         isCardPage={isCardPage}
-        
       />
 
       {children}
