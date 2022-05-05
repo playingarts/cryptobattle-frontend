@@ -54,7 +54,7 @@ const NewGame: NextPage = () => {
       const event = JSON.parse(data);
 
       if (event.event === "create-room") {
-        setRoomUrl(`https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/join/${event.data.roomId}`);
+        setRoomUrl(`https://cryptobattle-frontend-dzsb5.ondigitalocean.app/join/${event.data.roomId}`);
       }
 
       if (event.event === "room-changed") {
