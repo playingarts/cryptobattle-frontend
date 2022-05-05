@@ -7,6 +7,7 @@ import { CSSInterpolation } from "@emotion/serialize";
 import smoothscroll from "smoothscroll-polyfill";
 import { MetaMaskProvider } from "metamask-react";
 import { AuthProvider } from "../components/AuthProvider/";
+import { WSProvider } from "../components/WsProvider/index";
 
 declare module "@emotion/react" {
   export interface Theme {
@@ -210,9 +211,11 @@ const App = ({ Component, pageProps }: AppProps) => {
 
       <MetaMaskProvider>
         <AuthProvider>
-          <ThemeProvider theme={theme}>
-            <Component {...pageProps} />
-          </ThemeProvider>
+          <WSProvider url="playing-arts-game-backend-test-7pogl.ondigitalocean.app">
+            <ThemeProvider theme={theme}>
+              <Component {...pageProps} />
+            </ThemeProvider>
+          </WSProvider>
         </AuthProvider>
       </MetaMaskProvider>
     </Fragment>

@@ -1,10 +1,13 @@
 import { useMetaMask } from "metamask-react";
-import { FC, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import Button from "../Button";
 import store from "store";
+import { useRouter } from "next/router";
 
-const MetaMaskLogin: FC = () => {
-  const {  ethereum, account, connect } = useMetaMask();
+import { useAuth } from "../AuthProvider";
+
+const MetamaskLogin: any = () => {
+  const { ethereum, account, connect } = useMetaMask();
   const [
     { account: signedAccount, expiry, signature, signing },
     setSignature,
@@ -16,6 +19,9 @@ const MetaMaskLogin: FC = () => {
       signing?: boolean;
     }) || {}
   );
+  const router = useRouter();
+
+  const { loggedIn } = useAuth();
 
   useEffect(() => {
     if (!account) {
@@ -31,15 +37,14 @@ const MetaMaskLogin: FC = () => {
     store.set("signature", { expiry, signature, account });
   }, [account, signature, expiry, signedAccount]);
 
-
   if (account !== signedAccount) {
-
     const requestSignature = async () => {
       setSignature((prev) => ({ ...prev, signing: true }));
 
-      const address: string= (await ethereum.enable())[0];
-      connect()
+      const address: string = (await ethereum.enable())[0];
+      connect();
       console.log(account);
+
       ethereum
         .request({
           method: "personal_sign",
@@ -53,6 +58,8 @@ const MetaMaskLogin: FC = () => {
             signature,
             signing: false,
           });
+          localStorage.setItem("accessToken", "set from wallet");
+          router.push("/dashboard");
         })
         .catch(() => setSignature((prev) => ({ ...prev, signing: false })));
     };
@@ -66,14 +73,16 @@ const MetaMaskLogin: FC = () => {
         loading={signing}
         onClick={requestSignature}
       >
-        {signing ? "signing" : "sign with metamask"}
+        {signing
+          ? "signing"
+          : loggedIn
+          ? "connect metamask"
+          : "sign with metamask"}
       </Button>
     );
   }
 
-  // router.push('/dashboard')
-
-  return <Button>Logged in</Button>;
+  return "";
 };
 
-export default MetaMaskLogin;
+export default MetamaskLogin;

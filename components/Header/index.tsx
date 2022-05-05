@@ -2,13 +2,9 @@ import { FC, HTMLAttributes, useEffect, useState } from "react";
 import throttle from "just-throttle";
 import LogoIcon from "../Icons/Logo";
 import MenuIcon from "../Icons/Menu";
-// import Nav from "../Nav";
-// import Text from "../Text";
-// import Button from "../Button";
-// import Bag from "../Icons/Bag";
+import { useAuth } from "../AuthProvider";
+import Button from "../Button";
 import Link from "../Link";
-// import { useDeck } from "../../hooks/deck";
-// import MetamaskButton from "../MetamaskButton";
 
 export interface Props extends HTMLAttributes<HTMLElement> {
   palette?: "gradient";
@@ -32,6 +28,8 @@ const Header: FC<Props> = ({
   const [hovered, setHovered] = useState(false);
   const mouseEnter = () => setHovered(true);
   const mouseLeave = () => setHovered(false);
+
+  const { logout, loggedIn } = useAuth();
 
   useEffect(() => {
     if (noNav || hovered) {
@@ -160,6 +158,17 @@ const Header: FC<Props> = ({
           </div>
         )}
 
+        {loggedIn && (
+          <Button style={{marginRight: "10px"}} component={Link} href="/new">
+            New Game
+          </Button>
+        )}
+
+        {loggedIn && <Button onClick={logout}> Logout</Button>}
+
+        {/* {loggedIn && <div onClick={() => router.push('/new')}>New Game</div>}
+
+        {loggedIn && <div onClick={logout}>Logout</div>} */}
         {/* <MetamaskButton
           noLabel={true}
           backgroundColor={palette === "gradient" ? "dark_gray" : "white"}
@@ -185,24 +194,6 @@ const Header: FC<Props> = ({
         </div> */}
       </div>
 
-      {/* {!noNav && (
-        <Nav
-          css={(theme) => [
-            {
-              position: "absolute",
-              left: 0,
-              right: 0,
-              top: 0,
-              transition: theme.transitions.fast("transform"),
-              transform: `translate3d(0, 10px, 0)`,
-            },
-            expanded && {
-              paddingTop: theme.spacing(1),
-              transform: `translate3d(0, ${theme.spacing(6)}px, 0)`,
-            },
-          ]}
-        /> */}
-      {/* )} */}
     </header>
   );
 };

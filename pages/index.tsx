@@ -9,10 +9,12 @@ import Twitter from "../components/Icons/Twitter";
 import Line from "../components/Line";
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 import Arrowed from "../components/Arrowed";
-
+import { useAuth } from "../components/AuthProvider";
 import MetamaskLogin from "../components/MetamaskLogin/";
 
 const Home: NextPage = () => {
+  const { loggedIn } = useAuth();
+
   return (
     <ComposedGlobalLayout>
       <Layout
@@ -53,29 +55,36 @@ const Home: NextPage = () => {
             </Text>
 
             <Line spacing={2} />
-            <Text variant="body2">ready to play? log in with:</Text>
 
-            <div style={{ display: "flex", justifyContent: "start" }}>
-              <Button
-                component={Link}
-                href="https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter"
-                Icon={Twitter}
-                css={(theme) => ({
-                  background: "rgb(72, 155, 233)",
-                  marginRight: theme.spacing(1),
-                  color: "#fff",
-                })}
-              >
-                Twitter
+            {!loggedIn ? (
+              <div>
+                <Text variant="body2">ready to play? log in with: </Text>
+                <div style={{ display: "flex", justifyContent: "start" }}>
+                  <Button
+                    component={Link}
+                    href="https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter"
+                    Icon={Twitter}
+                    css={(theme) => ({
+                      background: "rgb(72, 155, 233)",
+                      marginRight: theme.spacing(1),
+                      color: "#fff",
+                    })}
+                  >
+                    Twitter
+                  </Button>
+
+                  <MetamaskLogin />
+                </div>
+              </div>
+            ) : (
+              <Button component={Link} href="/dashboard">
+                Go to dashboard
               </Button>
-
-              <MetamaskLogin />
-            </div>
+            )}
           </div>
           {/* <Hero css={{ gridColumn: "8 / span 5" }} /> */}
         </Grid>
       </Layout>
-
     </ComposedGlobalLayout>
   );
 };
