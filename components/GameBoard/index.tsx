@@ -4,6 +4,7 @@ import CardEmpty from "../../components/CardEmpty";
 
 interface Props extends HTMLAttributes<HTMLElement> {
   selectedCard?: string;
+  removeCard?: (cardId: string) => void
 }
 
 const Card3H = {
@@ -83,13 +84,13 @@ const Card6D = {
     "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-d-6mH3F99H.mp4",
 };
 
-const GameBoard: FC<Props> = ({ children, selectedCard }) => {
+const GameBoard: FC<Props> = ({ children, selectedCard, removeCard}) => {
   const [board, setBoard] = useState([
-    [null, null, null, null, null],
-    [null, null, "empty", null, null],
-    [null, "empty", "Card3H", "empty", null],
-    [null, null, "empty", null, null],
-    [null, null, null, null, null],
+    [null, null, null, null, null, null, null],
+    [null, null, null, "empty", null, null, null],
+    [null, null, "empty", "Card3H", "empty", null, null],
+    [null, null, null, "empty", null, null, null],
+    [null, null, null, null, null, null, null],
   ]);
 
   const addCard = useCallback(
@@ -131,6 +132,8 @@ const GameBoard: FC<Props> = ({ children, selectedCard }) => {
       }
 
       setBoard(localBoard);
+
+      removeCard ?  removeCard(selectedCard) : null
     },
     [selectedCard, board]
   ); // const addRow = (index) => board.rows.push(index)
