@@ -1,10 +1,8 @@
 import { FC, useEffect } from "react";
-import Layout from "../../../components/Layout";
-import Header, { Props as HeaderProps } from "../../../components/Header";
-import Footer from "../../../components/Footer";
+import Header, { Props as HeaderProps } from "../../components/Header";
 import { useRouter } from "next/router";
 
-const ComposedGlobalLayout: FC<
+const GameLayout: FC<
   Pick<
     HeaderProps,
     | "altNav"
@@ -79,21 +77,8 @@ const ComposedGlobalLayout: FC<
 
       {children}
 
-       <Layout css={(theme) => ({ marginTop: theme.spacing(1) })}>
-        <Footer
-          css={(theme) => ({
-            marginBottom: theme.spacing(1),
-            marginLeft: -theme.spacing(9.5),
-            marginRight: -theme.spacing(9.5),
-            paddingLeft: theme.spacing(9.5),
-            paddingRight: theme.spacing(9.5),
-            paddingTop: theme.spacing(6),
-            paddingBottom: theme.spacing(6),
-          })}
-        />
-      </Layout> 
     </div>
   );
 };
 
-export default ComposedGlobalLayout;
+export default GameLayout;

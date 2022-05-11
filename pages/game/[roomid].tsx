@@ -41,6 +41,7 @@ const JoinGame: NextPage = () => {
   useEffect(() => {
     WSProvider.onmessage = function ({ data }) {
       const event = JSON.parse(data);
+      console.log(event)
 
       if (event.event === "room-changed") {
         console.log(event.data.roomUsers, "room-changed");
@@ -51,17 +52,6 @@ const JoinGame: NextPage = () => {
         alert(event.data.error.message);
       } 
 
-      if (
-        event.data.error &&
-        event.data.error.subSpecificError === "JOINER_IS_HOST"
-      ) {
-        WSProvider.send(
-          JSON.stringify({
-            event: "close-room",
-            data: {},
-          })
-        );
-      }
     };
 
     if (!roomid) {

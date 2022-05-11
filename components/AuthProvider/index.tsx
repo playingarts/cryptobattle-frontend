@@ -97,7 +97,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     const isLoggedInCookie = () =>
       localStorage.getItem("accessToken") !== null ? true : false;
 
-    const publicPaths = ["/", "/401", "/join/login", "/join"];
+    const publicPaths = ["/", "/401", "/join/login", "/join", "/play"];
     const path = url.split("?")[0];
 
     setLoggedIn(isLoggedInCookie());

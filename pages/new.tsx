@@ -16,7 +16,6 @@ import Lobby from "../components/Lobby";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "../components/AuthProvider";
-import router from "next/router";
 
 const NewGame: NextPage = () => {
   const { user } = useAuth();
@@ -28,7 +27,7 @@ const NewGame: NextPage = () => {
         data: {}
       })
     );
-    router.push("/play");
+    // router.push("/play");
   };
 
   const [roomUrl, setRoomUrl] = useState("");
@@ -52,6 +51,8 @@ const NewGame: NextPage = () => {
   useEffect(() => {
     WSProvider.onmessage = function ({ data }) {
       const event = JSON.parse(data);
+
+      console.log(event)
 
       if (event.event === "create-room") {
         setRoomUrl(`https://cryptobattle-frontend-dzsb5.ondigitalocean.app/join/${event.data.roomId}`);

@@ -14,7 +14,6 @@ const Player: ElementType = ({ ...props }) => {
   const [playerInfo, setPlayerInfo] = useState({name: '',  profilePictureUrl: ''});
 
   const getUser = (playerId: string) => {
-    console.log('get user')
     return axios.get(
       `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/rest/user-info/${playerId}`,
       {
@@ -27,7 +26,6 @@ const Player: ElementType = ({ ...props }) => {
   };
 
   useEffect(() => {
-    console.log("happens", player);
     if (!playerInfo.name && player.userId) {
       getUser(player.userId).then(({ data }) => {
         setPlayerInfo(data);
