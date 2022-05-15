@@ -19,7 +19,7 @@ const GameLayout: FC<
   }, []);
 
   return (
-    <div style={{ background: "#0a0a0a", minHeight: "100vh" }}>
+    <div style={{ background: "#0a0a0a", minHeight: "100vh", cursor: "move"}}>
       <ScrollContainer
         className="scroll-container"
         style={{ width: "100vw", height: "100vh" }}

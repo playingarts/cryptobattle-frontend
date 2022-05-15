@@ -44,7 +44,7 @@ const CardSmall: FC<Props> = ({
         zIndex: 1,
         "&:hover": {
           transform: "translate(0, -10px)",
-          cursor: "pointer"
+          cursor: "grab"
         },
         transform: isSelected ? "translate(0, -10px)" : ''
       })}
