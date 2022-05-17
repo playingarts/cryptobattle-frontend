@@ -1,9 +1,13 @@
 import { NextPage } from "next";
 import Layout from "../components/Layout";
 import Text from "../components/Text";
-import {  useWS } from "../components/WsProvider/index";
-import { useAuth } from "../components/AuthProvider";
+import Button from "../components/Button";
+import Link from "../components/Link";
 
+import Twitter from "../components/Icons/Twitter";
+
+import { useWS } from "../components/WsProvider/index";
+import { useAuth } from "../components/AuthProvider";
 
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 
@@ -29,39 +33,55 @@ function truncateMiddle(word: string) {
 
 const Home: NextPage = () => {
   const { account } = useMetaMask();
-  const WSProvider = useWS()
-
+  const WSProvider = useWS();
 
   const { user } = useAuth();
-
 
   useEffect(() => {
     WSProvider.onmessage = function (event) {
       console.log(event.data);
-    }
-  })
+    };
+  });
 
   return (
     <ComposedGlobalLayout>
-        <Layout
-          css={(theme) => ({
-            background: theme.colors.dark_gray,
-            color: theme.colors.text_title_light,
-            overflow: "hidden",
-            paddingTop: theme.spacing(26),
-            paddingBottom: theme.spacing(6.5),
-            backgroundColor: "#0A0A0A",
-            backgroundSize: "cover",
-          })}
-        >
-          <div>
-            <Text component="h1" css={{ margin: "1px", fontSize: "80px" }}>
-              GM, {account ? truncateMiddle(account) : user.name}
-            </Text>
-            <br></br>
-            <MetamaskLogin />
-          </div>
-        </Layout>
+      <Layout
+        css={(theme) => ({
+          background: theme.colors.dark_gray,
+          color: theme.colors.text_title_light,
+          overflow: "hidden",
+          paddingTop: theme.spacing(26),
+          paddingBottom: theme.spacing(6.5),
+          backgroundColor: "#0A0A0A",
+          backgroundSize: "cover",
+        })}
+      >
+        <div>
+          <Text component="h1" css={{ margin: "1px", fontSize: "80px" }}>
+            GM, {account ? truncateMiddle(account) : user.name}
+          </Text>
+
+          <br></br>
+          <MetamaskLogin
+            isMetamaskConnected={
+              user.metamask && Object.keys(user.metamask).length > 0
+            }
+          ></MetamaskLogin>
+
+          <Button
+            component={Link}
+            href={`https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter?accesstoken=${localStorage.getItem("accessToken")}`}
+            Icon={Twitter}
+            css={(theme) => ({
+              background: "rgb(72, 155, 233)",
+              marginRight: theme.spacing(1),
+              color: "#fff",
+            })}
+          >
+            {(user.metamask && Object.keys(user.metamask).length > 0 || user.profilePictureUrl) ? 'Connect' : 'Connected'}
+          </Button>
+        </div>
+      </Layout>
     </ComposedGlobalLayout>
   );
 };

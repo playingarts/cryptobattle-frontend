@@ -1,12 +1,15 @@
 import { useMetaMask } from "metamask-react";
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../Button";
 import store from "store";
+import { useRouter } from "next/router";
+
+
 // import { useRouter } from "next/router";
 
 import { useAuth } from "../AuthProvider";
 
-const MetamaskLogin: any = () => {
+const MetamaskLogin: any = (isMetamaskConnected: boolean) => {
   const { ethereum, account, connect } = useMetaMask();
   const [
     { account: signedAccount, expiry, signature, signing },
@@ -19,9 +22,14 @@ const MetamaskLogin: any = () => {
       signing?: boolean;
     }) || {}
   );
-  // const router = useRouter();
+  const router = useRouter();
+
+  const { metamaskSignKey } = router.query;
 
   const { loggedIn } = useAuth();
+
+
+
 
   useEffect(() => {
     if (!account) {
@@ -37,16 +45,55 @@ const MetamaskLogin: any = () => {
     store.set("signature", { expiry, signature, account });
   }, [account, signature, expiry, signedAccount]);
 
+  useEffect(() => {
+    if (!metamaskSignKey || !ethereum) {
+      return;
+    }
+    // const address: string = (await ethereum.enable())[0];
+    // connect();
 
-  // get account Address
+    // window.location.href= "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=" + address
 
-  // redirect
+      console.log(ethereum)
+      ethereum
+        .request({
+          method: "personal_sign",
+          params: [metamaskSignKey, account],
+        })
+        .then((signature: string) => {
+          // how to check if me has no twitter.
+          let url = `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask/callback?walletAddress=${account}&signature=${signature}`
+          
+          if (loggedIn) {
+            url = url + `&?accesstoken=${localStorage.getItem("accessToken")}`
+          }
 
-  // get back ?metamaskSignKey
+          window.location.href = url;
+          
+          // router.push("/dashboard");
+        })
+        .catch(() => setSignature((prev) => ({ ...prev, signing: false })));
 
-  // get signature
+  }, [router.isReady, ethereum, metamaskSignKey, account]);
 
-  // go to dashboard
+
+  if (isMetamaskConnected) {
+
+    return (
+      <Button
+        css={() => ({
+          background: "rgb(248, 157, 53)",
+          color: "#fff",
+          pointerEvents: 'none',
+        })}
+      >
+        Connected
+      </Button>
+    );
+  }
+
+
+  
 
   if (account !== signedAccount) {
     const requestSignature = async () => {
@@ -55,9 +102,9 @@ const MetamaskLogin: any = () => {
       const address: string = (await ethereum.enable())[0];
       connect();
 
-
-      window.location.href= "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=" + address
-
+      window.location.href =
+        "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=" +
+        address;
 
       // ethereum
       //   .request({

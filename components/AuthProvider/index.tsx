@@ -14,6 +14,8 @@ interface User {
   userId: string;
   state: string;
   name: string;
+  metamask: object,
+  profilePictureUrl: string
 }
 
 export type IAuthProviderContext = {
@@ -44,7 +46,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
   const [authorized, setAuthorized] = useState(false);
 
-  const [user, setUser] = useState({ userId: "", state: "", name: "" });
+  const [user, setUser] = useState({ userId: "", state: "", name: "", metamask: {}, profilePictureUrl: "" });
 
   const { accesstoken } = router.query;
 
