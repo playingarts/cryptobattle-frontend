@@ -26,7 +26,7 @@ const MetamaskLogin: any = (isMetamaskConnected: boolean) => {
 
   const { metamaskSignKey } = router.query;
 
-  const { loggedIn } = useAuth();
+  const { loggedIn, user } = useAuth();
 
 
 
@@ -66,6 +66,10 @@ const MetamaskLogin: any = (isMetamaskConnected: boolean) => {
           
           if (loggedIn) {
             url = url + `&?accesstoken=${localStorage.getItem("accessToken")}`
+          }
+
+          if (user.metamask.address !== account) {
+            url = url + `&?&swap=1`
           }
 
           window.location.href = url;
