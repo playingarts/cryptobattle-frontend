@@ -10,11 +10,14 @@ import { useRouter } from "next/router";
 import axios from "axios";
 type AuthProviderProps = { children: ReactNode };
 
+type MetamaskUser = { address: string, signature: string };
+
+
 interface User {
   userId: string;
   state: string;
   name: string;
-  metamask: object,
+  metamask: MetamaskUser,
   profilePictureUrl: string
 }
 
