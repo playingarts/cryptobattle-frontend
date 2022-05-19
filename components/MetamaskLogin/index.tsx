@@ -28,7 +28,7 @@ const MetamaskLogin: any = (isMetamaskConnected: boolean) => {
 
   const { loggedIn, user } = useAuth();
 
-
+console.log(isMetamaskConnected)
 
 
   useEffect(() => {
@@ -81,20 +81,20 @@ const MetamaskLogin: any = (isMetamaskConnected: boolean) => {
   }, [router.isReady, ethereum, metamaskSignKey, account]);
 
 
-  if (isMetamaskConnected) {
+  // if (isMetamaskConnected) {
 
-    return (
-      <Button
-        css={() => ({
-          background: "rgb(248, 157, 53)",
-          color: "#fff",
-          pointerEvents: 'none',
-        })}
-      >
-        Connected
-      </Button>
-    );
-  }
+  //   return (
+  //     <Button
+  //       css={() => ({
+  //         background: "rgb(248, 157, 53)",
+  //         color: "#fff",
+  //         pointerEvents: 'none',
+  //       })}
+  //     >
+  //       Connected
+  //     </Button>
+  //   );
+  // }
 
 
   
