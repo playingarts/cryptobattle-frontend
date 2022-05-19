@@ -49,7 +49,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
   const [authorized, setAuthorized] = useState(false);
 
-  const [user, setUser] = useState({ userId: "", state: "", name: "", metamask: {}, profilePictureUrl: "" });
+  const [user, setUser] = useState({ userId: "", state: "", name: "", metamask: {address: "", signature: ""}, profilePictureUrl: "" });
 
   const { accesstoken } = router.query;
 
