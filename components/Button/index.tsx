@@ -5,6 +5,7 @@ import {
   forwardRef,
   ForwardRefRenderFunction,
   HTMLAttributes,
+  MouseEventHandler
 } from "react";
 import { Props as LinkProps } from "../Link";
 import Loader from "../Loader";
@@ -18,8 +19,9 @@ export interface Props extends Omit<LinkProps, "component" | "href"> {
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
   disabled?: ButtonHTMLAttributes<HTMLButtonElement>["disabled"];
   size?: "small" | "normal";
-  color?: "black";
+  color?: "black" | string | undefined;
   loading?: boolean;
+  onClick?:  MouseEventHandler<HTMLButtonElement | HTMLAnchorElement | HTMLDivElement> | undefined | (() => Promise<void>) 
 }
 
 const Button: ForwardRefRenderFunction<HTMLButtonElement, Props> = (

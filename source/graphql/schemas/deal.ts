@@ -3,6 +3,7 @@ import { Schema, model, models, Model, Types } from "mongoose";
 import { getDeck } from "./deck";
 import { getAssets } from "./opensea";
 import { recoverPersonalSignature } from "@metamask/eth-sig-util";
+import any from "redirect-https";
 
 export type MongoDeal = Omit<GQL.Deal, "deck"> & {
   deck?: string;
@@ -12,7 +13,7 @@ const schema = new Schema<GQL.Deal, Model<GQL.Deal>, GQL.Deal>({
   code: String,
   hash: { type: String, default: null },
   decks: Number,
-  deck: { type: Types.ObjectId, ref: "Deck", default: null },
+  deck: { type: any, ref: "Deck", default: null },
   claimed: { type: Boolean, default: false },
 });
 

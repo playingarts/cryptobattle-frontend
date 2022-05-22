@@ -3,15 +3,14 @@ import { useEffect, useState } from "react";
 import Button from "../Button";
 import store from "store";
 import { useRouter } from "next/router";
-import {HTMLAttributes, FC} from "react"
- 
+import { HTMLAttributes, FC } from "react";
+import Link from "../Link";
 import { useAuth } from "../AuthProvider";
 import Metamask from "../Icons/Metamask";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
 
-
-const MetamaskLogin: FC<Props> = (props) => {
+const MetamaskLogin: FC<Props> = ({ ...props }) => {
   const { ethereum, account, connect } = useMetaMask();
   const [
     { account: signedAccount, expiry, signature, signing },
@@ -29,8 +28,6 @@ const MetamaskLogin: FC<Props> = (props) => {
   const { metamaskSignKey } = router.query;
 
   const { loggedIn, user } = useAuth();
-
-
 
   useEffect(() => {
     if (!account) {
@@ -55,50 +52,46 @@ const MetamaskLogin: FC<Props> = (props) => {
 
     // window.location.href= "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=" + address
 
-      console.log(ethereum)
-      ethereum
-        .request({
-          method: "personal_sign",
-          params: [metamaskSignKey, account],
-        })
-        .then((signature: string) => {
-          // how to check if me has no twitter.
-          let url = `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask/callback?walletAddress=${account}&signature=${signature}`
-          
-          if (loggedIn) {
-            url = url + `&?accesstoken=${localStorage.getItem("accessToken")}`
-          }
+    console.log(ethereum);
+    ethereum
+      .request({
+        method: "personal_sign",
+        params: [metamaskSignKey, account],
+      })
+      .then((signature: string) => {
+        // how to check if me has no twitter.
+        let url = `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask/callback?walletAddress=${account}&signature=${signature}`;
 
-          if (user.metamask.address !== account) {
-            url = url + `&?&swap=1`
-          }
+        if (loggedIn) {
+          url = url + `&?accesstoken=${localStorage.getItem("accessToken")}`;
+        }
 
-          window.location.href = url;
-          
-          // router.push("/dashboard");
-        })
-        .catch(() => setSignature((prev) => ({ ...prev, signing: false })));
+        if (user.metamask.address !== account) {
+          url = url + `&?&swap=1`;
+        }
 
+        window.location.href = url;
+
+        // router.push("/dashboard");
+      })
+      .catch(() => setSignature((prev) => ({ ...prev, signing: false })));
   }, [router.isReady, ethereum, metamaskSignKey, account]);
 
-
-  // if (isMetamaskConnected) {
-
-  //   return (
-  //     <Button
-  //       css={() => ({
-  //         background: "rgb(248, 157, 53)",
-  //         color: "#fff",
-  //         pointerEvents: 'none',
-  //       })}
-  //     >
-  //       Connected
-  //     </Button>
-  //   );
-  // }
-
-
-  
+  if (user && user.metamask && Object.keys(user.metamask).length > 0) {
+    return (
+      <Button
+        {...props}
+        Icon={Metamask}
+        css={() => ({
+          background: "rgb(248, 157, 53)",
+          color: "#fff",
+          pointerEvents: "none",
+        })}
+      >
+        Connected
+      </Button>
+    );
+  }
 
   if (account !== signedAccount) {
     const requestSignature = async () => {
@@ -110,36 +103,20 @@ const MetamaskLogin: FC<Props> = (props) => {
       window.location.href =
         "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=" +
         address;
-
-      // ethereum
-      //   .request({
-      //     method: "personal_sign",
-      //     params: ["Play Crypto battle", address],
-      //   })
-      //   .then((signature: string) => {
-      //     console.log(signature);
-      //     setSignature({
-      //       account: address,
-      //       expiry: Date.now() + 1000 * 60 * 60,
-      //       signature,
-      //       signing: false,
-      //     });
-      //     localStorage.setItem("accessToken", "set from wallet");
-      //     router.push("/dashboard");
-      //   })
-      //   .catch(() => setSignature((prev) => ({ ...prev, signing: false })));
     };
 
     return (
       <Button
+        {...props}
         css={() => ({
           background: "rgb(248, 157, 53)",
           color: "#fff",
         })}
+        component={Link}
+        color="black"
         Icon={Metamask}
         loading={signing}
         onClick={requestSignature}
-        {...props}
       >
         {signing
           ? "signing"

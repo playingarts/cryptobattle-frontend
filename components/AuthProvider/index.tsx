@@ -54,6 +54,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     userId: "",
     state: "",
     name: "",
+    username: "",
     metamask: { address: "", signature: "" },
     profilePictureUrl: "",
   });
@@ -128,6 +129,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       setAuthorized(true);
     }
   }
+
   const logout = () => {
     axios
       .get(
@@ -155,7 +157,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       loggedIn,
       logout,
     }),
-    [authorized, loggedIn, user]
+    [authorized, loggedIn, user, logout]
   );
 
   if (!authorized) {

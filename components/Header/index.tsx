@@ -1,4 +1,4 @@
-import { FC, HTMLAttributes, useEffect, useState } from "react";
+import { FC, HTMLAttributes} from "react";
 import LogoIcon from "../Icons/Logo";
 
 import { useAuth } from "../AuthProvider";
@@ -17,8 +17,6 @@ export interface Props extends HTMLAttributes<HTMLElement> {
 
 const Header: FC<Props> = ({
   palette,
-  altNav,
-  showAltNav,
 
   ...props
 }) => {
@@ -53,22 +51,7 @@ const Header: FC<Props> = ({
               },
         ]}
       >
-        {/* <     <button
-          css={(theme) => ({
-            background: "none",
-            border: 0,
-            width: theme.spacing(7),
-            height: theme.spacing(7),
-            marginRight: theme.spacing(2.5),
-            padding: 0,
-            color:
-              palette !== "gradient"
-                ? theme.colors.text_subtitle_light
-                : theme.colors.dark_gray,
-          })}
-        >
-          <MenuIcon />
-        </button>> */}
+
 
         <div
           css={{
@@ -87,7 +70,7 @@ const Header: FC<Props> = ({
             textAlign: "center",
             position: "absolute",
             left: "50%",
-            top: (showAltNav && !expanded && "-50%") || "50%",
+            top: "50%",
             transform: "translate(-50%, -50%)",
           })}
         >

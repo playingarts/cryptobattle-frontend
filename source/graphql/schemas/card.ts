@@ -16,8 +16,8 @@ const schema = new Schema<MongoCard, Model<MongoCard>, MongoCard>({
   background: { type: String, default: null },
   suit: String,
   opensea: String,
-  artist: { type: Types.ObjectId, ref: "Artist" },
-  deck: { type: Types.ObjectId, ref: "Deck" },
+  artist: { type: String, ref: "Artist" },
+  deck: { type: String, ref: "Deck" },
 });
 
 export const Card = (models.Card as Model<MongoCard>) || model("Card", schema);

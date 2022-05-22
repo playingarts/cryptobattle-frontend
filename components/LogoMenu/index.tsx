@@ -21,10 +21,11 @@ interface MenuItem extends Props {
   text: string;
 }
 
-const MenuItem: FC<MenuItem> = ({ to, text }) => {
+const MenuItem: FC<MenuItem> = ({ to, text, ...props}) => {
   return (
     <Link href={to} passHref>
       <li
+         {...props}
         css={{
           color: "rgba(0, 0, 0)",
           cursor: "pointer",
@@ -42,32 +43,32 @@ const MenuItem: FC<MenuItem> = ({ to, text }) => {
   );
 };
 
-import { styled, keyframes } from "@stitches/react";
+import { styled } from "@stitches/react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import Playingarts from "../Icons/Playingarts";
 
-const slideUpAndFade = keyframes({
-  "0%": { opacity: 0, transform: "translateY(2px)" },
-  "100%": { opacity: 1, transform: "translateY(0)" },
-});
+// const slideUpAndFade = keyframes({
+//   "0%": { opacity: 0, transform: "translateY(2px)" },
+//   "100%": { opacity: 1, transform: "translateY(0)" },
+// });
 
-const slideRightAndFade = keyframes({
-  "0%": { opacity: 0, transform: "translateX(-2px)" },
-  "100%": { opacity: 1, transform: "translateX(0)" },
-});
+// const slideRightAndFade = keyframes({
+//   "0%": { opacity: 0, transform: "translateX(-2px)" },
+//   "100%": { opacity: 1, transform: "translateX(0)" },
+// });
 
-const slideDownAndFade = keyframes({
-  "0%": { opacity: 0, transform: "translateY(-2px)" },
-  "100%": { opacity: 1, transform: "translateY(0)" },
-});
+// const slideDownAndFade = keyframes({
+//   "0%": { opacity: 0, transform: "translateY(-2px)" },
+//   "100%": { opacity: 1, transform: "translateY(0)" },
+// });
 
-const slideLeftAndFade = keyframes({
-  "0%": { opacity: 0, transform: "translateX(2px)" },
-  "100%": { opacity: 1, transform: "translateX(0)" },
-});
+// const slideLeftAndFade = keyframes({
+//   "0%": { opacity: 0, transform: "translateX(2px)" },
+//   "100%": { opacity: 1, transform: "translateX(0)" },
+// });
 const StyledContent = styled(PopoverPrimitive.Content, {
   borderRadius: 20,
-  padding: "20px 10px",
+  padding: "11px 5px",
   width: 380,
   backgroundColor: "white",
   marginTop: -70,
@@ -138,7 +139,7 @@ export default function LogoMenu() {
             </div>
           </PopoverTrigger>
           <PopoverContent>
-            <Flex css={{ flexDirection: "column", gap: 10 }}>
+            <Flex css={{ flexDirection: "column" }}>
               <PopoverClose
                 css={{
                   background: "none",
@@ -157,8 +158,8 @@ export default function LogoMenu() {
                     margin: 0,
                     padding: 8,
                     position: "absolute",
-                    top: 16,
-                    left: 28,
+                    top: -52,
+                    left: 43,
                     cursor: "pointer",
                     transition: "all 600ms",
                     "&:hover": {
@@ -171,16 +172,43 @@ export default function LogoMenu() {
               </PopoverClose>
               <div css={{ padding: "0 60px 0 95px" }}>
                 <Playingarts />
-                <ul css={{ fontSize: 22, padding: 0 }}>
+                <ul css={{ fontSize: 22, padding: 0, marginTop: 40 }}>
                   <MenuItem to="/dashboard" text="Dashboard" />
                   <div onClick={closeModal}>
                     <GameRules>
-                      <div> Game rules</div>
+                      <div
+                        css={{
+                          color: "rgba(0, 0, 0)",
+                          cursor: "pointer",
+                          paddingBottom: 20,
+                          transition: "all 300ms",
+                          listStyle: "none",
+                          "&:hover": {
+                            opacity: "0.6",
+                          },
+                        }}
+                      >
+                        Game Rules
+                      </div>
                     </GameRules>
                   </div>
                   <Leaderboard>
-                      <div> Game rules</div>
-                    </Leaderboard>                  <div css={{ paddingBottom: 20 }}>
+                    <div
+                      css={{
+                        color: "rgba(0, 0, 0)",
+                        cursor: "pointer",
+                        paddingBottom: 20,
+                        transition: "all 300ms",
+                        listStyle: "none",
+                        "&:hover": {
+                          opacity: "0.6",
+                        },
+                      }}
+                    >
+                      Leaderboard
+                    </div>
+                  </Leaderboard>
+                  <div css={{ paddingBottom: 20 }}>
                     <Line spacing={2}></Line>
                   </div>
                   <MenuItem

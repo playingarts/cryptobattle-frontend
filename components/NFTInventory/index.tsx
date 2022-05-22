@@ -25,12 +25,10 @@ const getUserNftCards = () => {
 
 export type Props = HTMLAttributes<HTMLDivElement>;
 
-interface NFTInventory extends Props {
-  title: string;
-}
 
 
-const NFTInventory: FC<NFTInventory> = ({ ...props }) => {
+
+const NFTInventory: FC<Props> = ({ ...props }) => {
   const { user } = useAuth();
 
   const [NFTCards, setNFTCards] = useState([

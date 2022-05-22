@@ -15,7 +15,6 @@ const schema = new Schema<GQL.Product, Model<GQL.Product>, GQL.Product>({
   image2: String,
   info: String,
   short: String,
-  deck: { type: Types.ObjectId, ref: "Deck" },
 });
 
 export const Product =

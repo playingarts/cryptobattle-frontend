@@ -12,6 +12,8 @@ import StatBlock from "../../components/StatBlock";
 import Card from "../CardNew";
 // import Button from "../Button";
 import CardEmpty from "../../components/CardEmpty";
+import CardStats from "../../components/CardStats";
+
 import MostPlayedCards from "../../components/NFTInventory/MostPlayedCards";
 
 const getUserNftCards = () => {
@@ -67,7 +69,7 @@ const NFTChoose: FC<Props> = () => {
     setLoading(true);
     getUserNftCards().then(({ data }) => {
       setLoading(false);
-      setNFTCards(data.cards);
+      // setNFTCards(data.cards);
     });
     console.log(loading)
   }, []);
@@ -220,13 +222,13 @@ const NFTChoose: FC<Props> = () => {
           ) : (
             <Card
               key={firstCard.id}
-              css={{ marginRight: "20px", column: "span 3" }}
+              css={{ marginRight: "20px", column: "span 3", cursor: 'pointer' }}
               animated={false}
               noInfo={true}
               card={{ img: firstCard.imageUrl }}
             ></Card>
           )}
-          <div style={{ width: 150 }}>sadsa</div>
+          <CardStats color="light" xp={firstCard && firstCard.xp} power={firstCard && firstCard.power} scoring={firstCard && firstCard.scoring} />
         </div>
         <div onClick={setSecondCardActive} css={{ display: "flex" }}>
           {!secondCard ? (
@@ -234,13 +236,13 @@ const NFTChoose: FC<Props> = () => {
           ) : (
             <Card
               key={secondCard.id}
-              css={{ marginRight: "20px", column: "span 3" }}
+              css={{ marginRight: "20px", column: "span 3", cursor: 'pointer' }}
               animated={false}
               noInfo={true}
               card={{ img: secondCard.imageUrl }}
             ></Card>
           )}
-          <div style={{ width: 150 }}>sadsa</div>
+          <CardStats color="light" xp={secondCard && secondCard.xp} power={secondCard && secondCard.power} scoring={secondCard && secondCard.scoring} />
         </div>
       </div>
     );
@@ -306,6 +308,9 @@ const NFTChoose: FC<Props> = () => {
                             marginRight: "20px",
                             column: "span 3",
                             maxWidth: "180px",
+                            cursor: 'pointer',
+                            background: '#fff',
+                            height: '224px'
                           }}
                           animated={false}
                           noInfo={true}

@@ -94,6 +94,7 @@ const Card: FC<Props> = ({
         ref={wrapper}
       >
         <div
+        {...props}
           css={(theme) => [
             {
               transition: theme.transitions.fast(["transform", "box-shadow"]),

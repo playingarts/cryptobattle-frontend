@@ -18,7 +18,7 @@ import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 
 // import MetamaskLogin from "../components/MetamaskLogin/";
 
-import { useMetaMask } from "metamask-react";
+// import { useMetaMask } from "metamask-react";
 import { useEffect } from "react";
 
 function truncateMiddle(word: string) {
@@ -40,7 +40,7 @@ function truncateMiddle(word: string) {
 }
 
 const Home: NextPage = () => {
-  const { account } = useMetaMask();
+  // const { account } = useMetaMask();
   const WSProvider = useWS();
 
   const { user } = useAuth();

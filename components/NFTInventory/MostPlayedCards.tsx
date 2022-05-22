@@ -1,32 +1,36 @@
-import { FC, HTMLAttributes } from "react";
+import { FC, HTMLAttributes} from "react";
 
 import Card from "../../components/CardNew";
+import CardStats from "../CardStats";
 
 // type Props = HTMLAttributes<HTMLElement>;
 interface CardType {
-    id: string;
-    name: string;
-    onSale: boolean;
-    power: number;
-    scoring: number;
-    xp: number;
-    suit: string;
-    value: string;
-    imageUrl: string;
-  }
+  id: string;
+  name: string;
+  onSale: boolean;
+  power: number;
+  scoring: number;
+  xp: number;
+  suit: string;
+  value: string;
+  imageUrl: string;
+}
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   topCards: Array<CardType>;
-  addCard?: ((card: CardType) => void) | undefined 
+  addCard?: any
 }
 
 
+
 const MostPlayedCards: FC<Props> = ({ topCards, addCard, ...props }) => {
+
+  const handleClick = (card: CardType) => addCard && addCard(card)
   return (
     <div css={{ display: "flex", justifyContent: "start" }} {...props}>
       {topCards.map((card) => (
-        <div    
-        onClick={() => addCard && addCard(card)}
+        <div
+          onClick={handleClick(card)}
           style={{ width: "50%", display: "flex", alignItems: "center" }}
           key={card.id}
         >
@@ -37,18 +41,8 @@ const MostPlayedCards: FC<Props> = ({ topCards, addCard, ...props }) => {
             card={{ img: card.imageUrl }}
           ></Card>
 
-          <div>
-            <div>XP</div>
-            <div>{card.xp}</div>
-          </div>
-          <div>
-            <div>Power</div>
-            <div>{card.power}</div>
-          </div>
-          <div>
-            <div>Scoring</div>
-            <div>{card.scoring}</div>
-          </div>
+          <CardStats xp={card.xp} power={card.power} scoring={card.scoring} />
+
         </div>
       ))}
     </div>

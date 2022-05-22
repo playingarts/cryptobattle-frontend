@@ -84,21 +84,21 @@ const Card6D = {
     "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-d-6mH3F99H.mp4",
 };
 
-const cards = {
-  Card4C: {
-    img:
-      "https://s3.amazonaws.com/img.playingarts.com/crypto/game/4-c-977Jh2ML.jpg",
-    video:
-      "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/4-c-977Jh2ML.mp4",
-  },
+// const cards = {
+//   Card4C: {
+//     img:
+//       "https://s3.amazonaws.com/img.playingarts.com/crypto/game/4-c-977Jh2ML.jpg",
+//     video:
+//       "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/4-c-977Jh2ML.mp4",
+//   },
 
-  Card6D: {
-    img:
-      "https://s3.amazonaws.com/img.playingarts.com/crypto/game/6-d-6mH3F99H.jpg",
-    video:
-      "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-d-6mH3F99H.mp4",
-  },
-};
+//   Card6D: {
+//     img:
+//       "https://s3.amazonaws.com/img.playingarts.com/crypto/game/6-d-6mH3F99H.jpg",
+//     video:
+//       "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-d-6mH3F99H.mp4",
+//   },
+// };
 
 
 // const generateBoard(columns, width)
