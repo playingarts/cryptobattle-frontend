@@ -255,7 +255,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
       </div>
       <Line spacing={2}></Line>
 
-      <MostPlayedCards topCards={topCards} />
+      <MostPlayedCards color={'light'} topCards={topCards} />
 
       <div css={{ display: "flex", justifyContent: "start" }}>
         {loading && <div css={{ minHeight: 300 }}></div>}

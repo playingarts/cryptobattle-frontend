@@ -18,12 +18,13 @@ interface CardType {
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   topCards: Array<CardType>;
-  addCard?: any
+  addCard?: any,
+  color: "light" | "dark"
 }
 
 
 
-const MostPlayedCards: FC<Props> = ({ topCards, addCard, ...props }) => {
+const MostPlayedCards: FC<Props> = ({color, topCards, addCard, ...props }) => {
 
   const handleClick = (card: CardType) => addCard && addCard(card)
   return (
@@ -41,7 +42,7 @@ const MostPlayedCards: FC<Props> = ({ topCards, addCard, ...props }) => {
             card={{ img: card.imageUrl }}
           ></Card>
 
-          <CardStats xp={card.xp} power={card.power} scoring={card.scoring} />
+          <CardStats color={color} xp={card.xp} power={card.power} scoring={card.scoring} />
 
         </div>
       ))}
