@@ -10,12 +10,14 @@ import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 
 import Arrowed from "../components/Arrowed";
 import Button from "../components/Button";
-import Link from "../components/Link";
 import Line from "../components/Line";
 import Lobby from "../components/Lobby";
+import GameRules from "../components/GameRules";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "../components/AuthProvider";
+// import NFTInventory from "../components/NFTInventory";
+import NFTChoose from "../components/NFTChoose";
 
 const NewGame: NextPage = () => {
   const { user } = useAuth();
@@ -103,26 +105,20 @@ const NewGame: NextPage = () => {
         })}
       >
         <div>
-          <Text component="h1" css={{ margin: "1px", fontSize: "80px" }}>
+          <Text component="h1" css={{ margin: "1px", fontSize: "45px" }}>
             New Game
           </Text>
-          <Text variant="body2" css={{ margin: "1px" }}>
+          <Text variant="body2" css={{ margin: "20px 0", color: "#fff"}}>
             Share your unique link with friends, wait for them to connect and
             click “Start The Game”. Choose the NFTs you want to level up
             (optional).
           </Text>
-          <Text
-            component={Link}
-            variant="label"
-            href="/"
-            css={(theme) => ({
-              opacity: 0.7,
-              marginTop: theme.spacing(6),
-              paddingTop: theme.spacing(6),
-            })}
-          >
-            <Arrowed>Game Rules</Arrowed>
-          </Text>
+         
+          <GameRules>
+      <Text variant="label" css={{ opacity: 0.5 }}>
+        <Arrowed>Game Rules</Arrowed>
+      </Text>
+      </GameRules>
           <StatBlock
             css={(theme) => ({
               background: `#181818`,
@@ -147,17 +143,7 @@ const NewGame: NextPage = () => {
               })}
             />
           </StatBlock>
-          <StatBlock
-            //   {...props}
-            css={(theme) => ({
-              background: `#181818`,
-              backgroundSize: "85%",
-              color: theme.colors.text_title_light,
-              position: "relative",
-              margin: "20px 0",
-            })}
-            title="choose up to 2 nfts (optional)"
-          ></StatBlock>
+          <NFTChoose />
           <Lobby players={players} />
           <Line />{" "}
           <div style={{ display: "flex", justifyItems: "center" }}>

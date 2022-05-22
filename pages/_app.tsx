@@ -8,7 +8,7 @@ import smoothscroll from "smoothscroll-polyfill";
 import { MetaMaskProvider } from "metamask-react";
 import { AuthProvider } from "../components/AuthProvider/";
 import { WSProvider } from "../components/WsProvider/index";
-
+import "../css/style.css";
 declare module "@emotion/react" {
   export interface Theme {
     transitions: {

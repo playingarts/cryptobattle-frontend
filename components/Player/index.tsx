@@ -2,6 +2,7 @@ import { ElementType, useEffect, useState } from "react";
 import axios from "axios";
 
 import Text from "../Text";
+import UserAvatar from "../../components/UserAvatar";
 
 interface Player {
   userId: string;
@@ -11,7 +12,12 @@ interface Player {
 const Player: ElementType = ({ ...props }) => {
   const { player } = props;
 
-  const [playerInfo, setPlayerInfo] = useState({name: '',  profilePictureUrl: ''});
+  const [playerInfo, setPlayerInfo] = useState({
+    name: "",
+    profilePictureUrl: "",
+  });
+
+  const [hovered, setHover] = useState(false);
 
   const getUser = (playerId: string) => {
     return axios.get(
@@ -35,19 +41,24 @@ const Player: ElementType = ({ ...props }) => {
 
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
-      <div
+      {/* <div
         style={{
           borderRadius: "200px",
           width: "70px",
           height: "70px",
-          border: "solid 5px #7B61FF",
           background: "black",
           backgroundSize: "cover",
           backgroundImage: "url(" + playerInfo.profilePictureUrl + ")",
         }}
-      ></div>
+      ></div> */}
+
+      <UserAvatar
+        profilePictureUrl={playerInfo.profilePictureUrl}
+        css={{ border: "solid 5px #7B61FF" }}
+      />
+
       <div
-        style={{
+        css={{
           borderRadius: "200px",
           width: "40px",
           height: "40px",
@@ -56,9 +67,13 @@ const Player: ElementType = ({ ...props }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          // onMouseEnter={() => setHover(true)},
+          // onMouseLeave={() => setHover(false)}
         }}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
       >
-        {player.state === "ready" ? (
+        {player.state === "ready"  && !hovered &&  (
           <svg
             width="16"
             height="12"
@@ -71,7 +86,11 @@ const Player: ElementType = ({ ...props }) => {
               fill="white"
             />
           </svg>
-        ) : (
+        )}
+
+        {hovered && <div>x</div>}
+
+        {player.state === "waiting" && (
           <div>
             <svg
               width="24"
@@ -88,7 +107,7 @@ const Player: ElementType = ({ ...props }) => {
           </div>
         )}
       </div>
-      <div style={{marginLeft: "10px"}}>
+      <div style={{ marginLeft: "10px" }}>
         <Text component="div" variant="label">
           {playerInfo.name}
         </Text>

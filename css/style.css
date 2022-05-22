@@ -1,0 +1,74 @@
+body {
+  padding: 0 !important;
+}
+
+.hamburger {
+  cursor: pointer;
+  display: block;
+  min-width: 40px;
+}
+.line {
+  display: block;
+  width: 28px;
+  height: 2px;
+  background-color: white;
+  opacity: 40%;
+  margin: 7px 0;
+  transition: 0.3s all;
+}
+.line-2 {
+  width: 18px;
+}
+.line-3 {
+  width: 26px;
+}
+.hamburger:hover .line:nth-child(2) {
+  width: 30px;
+  transition: 0.3s all;
+}
+.hamburger:hover .line:nth-child(3) {
+  width: 30px;
+  transition: 0.3s all;
+}
+
+.hamburger:active .line:nth-child(1) {
+  width: 23px;
+  transition: 0.3s all;
+}
+.hamburger:active .line:nth-child(3) {
+  width: 20px;
+  transition: 0.6s all;
+}
+
+.hamburger:active .line:nth-child(2) {
+  width: 10px;
+  transition: 0.3s all;
+}
+
+.progress {
+  background-color: #282828;
+  border-radius: 20px;
+  position: relative;
+  margin: 15px 0;
+  height: 10px;
+  width: 100%;
+}
+
+.progress-done {
+  background: linear-gradient(90.19deg, #8482f8 14%, #a6fbf6 86.07%);
+  box-shadow: 0 3px 3px -5px #f2709c, 0 2px 5px #f2709c;
+  border-radius: 10px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 0;
+  opacity: 0;
+  transition: 1s ease 0.3s;
+}
+
+
+[data-radix-portal] {
+  z-index: 4000!important;
+}

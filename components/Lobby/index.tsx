@@ -36,7 +36,7 @@ const Lobby: ElementType = ({ ...props }) => {
           <Player player={player} key={player.userId} />
         ))}
 
-        {Array(10 - players.length)
+        {Array(4 - players.length)
           .fill(0)
           .map((_, i) => (
             <PlayerEmpty key={i} />

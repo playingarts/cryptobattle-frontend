@@ -3,7 +3,6 @@ import Layout from "../../components/Layout";
 import Text from "../../components/Text";
 import { useWS } from "../../components/WsProvider/index";
 import { useRouter } from "next/router";
-import StatBlock from "../../components/StatBlock";
 
 import ComposedGlobalLayout from "../../components/_composed/GlobalLayout";
 
@@ -15,6 +14,7 @@ import { useEffect, useState } from "react";
 
 import Line from "../../components/Line";
 import Lobby from "../../components/Lobby";
+import NFTChoose from "../../components/NFTChoose";
 
 const JoinGame: NextPage = () => {
   const WSProvider = useWS();
@@ -41,17 +41,37 @@ const JoinGame: NextPage = () => {
   useEffect(() => {
     WSProvider.onmessage = function ({ data }) {
       const event = JSON.parse(data);
-      console.log(event)
+      console.log(event);
 
       if (event.event === "room-changed") {
         console.log(event.data.roomUsers, "room-changed");
         setPlayers(event.data.roomUsers);
       }
-      
-      if (event.data.error && event.data.error.message) {
-        alert(event.data.error.message);
-      } 
 
+      if (event.data.error && event.data.error.message) {
+        if (
+          event.data.error.message ===
+          "Joining while hosting a game is forbidden"
+        ) {
+          // WSProvider.send(
+          //   JSON.stringify({
+          //     event: "quit-room",
+          //     data: {},
+          //   })
+          // );
+
+          WSProvider.send(
+            JSON.stringify({
+              event: "close-room",
+              data: {},
+            })
+          );
+          return;
+        }
+
+        console.log(event.data.error);
+        alert(event.data.error.message);
+      }
     };
 
     if (!roomid) {
@@ -103,17 +123,7 @@ const JoinGame: NextPage = () => {
             <Arrowed>Game Rules</Arrowed>
           </Text>
 
-          <StatBlock
-            //   {...props}
-            css={(theme) => ({
-              background: `#181818`,
-              backgroundSize: "85%",
-              color: theme.colors.text_title_light,
-              position: "relative",
-              margin: "20px 0",
-            })}
-            title="choose up to 2 nfts (optional)"
-          ></StatBlock>
+          <NFTChoose />
 
           <Lobby players={players} />
 

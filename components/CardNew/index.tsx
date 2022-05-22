@@ -7,7 +7,7 @@ import Loader from "../Loader";
 
 interface  Card {
   img: string,
-  video: string,
+  video?: string,
   background?: string,
   info?: string
 }

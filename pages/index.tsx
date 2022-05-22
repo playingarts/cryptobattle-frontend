@@ -4,6 +4,8 @@ import Grid from "../components/Grid";
 import Text from "../components/Text";
 import Link from "../components/Link";
 import Button from "../components/Button";
+import PromoSection from "../components/PromoSection";
+
 import Twitter from "../components/Icons/Twitter";
 
 import Line from "../components/Line";
@@ -82,8 +84,11 @@ const Home: NextPage = () => {
               </Button>
             )}
           </div>
+
           {/* <Hero css={{ gridColumn: "8 / span 5" }} /> */}
         </Grid>
+        <PromoSection />
+
       </Layout>
     </ComposedGlobalLayout>
   );

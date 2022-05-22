@@ -4,7 +4,7 @@ import CardEmpty from "../../components/CardEmpty";
 
 interface Props extends HTMLAttributes<HTMLElement> {
   selectedCard?: string;
-  removeCard?: (cardId: string) => void
+  removeCard?: (cardId: string) => void;
 }
 
 const Card3H = {
@@ -84,7 +84,26 @@ const Card6D = {
     "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-d-6mH3F99H.mp4",
 };
 
-const GameBoard: FC<Props> = ({ children, selectedCard, removeCard}) => {
+const cards = {
+  Card4C: {
+    img:
+      "https://s3.amazonaws.com/img.playingarts.com/crypto/game/4-c-977Jh2ML.jpg",
+    video:
+      "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/4-c-977Jh2ML.mp4",
+  },
+
+  Card6D: {
+    img:
+      "https://s3.amazonaws.com/img.playingarts.com/crypto/game/6-d-6mH3F99H.jpg",
+    video:
+      "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-d-6mH3F99H.mp4",
+  },
+};
+
+
+// const generateBoard(columns, width)
+
+const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
   const [board, setBoard] = useState([
     [null, null, null, null, null, null, null],
     [null, null, null, "empty", null, null, null],
@@ -133,7 +152,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard}) => {
 
       setBoard(localBoard);
 
-      removeCard ?  removeCard(selectedCard) : null
+      removeCard ? removeCard(selectedCard) : null;
     },
     [selectedCard, board]
   ); // const addRow = (index) => board.rows.push(index)
@@ -192,7 +211,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard}) => {
                     {column === "Card10S" && (
                       <Card animated={true} noInfo={true} card={Card10S}></Card>
                     )}
-      
+
                     {column === "CardJD" && (
                       <Card animated={true} noInfo={true} card={CardJD}></Card>
                     )}
@@ -214,10 +233,8 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard}) => {
                       <Card animated={true} noInfo={true} card={Card6D}></Card>
                     )}
                   </div>
-
                 );
               })}
-
             </div>
           );
         })}

@@ -1,0 +1,42 @@
+.hamburger {
+    cursor: pointer;
+    display: block;
+    min-width: 40px;
+  }
+  .line {
+    display: block;
+    width: 28px;
+    height: 2px;
+    background-color: white;
+    opacity: 40%;
+    margin: 7px 0;
+    transition: 0.3s all;
+  }
+  .line-2 {
+    width: 18px;
+  }
+  .line-3 {
+    width: 26px;
+  }
+  .hamburger:hover .line:nth-child(2) {
+    width: 30px;
+    transition: 0.3s all;
+  }
+  .hamburger:hover .line:nth-child(3) {
+    width: 30px;
+    transition: 0.3s all;
+  }
+  
+  .hamburger:active .line:nth-child(1) {
+    width: 23px;
+    transition: 0.3s all;
+  }
+  .hamburger:active .line:nth-child(3) {
+    width: 20px;
+    transition: 0.6s all;
+  }
+  
+  .hamburger:active .line:nth-child(2) {
+    width: 10px;
+    transition: 0.3s all;
+  }

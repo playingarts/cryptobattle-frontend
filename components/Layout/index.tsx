@@ -2,7 +2,7 @@ import {
   forwardRef,
   ForwardRefRenderFunction,
   HTMLAttributes,
-  useEffect,
+  // useEffect,
 } from "react";
 
 export interface Props extends HTMLAttributes<HTMLElement> {
@@ -13,14 +13,14 @@ const Layout: ForwardRefRenderFunction<HTMLElement, Props> = (
   {  children, ...props },
   ref
 ) => {
-  useEffect(() => {
+  // useEffect(() => {
 
-    setTimeout(() => {
-      window.scrollTo(0, document.body.scrollHeight/2 );
+  //   setTimeout(() => {
+  //     window.scrollTo(0, document.body.scrollHeight/2 );
   
-    }, 500);
+  //   }, 500);
 
-  }, []);
+  // }, []);
 
 
   return (

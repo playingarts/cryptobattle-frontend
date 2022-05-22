@@ -3,20 +3,28 @@ import Layout from "../components/Layout";
 import Text from "../components/Text";
 import Button from "../components/Button";
 import Link from "../components/Link";
-
+import Stats from "../components/Stats";
+import LeaderboardDashboard from "../components/LeaderboardDashboard";
+import NFTInventory from "../components/NFTInventory";
+import PromoSection from "../components/PromoSection";
+import Grid from "../components/Grid/";
 import Twitter from "../components/Icons/Twitter";
+import Line from "../components/Line/";
 
 import { useWS } from "../components/WsProvider/index";
 import { useAuth } from "../components/AuthProvider";
 
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 
-import MetamaskLogin from "../components/MetamaskLogin/";
+// import MetamaskLogin from "../components/MetamaskLogin/";
 
 import { useMetaMask } from "metamask-react";
 import { useEffect } from "react";
 
 function truncateMiddle(word: string) {
+  if (!word) {
+    return ""
+  }
   const tooLongChars = 19; // arbitrary
 
   if (word.length < tooLongChars) {
@@ -57,29 +65,73 @@ const Home: NextPage = () => {
         })}
       >
         <div>
-          <Text component="h1" css={{ margin: "1px", fontSize: "80px" }}>
-            GM, {account ? truncateMiddle(account) : user.name}
-          </Text>
 
-          <br></br>
-          <MetamaskLogin
-            isMetamaskConnected={
-              user.metamask && Object.keys(user.metamask).length > 0
-            }
-          ></MetamaskLogin>
 
-          <Button
-            component={Link}
-            href={`https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter?accesstoken=${localStorage.getItem("accessToken")}`}
-            Icon={Twitter}
+        <div
+            css={{
+  
+              padding: "0 42px",
+            }}
+          >
+
+          <div
+            css={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems:"center",
+              padding: "20px 40px",
+            }}
+          >
+            <Text component="h1" css={{ margin: "0", marginTop:"10px", fontSize: "60px", verticalAlign: "bottom" }}>
+              GM, {truncateMiddle(user.username)}
+            </Text>
+
+            <Button
+              component={Link}
+              href={`https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter?accesstoken=${localStorage.getItem(
+                "accessToken"
+              )}`}
+              Icon={Twitter}
+              css={(theme) => ({
+                background: "rgba(255, 255, 255, 0.05)",
+                marginRight: theme.spacing(1),
+                color: "#489BE9",
+              })}
+            >
+              {(user.metamask && Object.keys(user.metamask).length > 0) ||
+              user.profilePictureUrl
+                ? "Connect"
+                : "Connected"}
+            </Button>
+          </div>
+          <Line></Line>
+          </div>
+
+          <Grid
             css={(theme) => ({
-              background: "rgb(72, 155, 233)",
-              marginRight: theme.spacing(1),
-              color: "#fff",
+              marginTop: theme.spacing(4),
+              marginBottom: theme.spacing(3),
             })}
           >
-            {(user.metamask && Object.keys(user.metamask).length > 0 || user.profilePictureUrl) ? 'Connect' : 'Connected'}
-          </Button>
+            <Stats
+              css={(theme) => ({
+                gridColumn: "span 9",
+                background: theme.colors.dark_gray,
+                color: theme.colors.text_title_light,
+              })}
+            ></Stats>
+            <LeaderboardDashboard
+              css={(theme) => ({
+                gridColumn: "span 3",
+                background: theme.colors.dark_gray,
+                color: theme.colors.text_title_light,
+              })}
+            ></LeaderboardDashboard>
+          </Grid>
+
+          <NFTInventory></NFTInventory>
+
+          <PromoSection></PromoSection>
         </div>
       </Layout>
     </ComposedGlobalLayout>

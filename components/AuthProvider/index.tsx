@@ -10,15 +10,16 @@ import { useRouter } from "next/router";
 import axios from "axios";
 type AuthProviderProps = { children: ReactNode };
 
-type MetamaskUser = { address: string, signature: string };
-
+type MetamaskUser = { address: string; signature: string };
+import Loader from "../Loader";
 
 interface User {
   userId: string;
   state: string;
   name: string;
-  metamask: MetamaskUser,
-  profilePictureUrl: string
+  username: string;
+  metamask: MetamaskUser;
+  profilePictureUrl: string;
 }
 
 export type IAuthProviderContext = {
@@ -49,7 +50,13 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
   const [authorized, setAuthorized] = useState(false);
 
-  const [user, setUser] = useState({ userId: "", state: "", name: "", metamask: {address: "", signature: ""}, profilePictureUrl: "" });
+  const [user, setUser] = useState({
+    userId: "",
+    state: "",
+    name: "",
+    metamask: { address: "", signature: "" },
+    profilePictureUrl: "",
+  });
 
   const { accesstoken } = router.query;
 
@@ -122,8 +129,21 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     }
   }
   const logout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("signature");
+    axios
+      .get(
+        "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/logout?accesstoken=" +
+          localStorage.getItem("accessToken"),
+        {
+          headers: {
+            accesstoken: localStorage.getItem("accessToken"),
+            "content-type": "application/json",
+          },
+        }
+      )
+      .then(() => {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("signature");
+      });
     router.push("/");
   };
 
@@ -137,6 +157,32 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     }),
     [authorized, loggedIn, user]
   );
+
+  if (!authorized) {
+    return (
+      <div
+        css={{
+          height: "100vh",
+          background: "#181818",
+          width: "100vw",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Loader
+          css={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%) scale(2)",
+            lineHeight: 1,
+            color: "#fff",
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <AuthProviderContext.Provider value={memoedValue}>

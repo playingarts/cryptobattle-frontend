@@ -3,13 +3,15 @@ import { useEffect, useState } from "react";
 import Button from "../Button";
 import store from "store";
 import { useRouter } from "next/router";
-
-
-// import { useRouter } from "next/router";
-
+import {HTMLAttributes, FC} from "react"
+ 
 import { useAuth } from "../AuthProvider";
+import Metamask from "../Icons/Metamask";
 
-const MetamaskLogin: any = (isMetamaskConnected: boolean) => {
+export type Props = HTMLAttributes<HTMLDivElement>;
+
+
+const MetamaskLogin: FC<Props> = (props) => {
   const { ethereum, account, connect } = useMetaMask();
   const [
     { account: signedAccount, expiry, signature, signing },
@@ -28,7 +30,6 @@ const MetamaskLogin: any = (isMetamaskConnected: boolean) => {
 
   const { loggedIn, user } = useAuth();
 
-console.log(isMetamaskConnected)
 
 
   useEffect(() => {
@@ -135,8 +136,10 @@ console.log(isMetamaskConnected)
           background: "rgb(248, 157, 53)",
           color: "#fff",
         })}
+        Icon={Metamask}
         loading={signing}
         onClick={requestSignature}
+        {...props}
       >
         {signing
           ? "signing"
@@ -147,7 +150,7 @@ console.log(isMetamaskConnected)
     );
   }
 
-  return "";
+  return <div></div>;
 };
 
 export default MetamaskLogin;

@@ -57,7 +57,7 @@ const ComposedGlobalLayout: FC<
     <div style={{ background: "#0a0a0a", minHeight: "100vh" }}>
       <Header
         css={(theme) => ({
-          position: "fixed",
+          position: "absolute",
           left: theme.spacing(1),
           right: theme.spacing(1),
           top: theme.spacing(1),
