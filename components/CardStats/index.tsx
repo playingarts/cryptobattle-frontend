@@ -22,17 +22,17 @@ const CardStats: FC<CardStats> = ({ color, xp, power, scoring, ...props }) => {
       })}
     >
     <Line />
-      <Text variant="body" css={{ opacity: 0.9, margin: 0 }}>
-        {xp}
+      <Text variant="body" css={{ opacity: 0.9, margin: 0, display: 'flex', justifyContent: 'space-between'}}>
+        <span>XP</span><span>{xp}</span>
       </Text>
       <Line />
-      <Text variant="body" css={{ opacity: 0.9, margin: 0 }}>
-        {power}
+      <Text variant="body" css={{ opacity: 0.9, margin: 0, display: 'flex', justifyContent: 'space-between' }}>
+        <span>Power</span>{power}
       </Text>
       <Line />
-      <Text variant="body" css={{ opacity: 0.5, margin: 0 }}>
-        {scoring}
-      </Text>{" "}
+      <Text variant="body" css={{ opacity: 0.9, margin: 0, display: 'flex', justifyContent: 'space-between' }}>
+        <span>Scoring</span>{scoring}
+      </Text>
       <Line />
     </div>
   );

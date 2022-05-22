@@ -69,7 +69,7 @@ const NFTChoose: FC<Props> = () => {
     setLoading(true);
     getUserNftCards().then(({ data }) => {
       setLoading(false);
-      // setNFTCards(data.cards);
+      setNFTCards(data.cards);
     });
     console.log(loading)
   }, []);
@@ -283,7 +283,7 @@ const NFTChoose: FC<Props> = () => {
           <Text variant="h6">Most Played</Text>
 
           <DialogClose asChild>
-            <MostPlayedCards addCard={addCard} topCards={topCards} />
+            <MostPlayedCards color="dark" addCard={addCard} topCards={topCards} />
           </DialogClose>
 
           {cardInventory.length !== 0 && (

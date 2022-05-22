@@ -19,19 +19,20 @@ export type Props = HTMLAttributes<HTMLDivElement>;
 interface MenuItem extends Props {
   to: string;
   text: string;
+  fontSize?: number;
 }
 
-const MenuItem: FC<MenuItem> = ({ to, text, ...props}) => {
+const MenuItem: FC<MenuItem> = ({ to, text, fontSize = 22}) => {
   return (
-    <Link href={to} passHref>
+    <Link  href={to} passHref>
       <li
-         {...props}
         css={{
           color: "rgba(0, 0, 0)",
           cursor: "pointer",
           paddingBottom: 20,
           transition: "all 300ms",
           listStyle: "none",
+          fontSize,
           "&:hover": {
             opacity: "0.6",
           },
@@ -214,12 +215,12 @@ export default function LogoMenu() {
                   <MenuItem
                     to="/"
                     text="Buy NFT on Opensea"
-                    css={{ fontSize: 16 }}
+                    fontSize={16}
                   />
                   <MenuItem
                     to="/"
                     text="Buy NFT on LooksRare"
-                    css={{ fontSize: 16 }}
+                    fontSize={16}
                   />
                 </ul>
               </div>

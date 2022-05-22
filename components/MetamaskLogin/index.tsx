@@ -79,6 +79,8 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
 
   if (user && user.metamask && Object.keys(user.metamask).length > 0) {
     return (
+      // eslint-disable-next-line
+      // @ts-ignore-start
       <Button
         {...props}
         Icon={Metamask}
@@ -90,6 +92,8 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
       >
         Connected
       </Button>
+      // eslint-disable-next-line
+      // @ts-ignore-end
     );
   }
 
@@ -106,6 +110,8 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
     };
 
     return (
+      // eslint-disable-next-line
+      // @ts-ignore-start
       <Button
         {...props}
         css={() => ({
@@ -124,6 +130,8 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
           ? "connect metamask"
           : "sign with metamask"}
       </Button>
+      // eslint-disable-next-line
+      // @ts-ignore-end
     );
   }
 

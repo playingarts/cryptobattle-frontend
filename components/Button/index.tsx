@@ -10,7 +10,7 @@ import {
 import { Props as LinkProps } from "../Link";
 import Loader from "../Loader";
 
-export interface Props extends Omit<LinkProps, "component" | "href"> {
+export interface Props extends Omit<LinkProps, "component" | "href" > {
   href?: LinkProps["href"];
   Icon?: FC<HTMLAttributes<SVGElement>>;
   component?: "button" | FC<LinkProps>;
