@@ -1,17 +1,15 @@
-import { ElementType, useEffect, useState } from "react";
+import { HTMLAttributes, FC, useEffect, useState } from "react";
 import axios from "axios";
+
+export type Props = HTMLAttributes<HTMLDivElement>;
 
 import Text from "../Text";
 import UserAvatar from "../../components/UserAvatar";
-
-interface Player {
-  userId: string;
-  state: string;
+interface Player extends Props {
+  player: { userId: string; state: string };
 }
 
-const Player: ElementType = ({ ...props }) => {
-  const { player } = props;
-
+const Player: FC<Player> = ({ player }) => {
   const [playerInfo, setPlayerInfo] = useState({
     name: "",
     profilePictureUrl: "",
@@ -73,7 +71,7 @@ const Player: ElementType = ({ ...props }) => {
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
-        {player.state === "ready"  && !hovered &&  (
+        {player.state === "ready" && !hovered && (
           <svg
             width="16"
             height="12"

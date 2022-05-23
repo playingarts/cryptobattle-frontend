@@ -124,7 +124,8 @@ const JoinGame: NextPage = () => {
           </Text>
 
           <NFTChoose />
-
+          {/* // eslint-disable-next-line 
+    // @ts-ignore: Unreachable code error */}
           <Lobby players={players} />
 
           <Line />

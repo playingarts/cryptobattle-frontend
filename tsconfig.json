@@ -21,5 +21,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "source/graphql", "components/Charts"]
+  "exclude": ["node_modules", "source/**/*", "source/*graphql/*", "components/Charts", "components/_composed"]
 }

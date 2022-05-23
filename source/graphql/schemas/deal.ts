@@ -1,5 +1,5 @@
 import { ApolloError, gql } from "@apollo/client";
-import { Schema, model, models, Model, Types } from "mongoose";
+import { Schema, model, models, Model } from "mongoose";
 import { getDeck } from "./deck";
 import { getAssets } from "./opensea";
 import { recoverPersonalSignature } from "@metamask/eth-sig-util";

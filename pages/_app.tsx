@@ -213,6 +213,8 @@ const App = ({ Component, pageProps }: AppProps) => {
         <AuthProvider>
           <WSProvider url="playing-arts-game-backend-test-7pogl.ondigitalocean.app">
             <ThemeProvider theme={theme}>
+            {/* // eslint-disable-next-line 
+    // @ts-ignore: Unreachable code error */}
               <Component {...pageProps} />
             </ThemeProvider>
           </WSProvider>

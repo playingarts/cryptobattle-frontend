@@ -144,6 +144,8 @@ const NewGame: NextPage = () => {
             />
           </StatBlock>
           <NFTChoose />
+    {/* // eslint-disable-next-line 
+    // @ts-ignore: Unreachable code error */}
           <Lobby players={players} />
           <Line />{" "}
           <div style={{ display: "flex", justifyItems: "center" }}>

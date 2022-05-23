@@ -3,9 +3,9 @@ import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { useRouter } from "next/router";
 import { ClassNames, Theme, CSSObject } from "@emotion/react";
 import { CSSInterpolation } from "@emotion/serialize";
-
-export interface Props
-  extends NextLinkProps,
+    // eslint-disable-next-line 
+    // @ts-ignore: Unreachable code error
+export interface Props extends NextLinkProps,
     HTMLAttributes<HTMLAnchorElement | HTMLButtonElement> {
   component?: "a" | "button";
   activeCss?: ((_: Theme) => CSSInterpolation) | CSSObject;

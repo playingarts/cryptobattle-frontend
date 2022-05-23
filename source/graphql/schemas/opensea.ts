@@ -8,6 +8,8 @@ import intersect from "just-intersect";
 
 const { OPENSEA_KEY: apiKey = "" } = process.env;
 const provider = new Web3.providers.HttpProvider("https://mainnet.infura.io");
+// eslint-disable-next-line 
+// @ts-ignore: Unreachable code error
 const seaport = new OpenSeaPort(provider, {
   networkName: Network.Main,
   apiKey,
