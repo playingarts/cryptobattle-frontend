@@ -121,9 +121,13 @@ const NFTChoose: FC<Props> = () => {
       <div css={{ display: "flex" }}>
         <div onClick={setFirstCardActive} css={{ display: "flex" }}>
           {!firstCard ? (
-            <CardEmpty />
+            <div css={{minWidth: 400}}>
+
+<CardEmpty />
+
+            </div>
           ) : (
-            <div css={{display: 'flex'}}>
+            <div css={{display: 'flex', marginRight: 30}}>
               <Card
                 key={firstCard.id}
                 css={{
@@ -146,7 +150,11 @@ const NFTChoose: FC<Props> = () => {
         </div>
         <div onClick={setSecondCardActive} css={{ display: "flex" }}>
           {!secondCard ? (
-            <CardEmpty />
+         <div css={{minWidth: 400}}>
+
+         <CardEmpty />
+         
+                     </div>
           ) : (
             <div css={{display: 'flex'}}>
               <Card
