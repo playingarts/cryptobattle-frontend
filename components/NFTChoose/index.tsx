@@ -63,7 +63,7 @@ const NFTChoose: FC<Props> = () => {
       }
     },
     [setFirstCard, setSecondCard, activeCard]
-  ); 
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -121,13 +121,11 @@ const NFTChoose: FC<Props> = () => {
       <div css={{ display: "flex" }}>
         <div onClick={setFirstCardActive} css={{ display: "flex" }}>
           {!firstCard ? (
-            <div css={{minWidth: 400}}>
-
-<CardEmpty />
-
+            <div css={{ minWidth: 400 }}>
+              <CardEmpty />
             </div>
           ) : (
-            <div css={{display: 'flex', marginRight: 30}}>
+            <div css={{ display: "flex", marginRight: 30 }}>
               <Card
                 key={firstCard.id}
                 css={{
@@ -150,13 +148,11 @@ const NFTChoose: FC<Props> = () => {
         </div>
         <div onClick={setSecondCardActive} css={{ display: "flex" }}>
           {!secondCard ? (
-         <div css={{minWidth: 400}}>
-
-         <CardEmpty />
-         
-                     </div>
+            <div css={{ minWidth: 400 }}>
+              <CardEmpty />
+            </div>
           ) : (
-            <div css={{display: 'flex'}}>
+            <div css={{ display: "flex" }}>
               <Card
                 key={secondCard.id}
                 css={{
