@@ -5,7 +5,7 @@ import Text from "../Text";
 import { useAuth } from "../AuthProvider";
 import axios from "axios";
 import Loader from "../Loader";
-import MetamaskLogin from "../MetamaskLogin/";
+import MetamaskLogin from "../../components/MetamaskLogin/";
 import Card from "../../components/CardNew";
 import CardEmpty from "../../components/CardEmpty";
 import MostPlayedCards from "./MostPlayedCards";
@@ -159,6 +159,11 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
   }, []);
 
   useEffect(() => {
+
+    if (NFTCards.length === 0) {
+      return
+    }
+
     const filteredCards = NFTCards.filter((card) => card.onSale);
 
     const topCard = NFTCards.reduce(

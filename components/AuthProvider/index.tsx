@@ -20,6 +20,8 @@ interface User {
   username: string;
   metamask: MetamaskUser;
   profilePictureUrl: string;
+  isTwitterConnected: boolean;
+  isMetamaskConnected: boolean;
 }
 
 export type IAuthProviderContext = {
@@ -57,6 +59,8 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     username: "",
     metamask: { address: "", signature: "" },
     profilePictureUrl: "",
+    isMetamaskConnected: false,
+    isTwitterConnected: false
   });
 
   const { accesstoken } = router.query;
@@ -70,6 +74,9 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     if (isLoggedInCookie()) {
       getUser().then(({ data }) => {
         console.log(data);
+        data.isTwitterConnected = data.authProvider === 'twitter' || 'unified'
+        data.isMetamaskConnected = data.authProvider === 'metamask' || 'unified'
+
         setUser(data);
       });
     }

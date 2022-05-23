@@ -77,7 +77,7 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
       .catch(() => setSignature((prev) => ({ ...prev, signing: false })));
   }, [router.isReady, ethereum, metamaskSignKey, account]);
 
-  if (user && user.metamask && Object.keys(user.metamask).length > 0) {
+  if (user && user.isMetamaskConnected) {
     return (
       // eslint-disable-next-line
       // @ts-ignore-start
@@ -90,7 +90,7 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
           pointerEvents: "none",
         })}
       >
-        Connected
+        Swap address
       </Button>
       // eslint-disable-next-line
       // @ts-ignore-end

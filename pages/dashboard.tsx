@@ -98,8 +98,7 @@ const Home: NextPage = () => {
                 color: "#489BE9",
               })}
             >
-              {(user.metamask && Object.keys(user.metamask).length > 0) ||
-              user.profilePictureUrl
+              {(user.isTwitterConnected)
                 ? "Connect"
                 : "Connected"}
             </Button>

@@ -2,7 +2,7 @@ import { FC, HTMLAttributes, useEffect, useState, useCallback } from "react";
 
 import { Modal, DialogClose } from "../Modal";
 import Text from "../Text";
-// import { useAuth } from "../AuthProvider";
+import { useAuth } from "../AuthProvider";
 import axios from "axios";
 import Line from "../Line";
 // import Loader from "../Loader";
@@ -13,6 +13,7 @@ import Card from "../CardNew";
 // import Button from "../Button";
 import CardEmpty from "../../components/CardEmpty";
 import CardStats from "../../components/CardStats";
+import Loader from "../Loader";
 
 import MostPlayedCards from "../../components/NFTInventory/MostPlayedCards";
 
@@ -34,26 +35,25 @@ export type Props = HTMLAttributes<HTMLDivElement>;
 const NFTChoose: FC<Props> = () => {
   // const [NFTCards, setNFTCards] = useState([]);
 
-  const [firstCard, setFirstCard] =  useState<CardType>();
+  const { user } = useAuth();
+
+  const [firstCard, setFirstCard] = useState<CardType>();
   const [secondCard, setSecondCard] = useState<CardType>();
 
   const [activeCard, setActiveCard] = useState(0);
 
   const [loading, setLoading] = useState(false);
-  const [metamaskConnected] = useState(true);
   const [topCards, setTopCards] = useState<Array<CardType>>([]);
 
   const setFirstCardActive = () => {
     setActiveCard(1);
   };
   const setSecondCardActive = () => {
-
     setActiveCard(2);
   };
 
   const addCard = useCallback(
     (card: CardType) => () => {
-
       if (activeCard === 1) {
         setFirstCard(card);
       }
@@ -71,10 +71,10 @@ const NFTChoose: FC<Props> = () => {
       setLoading(false);
       setNFTCards(data.cards);
     });
-    console.log(loading)
+    console.log(loading);
   }, []);
 
-  const [NFTCards, setNFTCards] = useState([
+  const [NFTCards, setNFTCards] = useState<Array<CardType>>([
     {
       id: "7074",
       name: "5 of Spades",
@@ -190,24 +190,27 @@ const NFTChoose: FC<Props> = () => {
   const [cardInventory, setCardInventory] = useState<Array<CardType>>([]);
 
   useEffect(() => {
-    const topCard = NFTCards.reduce(
-      (prev: CardType, current: CardType) => (prev.xp > current.xp ? prev : current),
-    );
-    const secondCard = NFTCards.filter((card) => card.id !== topCard.id).reduce(
-      (prev: CardType, current: CardType) => (prev.xp > current.xp ? prev : current),
-    );
+    if (NFTCards.length === 0) {
+      return;
+    }
 
+    const topCard = NFTCards.reduce((prev: CardType, current: CardType) =>
+      prev.xp > current.xp ? prev : current
+    );
+    const secondCard = NFTCards.filter(
+      (card) => card.id !== topCard.id
+    ).reduce((prev: CardType, current: CardType) =>
+      prev.xp > current.xp ? prev : current
+    );
 
     const inventory = NFTCards.filter(
       (card) =>
         card.id !== topCard.id && card.id !== secondCard.id && !card.onSale
     );
 
-
     setCardInventory(inventory);
 
     setTopCards([topCard, secondCard]);
-
   }, [NFTCards]);
 
   setFirstCardActive;
@@ -222,13 +225,18 @@ const NFTChoose: FC<Props> = () => {
           ) : (
             <Card
               key={firstCard.id}
-              css={{ marginRight: "20px", column: "span 3", cursor: 'pointer' }}
+              css={{ marginRight: "20px", column: "span 3", cursor: "pointer" }}
               animated={false}
               noInfo={true}
               card={{ img: firstCard.imageUrl }}
             ></Card>
           )}
-          <CardStats color="light" xp={firstCard && firstCard.xp} power={firstCard && firstCard.power} scoring={firstCard && firstCard.scoring} />
+          <CardStats
+            color="light"
+            xp={firstCard && firstCard.xp}
+            power={firstCard && firstCard.power}
+            scoring={firstCard && firstCard.scoring}
+          />
         </div>
         <div onClick={setSecondCardActive} css={{ display: "flex" }}>
           {!secondCard ? (
@@ -236,13 +244,18 @@ const NFTChoose: FC<Props> = () => {
           ) : (
             <Card
               key={secondCard.id}
-              css={{ marginRight: "20px", column: "span 3", cursor: 'pointer' }}
+              css={{ marginRight: "20px", column: "span 3", cursor: "pointer" }}
               animated={false}
               noInfo={true}
               card={{ img: secondCard.imageUrl }}
             ></Card>
           )}
-          <CardStats color="light" xp={secondCard && secondCard.xp} power={secondCard && secondCard.power} scoring={secondCard && secondCard.scoring} />
+          <CardStats
+            color="light"
+            xp={secondCard && secondCard.xp}
+            power={secondCard && secondCard.power}
+            scoring={secondCard && secondCard.scoring}
+          />
         </div>
       </div>
     );
@@ -259,7 +272,7 @@ const NFTChoose: FC<Props> = () => {
         margin: "20px 0",
       })}
     >
-      {!metamaskConnected && (
+      {!user.isMetamaskConnected && (
         <div>
           <Text variant="body" css={{ opacity: 0.6 }}>
             Connect wallet to use and level up NFT cards you are holding.
@@ -273,17 +286,31 @@ const NFTChoose: FC<Props> = () => {
         </div>
       )}
 
-      {metamaskConnected && (
+      {user.isMetamaskConnected && (
         <Modal
           trigger={trigger()}
           description="Share your game link, wait for players to connect and click “Start”!
         Choose the NFTs you want to level up (optional)."
           title="Choose your NFTs"
         >
+          {loading && (
+            <Loader
+              css={{
+                textAlign: "center",
+                alignSelf: "center",
+                marginLeft: 20,
+              }}
+            />
+          )}
+
           <Text variant="h6">Most Played</Text>
 
           <DialogClose asChild>
-            <MostPlayedCards color="dark" addCard={addCard} topCards={topCards} />
+            <MostPlayedCards
+              color="dark"
+              addCard={addCard}
+              topCards={topCards}
+            />
           </DialogClose>
 
           {cardInventory.length !== 0 && (
@@ -308,9 +335,9 @@ const NFTChoose: FC<Props> = () => {
                             marginRight: "20px",
                             column: "span 3",
                             maxWidth: "180px",
-                            cursor: 'pointer',
-                            background: '#fff',
-                            height: '224px'
+                            cursor: "pointer",
+                            background: "#fff",
+                            height: "224px",
                           }}
                           animated={false}
                           noInfo={true}

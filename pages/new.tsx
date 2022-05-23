@@ -37,8 +37,6 @@ const NewGame: NextPage = () => {
   const [allReady, setAllReady] = useState(false);
 
   useEffect(() => {
-    console.log("players changed");
-
     const isEveryoneReady = players.every((player) => player.state === "ready");
 
     setAllReady(isEveryoneReady && players.length > 1);
@@ -57,7 +55,7 @@ const NewGame: NextPage = () => {
       console.log(event)
 
       if (event.event === "create-room") {
-        setRoomUrl(`${process.env.APP_URL}/join/${event.data.roomId}`);
+        setRoomUrl(`${process.env.customKey}/join/${event.data.roomId}`);
       }
 
       if (event.event === "room-changed") {
