@@ -20,7 +20,7 @@ const BrowseCollection: FC<HTMLAttributes<HTMLElement>> = (props) => {
       {decks.map(({ slug, product }) =>
         !product ? null : (
           <Link
-            href={`/${slug}`}
+            href={`s`}
             key={slug}
             css={(theme) => ({
               aspectRatio: "1",

@@ -30,7 +30,7 @@ const CardList: FC<Props> = ({ deckId, ...props }) => {
       })}
     >
       {cards.map((card) => (
-        <Link key={card._id} href={`/${query.deckId}/${card.artist.slug}`}>
+        <Link key={card._id} href={`s`}>
           <Card card={card} />
         </Link>
       ))}

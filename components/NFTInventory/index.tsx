@@ -25,9 +25,6 @@ const getUserNftCards = () => {
 
 export type Props = HTMLAttributes<HTMLDivElement>;
 
-
-
-
 const NFTInventory: FC<Props> = ({ ...props }) => {
   const { user } = useAuth();
 
@@ -49,7 +46,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
   const [topCards, setTopCards] = useState<Array<CardType>>([]);
   const [cardInventory, setCardInventory] = useState<Array<CardType>>([]);
 
-  const [cardsOnSale, setCardsOnSale] =  useState<Array<CardType>>([]);
+  const [cardsOnSale, setCardsOnSale] = useState<Array<CardType>>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -60,18 +57,19 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
   }, []);
 
   useEffect(() => {
-
     if (NFTCards.length === 0) {
-      return
+      return;
     }
 
     const filteredCards = NFTCards.filter((card) => card.onSale);
 
-    const topCard = NFTCards.reduce(
-      (prev: CardType, current: CardType) => (prev.xp > current.xp ? prev : current),
+    const topCard = NFTCards.reduce((prev: CardType, current: CardType) =>
+      prev.xp > current.xp ? prev : current
     );
-    const secondCard = NFTCards.filter((card) => card.id !== topCard.id).reduce(
-      (prev: CardType, current: CardType) => (prev.xp > current.xp ? prev : current),
+    const secondCard = NFTCards.filter(
+      (card) => card.id !== topCard.id
+    ).reduce((prev: CardType, current: CardType) =>
+      prev.xp > current.xp ? prev : current
     );
 
     const inventory = NFTCards.filter(
@@ -80,7 +78,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
     setCardsOnSale(filteredCards);
     setCardInventory(inventory);
 
-    setTopCards([topCard , secondCard]);
+    setTopCards([topCard, secondCard]);
   }, [NFTCards]);
 
   if (Object.keys(user.metamask).length === 0) {
@@ -161,17 +159,30 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
       </div>
       <Line spacing={2}></Line>
 
-      <MostPlayedCards color={'light'} topCards={topCards} />
+      <MostPlayedCards color={"light"} topCards={topCards} />
 
       {loading && (
-          <div
+        <div
+          css={{
+            minHeight: 300,
+          }}
+        />
+      )}
 
-            css={{
-              minHeight: 300
-            }}
-          />
-        )}
-
+      {!loading && NFTCards.length === 0 && (
+        <div
+          css={{
+            minHeight: 300,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text variant="h2" css={{ opacity: 0.6 }}>
+            Cards on sale (not playable)
+          </Text>
+        </div>
+      )}
 
       {cardInventory.length > 0 && (
         <div style={{}}>
@@ -188,7 +199,6 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
             }}
           >
             {cardInventory.map((card, index) => (
-
               <Card
                 key={index}
                 css={{ marginRight: "20px", column: "span 3" }}
@@ -216,7 +226,6 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
             }}
           >
             {cardsOnSale.map((card, index) => (
-
               <Card
                 key={index}
                 css={{ marginRight: "20px", column: "span 3" }}

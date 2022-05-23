@@ -99,8 +99,8 @@ const Home: NextPage = () => {
               })}
             >
               {(user.isTwitterConnected)
-                ? "Connect"
-                : "Connected"}
+                ? "Connected"
+                : "Connect"}
             </Button>
           </div>
           <Line></Line>
