@@ -56,7 +56,7 @@ const LeaderboardDashboard: FC<Props> = ({ ...props }) => {
 
       <Line spacing={4} />
       <Leaderboard>
-        <Text variant="label" css={{ opacity: 0.5 }}>
+        <Text variant="label" css={{ opacity: 0.5, cursor: 'pointer' }}>
           <Arrowed>Leaderboard</Arrowed>
         </Text>
         </Leaderboard>

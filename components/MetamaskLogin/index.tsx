@@ -90,7 +90,7 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
           pointerEvents: "none",
         })}
       >
-        Swap address
+        Change address
       </Button>
       // eslint-disable-next-line
       // @ts-ignore-end

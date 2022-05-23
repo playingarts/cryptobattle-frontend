@@ -110,7 +110,6 @@ const Stats: FC<Props> = ({ ...props }) => {
 
       You need to win at least 3 more games with 1 new player to get it to the level 3.
 
-      
 
       </Text>
       </div>
@@ -118,7 +117,7 @@ const Stats: FC<Props> = ({ ...props }) => {
       <Line spacing={4} />
          
       <GameRules>
-      <Text variant="label" css={{ opacity: 0.5 }}>
+      <Text variant="label" css={{ opacity: 0.5, cursor: 'pointer'}}>
         <Arrowed>Game Rules</Arrowed>
       </Text>
       </GameRules>

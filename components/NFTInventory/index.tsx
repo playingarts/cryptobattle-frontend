@@ -31,106 +31,7 @@ export type Props = HTMLAttributes<HTMLDivElement>;
 const NFTInventory: FC<Props> = ({ ...props }) => {
   const { user } = useAuth();
 
-  const [NFTCards, setNFTCards] = useState([
-    {
-      id: "7074",
-      name: "5 of Spades",
-      onSale: false,
-      power: 1,
-      scoring: 1,
-      xp: 999999,
-      suit: "spades",
-      value: "5",
-      imageUrl:
-        "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/5-s-gd8kN968.jpg",
-    },
-    {
-      id: "11",
-      name: "5 of Spades",
-      onSale: false,
-      power: 1,
-      scoring: 1,
-      xp: 3,
-      suit: "spades",
-      value: "5",
-      imageUrl:
-        "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/5-s-gd8kN968.jpg",
-    },
-    {
-      id: "45",
-      name: "7 of Hearts",
-      onSale: false,
-      power: 1,
-      scoring: 1,
-      xp: 251,
-      suit: "hearts",
-      value: "7",
-      imageUrl:
-        "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-    },
-
-    {
-      id: "451",
-      name: "7 of Hearts",
-      onSale: false,
-      power: 1,
-      scoring: 1,
-      xp: 1,
-      suit: "hearts",
-      value: "7",
-      imageUrl:
-        "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-    },
-
-    {
-      id: "452",
-      name: "7 of Hearts",
-      onSale: false,
-      power: 1,
-      scoring: 1,
-      xp: 1,
-      suit: "hearts",
-      value: "7",
-      imageUrl:
-        "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-    },
-    {
-      id: "4115",
-      name: "7 of Hearts",
-      onSale: false,
-      power: 1,
-      scoring: 1,
-      xp: 2222,
-      suit: "hearts",
-      value: "7",
-      imageUrl:
-        "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-    },
-    {
-      id: "48",
-      name: "8 of Hearts",
-      onSale: true,
-      power: 1,
-      scoring: 1,
-      xp: 1,
-      suit: "hearts",
-      value: "8",
-      imageUrl:
-        "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-    },
-    {
-      id: "49",
-      name: "3 of Hearts",
-      onSale: true,
-      power: 1,
-      scoring: 1,
-      xp: 1,
-      suit: "hearts",
-      value: "3",
-      imageUrl:
-        "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-    },
-  ]);
+  const [NFTCards, setNFTCards] = useState<Array<CardType>>([]);
 
   interface CardType {
     id: string;
@@ -262,9 +163,6 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
 
       <MostPlayedCards color={'light'} topCards={topCards} />
 
-      <div css={{ display: "flex", justifyContent: "start" }}>
-        {loading && <div css={{ minHeight: 300 }}></div>}
-      </div>
       {cardInventory.length > 0 && (
         <div style={{}}>
           <Line spacing={5}></Line>

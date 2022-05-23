@@ -55,7 +55,7 @@ const NewGame: NextPage = () => {
       console.log(event)
 
       if (event.event === "create-room") {
-        setRoomUrl(`${process.env.customKey}/join/${event.data.roomId}`);
+        setRoomUrl(`https://play2.playingarts.com/join/${event.data.roomId}`);
       }
 
       if (event.event === "room-changed") {

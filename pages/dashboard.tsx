@@ -69,7 +69,7 @@ const Home: NextPage = () => {
 
         <div
             css={{
-  
+
               padding: "0 42px",
             }}
           >
