@@ -57,7 +57,7 @@ const NewGame: NextPage = () => {
       console.log(event)
 
       if (event.event === "create-room") {
-        setRoomUrl(`https://cryptobattle-frontend-dzsb5.ondigitalocean.app/join/${event.data.roomId}`);
+        setRoomUrl(`${process.env.APP_URL}/join/${event.data.roomId}`);
       }
 
       if (event.event === "room-changed") {
