@@ -163,6 +163,16 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
 
       <MostPlayedCards color={'light'} topCards={topCards} />
 
+      {loading && (
+          <div
+
+            css={{
+              minHeight: 300
+            }}
+          />
+        )}
+
+
       {cardInventory.length > 0 && (
         <div style={{}}>
           <Line spacing={5}></Line>
@@ -178,7 +188,6 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
             }}
           >
             {cardInventory.map((card, index) => (
-              // <div key={card.id}>          {card.name}</div>
 
               <Card
                 key={index}
@@ -207,7 +216,6 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
             }}
           >
             {cardsOnSale.map((card, index) => (
-              // <div key={card.id}>          {card.name}</div>
 
               <Card
                 key={index}
