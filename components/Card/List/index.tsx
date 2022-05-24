@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import { FC, HTMLAttributes } from "react";
 import { useCards } from "../../../hooks/card";
 import Card from "../../Card";
@@ -10,7 +9,6 @@ interface Props extends HTMLAttributes<HTMLElement> {
 }
 
 const CardList: FC<Props> = ({ deckId, ...props }) => {
-  const { query } = useRouter();
   const { cards, loading } = useCards({
     variables: { deck: deckId },
   });

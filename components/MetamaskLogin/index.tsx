@@ -4,7 +4,6 @@ import Button from "../Button";
 import store from "store";
 import { useRouter } from "next/router";
 import { HTMLAttributes, FC } from "react";
-import Link from "../Link";
 import { useAuth } from "../AuthProvider";
 import Metamask from "../Icons/Metamask";
 
@@ -47,10 +46,6 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
     if (!metamaskSignKey || !ethereum) {
       return;
     }
-    // const address: string = (await ethereum.enable())[0];
-    // connect();
-
-    // window.location.href= "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=" + address
 
     console.log(ethereum);
     ethereum
@@ -118,7 +113,7 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
           background: "rgb(248, 157, 53)",
           color: "#fff",
         })}
-        component={Link}
+        // component={''}
         color="black"
         Icon={Metamask}
         loading={signing}

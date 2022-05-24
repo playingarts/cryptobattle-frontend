@@ -1,5 +1,4 @@
 import UserAvatar from "../UserAvatar";
-// import Button from "../Button";
 
 import { FC, HTMLAttributes } from "react";
 
@@ -77,7 +76,7 @@ const NavProfile: FC<Props> = (props) => {
     <div style={{ cursor: "pointer" }} {...props}>
       <Popover>
         <PopoverTrigger asChild>
-          {/* <IconButton aria-label="Update dimensions"> */}
+          <div>
           <UserAvatar
             css={{
               transition: "opacity 400ms",
@@ -87,13 +86,12 @@ const NavProfile: FC<Props> = (props) => {
             }}
             profilePictureUrl={user.profilePictureUrl}
           />
+          </div>
 
-          {/* </IconButton> */}
         </PopoverTrigger>
         <PopoverContent>
 
          <Text onClick={logout} css={{cursor: 'pointer', width: '100%', textAlign: 'center', margin: 0}}>Logout</Text>
-          {/* <PopoverArrow /> */}
         </PopoverContent>
         <PopoverAnchor></PopoverAnchor>
       </Popover>

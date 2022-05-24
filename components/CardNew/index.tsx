@@ -18,7 +18,6 @@ interface Props extends HTMLAttributes<HTMLElement> {
   isStatic?: boolean;
   size?: "big";
   interactive?: boolean;
-  noInfo?: boolean;
 }
 
 const Card: FC<Props> = ({

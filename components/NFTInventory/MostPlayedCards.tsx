@@ -36,9 +36,8 @@ const MostPlayedCards: FC<Props> = ({color, topCards, addCard, ...props }) => {
           key={card.id}
         >
           <Card
-            css={{ marginRight: "10px", column: "span 3" }}
+            css={{ marginRight: "20px" }}
             animated={false}
-            noInfo={true}
             card={{ img: card.imageUrl }}
           ></Card>
 

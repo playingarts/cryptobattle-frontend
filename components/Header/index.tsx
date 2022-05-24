@@ -91,22 +91,6 @@ const Header: FC<Props> = ({
           </Link>
         </div>
 
-        {/* {altNav && (
-          <div
-            css={(theme) => ({
-              transition: theme.transitions.normal("top"),
-              textAlign: "center",
-              position: "absolute",
-              left: "50%",
-              top: (showAltNav && !expanded && "50%") || "150%",
-              transform: "translate(-50%, -50%)",
-            })}
-            onClick={mouseEnter}
-          >
-            {altNav}
-          </div>
-        )} */}
-
         {loggedIn && (
           <Button
             style={{

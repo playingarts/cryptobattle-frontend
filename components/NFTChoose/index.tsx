@@ -134,7 +134,6 @@ const NFTChoose: FC<Props> = () => {
                   cursor: "pointer",
                 }}
                 animated={false}
-                noInfo={true}
                 card={{ img: firstCard.imageUrl }}
               ></Card>
               <CardStats
@@ -161,7 +160,6 @@ const NFTChoose: FC<Props> = () => {
                   cursor: "pointer",
                 }}
                 animated={false}
-                noInfo={true}
                 card={{ img: secondCard.imageUrl }}
               ></Card>
               <CardStats
@@ -256,7 +254,6 @@ const NFTChoose: FC<Props> = () => {
                             height: "224px",
                           }}
                           animated={false}
-                          noInfo={true}
                           card={{ img: card.imageUrl }}
                         ></Card>
                       </DialogClose>

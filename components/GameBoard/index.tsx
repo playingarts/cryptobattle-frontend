@@ -195,42 +195,42 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                       ></CardEmpty>
                     )}
                     {column === "Card3H" && (
-                      <Card animated={true} noInfo={true} card={Card3H}></Card>
+                      <Card animated={true} card={Card3H}></Card>
                     )}
 
                     {column === "Card2H" && (
-                      <Card animated={true} noInfo={true} card={Card2H}></Card>
+                      <Card animated={true} card={Card2H}></Card>
                     )}
                     {column === "CardKH" && (
-                      <Card animated={true} noInfo={true} card={CardKH}></Card>
+                      <Card animated={true} card={CardKH}></Card>
                     )}
 
                     {column === "CardQC" && (
-                      <Card animated={true} noInfo={true} card={CardQC}></Card>
+                      <Card animated={true} card={CardQC}></Card>
                     )}
                     {column === "Card10S" && (
-                      <Card animated={true} noInfo={true} card={Card10S}></Card>
+                      <Card animated={true} card={Card10S}></Card>
                     )}
 
                     {column === "CardJD" && (
-                      <Card animated={true} noInfo={true} card={CardJD}></Card>
+                      <Card animated={true} card={CardJD}></Card>
                     )}
 
                     {column === "Card8H" && (
-                      <Card animated={true} noInfo={true} card={Card8H}></Card>
+                      <Card animated={true} card={Card8H}></Card>
                     )}
                     {column === "CardAS" && (
-                      <Card animated={true} noInfo={true} card={CardAS}></Card>
+                      <Card animated={true} card={CardAS}></Card>
                     )}
                     {column === "CardKD" && (
-                      <Card animated={true} noInfo={true} card={CardKD}></Card>
+                      <Card animated={true} card={CardKD}></Card>
                     )}
 
                     {column === "Card4C" && (
-                      <Card animated={true} noInfo={true} card={Card4C}></Card>
+                      <Card animated={true} card={Card4C}></Card>
                     )}
                     {column === "Card6D" && (
-                      <Card animated={true} noInfo={true} card={Card6D}></Card>
+                      <Card animated={true} card={Card6D}></Card>
                     )}
                   </div>
                 );

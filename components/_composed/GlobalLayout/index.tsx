@@ -14,12 +14,8 @@ const ComposedGlobalLayout: FC<
     | "isCardPage"
   >
 > = ({
-  noNav,
-  altNav,
-  showAltNav,
   palette,
   children,
-  isCardPage,
 }) => {
   const {
     query: { scrollIntoView, scrollIntoViewBehavior, ...query },
@@ -70,11 +66,7 @@ const ComposedGlobalLayout: FC<
             width: "100%",
           },
         })}
-        altNav={altNav}
-        showAltNav={showAltNav}
-        noNav={noNav}
         palette={palette}
-        isCardPage={isCardPage}
       />
 
       {children}

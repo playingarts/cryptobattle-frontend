@@ -203,7 +203,6 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                 key={index}
                 css={{ marginRight: "20px", column: "span 3" }}
                 animated={true}
-                noInfo={true}
                 card={{ img: card.imageUrl }}
               ></Card>
             ))}
@@ -230,7 +229,6 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                 key={index}
                 css={{ marginRight: "20px", column: "span 3" }}
                 animated={true}
-                noInfo={true}
                 card={{ img: card.imageUrl }}
               ></Card>
             ))}
