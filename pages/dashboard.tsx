@@ -96,6 +96,7 @@ const Home: NextPage = () => {
                 background: "rgba(255, 255, 255, 0.05)",
                 marginRight: theme.spacing(1),
                 color: "#489BE9",
+                pointerEvents:  user.isTwitterConnected ? 'none' : 'unset',
               })}
             >
               {(user.isTwitterConnected)

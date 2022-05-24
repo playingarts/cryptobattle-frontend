@@ -74,9 +74,9 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     if (isLoggedInCookie()) {
       getUser().then(({ data }) => {
         console.log(data);
-        data.isTwitterConnected = data.authProvider === "twitter" || "unified";
+        data.isTwitterConnected = data.authProvider === "twitter" || data.authProvider === "unified";
         data.isMetamaskConnected =
-          data.authProvider === "metamask" || "unified";
+          data.authProvider === "metamask" || data.authProvider === "unified";
 
         setUser(data);
       });
@@ -93,9 +93,9 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       if (accesstoken) {
         localStorage.setItem("accessToken", accesstoken as string);
         getUser().then(({ data }) => {
-          data.isTwitterConnected = data.authProvider === "twitter" || "unified";
+          data.isTwitterConnected = data.authProvider === "twitter" || data.authProvider === "unified"
           data.isMetamaskConnected =
-            data.authProvider === "metamask" || "unified";
+            data.authProvider === "metamask" || data.authProvider === "unified";
   
           setUser(data);
           console.log("data");

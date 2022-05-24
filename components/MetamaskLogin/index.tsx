@@ -95,7 +95,6 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
         css={() => ({
           background: "rgb(248, 157, 53)",
           color: "#fff",
-          pointerEvents: "none",
         })}
       >
         Change address
