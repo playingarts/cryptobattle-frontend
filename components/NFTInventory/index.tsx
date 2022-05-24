@@ -49,15 +49,17 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
   const [cardsOnSale, setCardsOnSale] = useState<Array<CardType>>([]);
 
   useEffect(() => {
-    setLoading(true);
     if (!user.isMetamaskConnected) {
       return;
     }
+    setLoading(true);
+
     getUserNftCards().then(({ data }) => {
       setLoading(false);
       setNFTCards(data.cards);
     });
-  }, []);
+  }, [user]);
+
 
   useEffect(() => {
     if (NFTCards.length === 0) {

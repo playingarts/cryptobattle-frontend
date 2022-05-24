@@ -66,15 +66,16 @@ const NFTChoose: FC<Props> = () => {
   );
 
   useEffect(() => {
-    setLoading(true);
     if (!user.isMetamaskConnected) {
       return;
     }
+    setLoading(true);
+
     getUserNftCards().then(({ data }) => {
       setLoading(false);
       setNFTCards(data.cards);
     });
-  }, []);
+  }, [user]);
 
   const [NFTCards, setNFTCards] = useState<Array<CardType>>([]);
 
