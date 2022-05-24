@@ -60,7 +60,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     metamask: { address: "", signature: "" },
     profilePictureUrl: "",
     isMetamaskConnected: false,
-    isTwitterConnected: false
+    isTwitterConnected: false,
   });
 
   const { accesstoken } = router.query;
@@ -74,8 +74,9 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     if (isLoggedInCookie()) {
       getUser().then(({ data }) => {
         console.log(data);
-        data.isTwitterConnected = data.authProvider === 'twitter' || 'unified'
-        data.isMetamaskConnected = data.authProvider === 'metamask' || 'unified'
+        data.isTwitterConnected = data.authProvider === "twitter" || "unified";
+        data.isMetamaskConnected =
+          data.authProvider === "metamask" || "unified";
 
         setUser(data);
       });
@@ -92,6 +93,10 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       if (accesstoken) {
         localStorage.setItem("accessToken", accesstoken as string);
         getUser().then(({ data }) => {
+          data.isTwitterConnected = data.authProvider === "twitter" || "unified";
+          data.isMetamaskConnected =
+            data.authProvider === "metamask" || "unified";
+  
           setUser(data);
           console.log("data");
 
@@ -138,22 +143,27 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   }
 
   const logout = () => {
-    axios
-      .get(
-        "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/logout?accesstoken=" +
-          localStorage.getItem("accessToken"),
-        {
-          headers: {
-            accesstoken: localStorage.getItem("accessToken"),
-            "content-type": "application/json",
-          },
-        }
-      )
-      .then(() => {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("signature");
-      });
-    router.push("/");
+    // axios
+    //   .get(
+    //     "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/logout?accesstoken=" +
+    //       localStorage.getItem("accessToken"),
+    //     {
+    //       headers: {
+    //         accesstoken: localStorage.getItem("accessToken"),
+    //         "content-type": "application/json",
+    //       },
+    //     }
+    //   )
+    //   .then(() => {
+    //     localStorage.removeItem("accessToken");
+    //     localStorage.removeItem("signature");
+    //   });
+
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("signature");
+    setTimeout(() => {
+      router.push("/");
+    }, 1000);
   };
 
   const memoedValue = useMemo(
