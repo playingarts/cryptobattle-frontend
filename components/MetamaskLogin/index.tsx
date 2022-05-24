@@ -54,14 +54,13 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
         params: [metamaskSignKey, account],
       })
       .then((signature: string) => {
-        // how to check if me has no twitter.
         let url = `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask/callback?walletAddress=${account}&signature=${signature}`;
 
         if (loggedIn) {
           url = url + `&?accesstoken=${localStorage.getItem("accessToken")}`;
         }
 
-        if (user.metamask.address !== account) {
+        if (user.metamask.address && user.metamask.address !== account) {
           url = url + `&?&swap=1`;
         }
 

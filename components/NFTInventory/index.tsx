@@ -178,8 +178,8 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
             alignItems: "center",
           }}
         >
-          <Text variant="h2" css={{ opacity: 0.6 }}>
-            Cards on sale (not playable)
+          <Text variant="h3" css={{ opacity: 0.6 }}>
+            No NFTs
           </Text>
         </div>
       )}
