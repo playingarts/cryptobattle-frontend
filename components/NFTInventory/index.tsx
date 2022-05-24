@@ -50,6 +50,9 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
 
   useEffect(() => {
     setLoading(true);
+    if (!user.isMetamaskConnected) {
+      return
+    }
     getUserNftCards().then(({ data }) => {
       setLoading(false);
       setNFTCards(data.cards);
@@ -88,14 +91,32 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
         <Text component="h3" css={{ margin: 0 }}>
           NFT Inventory
         </Text>
-        <Text variant="body2" css={{ opacity: 0.6 }}>
+
+        <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 20
+        }}
+      >
+           <Text variant="body2" css={{ opacity: 0.6 }}>
           Connect wallet to use and level up NFT cards you are holding.
         </Text>
+        <MetamaskLogin
+          css={{
+            background: "rgba(255, 255, 255, 0.05)",
+            color: "#F89D35",
+          }}
+        ></MetamaskLogin>
+      </div>
+
         <div css={{ display: "flex", justifyContent: "space-between" }}>
           {Array(5)
             .fill(0)
             .map((card, index) => (
               <CardEmpty
+                isPlaceholder={true}
                 key={index}
                 css={{ marginRight: "20px", column: "span 3" }}
               ></CardEmpty>

@@ -83,6 +83,27 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
       address;
   };
 
+  if (!ethereum) {
+    return (
+      // eslint-disable-next-line
+      // @ts-ignore-start
+      <Button
+        {...props}
+        Icon={Metamask}
+        loading={signing}
+        css={() => ({
+          background: "rgb(248, 157, 53)",
+          color: "#fff",
+          pointerEvents: 'none'
+        })}
+      >
+        Install Metamask
+      </Button>
+      // eslint-disable-next-line
+      // @ts-ignore-end
+    );
+  }
+
   if (user && user.isMetamaskConnected) {
     return (
       // eslint-disable-next-line

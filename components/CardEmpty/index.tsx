@@ -1,5 +1,5 @@
 import { FC, HTMLAttributes, useRef } from "react";
-import {  useState } from "react";
+import { useState } from "react";
 import { theme } from "../../pages/_app";
 
 interface Props extends HTMLAttributes<HTMLElement> {
@@ -8,11 +8,13 @@ interface Props extends HTMLAttributes<HTMLElement> {
   size?: "big";
   interactive?: boolean;
   noInfo?: boolean;
+  isPlaceholder?: boolean;
 }
 
 const Card: FC<Props> = ({
   isStatic,
   size,
+  isPlaceholder = false,
   interactive,
   ...props
 }) => {
@@ -37,10 +39,7 @@ const Card: FC<Props> = ({
         lineheight: 21,
       })}
     >
-      <div
-
-        ref={wrapper}
-      >
+      <div ref={wrapper}>
         <div
           css={(theme) => [
             {
@@ -50,7 +49,8 @@ const Card: FC<Props> = ({
               position: "relative",
               height: theme.spacing(height),
               borderRadius: theme.spacing(1.5),
-              border: "3px dashed #333",
+              border: isPlaceholder ? "0" : "3px dashed #333",
+              background: isPlaceholder ? '#111' : 'transparent'
             },
             hovered &&
               !interactive &&
@@ -59,7 +59,6 @@ const Card: FC<Props> = ({
                 boxShadow: "0 20px 10px rgba(0, 0, 0, 0.25)",
               },
           ]}
-
         >
           <div
             style={{
@@ -74,45 +73,47 @@ const Card: FC<Props> = ({
               alignItems: "center",
             }}
           >
-            <div
-              style={{
-                width: "70px",
-                height: "70px",
-                background: "#181818",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: "100px",
-                cursor: "pointer"
-              }}
-            >
-              <svg
-                width="31"
-                height="31"
-                viewBox="0 0 31 31"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+            {!isPlaceholder && (
+              <div
+                style={{
+                  width: "70px",
+                  height: "70px",
+                  background: "#181818",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: "100px",
+                  cursor: "pointer",
+                }}
               >
-                <line
-                  x1="16"
-                  y1="1.5"
-                  x2="16"
-                  y2="29.5"
-                  stroke="#8B8C8F"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-                <line
-                  x1="29.5"
-                  y1="16"
-                  x2="1.5"
-                  y2="16"
-                  stroke="#8B8C8F"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
+                <svg
+                  width="31"
+                  height="31"
+                  viewBox="0 0 31 31"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <line
+                    x1="16"
+                    y1="1.5"
+                    x2="16"
+                    y2="29.5"
+                    stroke="#8B8C8F"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                  <line
+                    x1="29.5"
+                    y1="16"
+                    x2="1.5"
+                    y2="16"
+                    stroke="#8B8C8F"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+            )}
           </div>
         </div>
       </div>
