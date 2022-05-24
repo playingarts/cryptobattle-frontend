@@ -71,6 +71,18 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
       .catch(() => setSignature((prev) => ({ ...prev, signing: false })));
   }, [router.isReady, ethereum, metamaskSignKey, account]);
 
+
+  const requestSignature = async () => {
+    setSignature((prev) => ({ ...prev, signing: true }));
+
+    const address: string = (await ethereum.enable())[0];
+    connect();
+
+    window.location.href =
+      "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=" +
+      address;
+  };
+
   if (user && user.isMetamaskConnected) {
     return (
       // eslint-disable-next-line
@@ -78,6 +90,8 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
       <Button
         {...props}
         Icon={Metamask}
+        loading={signing}
+        onClick={requestSignature}
         css={() => ({
           background: "rgb(248, 157, 53)",
           color: "#fff",
@@ -92,16 +106,7 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
   }
 
   if (account !== signedAccount) {
-    const requestSignature = async () => {
-      setSignature((prev) => ({ ...prev, signing: true }));
 
-      const address: string = (await ethereum.enable())[0];
-      connect();
-
-      window.location.href =
-        "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=" +
-        address;
-    };
 
     return (
       // eslint-disable-next-line
