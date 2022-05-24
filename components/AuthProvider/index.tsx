@@ -163,7 +163,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     localStorage.removeItem("signature");
     setTimeout(() => {
       router.push("/");
-    }, 1000);
+    }, 0);
   };
 
   const memoedValue = useMemo(
