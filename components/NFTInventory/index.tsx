@@ -54,12 +54,16 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
     }
     setLoading(true);
 
-    getUserNftCards().then(({ data }) => {
-      setLoading(false);
-      setNFTCards(data.cards);
-    });
+    getUserNftCards()
+      .then(({ data }) => {
+        setLoading(false);
+        setNFTCards(data.cards);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
   }, [user]);
-
 
   useEffect(() => {
     if (NFTCards.length === 0) {
@@ -71,10 +75,9 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
     const topCard = NFTCards.reduce((prev: CardType, current: CardType) =>
       prev.xp > current.xp ? prev : current
     );
-    const secondCard = NFTCards.filter(
-      (card) => card.id !== topCard.id
-    ).reduce((prev: CardType, current: CardType) =>
-      prev.xp > current.xp ? prev : current
+    const secondCard = NFTCards.filter((card) => card.id !== topCard.id).reduce(
+      (prev: CardType, current: CardType) =>
+        prev.xp > current.xp ? prev : current
     );
 
     const inventory = NFTCards.filter(

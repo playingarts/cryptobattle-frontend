@@ -31,9 +31,13 @@ const Player: FC<Player> = ({ player }) => {
 
   useEffect(() => {
     if (!playerInfo.name && player.userId) {
-      getUser(player.userId).then(({ data }) => {
-        setPlayerInfo(data);
-      });
+      getUser(player.userId)
+        .then(({ data }) => {
+          setPlayerInfo(data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   }, [player]);
 

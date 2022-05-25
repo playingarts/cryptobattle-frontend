@@ -32,9 +32,13 @@ const LeaderboardDashboard: FC<Props> = ({ ...props }) => {
   // const { user } = useAuth();
 
   useEffect(() => {
-    getLeaderboard().then(({ data }) => {
-      console.log(data);
-    });
+    getLeaderboard()
+      .then(({ data }) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -50,16 +54,14 @@ const LeaderboardDashboard: FC<Props> = ({ ...props }) => {
       })}
       title="Top Players"
     >
-      <div css={() => ({ height: "280px" })}>
-          Player
-      </div>
+      <div css={() => ({ height: "280px" })}>Player</div>
 
       <Line spacing={4} />
       <Leaderboard>
-        <Text variant="label" css={{ opacity: 0.5, cursor: 'pointer' }}>
+        <Text variant="label" css={{ opacity: 0.5, cursor: "pointer" }}>
           <Arrowed>Leaderboard</Arrowed>
         </Text>
-        </Leaderboard>
+      </Leaderboard>
     </StatBlock>
   );
 };

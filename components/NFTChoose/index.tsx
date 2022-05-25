@@ -71,10 +71,15 @@ const NFTChoose: FC<Props> = () => {
     }
     setLoading(true);
 
-    getUserNftCards().then(({ data }) => {
-      setLoading(false);
-      setNFTCards(data.cards);
-    });
+    getUserNftCards()
+      .then(({ data }) => {
+        setLoading(false);
+        setNFTCards(data.cards);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
   }, [user]);
 
   const [NFTCards, setNFTCards] = useState<Array<CardType>>([]);
@@ -101,10 +106,9 @@ const NFTChoose: FC<Props> = () => {
     const topCard = NFTCards.reduce((prev: CardType, current: CardType) =>
       prev.xp > current.xp ? prev : current
     );
-    const secondCard = NFTCards.filter(
-      (card) => card.id !== topCard.id
-    ).reduce((prev: CardType, current: CardType) =>
-      prev.xp > current.xp ? prev : current
+    const secondCard = NFTCards.filter((card) => card.id !== topCard.id).reduce(
+      (prev: CardType, current: CardType) =>
+        prev.xp > current.xp ? prev : current
     );
 
     const inventory = NFTCards.filter(

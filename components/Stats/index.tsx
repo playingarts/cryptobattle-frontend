@@ -11,7 +11,6 @@ import { useAuth } from "../AuthProvider";
 // import Progress from '../../components/Progress';
 import GameRules from "../GameRules/";
 
-
 import Arrowed from "../Arrowed";
 import StatsEntry from "./StatsEntry";
 
@@ -49,12 +48,16 @@ const Stats: FC<Props> = ({ ...props }) => {
 
   useEffect(() => {
     if (!user.userId) {
-      return
+      return;
     }
-    getUserStats(user.userId).then(({ data }) => {
-      console.log("User Stats: ", data);
-      setUserStats(data);
-    });
+    getUserStats(user.userId)
+      .then(({ data }) => {
+        console.log("User Stats: ", data);
+        setUserStats(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.userId]);
@@ -68,15 +71,15 @@ const Stats: FC<Props> = ({ ...props }) => {
         color: theme.colors.text_title_light,
         position: "relative",
         margin: "20px 0",
-        padding: "40px 80px"
+        padding: "40px 80px",
       })}
       title="Your Stats"
     >
       <div css={() => ({ height: "280px" })}>
         <div
           css={() => ({
-            display: 'flex',
-            justifyContent: 'space-between',
+            display: "flex",
+            justifyContent: "space-between",
           })}
         >
           <StatsEntry
@@ -104,24 +107,20 @@ const Stats: FC<Props> = ({ ...props }) => {
           />
         </div>
         <Text variant="body2" css={{ opacity: 0.5 }}>
-
-        {/* <Progress done='25' />
- */}
-
-      You need to win at least 3 more games with 1 new player to get it to the level 3.
-
-
-      </Text>
+          {/* <Progress done='25' />
+           */}
+          You need to win at least 3 more games with 1 new player to get it to
+          the level 3.
+        </Text>
       </div>
 
       <Line spacing={4} />
-         
-      <GameRules>
-      <Text variant="label" css={{ opacity: 0.5, cursor: 'pointer'}}>
-        <Arrowed>Game Rules</Arrowed>
-      </Text>
-      </GameRules>
 
+      <GameRules>
+        <Text variant="label" css={{ opacity: 0.5, cursor: "pointer" }}>
+          <Arrowed>Game Rules</Arrowed>
+        </Text>
+      </GameRules>
     </StatBlock>
   );
 };
