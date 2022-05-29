@@ -7,6 +7,9 @@ import { CSSInterpolation } from "@emotion/serialize";
 import smoothscroll from "smoothscroll-polyfill";
 import { MetaMaskProvider } from "metamask-react";
 import { AuthProvider } from "../components/AuthProvider/";
+import { GameProvider } from "../components/GameProvider/";
+import { NotificationProvider } from "../components/NotificationProvider/";
+
 import { WSProvider } from "../components/WsProvider/index";
 import "../css/style.css";
 declare module "@emotion/react" {
@@ -208,18 +211,21 @@ const App = ({ Component, pageProps }: AppProps) => {
         />
         <title>Crypto Battle </title>
       </Head>
-
-      <MetaMaskProvider>
-        <AuthProvider>
-          <WSProvider url="playing-arts-game-backend-test-7pogl.ondigitalocean.app">
-            <ThemeProvider theme={theme}>
-            {/* // eslint-disable-next-line 
+      <ThemeProvider theme={theme}>
+        <NotificationProvider>
+          <MetaMaskProvider>
+            <AuthProvider>
+              <WSProvider url="playing-arts-game-backend-test-7pogl.ondigitalocean.app">
+                <GameProvider>
+                  {/* // eslint-disable-next-line 
     // @ts-ignore: Unreachable code error */}
-              <Component {...pageProps} />
-            </ThemeProvider>
-          </WSProvider>
-        </AuthProvider>
-      </MetaMaskProvider>
+                  <Component {...pageProps} />
+                </GameProvider>
+              </WSProvider>
+            </AuthProvider>
+          </MetaMaskProvider>
+        </NotificationProvider>
+      </ThemeProvider>
     </Fragment>
   );
 };

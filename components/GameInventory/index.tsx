@@ -1,15 +1,16 @@
 import { FC, useState, useCallback, HTMLAttributes } from "react";
 import CardSmall from "../../components/CardSmall";
 import { CardSuits } from "../../source/enums";
+import Button from "../../components/Button";
+import Skip from "../../components/Icons/Skip";
+import { useWS } from "../WsProvider";
 
 interface Card {
   id?: string;
   Icon: FC<HTMLAttributes<SVGElement>>;
-  cardValue: string;
+  value: string;
   suit?: CardSuits;
 }
-
-
 
 interface Props {
   selectedCard?: string;
@@ -18,19 +19,29 @@ interface Props {
 }
 
 const GameInventory: FC<Props> = ({ children, cards, ...props }) => {
-  const [selectedCardId, setSelectedCardId] = useState(null);
+  const [selectedCard, setSelectedCard] = useState<any>(null);
 
-  // const selectCard = useCallback((cardId) =>  setSelectedCardId(cardId), []);
+  const WSProvider = useWS()
+
+  const skip = () => {
+    WSProvider.send(
+      JSON.stringify({
+        event: "play-card",
+        data: {
+          action: 'pass',
+        },
+      })
+    );
+  }
 
   const selectCard = useCallback(
-    (cardId) => () => {
-      if (selectedCardId === cardId) {
-        console.log("happens");
-        setSelectedCardId(null);
+    (card) => () => {
+      if (selectedCard === card) {
+        setSelectedCard(null);
         return;
       }
-      props.onChange ? props.onChange(cardId) : null;
-      setSelectedCardId(cardId);
+      props.onChange ? props.onChange(card) : null;
+      setSelectedCard(card);
     },
     []
   );
@@ -45,6 +56,7 @@ const GameInventory: FC<Props> = ({ children, cards, ...props }) => {
         zIndex: 400,
         display: "flex",
         justifyContent: "center",
+        alignItems: "center",
       }}
     >
       <div
@@ -58,18 +70,25 @@ const GameInventory: FC<Props> = ({ children, cards, ...props }) => {
           justifyContent: "space-between",
         }}
       >
-        {cards.map((card) => {
+        {cards.map((card, index) => {
           return (
             <CardSmall
-              onClick={selectCard(card.id)}
-              key={card.id}
-              isSelected={selectedCardId ? selectedCardId === card.id : false}
+              onClick={selectCard(card)}
+              key={`${index}`}
+              isSelected={selectedCard ? selectedCard.id === card.id : false}
               style={{ marginRight: "10px" }}
+              cardValue={card.value}
               {...card}
             />
           );
         })}
       </div>
+
+      <Button
+        Icon={Skip}
+        onClick={skip}
+        css={{marginLeft: 20, borderRadius: 400, background: '#181818', width: 60, height: 60}}
+      ></Button>
 
       {children}
     </div>

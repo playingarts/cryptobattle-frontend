@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef } from "react";
-import Header, { Props as HeaderProps } from "../../components/Header";
+import GameHeader, { Props as HeaderProps } from "../../components/GameHeader";
 import ScrollContainer from "react-indiana-drag-scroll";
 
 const GameLayout: FC<
@@ -7,8 +7,12 @@ const GameLayout: FC<
     HeaderProps,
     "altNav" | "showAltNav" | "noNav" | "palette" | "isCardPage"
   >
-> = ({ noNav, altNav, showAltNav, palette, children, isCardPage }) => {
+> = ({ palette, children }) => {
   const container = useRef(null);
+  // const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
+
+
+
 
   useEffect(() => {
     if (container.current) {
@@ -28,7 +32,7 @@ const GameLayout: FC<
         innerRef={container}
 
       >
-        <Header
+        <GameHeader
           css={(theme) => ({
             position: "fixed",
             left: theme.spacing(1),
@@ -43,13 +47,12 @@ const GameLayout: FC<
               width: "100%",
             },
           })}
-          altNav={altNav}
-          showAltNav={showAltNav}
-          noNav={noNav}
+ 
           palette={palette}
-          isCardPage={isCardPage}
         />
-
+        {/* <Draggable >
+          <div className="box">I can be dragged anywhere</div>
+        </Draggable> */}
         {children}
       </ScrollContainer>
     </div>

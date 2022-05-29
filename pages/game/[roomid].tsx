@@ -3,6 +3,7 @@ import Layout from "../../components/Layout";
 import Text from "../../components/Text";
 import { useWS } from "../../components/WsProvider/index";
 import { useRouter } from "next/router";
+import { useGame } from "../../components/GameProvider";
 
 import ComposedGlobalLayout from "../../components/_composed/GlobalLayout";
 
@@ -16,17 +17,20 @@ import Line from "../../components/Line";
 import Lobby from "../../components/Lobby";
 import NFTChoose from "../../components/NFTChoose";
 
+import { useNotifications } from "../../components/NotificationProvider";
+
 const JoinGame: NextPage = () => {
   const WSProvider = useWS();
   const router = useRouter();
   const { roomid } = router.query;
   const [players, setPlayers] = useState([]);
-
+  const { setGameState } = useGame();
   const [isReady, setReady] = useState(false);
+  const { openNotification } = useNotifications();
 
   const toggleReady = () => {
     const ready = isReady ? false : true;
-    console.log(ready, "ready");
+    console.log("Setting Ready: ", ready);
     WSProvider.send(
       JSON.stringify({
         event: "player-ready",
@@ -37,14 +41,39 @@ const JoinGame: NextPage = () => {
     );
     setReady(ready);
   };
+  useEffect(() => {
+    if (!isReady) {
+      openNotification(null);
+
+      return;
+    }
+
+    openNotification({
+      title: "You are ready!",
+      description:
+        "Please wait for others to connect. The game will start soon.",
+      footer: (
+        <Button
+          onClick={toggleReady}
+          css={() => ({
+            background: "#7B61FF",
+            color: "#fff",
+            margin: "20px auto",
+          })}
+        >
+          {isReady ? "I'M NOT READY" : "I'M READY"}
+        </Button>
+      ),
+    });
+  }, [isReady, openNotification]);
 
   useEffect(() => {
     WSProvider.onmessage = function ({ data }) {
       const event = JSON.parse(data);
-      console.log(event);
+      console.log("Event: ", event);
 
-      if (event.event === "room-changed") {
-        console.log(event.data.roomUsers, "room-changed");
+      if (event.event === "room-updated" || event.event === "room-info") {
+        console.log(event.data.roomUsers, "room-updated, users");
         setPlayers(event.data.roomUsers);
       }
 
@@ -53,16 +82,22 @@ const JoinGame: NextPage = () => {
           event.data.error.message ===
           "Joining while hosting a game is forbidden"
         ) {
-          // WSProvider.send(
-          //   JSON.stringify({
-          //     event: "quit-room",
-          //     data: {},
-          //   })
-          // );
-
+          console.log("as");
           WSProvider.send(
             JSON.stringify({
-              event: "close-room",
+              event: "purge-rooms-and-games",
+              data: {},
+            })
+          );
+          return;
+        }
+
+        if (
+          event.data.error.message.startsWith("User has already joined room")
+        ) {
+          WSProvider.send(
+            JSON.stringify({
+              event: "room-info",
               data: {},
             })
           );
@@ -71,6 +106,18 @@ const JoinGame: NextPage = () => {
 
         console.log(event.data.error);
         alert(event.data.error.message);
+      }
+
+      if (event.event === "game-updated") {
+        setGameState(event.data);
+
+        setTimeout(() => {
+          if (event.data.state === "started") {
+            router.push("/play");
+          }
+        }, 2000);
+
+        console.log('game-updated": ', data);
       }
     };
 
@@ -88,6 +135,24 @@ const JoinGame: NextPage = () => {
         })
       );
     };
+
+    WSProvider.addEventListener("close-room", (data) => {
+      console.log("close-room: ", data);
+
+      alert("room-is-closed");
+    });
+
+    WSProvider.addEventListener("start-game", (data) => {
+      console.log("start-game: ", data);
+    });
+
+    // WSProvider.addEventListener("game-updated", (data) => {
+
+    // });
+
+    WSProvider.addEventListener("kick-player", (data) => {
+      console.log("kicked ", data);
+    });
   }, [roomid]);
 
   return (

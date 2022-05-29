@@ -1,5 +1,6 @@
-import { HTMLAttributes, FC, useEffect, useState } from "react";
+import { HTMLAttributes, FC, useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { useWS } from "../../components/WsProvider/index";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
 
@@ -7,13 +8,17 @@ import Text from "../Text";
 import UserAvatar from "../../components/UserAvatar";
 interface Player extends Props {
   player: { userId: string; state: string };
+  color: string,
+  isAdmin: boolean;
 }
 
-const Player: FC<Player> = ({ player }) => {
+const Player: FC<Player> = ({ color, player, isAdmin }) => {
   const [playerInfo, setPlayerInfo] = useState({
     name: "",
     profilePictureUrl: "",
   });
+
+  const WSProvider = useWS();
 
   const [hovered, setHover] = useState(false);
 
@@ -28,6 +33,28 @@ const Player: FC<Player> = ({ player }) => {
       }
     );
   };
+
+  const kickPlayer = useCallback((e: React.MouseEvent<HTMLDivElement>, userId: string) => {
+    WSProvider.send(
+      JSON.stringify({
+        event: "kick-player",
+        data: {
+          userId,
+        },
+      })
+    );
+  }, []);
+
+  // const kickPlayer = (userId: string) => {
+  //   WSProvider.send(
+  //     JSON.stringify({
+  //       event: "kick-player",
+  //       data: {
+  //         userId,
+  //       },
+  //     })
+  //   );
+  // }
 
   useEffect(() => {
     if (!playerInfo.name && player.userId) {
@@ -56,7 +83,7 @@ const Player: FC<Player> = ({ player }) => {
 
       <UserAvatar
         profilePictureUrl={playerInfo.profilePictureUrl}
-        css={{ border: "solid 5px #7B61FF" }}
+        css={{ border: "solid 5px " + color}}
       />
 
       <div
@@ -64,7 +91,7 @@ const Player: FC<Player> = ({ player }) => {
           borderRadius: "200px",
           width: "40px",
           height: "40px",
-          background: "#7B61FF",
+          background: color,
           marginLeft: "-10px",
           display: "flex",
           alignItems: "center",
@@ -75,7 +102,7 @@ const Player: FC<Player> = ({ player }) => {
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
-        {player.state === "ready" && !hovered && (
+        {player.state === "ready" && (
           <svg
             width="16"
             height="12"
@@ -90,8 +117,8 @@ const Player: FC<Player> = ({ player }) => {
           </svg>
         )}
 
-        {hovered && <div>x</div>}
-
+        {hovered && isAdmin && <div onClick={(e) => kickPlayer(e, player.userId)}>x</div>}
+        
         {player.state === "waiting" && (
           <div>
             <svg

@@ -111,14 +111,8 @@ export const PopoverContent = StyledContent;
 // Your app...
 const Flex = styled("div", { display: "flex" });
 
-export default function LogoMenu() {
+export default function LogoMenu({logo}: {logo: any}) {
   const [open, setOpen] = useState(false);
-  const closeModal = () => {
-    // setTimeout(() => {
-    //   setOpen(false);
-    // }, 1000);
-    return;
-  };
   return (
     <>
       {/* Hamburger & Logo */}
@@ -175,7 +169,7 @@ export default function LogoMenu() {
                 <Playingarts />
                 <ul css={{ fontSize: 22, padding: 0, marginTop: 40 }}>
                   <MenuItem to="/dashboard" text="Dashboard" />
-                  <div onClick={closeModal}>
+                  <div>
                     <GameRules>
                       <div
                         css={{
@@ -281,10 +275,10 @@ export default function LogoMenu() {
               </nav>
             </Flex>
 
-            {/* <PopoverArrow /> */}
           </PopoverContent>
           <PopoverAnchor>
-            <Link href="/" aria-label="Cruip" passHref>
+
+            {!logo &&  <Link href="/" aria-label="Cruip" passHref>
               <svg
                 width="192"
                 height="70"
@@ -297,7 +291,10 @@ export default function LogoMenu() {
                   fill="#DDDDDD"
                 />
               </svg>
-            </Link>
+            </Link> } 
+
+            {logo && logo}
+
           </PopoverAnchor>
         </Popover>
       </div>

@@ -2,78 +2,71 @@ import Spades from "../Icons/Spades";
 import Clubs from "../Icons/Clubs";
 import Diamonds from "../Icons/Diamonds";
 import Hearts from "../Icons/Hearts";
-import { CardSuits } from "../../source/enums";
+import Joker from "../Icons/Joker";
+import { v4 as uuid } from 'uuid';
 
-const CardKH = {
-  id: "CardKH",
-  cardValue: "k",
-  suit: CardSuits.h,
-  Icon: Hearts,
+import cards from "./cards.json";
+
+const getSuit = (suit: string) => {
+
+  if (suit === "hearts") {
+    return Hearts;
+  }
+  if (suit === "spades") {
+    return Spades;
+  }
+  if (suit === "diamonds") {
+    return Diamonds;
+  }
+  if (suit === "joker") {
+    return Joker;
+  }
+
+  if (suit === "clubs") {
+    return Clubs;
+  }
+  return Joker;
 };
 
-const CardQC = {
-  id: "CardQC",
-  cardValue: "q",
-  suit: CardSuits.c,
-  Icon: Clubs,
-};
+const getCard = (suit: string, value: string) => {
+  if (!suit) {
+    throw Error ('no suit = getCard')
+  }
+  if (!value) {
+    throw Error ('no value = getCard')
+  }
+  const foundCard: any = cards.find(card => {
 
-const Card2H = {
-  id: "Card2H",
-  cardValue: "2",
-  suit: CardSuits.h,
-  Icon: Hearts,
-};
+    if (!value) {
+      return false
+    }
 
-const Card10S = {
-  id: "Card10S",
-  cardValue: "10",
-  suit: CardSuits.s,
-  Icon: Spades,
-};
+    const isSuitFound =  suit ? suit?.toLowerCase() === card.suit?.toLowerCase() : true;
+    const isValueFound =  value == card.value 
+    return isSuitFound && isValueFound
+  })
 
-const CardJD = {
-  id: "CardJD",
-  cardValue: "J",
-  suit: CardSuits.s,
-  Icon: Diamonds,
-};
+  if (!foundCard) {
+    console.log(suit, value)
+    return null
+      // throw Error ('Card not found in getCard')
+  }
+  foundCard.Icon = getSuit(suit);
+  foundCard.id = uuid()
 
+  // console.log(foundCard);
 
-const Card8H = {
-  id: "Card8H",
-  cardValue: "8",
-  suit: CardSuits.h,
-  Icon: Hearts,
-};
+  // console.log(suit,value)
+  return foundCard
 
-const CardAS = {
-  id: "CardAS",
-  cardValue: "A",
-  suit: CardSuits.s,
-  Icon: Spades,
-};
-
-const CardKD = {
-  id: "CardKD",
-  cardValue: "K",
-  suit: CardSuits.d,
-  Icon: Diamonds,
-};
-
-const Card6D = {
-  id: "Card6D",
-  cardValue: "6",
-  suit: CardSuits.d,
-  Icon: Diamonds,
-};
-
-const Card4C = {
-  id: "Card4C",
-  cardValue: "4",
-  suit: CardSuits.c,
-  Icon: Clubs,
+//   return {
+//     id: value,
+//     suit: suit
+//   };
 };
 
 
-export {CardKH, CardQC, Card2H, Card10S, CardJD, Card8H, CardAS, CardKD, Card4C, Card6D}
+
+export {
+  getCard
+};

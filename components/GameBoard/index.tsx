@@ -1,161 +1,126 @@
-import { FC, useState, useCallback, HTMLAttributes } from "react";
+import { FC, useState, useEffect, useCallback, HTMLAttributes } from "react";
 import Card from "../../components/CardNew";
+import { getCard } from "../../components/Cards";
+
 import CardEmpty from "../../components/CardEmpty";
+import { useGame } from "../GameProvider";
+import { useWS } from "../WsProvider";
 
 interface Props extends HTMLAttributes<HTMLElement> {
   selectedCard?: string;
   removeCard?: (cardId: string) => void;
 }
 
-const Card3H = {
-  img:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/3-h-4J4x76NB.jpg",
-  video:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/3-h-4J4x76NB.mp4",
-};
-
-const Card2H = {
-  img:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/game/2-h-4si4nh43.jpg",
-  video:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/2-h-4si4nh43.mp4",
-};
-
-const CardQC = {
-  img:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/game/q-c-jE72m69y.jpg",
-  video:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/q-c-jE72m69y.mp4",
-};
-
-const CardKH = {
-  img:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/game/k-h-36QTB8R9.jpg",
-  video:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/k-h-36QTB8R9.mp4",
-};
-
-const Card10S = {
-  img:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/game/10-s-239yn6fp.jpg",
-  video:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/10-s-239yn6fp.mp4",
-};
-
-const CardJD = {
-  img:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/game/j-d-X37rjw98.jpg",
-  video:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/j-d-X37rjw98.mp4",
-};
-
-const Card8H = {
-  img:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/game/8-h-V3AR64f2.jpg",
-  video:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/8-h-V3AR64f2.mp4",
-};
-
-const CardAS = {
-  img:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/game/a-s-26vr86EL.jpg",
-  video:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/a-s-26vr86EL.mp4",
-};
-
-const CardKD = {
-  img:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/game/k-d-9ex8HW27.jpg",
-  video:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/k-d-9ex8HW27.mp4",
-};
-
-const Card4C = {
-  img:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/game/4-c-977Jh2ML.jpg",
-  video:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/4-c-977Jh2ML.mp4",
-};
-
-const Card6D = {
-  img:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/game/6-d-6mH3F99H.jpg",
-  video:
-    "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-d-6mH3F99H.mp4",
-};
-
-// const cards = {
-//   Card4C: {
-//     img:
-//       "https://s3.amazonaws.com/img.playingarts.com/crypto/game/4-c-977Jh2ML.jpg",
-//     video:
-//       "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/4-c-977Jh2ML.mp4",
-//   },
-
-//   Card6D: {
-//     img:
-//       "https://s3.amazonaws.com/img.playingarts.com/crypto/game/6-d-6mH3F99H.jpg",
-//     video:
-//       "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-d-6mH3F99H.mp4",
-//   },
-// };
-
-
-// const generateBoard(columns, width)
-
 const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
-  const [board, setBoard] = useState([
-    [null, null, null, null, null, null, null],
-    [null, null, null, "empty", null, null, null],
-    [null, null, "empty", "Card3H", "empty", null, null],
-    [null, null, null, "empty", null, null, null],
-    [null, null, null, null, null, null, null],
-  ]);
+
+  const WSProvider = useWS()
+
+
+
+
+  const generateBoard = (x: number, y: number) => {
+    const columns : any = Array(x)
+      .fill(0)
+      .map(() => null);
+
+    const rows : any = Array(y)
+      .fill(0)
+      .map(() => [...columns]);
+
+    return rows
+  };
+  const { gameState } = useGame();
+
+
+  const [board, setBoard] = useState(generateBoard(7, 5));
 
   const addCard = useCallback(
-    (rowIndex, columnIndex) => () => {
-      if (!selectedCard) {
-        console.log("cancelling");
-        return;
-      }
-      // props.onChange(selectedCard);
-      const localBoard = [...board];
-      localBoard[rowIndex][columnIndex] = selectedCard;
+    (rowIndex, columnIndex, card = selectedCard) =>
+      () => {
 
-      if (
-        localBoard[rowIndex][columnIndex + 1] !== undefined &&
-        localBoard[rowIndex][columnIndex + 1] === null
-      ) {
-        localBoard[rowIndex][columnIndex + 1] = "empty";
-      }
+        console.log ("Playing card: ", card)
+        WSProvider.send(
+          JSON.stringify({
+            event: "play-card",
+            data: {
+              action: 'move',
+              x: rowIndex,
+              y: columnIndex,
+              suit: card.suit,
+              value: card.value
+            },
+          })
+        );
+      },
+    [WSProvider, selectedCard]
+  );
 
-      if (
-        localBoard[rowIndex][columnIndex - 1] !== undefined &&
-        localBoard[rowIndex][columnIndex - 1] === null
-      ) {
-        localBoard[rowIndex][columnIndex - 1] = "empty";
-      }
+  const addCardOnce = (rowIndex: number, columnIndex: number, card: any = selectedCard) => {
 
-      if (
-        localBoard[rowIndex - 1] !== undefined &&
-        localBoard[rowIndex - 1][columnIndex] === null
-      ) {
-        localBoard[rowIndex - 1][columnIndex] = "empty";
-      }
+    const row = Number(rowIndex);
+    const column = Number(columnIndex);
 
-      if (
-        localBoard[rowIndex + 1] !== undefined &&
-        localBoard[rowIndex + 1][columnIndex] === null
-      ) {
-        localBoard[rowIndex + 1][columnIndex] = "empty";
-      }
+    const localBoard = [...board];
 
-      setBoard(localBoard);
+    localBoard[row][column] = card;
+    
+    console.log(localBoard[row][column + 1]);
+    if (
+      localBoard[row][column + 1] !== undefined &&
+      localBoard[row][column + 1] === null
+    ) {
+      localBoard[row][column + 1] = "empty";
+    }
 
-      removeCard ? removeCard(selectedCard) : null;
-    },
-    [selectedCard, board]
-  ); // const addRow = (index) => board.rows.push(index)
+    if (
+      localBoard[row][column - 1] !== undefined &&
+      localBoard[row][column - 1] === null
+    ) {
+      localBoard[row][column - 1] = "empty";
+    }
+
+    if (
+      localBoard[row - 1] !== undefined &&
+      localBoard[row - 1][column] === null
+    ) {
+      localBoard[row - 1][column] = "empty";
+    }
+
+    if (
+      localBoard[row + 1] !== undefined &&
+      localBoard[row + 1][column] === null
+    ) {
+      localBoard[row + 1][column] = "empty";
+    }
+    console.log(localBoard);
+
+    setBoard(localBoard);
+
+    console.log(board);
+
+    removeCard ? removeCard(card) : null;
+  };
+
+  useEffect(() => {
+    // console.log(gameState)
+
+    if (!gameState) {
+      return;
+    }
+    const tableCards = gameState.gameTableCards?.additionalProperties;
+    console.log("tableCards", tableCards);
+    if (!tableCards) {
+      return;
+    }
+
+    Object.keys(tableCards).forEach((key) => {
+      const cards = gameState.gameTableCards?.additionalProperties;
+      const indexes = key.split("-");
+      const card = getCard(cards[key][0].suit, cards[key][0].value);
+      addCardOnce(Number(indexes[1]), Number(indexes[0]), card);
+      console.log(board);
+    });
+  }, [gameState]);
 
   return (
     <div
@@ -168,17 +133,16 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
       })}
     >
       <div>
-        {board.map((row, rowIndex) => {
+        {board.map((row: any, rowIndex: number) => {
           return (
             <div
               key={rowIndex}
-              // {...props}
               css={() => ({
                 display: "flex",
                 justifyContent: "center",
               })}
             >
-              {row.map((column, columnIndex) => {
+              {row.map((column: any, columnIndex: number) => {
                 return (
                   <div
                     css={() => ({
@@ -194,43 +158,8 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                         onClick={addCard(rowIndex, columnIndex)}
                       ></CardEmpty>
                     )}
-                    {column === "Card3H" && (
-                      <Card animated={true} card={Card3H}></Card>
-                    )}
-
-                    {column === "Card2H" && (
-                      <Card animated={true} card={Card2H}></Card>
-                    )}
-                    {column === "CardKH" && (
-                      <Card animated={true} card={CardKH}></Card>
-                    )}
-
-                    {column === "CardQC" && (
-                      <Card animated={true} card={CardQC}></Card>
-                    )}
-                    {column === "Card10S" && (
-                      <Card animated={true} card={Card10S}></Card>
-                    )}
-
-                    {column === "CardJD" && (
-                      <Card animated={true} card={CardJD}></Card>
-                    )}
-
-                    {column === "Card8H" && (
-                      <Card animated={true} card={Card8H}></Card>
-                    )}
-                    {column === "CardAS" && (
-                      <Card animated={true} card={CardAS}></Card>
-                    )}
-                    {column === "CardKD" && (
-                      <Card animated={true} card={CardKD}></Card>
-                    )}
-
-                    {column === "Card4C" && (
-                      <Card animated={true} card={Card4C}></Card>
-                    )}
-                    {column === "Card6D" && (
-                      <Card animated={true} card={Card6D}></Card>
+                    {column?.value && (
+                      <Card animated={true} card={column}></Card>
                     )}
                   </div>
                 );

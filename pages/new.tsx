@@ -3,10 +3,12 @@ import Layout from "../components/Layout";
 import Text from "../components/Text";
 import { CSSObject } from "@emotion/serialize";
 import { useWS } from "../components/WsProvider/index";
+import { useRouter } from "next/router";
 
 import StatBlock from "../components/StatBlock";
 
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
+import { useNotifications } from "../components/NotificationProvider";
 
 import Arrowed from "../components/Arrowed";
 import Button from "../components/Button";
@@ -16,19 +18,58 @@ import GameRules from "../components/GameRules";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "../components/AuthProvider";
+import { useGame } from "../components/GameProvider";
+
 // import NFTInventory from "../components/NFTInventory";
 import NFTChoose from "../components/NFTChoose";
 
 const NewGame: NextPage = () => {
   const { user } = useAuth();
+  const { openNotification, closeNotification } = useNotifications();
+
+  const { setGameState } = useGame();
+  const router = useRouter();
 
   const startGame = () => {
-    WSProvider.send(
-      JSON.stringify({
-        event: "start-game",
-        data: {}
-      })
-    );
+    const startGameEvent = () => {
+      WSProvider.send(
+        JSON.stringify({
+          event: "start-game",
+          data: {},
+        })
+      );
+    };
+
+    openNotification({
+      title: "Are You Sure?",
+      description:
+        "Some of the players are still not ready and will not play this round!",
+      footer: (
+        <div>
+          <Button
+            onClick={closeNotification}
+            css={() => ({
+              background: "#7B61FF",
+              color: "#fff",
+              margin: "20px auto",
+            })}
+          >
+            Wait for others
+          </Button>
+
+          <Button
+            onClick={startGameEvent}
+            css={() => ({
+              background: "#7B61FF",
+              color: "#fff",
+              margin: "20px auto",
+            })}
+          >
+            Start the game
+          </Button>
+        </div>
+      ),
+    });
     // router.push("/play");
   };
 
@@ -52,13 +93,49 @@ const NewGame: NextPage = () => {
     WSProvider.onmessage = function ({ data }) {
       const event = JSON.parse(data);
 
-      console.log(event)
+      console.log(event);
+      setGameState(event);
 
       if (event.event === "create-room") {
         setRoomUrl(`https://play2.playingarts.com/join/${event.data.roomId}`);
+        // WSProvider.send(
+        //   JSON.stringify({
+        //     event: "player-ready",
+        //     data: {
+        //       ready: true,
+        //     },
+        //   })
+        // );
       }
 
-      if (event.event === "room-changed") {
+      if (event.data.error && event.data.error.message) {
+        if (
+          event.data.error.message ===
+          "Its not allowed to create new room while being in game"
+        ) {
+          WSProvider.send(
+            JSON.stringify({
+              event: "purge-rooms-and-games",
+              data: {},
+            })
+          );
+          return;
+        }
+      }
+
+      if (event.event === "game-updated") {
+        setGameState(event.data);
+
+        setTimeout(() => {
+          if (event.data.state === "started") {
+            router.push("/play");
+          }
+        }, 2000);
+
+        console.log('game-updated": ', data);
+      }
+
+      if (event.event === "room-updated") {
         console.log(event.data.roomUsers);
         setPlayers(event.data.roomUsers);
       }
@@ -75,12 +152,24 @@ const NewGame: NextPage = () => {
       console.log(data, "eventlistener");
     });
 
+    WSProvider.addEventListener("close-room", (data) => {
+      console.log("close-room: ", data);
+    });
+
+    WSProvider.addEventListener("player-ready", (data) => {
+      console.log("player-ready ", data);
+    });
+
+    WSProvider.addEventListener("start-game", (data) => {
+      console.log("start-game: ", data);
+    });
+
     WSProvider.onopen = function () {
       WSProvider.send(
         JSON.stringify({
           event: "create-room",
           data: {
-            type: "public",
+            type: "private",
             maxPlayers: 10,
           },
         })
@@ -106,17 +195,16 @@ const NewGame: NextPage = () => {
           <Text component="h1" css={{ margin: "1px", fontSize: "45px" }}>
             New Game
           </Text>
-          <Text variant="body2" css={{ margin: "20px 0", color: "#fff"}}>
+          <Text variant="body2" css={{ margin: "20px 0", color: "#fff" }}>
             Share your unique link with friends, wait for them to connect and
             click “Start The Game”. Choose the NFTs you want to level up
             (optional).
           </Text>
-         
           <GameRules>
-      <Text variant="label" css={{ opacity: 0.5 }}>
-        <Arrowed>Game Rules</Arrowed>
-      </Text>
-      </GameRules>
+            <Text variant="label" css={{ opacity: 0.5 }}>
+              <Arrowed>Game Rules</Arrowed>
+            </Text>
+          </GameRules>
           <StatBlock
             css={(theme) => ({
               background: `#181818`,
@@ -142,9 +230,9 @@ const NewGame: NextPage = () => {
             />
           </StatBlock>
           <NFTChoose />
-    {/* // eslint-disable-next-line 
+          {/* // eslint-disable-next-line 
     // @ts-ignore: Unreachable code error */}
-          <Lobby players={players} />
+          <Lobby isAdmin={true} players={players} />
           <Line />{" "}
           <div style={{ display: "flex", justifyItems: "center" }}>
             <Button

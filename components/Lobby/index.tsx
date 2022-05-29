@@ -1,5 +1,12 @@
-import { ElementType } from "react";
+import { FC, HTMLAttributes } from "react";
 import StatBlock from "../StatBlock";
+
+export type Props = HTMLAttributes<HTMLDivElement>;
+interface Stats extends Props {
+    isAdmin:  boolean,
+    players: Array<PlayerType>
+  }
+
 
 interface PlayerType {
   userId: string;
@@ -8,10 +15,18 @@ interface PlayerType {
 
 import Player from "../Player";
 
+const colors = [
+  'red',
+  'blue',
+  'green',
+  'yellow',
+  'black'
+]
+
 import PlayerEmpty from "../PlayerEmpty";
 
-const Lobby: ElementType = ({ ...props }) => {
-  const { players } = props;
+const Lobby: FC<Stats> = ({ isAdmin, players}) => {
+  // const { players } = props;
 
 
   return (
@@ -32,8 +47,8 @@ const Lobby: ElementType = ({ ...props }) => {
           gap: "20px",
         }}
       >
-        {players.map((player: PlayerType) => (
-          <Player player={player} key={player.userId} />
+        {players.map((player: PlayerType, index) => (
+          <Player color={colors[index]} isAdmin={isAdmin} player={player} key={player.userId} />
         ))}
 
         {Array(4 - players.length)

@@ -4,14 +4,33 @@ import Layout from "../../components/Layout";
 import GameLayout from "../../components/GameLayout";
 import GameBoard from "../../components/GameBoard";
 import GameInventory from "../../components/GameInventory";
-import {CardKH, CardQC, Card2H, Card10S, CardJD, Card8H, CardAS, CardKD, Card4C, Card6D} from "../../components/Cards";
+import { getCard } from "../../components/Cards";
+import { useGame } from "../../components/GameProvider";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 const Play: NextPage = () => {
-  const [selectedCard, setSelectedCard] = useState('');
-  const [myCards, setMyCards] = useState([CardKH, CardQC, Card2H, Card10S, CardJD, Card8H, CardAS, CardKD, Card4C, Card6D]);
+  const [selectedCard, setSelectedCard] = useState("");
 
+  const [myCards, setMyCards] = useState<Array<any>>([]);
 
+  const {gameState} = useGame()
+
+  useEffect(() => {
+    if (!gameState) {
+      return
+    }
+    const cards = gameState.gameUsersWithCards[0].cards
+
+    if (!cards) {
+      return
+    }
+
+    const cardsFormatted = cards.map((card: any) => {
+      return getCard(card.suit, card.value);
+    });
+
+    setMyCards(cardsFormatted);
+  }, []);
 
   return (
     <GameLayout>
@@ -24,13 +43,12 @@ const Play: NextPage = () => {
           minHeight: "100vh",
         })}
       >
-
         <GameBoard
           selectedCard={selectedCard}
-          removeCard={(cardId) => setMyCards(myCards.filter(card => card.id !== cardId))}
-
+          removeCard={(cardToRemove: any) =>
+            setMyCards(myCards.filter((card:any) => card.id !== cardToRemove.id))
+          }
         ></GameBoard>
-  
       </Layout>
       <GameInventory
         onChange={(selectedCard) => setSelectedCard(selectedCard)}

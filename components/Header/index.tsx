@@ -52,7 +52,6 @@ const Header: FC<Props> = ({
         ]}
       >
 
-
         <div
           css={{
             flexGrow: 1,
@@ -61,7 +60,7 @@ const Header: FC<Props> = ({
             fontSize: "30px",
           }}
         >
-          <LogoMenu></LogoMenu>
+          <LogoMenu logo={null}></LogoMenu>
         </div>
 
         <div
