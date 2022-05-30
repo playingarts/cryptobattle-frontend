@@ -3,7 +3,6 @@ import Layout from "../components/Layout";
 import Text from "../components/Text";
 import { CSSObject } from "@emotion/serialize";
 import { useWS } from "../components/WsProvider/index";
-import { useRouter } from "next/router";
 
 import StatBlock from "../components/StatBlock";
 
@@ -17,18 +16,18 @@ import Lobby from "../components/Lobby";
 import GameRules from "../components/GameRules";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "../components/AuthProvider";
+// import { useAuth } from "../components/AuthProvider";
 import { useGame } from "../components/GameProvider";
 
 // import NFTInventory from "../components/NFTInventory";
 import NFTChoose from "../components/NFTChoose";
 
 const NewGame: NextPage = () => {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const { openNotification, closeNotification } = useNotifications();
 
-  const { setGameState } = useGame();
-  const router = useRouter();
+  const { roomUrl, players } = useGame();
+  // const router = useRouter();
 
   const startGame = () => {
     const startGameEvent = () => {
@@ -73,79 +72,78 @@ const NewGame: NextPage = () => {
     // router.push("/play");
   };
 
-  const [roomUrl, setRoomUrl] = useState("");
-  const [players, setPlayers] = useState([{ ...user, state: "ready" }]);
+  // const [roomUrl, setRoomUrl] = useState("");
   const [allReady, setAllReady] = useState(false);
 
   useEffect(() => {
-    const isEveryoneReady = players.every((player) => player.state === "ready");
+    const isEveryoneReady = players.every((player:any) => player.state === "ready");
 
     setAllReady(isEveryoneReady && players.length > 1);
   }, [players]);
 
-  useEffect(() => {
-    setPlayers([{ ...user, state: "ready" }]);
-  }, [user]);
+  // useEffect(() => {
+  //   setPlayers([{ ...user, state: "ready" }]);
+  // }, [user]);
 
   const WSProvider = useWS();
 
   useEffect(() => {
-    WSProvider.onmessage = function ({ data }) {
-      const event = JSON.parse(data);
+    // WSProvider.onmessage = function ({ data }) {
+    //   const event = JSON.parse(data);
 
-      console.log(event);
-      setGameState(event);
+    //   // console.log(event);
+    //   // setGameState(event);
 
-      if (event.event === "create-room") {
-        setRoomUrl(`https://play2.playingarts.com/join/${event.data.roomId}`);
-        // WSProvider.send(
-        //   JSON.stringify({
-        //     event: "player-ready",
-        //     data: {
-        //       ready: true,
-        //     },
-        //   })
-        // );
-      }
+    //   if (event.event === "create-room") {
+    //     setRoomUrl(`https://play2.playingarts.com/join/${event.data.roomId}`);
+    //     // WSProvider.send(
+    //     //   JSON.stringify({
+    //     //     event: "player-ready",
+    //     //     data: {
+    //     //       ready: true,
+    //     //     },
+    //     //   })
+    //     // );
+    //   }
 
-      if (event.data.error && event.data.error.message) {
-        if (
-          event.data.error.message ===
-          "Its not allowed to create new room while being in game"
-        ) {
-          WSProvider.send(
-            JSON.stringify({
-              event: "purge-rooms-and-games",
-              data: {},
-            })
-          );
-          return;
-        }
-      }
+    //   if (event.data.error && event.data.error.message) {
+    //     if (
+    //       event.data.error.message ===
+    //       "Its not allowed to create new room while being in game"
+    //     ) {
+    //       WSProvider.send(
+    //         JSON.stringify({
+    //           event: "purge-rooms-and-games",
+    //           data: {},
+    //         })
+    //       );
+    //       return;
+    //     }
+    //   }
 
-      if (event.event === "game-updated") {
-        setGameState(event.data);
+    //   // if (event.event === "game-updated") {
+    //   //   setGameState(event.data);
 
-        setTimeout(() => {
-          if (event.data.state === "started") {
-            router.push("/play");
-          }
-        }, 2000);
+    //   //   setTimeout(() => {
+    //   //     if (event.data.state === "started") {
+    //   //       router.push("/play");
+    //   //     }
+    //   //   }, 2000);
 
-        console.log('game-updated": ', data);
-      }
+    //   //   console.log('game-updated": ', data);
+    //   // }
 
-      if (event.event === "room-updated") {
-        console.log(event.data.roomUsers);
-        setPlayers(event.data.roomUsers);
-      }
+    //   if (event.event === "room-updated") {
+    //     console.log(event.data.roomUsers);
+    //     setPlayers(event.data.roomUsers);
+    //   }
 
-      if (event.data.error && event.data.error.message) {
-        alert(event.data.error.message);
-      }
+    //   if (event.data.error && event.data.error.message) {
+    //     alert(event.data.error.message);
+    //   }
 
-      console.log(JSON.parse(data));
-    };
+    //   console.log(JSON.parse(data));
+    // };
 
     WSProvider.addEventListener("create-room", (data) => {
       // I am expecting 'Hello specific client'

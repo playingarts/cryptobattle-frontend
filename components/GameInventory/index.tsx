@@ -70,9 +70,9 @@ const GameInventory: FC<Props> = ({ children, cards, ...props }) => {
           justifyContent: "space-between",
         }}
       >
-        {cards.map((card, index) => {
+        {cards.length > 0 && cards.map((card, index) => {
           return (
-            <CardSmall
+            <CardSmall  
               onClick={selectCard(card)}
               key={`${index}`}
               isSelected={selectedCard ? selectedCard.id === card.id : false}

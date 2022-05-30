@@ -1,5 +1,19 @@
-import { createContext, useContext, useMemo, ReactNode, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
 import { useNotifications } from "../NotificationProvider";
+import Text from "../Text/";
+import Button from "../Button/";
+
+import { useRouter } from "next/router";
+
+import { useWS } from "../../components/WsProvider/index";
+import { useAuth } from "../../components/AuthProvider";
 
 type GameProviderProps = { children: ReactNode };
 
@@ -7,174 +21,171 @@ type GameProviderProps = { children: ReactNode };
 
 export type IGameProviderContext = {
   gameState: any;
-  setGameState: any;
+  players: any;
+  roomUrl: any;
 };
 
 const GameProviderContext = createContext<IGameProviderContext | null>(null);
 
 function GameProvider({ children }: GameProviderProps): JSX.Element {
+  const { openNotification } = useNotifications();
+
+  const [results, setResults] = useState<any>(null);
+  const [players, setPlayers] = useState<any>([]);
+  const [roomUrl, setRoomUrl] = useState("");
 
 
-  const {openNotification} = useNotifications()
 
-  const [results] = useState(null)
+  const router = useRouter();
+
+  const quit = () => {
+    setResults(null)
+    router.push('/dashboard')
+  }
+  const WSProvider = useWS();
+  const { user } = useAuth();
+
+  const [gameState, setGameState] = useState<any>(null);
+
+  useEffect(() => {
+    WSProvider.onmessage = function ({ data }) {
+      const event = JSON.parse(data);
+      console.log("Game Provider WS event:", event);
+
+      if (event.event === "room-updated" || event.event === "room-info") {
+        console.log("Room updated: ", event.data.roomUsers);
+        setPlayers(event.data.roomUsers);
+      }
+
+      if (event.event === "create-room") {
+        setRoomUrl(`https://play2.playingarts.com/join/${event.data.roomId}`);
+      }
+
+      if (event.data.error && event.data.error.message) {
+        if (
+          event.data.error.message ===
+            "Its not allowed to create new room while being in game" ||
+          event.data.error.message ===
+            "Joining while hosting a game is forbidden"
+        ) {
+          WSProvider.send(
+            JSON.stringify({
+              event: "purge-rooms-and-games",
+              data: {},
+            })
+          );
+          return;
+        }
+      }
+
+      if (event.event === "game-results") {
+        console.log('game-results', event.data)
+        setResults(true);
+      }
+      if (event.event === "game-info") {
+        // setGameState({})
+        setGameState({ ...event.data });
+        // setTimeout(() => {
+        //   // setGameState({ ...event.data });
+
+        //   if (event.data.state === "started") {
+        //     router.push("/play", null, { shallow: true });
+        //   }
+
+        //   if (event.data.state === "ended") {
+        //     setResults(true);
+        //   }
+
+        // }, 100);
+
+        console.log(event.data.state)
+
+        if (event.data.state === "ended") {
+          console.log('eneded')
+            // setResults(true)
+        }
+
+        console.log('game-info": ', event.data);
+      }
+
+      if (event.event === "game-updated") {
+        // setGameState({})
+        setGameState({ ...event.data });
+        setTimeout(() => {
+          // setGameState({ ...event.data });
+
+          if (event.data.state === "started") {
+            router.push("/play");
+
+            // router.push("/play", null, { shallow: true });
+          }
+
+          if (event.data.state === "ended") {
+            setResults(true);
+          }
+
+          // setTimeout(() => {
+          //   if (event.data.state === "started") {
+          //     router.push("/play");
+          //   }
+          // }, 4000);
+        }, 1000);
+
+        console.log('game-updated": ', event.data);
+      }
+      if (event.data.error && event.data.error.message) {
+        alert(event.data.error.message);
+      }
+
+      // console.log(JSON.parse(data));
+    };
+  }, []);
+
+  useEffect(() => {
+    setPlayers([{ ...user, state: "ready" }]);
+  }, [user]);
 
   useEffect(() => {
     if (!results) {
-      openNotification(null)
+      openNotification(null);
 
-      return
-
+      return;
     }
-    console.log('happens')
-    openNotification(true)
-  
-
-  }, [results, openNotification])
-  
-
-  // setTimeout(() => {
-  //   setResults(true)
-  // }, 5000);
-
-
-  const [gameState, setGameState] = useState<any>({
-    gameId: "6290ecf5c570987ca2e71986",
-    tableSizeX: 7,
-    tableSizeY: 5,
-    turnForPlayer: "6285c7787c045edb5ceb24aa",
-    gameUsersWithCards: [
-      {
-        lastAction: "none",
-        userId: "6285c7787c045edb5ceb24aa",
-        cards: [
-          {
-            power: 4,
-            scoring: 1,
-            suit: "spades",
-            value: "2",
-          },
-          {
-            power: 4,
-            scoring: 1,
-            suit: "hearts",
-            value: "9",
-          },
-          {
-            power: 4,
-            scoring: 1,
-            suit: "diamonds",
-            value: "ace",
-          },
-          {
-            power: 4,
-            scoring: 1,
-            suit: "diamonds",
-            value: "4",
-          },
-          {
-            power: 4,
-            scoring: 1,
-            suit: "hearts",
-            value: "jack",
-          },
-          {
-            power: 4,
-            scoring: 1,
-            suit: "spades",
-            value: "jack",
-          },
-          {
-            power: 4,
-            scoring: 1,
-            suit: "hearts",
-            value: "6",
-          },
-          {
-            power: 4,
-            scoring: 1,
-            suit: "hearts",
-            value: "5",
-          },
-          {
-            power: 4,
-            scoring: 1,
-            suit: "spades",
-            value: "ace",
-          },
-          {
-            power: 4,
-            scoring: 1,
-            suit: "hearts",
-            value: "2",
-          },
-        ],
-      },
-    ],
-    gameTableCards: {
-      additionalProperties: {
-        "3-2": [
-          {
-            id: null,
-            userId: "system",
-            imageUrl: null,
-            name: null,
-            power: 4,
-            scoring: 1,
-            suit: "clubs",
-            value: "8",
-            xp: null,
-            videoUrl: null,
-          },
-        ],
-      },
-    },
-    allowedUserCardsPlacement: {
-      additionalProperties: {
-        "2-2": [
-          {
-            suit: "hearts",
-            value: "9",
-          },
-        ],
-        "3-1": [
-          {
-            suit: "hearts",
-            value: "9",
-          },
-        ],
-        "3-3": [
-          {
-            suit: "hearts",
-            value: "9",
-          },
-        ],
-        "4-2": [
-          {
-            suit: "hearts",
-            value: "9",
-          },
-        ],
-      },
-    },
-    playersCurrentPoints: {},
-    opponentPlayers: [
-      {
-        username: "uvisgrinfelds",
-        profileImageUrl:
-          "https://pbs.twimg.com/profile_images/1520748027622866947/Pmy0a_v4_normal.jpg",
-      },
-    ],
-    state: "started",
-  });
-
+    openNotification({
+      title: "Game Over!",
+      description: "You did it",
+      dark: true,
+      iconColor: "blue",
+      icon: (
+        <Text variant="h1" css={{ fontSize: 30, lineHeight: 1 }}>
+          55
+        </Text>
+      ),
+      footer: (
+        <div css={{ display: "flex" }}>
+          <Button
+            css={(theme) => ({
+              color: "#fff",
+              background: "purple",
+              marginRight: theme.spacing(2),
+            })}
+            disabled
+          >
+            Play again (60)
+          </Button>
+          <Button onClick={quit}>Quit</Button>
+        </div>
+      ),
+    });
+  }, [results, openNotification]);
 
   const memoedValue = useMemo(
     () => ({
       gameState,
-      setGameState,
+      players,
+      roomUrl,
     }),
-    [gameState, setGameState]
+    [gameState, players, roomUrl]
   );
 
   return (

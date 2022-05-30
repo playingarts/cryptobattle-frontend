@@ -36,7 +36,6 @@ const getCard = (suit: string, value: string) => {
     throw Error ('no value = getCard')
   }
   const foundCard: any = cards.find(card => {
-
     if (!value) {
       return false
     }
@@ -47,7 +46,6 @@ const getCard = (suit: string, value: string) => {
   })
 
   if (!foundCard) {
-    console.log(suit, value)
     return null
       // throw Error ('Card not found in getCard')
   }

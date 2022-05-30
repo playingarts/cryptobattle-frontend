@@ -365,16 +365,28 @@
     },
     {
         "value": "joker",
-        "suit": "joker",
-
+        "suit": "clubs",
         "artist": "Glass Crane",
         "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/joker-PQy3C426.jpg",
         "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/joker-PQy3C426.mp4"
     },
     {
         "value": "joker",
-        "suit": "joker",
-
+        "suit": "spades",
+        "artist": "Glass Crane",
+        "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/joker-PQy3C426.jpg",
+        "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/joker-PQy3C426.mp4"
+    },
+    {
+        "value": "joker",
+        "suit": "diamonds",
+        "artist": "BakaArts",
+        "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/joker2-aB2fC925.jpg",
+        "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/joker2-aB2fC925.mp4"
+    },
+    {
+        "value": "joker",
+        "suit": "hearts",
         "artist": "BakaArts",
         "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/joker2-aB2fC925.jpg",
         "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/joker2-aB2fC925.mp4"

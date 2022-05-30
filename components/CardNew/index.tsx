@@ -66,10 +66,62 @@ const Card: FC<Props> = ({
         fontWeight: 500,
         fontsize: 18,
         lineheight: 21,
+        position: 'relative'
       })}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
+              <div
+                css={{
+                  width: "70px",
+                  height: "70px",
+                  background: "#181818",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: "100px",
+                  cursor: "pointer",
+                  opacity: 0.5,
+                  position: 'absolute',
+                  top: "50%",
+                  left: "50%",
+                  marginLeft: "-35px",
+                  marginTop: "-35px",
+                  zIndex: 9999,
+                  "&:hover": {
+                    opacity: 0.9
+                  }
+                }}
+              >
+                <svg
+                  width="31"
+                  height="31"
+                  viewBox="0 0 31 31"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <line
+                    x1="16"
+                    y1="1.5"
+                    x2="16"
+                    y2="29.5"
+                    stroke="#8B8C8F"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                  <line
+                    x1="29.5"
+                    y1="16"
+                    x2="1.5"
+                    y2="16"
+                    stroke="#8B8C8F"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+
+      
       <div
         {...(interactive && {
           onMouseMove: ({ clientX, clientY }) => {
@@ -122,6 +174,7 @@ const Card: FC<Props> = ({
             undefined
           }
         >
+          
           {!animated && (
             <div
               style={{

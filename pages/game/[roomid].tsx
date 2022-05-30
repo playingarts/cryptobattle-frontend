@@ -23,8 +23,8 @@ const JoinGame: NextPage = () => {
   const WSProvider = useWS();
   const router = useRouter();
   const { roomid } = router.query;
-  const [players, setPlayers] = useState([]);
-  const { setGameState } = useGame();
+  // const [players, setPlayers] = useState([]);
+  const { players } = useGame();
   const [isReady, setReady] = useState(false);
   const { openNotification } = useNotifications();
 
@@ -61,65 +61,64 @@ const JoinGame: NextPage = () => {
             margin: "20px auto",
           })}
         >
-          {isReady ? "I'M NOT READY" : "I'M READY"}
+          {"I'M NOT READY"}
         </Button>
       ),
     });
   }, [isReady, openNotification]);
 
   useEffect(() => {
-    WSProvider.onmessage = function ({ data }) {
-      const event = JSON.parse(data);
-      console.log("Event: ", event);
+    // WSProvider.onmessage = function ({ data }) {
+    //   // const event = JSON.parse(data);
+    //   // console.log("Event: ", event);
 
-      if (event.event === "room-updated" || event.event === "room-info") {
-        console.log(event.data.roomUsers, "room-updated, users");
-        setPlayers(event.data.roomUsers);
-      }
+    //   // // if (event.event === "room-updated" || event.event === "room-info") {
+    //   // //   console.log(event.data.roomUsers, "room-updated, users");
+    //   // //   setPlayers(event.data.roomUsers);
+    //   // // }
 
-      if (event.data.error && event.data.error.message) {
-        if (
-          event.data.error.message ===
-          "Joining while hosting a game is forbidden"
-        ) {
-          console.log("as");
-          WSProvider.send(
-            JSON.stringify({
-              event: "purge-rooms-and-games",
-              data: {},
-            })
-          );
-          return;
-        }
+    //   // if (event.data.error && event.data.error.message) {
+    //   //   if (
+    //   //     event.data.error.message ===
+    //   //     "Joining while hosting a game is forbidden"
+    //   //   ) {
+    //   //     WSProvider.send(
+    //   //       JSON.stringify({
+    //   //         event: "purge-rooms-and-games",
+    //   //         data: {},
+    //   //       })
+    //   //     );
+    //   //     return;
+    //   //   }
 
-        if (
-          event.data.error.message.startsWith("User has already joined room")
-        ) {
-          WSProvider.send(
-            JSON.stringify({
-              event: "room-info",
-              data: {},
-            })
-          );
-          return;
-        }
+    //   //   if (
+    //   //     event.data.error.message.startsWith("User has already joined room")
+    //   //   ) {
+    //   //     WSProvider.send(
+    //   //       JSON.stringify({
+    //   //         event: "room-info",
+    //   //         data: {},
+    //   //       })
+    //   //     );
+    //   //     return;
+    //   //   }
 
-        console.log(event.data.error);
-        alert(event.data.error.message);
-      }
+    //   //   console.log(event.data.error);
+    //   //   alert(event.data.error.message);
+    //   // }
 
-      if (event.event === "game-updated") {
-        setGameState(event.data);
+    //   // if (event.event === "game-updated") {
+    //   //   setGameState(event.data);
 
-        setTimeout(() => {
-          if (event.data.state === "started") {
-            router.push("/play");
-          }
-        }, 2000);
+    //   //   setTimeout(() => {
+    //   //     if (event.data.state === "started") {
+    //   //       router.push("/play");
+    //   //     }
+    //   //   }, 2000);
 
-        console.log('game-updated": ', data);
-      }
-    };
+    //   //   console.log('game-updated": ', data);
+    //   // }
+    // };
 
     if (!roomid) {
       return;
@@ -136,23 +135,23 @@ const JoinGame: NextPage = () => {
       );
     };
 
-    WSProvider.addEventListener("close-room", (data) => {
-      console.log("close-room: ", data);
+    // WSProvider.addEventListener("close-room", (data) => {
+    //   console.log("close-room: ", data);
 
-      alert("room-is-closed");
-    });
-
-    WSProvider.addEventListener("start-game", (data) => {
-      console.log("start-game: ", data);
-    });
-
-    // WSProvider.addEventListener("game-updated", (data) => {
-
+    //   alert("room-is-closed");
     // });
 
-    WSProvider.addEventListener("kick-player", (data) => {
-      console.log("kicked ", data);
-    });
+    // WSProvider.addEventListener("start-game", (data) => {
+    //   console.log("start-game: ", data);
+    // });
+
+    // // WSProvider.addEventListener("game-updated", (data) => {
+
+    // // });
+
+    // WSProvider.addEventListener("kick-player", (data) => {
+    //   console.log("kicked ", data);
+    // });
   }, [roomid]);
 
   return (
@@ -197,13 +196,14 @@ const JoinGame: NextPage = () => {
           <div style={{ display: "flex", justifyItems: "center" }}>
             <Button
               onClick={toggleReady}
+              disabled={isReady}
               css={() => ({
                 background: "#7B61FF",
                 color: "#fff",
                 margin: "20px auto",
               })}
             >
-              {isReady ? "I'M NOT READY" : "I'M READY"}
+              {"I'M READY"}
             </Button>
           </div>
         </div>

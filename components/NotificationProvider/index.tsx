@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, ReactNode, useState } from "react";
+import { createContext, useContext, useMemo, ReactNode, useState, useEffect } from "react";
 import Text from "../Text";
 
 type NotificationProviderProps = { children: ReactNode };
@@ -18,82 +18,103 @@ function NotificationProvider({
   const [notification, openNotification] = useState<any>({
     title: null,
     description: null,
-    footer: null
+    footer: null,
   });
 
   const closeNotification = () => {
-      openNotification({
-        title: null,
-        description: null,
-        footer: null
-      })
+    openNotification({
+      title: null,
+      description: null,
+      footer: null,
+    });
+  };
+
+useEffect(() => {
+  if (notification && Object.keys(notification).some((key) => notification[key])) {
+    document.body.style.overflow = "hidden";
+
   }
 
+}, [notification])
+
+
+  // useEffect(())
+ 
   const memoedValue = useMemo(
     () => ({
       notification,
       openNotification,
-      closeNotification
+      closeNotification,
     }),
     [notification, openNotification, closeNotification]
   );
 
   return (
     <NotificationProviderContext.Provider value={memoedValue}>
-      {notification && (
-        <div
-          css={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(0, 0, 0, .5)",
-            zIndex: 9999,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+      {notification &&
+        Object.keys(notification).some((key) => notification[key]) && (
           <div
             css={{
-              borderRadius: 20,
-              boxShadow: "0px 2px 3px rgba(0, 0, 0, 0.1)",
-              opacity: 1,
-              zIndex: 99999,
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: notification.dark ? "rgba(255, 255, 255, .3)" :  "rgba(0, 0, 0, .9)",
+              zIndex: 9999,
               display: "flex",
               justifyContent: "center",
-              flexDirection: "column",
               alignItems: "center",
-              background: "white",
-              width: 600,
-              minHeight: 200,
-              position: "relative",
             }}
           >
             <div
               css={{
-                borderRadius: 900,
-                background: "red",
-                height: 60,
-                top: 0,
-                width: 60,
-                marginTop: -30,
-                position: "absolute",
+                borderRadius: 20,
+                boxShadow: "0px 2px 3px rgba(0, 0, 0, 0.1)",
+                opacity: 1,
+                zIndex: 99999,
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+                alignItems: "center",
+                background: notification.dark ? "black" : "white",
+                color: notification.dark ? "white" : "black",
+                width: 600,
+                minHeight: 200,
+                position: "relative",
+                paddingBottom: 50
+
               }}
-            ></div>
-            {notification.title && (
-              <Text variant="h4">{notification.title}</Text>
-            )}
-            {notification.description && (
-              <div>
-                <Text variant="body">{notification.description}</Text>
+            >
+              <div
+                css={{
+                  borderRadius: 900,
+                  background: notification.iconColor ?  notification.iconColor : 'black',
+                  color: "#fff",
+                  height: 60,
+                  top: 0,
+                  width: 60,
+                  marginTop: -30,
+                  position: "absolute",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                {notification.icon && notification.icon}
               </div>
-            )}
-            {notification.footer && <div>{notification.footer}</div>}
+              {notification.title && (
+                <Text variant="h4">{notification.title}</Text>
+              )}
+              {notification.description && (
+                <div>
+                  <Text variant="body">{notification.description}</Text>
+                </div>
+              )}
+              {notification.footer && <div>{notification.footer}</div>}
+            </div>
           </div>
-        </div>
-      )}
+        )}
       {children}
     </NotificationProviderContext.Provider>
   );

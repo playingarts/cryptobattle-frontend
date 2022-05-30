@@ -40,8 +40,22 @@ const GameHeader: FC<Props> = ({
 
     const players: any = [user, ...gameState.opponentPlayers];
 
-    console.log(players, "players");
-    setPlayers(players);
+    const playersWithPoints = players.map((player: any) => {
+      player.points = gameState.playersCurrentPoints[player.id]
+        ? gameState.playersCurrentPoints[player.id]
+        : 0 ;
+
+
+      return { ...player };
+    });
+
+    console.log(playersWithPoints, "playersWithPoints");
+
+    const playersSorted = playersWithPoints.sort((a: any, b: any) => b.points - a.points);
+    console.log(playersSorted, "playersSorted");
+
+
+    setPlayers(playersSorted);
 
     setCurrentPlayer(gameState.turnForPlayer);
   }, [gameState, user]);
@@ -56,7 +70,6 @@ const GameHeader: FC<Props> = ({
             alignItems: "center",
             position: "relative",
             zIndex: 1,
-            overflow: "hidden",
           },
           palette === "gradient"
             ? {
@@ -119,20 +132,41 @@ const GameHeader: FC<Props> = ({
           user &&
           players.map((player: any) => {
             return (
-              <UserAvatar
-                key={player.username}
+              <div
+              key={player.username}
+
                 css={{
+                  position: "relative",
                   transition: "opacity 800ms",
+                  border: "10px solid" + player.color,
+
                   "&:hover": {
-                    opacity: 0.4,
+                    opacity: 0.9,
+                    "&::before": {
+                      content: `'${player.points}'`,
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      color: 'black',
+                      position: "absolute",
+                      background: "#ffff",
+                      borderRadius: 10,
+                      zIndex: 9999,
+                      bottom: -20,
+                      width: 70,
+                      height: 30,
+                    },
                   },
                 }}
-                profilePictureUrl={
-                  player.profilePictureUrl
-                    ? player.profilePictureUrl
-                    : player.profileImageUrl
-                }
-              />
+              >
+                <UserAvatar
+                  profilePictureUrl={
+                    player.profilePictureUrl
+                      ? player.profilePictureUrl
+                      : player.profileImageUrl
+                  }
+                />
+              </div>
             );
           })}
       </div>
