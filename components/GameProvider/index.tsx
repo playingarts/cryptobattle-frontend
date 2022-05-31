@@ -75,7 +75,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       if (!player.username) {
         getUser(player.userId)
         .then(({ data }) => {
-          const playersFiltered = players.map(player => {
+          const playersFiltered = players.map((player: any) => {
             if (player.userId === data.userId) {
               return {...player, ...data}
             }

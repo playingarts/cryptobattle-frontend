@@ -22,18 +22,12 @@ const GameHeader: FC<Props> = ({
 
   ...props
 }) => {
-  // const { deck } = useDeck({ variables: { slug: deckId } });
 
-  // const [expanded, setExpanded] = useState(true);
-  // const [hovered, setHovered] = useState(false);
-  // const mouseEnter = () => setHovered(true);
-  // const mouseLeave = () => setHovered(false);
-  //   const [players, setPlayers] = useState([user]);
 
   const { loggedIn, user } = useAuth();
   const { gameState, players } = useGame();
-  const [playersWithPoints, setPlayersWithPoints] = useState([]);
-  const [currentPlayer, setCurrentPlayer] = useState("");
+  const [playersWithPoints, setPlayersWithPoints] = useState<Array<any>>([]);
+  const [currentPlayer, setCurrentPlayer] = useState<any>("");
   const [opponentsCards, setOpponentsCards] = useState<Array<any>>([]);
 
   useEffect(() => {
@@ -67,7 +61,6 @@ const GameHeader: FC<Props> = ({
     if (!gameState || !user || !user.userId) {
       return;
     }
-    console.log(gameState.gameUsersWithCards);
 
     // Show opponents cards if 2 players
     if (gameState.opponentPlayers.length === 1) {

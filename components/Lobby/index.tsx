@@ -42,7 +42,7 @@ const Lobby: FC<Stats> = ({ isAdmin, players}) => {
           gap: "20px",
         }}
       >
-        {players.map((player: PlayerType, index) => (
+        {players.map((player: PlayerType) => (
           <Player color={player.color} isAdmin={isAdmin} player={player} key={player.userId} />
         ))}
 
