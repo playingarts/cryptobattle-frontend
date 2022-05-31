@@ -37,14 +37,15 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
             `${rowIndex}-${columnIndex}`
           ];
 
-          console.log(allowedPlacement, 'allowedPLacment')
-          console.log(card)
+        console.log(rowIndex, columnIndex, allowedPlacement, "allowedPLacment");
+        console.log(card);
 
         if (
           allowedPlacement &&
           !allowedPlacement.find(
             (allowedCard: any) =>
-              allowedCard.suit.toLowerCase() === card.suit.toLowerCase() && allowedCard.value === card.value
+              allowedCard.suit.toLowerCase() === card.suit.toLowerCase() &&
+              allowedCard.value !== card.value
           )
         ) {
           console.log(rowIndex, columnIndex);
@@ -58,13 +59,20 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
             event: "play-card",
             data: {
               action: "move",
-              x: rowIndex,
-              y: columnIndex,
+              x: columnIndex,
+              y: rowIndex,
               suit: card.suit,
-              value: card.value,
+              value: card.value.toString(),
             },
           })
         );
+        console.log({
+          action: "move",
+          x: rowIndex,
+          y: columnIndex,
+          suit: card.suit,
+          value: card.value.toString(),
+        })
       },
     [WSProvider, selectedCard, gameState]
   );
@@ -81,7 +89,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
 
     localBoard[row][column] = card;
 
-    console.log(localBoard[row][column + 1]);
+
     if (
       localBoard[row][column + 1] !== undefined &&
       localBoard[row][column + 1] === null
@@ -109,11 +117,12 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
     ) {
       localBoard[row + 1][column] = "empty";
     }
-    console.log(localBoard);
 
     setBoard([...localBoard]);
 
-    console.log(board);
+    console.log(board, ' :addCardOnce')
+
+ 
 
     removeCard ? removeCard(card) : null;
   };
@@ -133,9 +142,8 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
     Object.keys(tableCards).forEach((key) => {
       const cards = gameState.gameTableCards?.additionalProperties;
       const indexes = key.split("-");
-      const card = getCard(cards[key][0].suit, cards[key][0].value);
+      const card = getCard(cards[key].slice(-1)[0].suit, cards[key].slice(-1)[0].value);
       addCardOnce(Number(indexes[1]), Number(indexes[0]), card);
-      console.log("board", board);
     });
   }, [gameState]);
 
@@ -177,7 +185,11 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                     )}
                     {/* TODO */}
                     {column?.value && (
-                      <Card animated={false} card={column}></Card>
+                      <Card
+                        onClick={addCard(rowIndex, columnIndex)}
+                        animated={false}
+                        card={column}
+                      ></Card>
                     )}
                   </div>
                 );

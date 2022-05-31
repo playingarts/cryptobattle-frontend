@@ -14,7 +14,7 @@ import { useRouter } from "next/router";
 
 import { useWS } from "../../components/WsProvider/index";
 import { useAuth } from "../../components/AuthProvider";
-import axios from "axios"
+import axios from "axios";
 type GameProviderProps = { children: ReactNode };
 
 //   import Loader from "../Loader";
@@ -24,8 +24,6 @@ export type IGameProviderContext = {
   players: any;
   roomUrl: any;
 };
-
-
 
 const getUser = async (playerId: string) => {
   return axios.get(
@@ -39,7 +37,6 @@ const getUser = async (playerId: string) => {
   );
 };
 
-
 const GameProviderContext = createContext<IGameProviderContext | null>(null);
 
 function GameProvider({ children }: GameProviderProps): JSX.Element {
@@ -49,52 +46,40 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   const [players, setPlayers] = useState<any>([]);
   const [roomUrl, setRoomUrl] = useState("");
 
-
-
   const router = useRouter();
 
   const quit = () => {
-    setResults(null)
-    router.push('/dashboard')
-  }
+    setResults(null);
+    router.push("/dashboard");
+  };
   const WSProvider = useWS();
   const { user } = useAuth();
 
   const [gameState, setGameState] = useState<any>(null);
 
-
-
-  useEffect( () => {
+  useEffect(() => {
     if (!players) {
-      return 
-
+      return;
     }
 
-
-    players.forEach((player:any) => {
+    players.forEach((player: any) => {
       if (!player.username) {
         getUser(player.userId)
-        .then(({ data }) => {
-          const playersFiltered = players.map((player: any) => {
-            if (player.userId === data.userId) {
-              return {...player, ...data}
-            }
-            return player
+          .then(({ data }) => {
+            const playersFiltered = players.map((player: any) => {
+              if (player.userId === data.userId) {
+                return { ...player, ...data };
+              }
+              return player;
+            });
+            setPlayers(playersFiltered);
           })
-          setPlayers(playersFiltered)
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+          .catch((err) => {
+            console.log(err);
+          });
       }
-    })
-
-
-
-
+    });
   }, [players]);
-
-
 
   useEffect(() => {
     WSProvider.onmessage = function ({ data }) {
@@ -105,6 +90,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         console.log("Room updated: ", event.data.roomUsers);
         setPlayers(event.data.roomUsers);
       }
+
+      
 
       if (event.event === "create-room") {
         setRoomUrl(`https://play2.playingarts.com/join/${event.data.roomId}`);
@@ -128,8 +115,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       }
 
       if (event.event === "game-results") {
-        console.log('game-results', event.data)
-        setResults(true);
+        console.log("game-results", event.data);
+        setResults(event.data);
       }
       if (event.event === "game-info") {
         // setGameState({})
@@ -141,17 +128,26 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         //     router.push("/play", null, { shallow: true });
         //   }
 
-        //   if (event.data.state === "ended") {
-        //     setResults(true);
-        //   }
+        if (event.data.state === "ended" && !results) {
+          openNotification({
+            title: "Game Over!",
+            dark: true,
+            iconColor: "blue",
+            footer: (
+              <div css={{ display: "flex" }}>
+                <Button onClick={quit}>Quit</Button>
+              </div>
+            ),
+          });
+        }
 
         // }, 100);
 
-        console.log(event.data.state)
+        console.log(event.data.state);
 
         if (event.data.state === "ended") {
-          console.log('eneded')
-            // setResults(true)
+          // console.log('eneded')
+          // setResults(true)
         }
 
         console.log('game-info": ', event.data);
@@ -167,10 +163,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
             router.push("/play");
 
             // router.push("/play", null, { shallow: true });
-          }
-
-          if (event.data.state === "ended") {
-            setResults(true);
           }
 
           // setTimeout(() => {
@@ -202,14 +194,23 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     }
     openNotification({
       title: "Game Over!",
-      description: "You did it",
-      dark: true,
-      iconColor: "blue",
-      icon: (
+      description: (
         <Text variant="h1" css={{ fontSize: 30, lineHeight: 1 }}>
-          55
+          {results.playersPoints.map((entry: any) => {
+            return (
+              <div css={{marginBottom: 10}} key={entry.userId}>
+                {players.find((player: any) => player.userId === entry.userId)
+                  .username +
+                  " : " +
+                  entry.points}
+              </div>
+            );
+          })}
         </Text>
       ),
+      dark: true,
+      iconColor: "blue",
+
       footer: (
         <div css={{ display: "flex" }}>
           <Button

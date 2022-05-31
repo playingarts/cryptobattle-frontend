@@ -31,7 +31,10 @@ const GameHeader: FC<Props> = ({
   const [opponentsCards, setOpponentsCards] = useState<Array<any>>([]);
 
   useEffect(() => {
-    if (!gameState || !players) {
+
+    if (!gameState ) {
+      console.log('!gameState')
+
       return;
     }
 
@@ -43,19 +46,16 @@ const GameHeader: FC<Props> = ({
       return { ...player };
     });
 
-    console.log(playersWithPoints, "playersWithPoints");
-
     const playersSorted = playersWithPoints.sort(
       (a: any, b: any) => b.points - a.points
     );
-    console.log(playersSorted, "playersSorted");
 
     setPlayersWithPoints(playersSorted);
 
     setCurrentPlayer(
       players.find((player: any) => player.userId === gameState.turnForPlayer)
     );
-  }, [gameState, user, players]);
+  }, [gameState, players]);
 
   useEffect(() => {
     if (!gameState || !user || !user.userId) {
