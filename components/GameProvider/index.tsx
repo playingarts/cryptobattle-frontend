@@ -14,7 +14,7 @@ import { useRouter } from "next/router";
 
 import { useWS } from "../../components/WsProvider/index";
 import { useAuth } from "../../components/AuthProvider";
-
+import axios from "axios"
 type GameProviderProps = { children: ReactNode };
 
 //   import Loader from "../Loader";
@@ -24,6 +24,21 @@ export type IGameProviderContext = {
   players: any;
   roomUrl: any;
 };
+
+
+
+const getUser = async (playerId: string) => {
+  return axios.get(
+    `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/rest/user-info/${playerId}`,
+    {
+      headers: {
+        accesstoken: localStorage.getItem("accessToken"),
+        "content-type": "application/json",
+      },
+    }
+  );
+};
+
 
 const GameProviderContext = createContext<IGameProviderContext | null>(null);
 
@@ -46,6 +61,40 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   const { user } = useAuth();
 
   const [gameState, setGameState] = useState<any>(null);
+
+
+
+  useEffect( () => {
+    if (!players) {
+      return 
+
+    }
+
+
+    players.forEach((player:any) => {
+      if (!player.username) {
+        getUser(player.userId)
+        .then(({ data }) => {
+          const playersFiltered = players.map(player => {
+            if (player.userId === data.userId) {
+              return {...player, ...data}
+            }
+            return player
+          })
+          setPlayers(playersFiltered)
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      }
+    })
+
+
+
+
+  }, [players]);
+
+
 
   useEffect(() => {
     WSProvider.onmessage = function ({ data }) {

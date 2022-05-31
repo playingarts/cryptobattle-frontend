@@ -27,7 +27,6 @@ const NewGame: NextPage = () => {
   const { openNotification, closeNotification } = useNotifications();
 
   const { roomUrl, players } = useGame();
-  // const router = useRouter();
 
   const startGame = () => {
     const startGameEvent = () => {
@@ -38,113 +37,59 @@ const NewGame: NextPage = () => {
         })
       );
     };
+    if (!allReady) {
+      openNotification({
+        title: "Are You Sure?",
+        description:
+          "Some of the players are still not ready and will not play this round!",
+        footer: (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <Button
+              onClick={closeNotification}
+              css={() => ({
+                background: "#7B61FF",
+                color: "#fff",
+                margin: "10px auto",
+              })}
+            >
+              Wait for others
+            </Button>
 
-    openNotification({
-      title: "Are You Sure?",
-      description:
-        "Some of the players are still not ready and will not play this round!",
-      footer: (
-        <div>
-          <Button
-            onClick={closeNotification}
-            css={() => ({
-              background: "#7B61FF",
-              color: "#fff",
-              margin: "20px auto",
-            })}
-          >
-            Wait for others
-          </Button>
-
-          <Button
-            onClick={startGameEvent}
-            css={() => ({
-              background: "#7B61FF",
-              color: "#fff",
-              margin: "20px auto",
-            })}
-          >
-            Start the game
-          </Button>
-        </div>
-      ),
-    });
-    // router.push("/play");
+            <Button
+              onClick={startGameEvent}
+              css={() => ({
+                background: "#7B61FF",
+                color: "#fff",
+                margin: "20px auto",
+              })}
+            >
+              Start the game
+            </Button>
+          </div>
+        ),
+      });
+    }
+    else {
+      startGameEvent()
+    }
   };
 
-  // const [roomUrl, setRoomUrl] = useState("");
   const [allReady, setAllReady] = useState(false);
+  const [startGameDisabled, setStartGameDisabled] = useState(true);
 
   useEffect(() => {
-    const isEveryoneReady = players.every((player:any) => player.state === "ready");
-
+    const isEveryoneReady = players.every(
+      (player: any) => player.state === "ready"
+    );
+    const startGameDisabled =
+      players.filter((player: any) => player.state === "ready").length < 2;
     setAllReady(isEveryoneReady && players.length > 1);
+    setStartGameDisabled(startGameDisabled);
   }, [players]);
-
-  // useEffect(() => {
-  //   setPlayers([{ ...user, state: "ready" }]);
-  // }, [user]);
 
   const WSProvider = useWS();
 
   useEffect(() => {
-    // WSProvider.onmessage = function ({ data }) {
-    //   const event = JSON.parse(data);
-
-    //   // console.log(event);
-    //   // setGameState(event);
-
-    //   if (event.event === "create-room") {
-    //     setRoomUrl(`https://play2.playingarts.com/join/${event.data.roomId}`);
-    //     // WSProvider.send(
-    //     //   JSON.stringify({
-    //     //     event: "player-ready",
-    //     //     data: {
-    //     //       ready: true,
-    //     //     },
-    //     //   })
-    //     // );
-    //   }
-
-    //   if (event.data.error && event.data.error.message) {
-    //     if (
-    //       event.data.error.message ===
-    //       "Its not allowed to create new room while being in game"
-    //     ) {
-    //       WSProvider.send(
-    //         JSON.stringify({
-    //           event: "purge-rooms-and-games",
-    //           data: {},
-    //         })
-    //       );
-    //       return;
-    //     }
-    //   }
-
-    //   // if (event.event === "game-updated") {
-    //   //   setGameState(event.data);
-
-    //   //   setTimeout(() => {
-    //   //     if (event.data.state === "started") {
-    //   //       router.push("/play");
-    //   //     }
-    //   //   }, 2000);
-
-    //   //   console.log('game-updated": ', data);
-    //   // }
-
-    //   if (event.event === "room-updated") {
-    //     console.log(event.data.roomUsers);
-    //     setPlayers(event.data.roomUsers);
-    //   }
-
-    //   if (event.data.error && event.data.error.message) {
-    //     alert(event.data.error.message);
-    //   }
-
-    //   console.log(JSON.parse(data));
-    // };
-
     WSProvider.addEventListener("create-room", (data) => {
       // I am expecting 'Hello specific client'
       console.log(data, "eventlistener");
@@ -170,6 +115,12 @@ const NewGame: NextPage = () => {
             type: "private",
             maxPlayers: 10,
           },
+        })
+      );
+      WSProvider.send(
+        JSON.stringify({
+          event: "room-info",
+          data: {},
         })
       );
     };
@@ -234,7 +185,7 @@ const NewGame: NextPage = () => {
           <Line />{" "}
           <div style={{ display: "flex", justifyItems: "center" }}>
             <Button
-              disabled={!allReady}
+              disabled={startGameDisabled}
               css={() => ({
                 background: "#7B61FF",
                 color: "#fff",

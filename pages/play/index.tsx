@@ -27,6 +27,12 @@ const Play: NextPage = () => {
           data: {},
         })
       );
+      WSProvider.send(
+        JSON.stringify({
+          event: "room-info",
+          data: {},
+        })
+      );
     };
   }, []);
 

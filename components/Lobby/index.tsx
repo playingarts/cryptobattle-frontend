@@ -11,17 +11,12 @@ interface Stats extends Props {
 interface PlayerType {
   userId: string;
   state: string;
+  color: string;
 }
 
 import Player from "../Player";
 
-const colors = [
-  'red',
-  'blue',
-  'green',
-  'yellow',
-  'black'
-]
+
 
 import PlayerEmpty from "../PlayerEmpty";
 
@@ -48,7 +43,7 @@ const Lobby: FC<Stats> = ({ isAdmin, players}) => {
         }}
       >
         {players.map((player: PlayerType, index) => (
-          <Player color={colors[index]} isAdmin={isAdmin} player={player} key={player.userId} />
+          <Player color={player.color} isAdmin={isAdmin} player={player} key={player.userId} />
         ))}
 
         {Array(4 - players.length)

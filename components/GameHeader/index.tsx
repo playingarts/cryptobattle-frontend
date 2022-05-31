@@ -9,8 +9,6 @@ import UserAvatar from "../UserAvatar";
 import GameInventory from "../GameInventory";
 import { getCard } from "../../components/Cards";
 
-
-  
 export interface Props extends HTMLAttributes<HTMLElement> {
   palette?: "gradient";
   altNav?: JSX.Element;
@@ -33,38 +31,37 @@ const GameHeader: FC<Props> = ({
   //   const [players, setPlayers] = useState([user]);
 
   const { loggedIn, user } = useAuth();
-  const { gameState } = useGame();
-  const [players, setPlayers] = useState([]);
+  const { gameState, players } = useGame();
+  const [playersWithPoints, setPlayersWithPoints] = useState([]);
   const [currentPlayer, setCurrentPlayer] = useState("");
   const [opponentsCards, setOpponentsCards] = useState<Array<any>>([]);
 
   useEffect(() => {
-    if (!gameState) {
+    if (!gameState || !players) {
       return;
     }
 
-    const players: any = [user, ...gameState.opponentPlayers];
-
-    const playersWithPoints = players.map((player: any) => {
-      player.points = gameState.playersCurrentPoints[player.id]
-        ? gameState.playersCurrentPoints[player.id]
-        : 0 ;
-
+    const playersWithPoints = [...players].map((player: any) => {
+      player.points = gameState.playersCurrentPoints[player.userId]
+        ? gameState.playersCurrentPoints[player.userId]
+        : 0;
 
       return { ...player };
     });
 
     console.log(playersWithPoints, "playersWithPoints");
 
-    const playersSorted = playersWithPoints.sort((a: any, b: any) => b.points - a.points);
+    const playersSorted = playersWithPoints.sort(
+      (a: any, b: any) => b.points - a.points
+    );
     console.log(playersSorted, "playersSorted");
 
+    setPlayersWithPoints(playersSorted);
 
-    setPlayers(playersSorted);
-
-    setCurrentPlayer(gameState.turnForPlayer);
-  }, [gameState, user]);
-
+    setCurrentPlayer(
+      players.find((player: any) => player.userId === gameState.turnForPlayer)
+    );
+  }, [gameState, user, players]);
 
   useEffect(() => {
     if (!gameState || !user || !user.userId) {
@@ -77,16 +74,13 @@ const GameHeader: FC<Props> = ({
       const cardsOpponents = gameState.gameUsersWithCards.filter(
         (userCards: any) => userCards.userId !== user.userId
       )[0].cards;
-  
+
       const cardsOpponentsFormatted = cardsOpponents.map((card: any) => {
         return getCard(card.suit, card.value);
       });
       setOpponentsCards(cardsOpponentsFormatted);
-
     }
-
   }, [gameState, user]);
-
 
   return (
     <header {...props}>
@@ -136,7 +130,7 @@ const GameHeader: FC<Props> = ({
                     color: "#fff",
                   }}
                 >
-                  {currentPlayer}
+                  {currentPlayer ? currentPlayer.username : ""}
                 </Text>
                 <svg
                   width="16"
@@ -167,29 +161,27 @@ const GameHeader: FC<Props> = ({
             transform: "translate(-50%, -50%) scale(0.8)",
           })}
         >
-           <GameInventory isOpponentsCards={true} cards={opponentsCards} />
+          <GameInventory isOpponentsCards={true} cards={opponentsCards} />
         </div>
 
         {loggedIn &&
           user &&
-          players.map((player: any) => {
+          playersWithPoints.map((player: any) => {
             return (
               <div
-              key={player.username}
-
+                key={player.userId}
                 css={{
                   position: "relative",
                   transition: "opacity 800ms",
                   border: "10px solid" + player.color,
-
                   "&:hover": {
                     opacity: 0.9,
                     "&::before": {
                       content: `'${player.points}'`,
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      color: 'black',
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      color: "black",
                       position: "absolute",
                       background: "#ffff",
                       borderRadius: 10,

@@ -89,7 +89,7 @@ useEffect(() => {
               <div
                 css={{
                   borderRadius: 900,
-                  background: notification.iconColor ?  notification.iconColor : 'black',
+                  background: notification.iconColor ?  notification.iconColor : 'purple',
                   color: "#fff",
                   height: 60,
                   top: 0,
