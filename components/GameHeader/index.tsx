@@ -6,7 +6,11 @@ import { useGame } from "../GameProvider";
 import Text from "../Text";
 import LogoMenu from "../LogoMenu";
 import UserAvatar from "../UserAvatar";
+import GameInventory from "../GameInventory";
+import { getCard } from "../../components/Cards";
 
+
+  
 export interface Props extends HTMLAttributes<HTMLElement> {
   palette?: "gradient";
   altNav?: JSX.Element;
@@ -32,6 +36,7 @@ const GameHeader: FC<Props> = ({
   const { gameState } = useGame();
   const [players, setPlayers] = useState([]);
   const [currentPlayer, setCurrentPlayer] = useState("");
+  const [opponentsCards, setOpponentsCards] = useState<Array<any>>([]);
 
   useEffect(() => {
     if (!gameState) {
@@ -59,6 +64,29 @@ const GameHeader: FC<Props> = ({
 
     setCurrentPlayer(gameState.turnForPlayer);
   }, [gameState, user]);
+
+
+  useEffect(() => {
+    if (!gameState || !user || !user.userId) {
+      return;
+    }
+    console.log(gameState.gameUsersWithCards);
+
+    // Show opponents cards if 2 players
+    if (gameState.opponentPlayers.length === 1) {
+      const cardsOpponents = gameState.gameUsersWithCards.filter(
+        (userCards: any) => userCards.userId !== user.userId
+      )[0].cards;
+  
+      const cardsOpponentsFormatted = cardsOpponents.map((card: any) => {
+        return getCard(card.suit, card.value);
+      });
+      setOpponentsCards(cardsOpponentsFormatted);
+
+    }
+
+  }, [gameState, user]);
+
 
   return (
     <header {...props}>
@@ -128,6 +156,20 @@ const GameHeader: FC<Props> = ({
             }
           ></LogoMenu>
         </div>
+
+        <div
+          css={(theme) => ({
+            transition: theme.transitions.normal("top"),
+            textAlign: "center",
+            position: "absolute",
+            left: "50%",
+            top: "120%",
+            transform: "translate(-50%, -50%) scale(0.8)",
+          })}
+        >
+           <GameInventory isOpponentsCards={true} cards={opponentsCards} />
+        </div>
+
         {loggedIn &&
           user &&
           players.map((player: any) => {

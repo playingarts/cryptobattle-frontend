@@ -13,7 +13,7 @@ import { useState, useEffect } from "react";
 const Play: NextPage = () => {
   const [selectedCard, setSelectedCard] = useState("");
   const WSProvider = useWS();
-  const {user} = useAuth();
+  const { user } = useAuth();
 
   const [myCards, setMyCards] = useState<Array<any>>([]);
 
@@ -34,9 +34,13 @@ const Play: NextPage = () => {
     if (!gameState || !user || !user.userId) {
       return;
     }
-    console.log(gameState.gameUsersWithCards)
-    console.log(user.userId, 'id')
-    const cards = gameState.gameUsersWithCards.filter((userCards:any) => userCards.userId === user.userId)[0].cards;
+    console.log(gameState.gameUsersWithCards);
+    console.log(user.userId, "id");
+
+    const cards = gameState.gameUsersWithCards.filter(
+      (userCards: any) => userCards.userId === user.userId
+    )[0].cards;
+
 
     if (!cards) {
       return;
@@ -47,6 +51,10 @@ const Play: NextPage = () => {
     });
 
     setMyCards(cardsFormatted);
+
+
+
+
   }, [gameState, user]);
 
   return (

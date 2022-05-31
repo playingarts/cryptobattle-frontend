@@ -15,24 +15,30 @@ interface Card {
 interface Props {
   selectedCard?: string;
   cards: Card[];
-  onChange: (cardId: string) => void;
+  isOpponentsCards?: boolean;
+  onChange?: (cardId: string) => void;
 }
 
-const GameInventory: FC<Props> = ({ children, cards, ...props }) => {
+const GameInventory: FC<Props> = ({ children,  isOpponentsCards, cards, ...props }) => {
   const [selectedCard, setSelectedCard] = useState<any>(null);
+  // const [cardsSorted, setSortedCards] = useState<any>([]);
 
-  const WSProvider = useWS()
+  const WSProvider = useWS();
 
   const skip = () => {
     WSProvider.send(
       JSON.stringify({
         event: "play-card",
         data: {
-          action: 'pass',
+          action: "pass",
         },
       })
     );
-  }
+  };
+  // useEffect(() => {
+  //   const sortedCards = cars
+
+  // }, [cards])
 
   const selectCard = useCallback(
     (card) => () => {
@@ -70,25 +76,33 @@ const GameInventory: FC<Props> = ({ children, cards, ...props }) => {
           justifyContent: "space-between",
         }}
       >
-        {cards.length > 0 && cards.map((card, index) => {
-          return (
-            <CardSmall  
-              onClick={selectCard(card)}
-              key={`${index}`}
-              isSelected={selectedCard ? selectedCard.id === card.id : false}
-              style={{ marginRight: "10px" }}
-              cardValue={card.value}
-              {...card}
-            />
-          );
-        })}
+        {cards.length > 0 &&
+          cards.map((card, index) => {
+            return (
+              <CardSmall
+                onClick={selectCard(card)}
+                key={`${index}`}
+                isSelected={selectedCard ? selectedCard.id === card.id : false}
+                style={{ marginRight: "10px", pointerEvents:  !isOpponentsCards ? 'auto' : 'none' }}
+                cardValue={card.value}
+                {...card}
+              />
+            );
+          })}
       </div>
-
-      <Button
-        Icon={Skip}
-        onClick={skip}
-        css={{marginLeft: 20, borderRadius: 400, background: '#181818', width: 60, height: 60}}
-      ></Button>
+      {!isOpponentsCards && (
+        <Button
+          Icon={Skip}
+          onClick={skip}
+          css={{
+            marginLeft: 20,
+            borderRadius: 400,
+            background: "#181818",
+            width: 60,
+            height: 60,
+          }}
+        ></Button>
+      )}
 
       {children}
     </div>
