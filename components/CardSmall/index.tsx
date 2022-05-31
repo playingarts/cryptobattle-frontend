@@ -7,6 +7,7 @@ interface Props extends HTMLAttributes<HTMLElement> {
   cardValue: string;
   suit?: CardSuits;
   isSelected: boolean;
+  background?: string
 }
 
 const CardSmall: FC<Props> = ({
@@ -14,6 +15,7 @@ const CardSmall: FC<Props> = ({
   cardValue,
   suit,
   isSelected,
+  background,
   ...props
 }) => (
   <div
@@ -37,7 +39,7 @@ const CardSmall: FC<Props> = ({
         paddingTop: theme.spacing(1.5),
         paddingBottom: theme.spacing(1.5),
         borderRadius: theme.spacing(1),
-        background: "#0C0E11",
+        background: background ? background : "#0C0E11",
         height: theme.spacing(9),
         width: theme.spacing(6.5),
         position: "relative",

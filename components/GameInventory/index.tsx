@@ -1,4 +1,4 @@
-import { FC, useState, useCallback, HTMLAttributes } from "react";
+import { FC, useState, useEffect, useCallback, HTMLAttributes } from "react";
 import CardSmall from "../../components/CardSmall";
 import { CardSuits } from "../../source/enums";
 import Button from "../../components/Button";
@@ -21,6 +21,9 @@ interface Props {
 
 const GameInventory: FC<Props> = ({ children,  isOpponentsCards, cards, ...props }) => {
   const [selectedCard, setSelectedCard] = useState<any>(null);
+  const [cardsRegular, setCardsRegular] = useState<any>([]);
+  const [cardsNft, setCardsNft] = useState<any>([]);
+
   // const [cardsSorted, setSortedCards] = useState<any>([]);
 
   const WSProvider = useWS();
@@ -35,10 +38,13 @@ const GameInventory: FC<Props> = ({ children,  isOpponentsCards, cards, ...props
       })
     );
   };
-  // useEffect(() => {
-  //   const sortedCards = cars
 
-  // }, [cards])
+  useEffect(() => {
+    const cardsNft = cards.filter(card => !card.id)
+    const cardsRegular = cards.filter(card => card.id)
+    setCardsNft(cardsNft)
+    setCardsRegular(cardsRegular)
+  }, [cards])
 
   const selectCard = useCallback(
     (card) => () => {
@@ -76,14 +82,28 @@ const GameInventory: FC<Props> = ({ children,  isOpponentsCards, cards, ...props
           justifyContent: "space-between",
         }}
       >
-        {cards.length > 0 &&
-          cards.map((card, index) => {
+        {cardsRegular.length > 0 &&
+          cardsRegular.map((card: any, index: number) => {
             return (
               <CardSmall
                 onClick={selectCard(card)}
                 key={`${index}`}
                 isSelected={selectedCard ? selectedCard.id === card.id : false}
                 style={{ marginRight: "10px", pointerEvents:  !isOpponentsCards ? 'auto' : 'none' }}
+                cardValue={card.value}
+                {...card}
+              />
+            );
+          })}
+        {cardsNft.length > 0 &&
+          cardsNft.map((card: any, index: number) => {
+            return (
+              <CardSmall
+                onClick={selectCard(card)}
+                key={`${index}`}
+                isSelected={selectedCard ? selectedCard.id === card.id : false}
+                style={{ marginRight: "10px", pointerEvents:  !isOpponentsCards ? 'auto' : 'none',}}
+                background="purple"
                 cardValue={card.value}
                 {...card}
               />
