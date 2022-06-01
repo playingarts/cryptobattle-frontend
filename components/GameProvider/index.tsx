@@ -40,7 +40,7 @@ const getUser = async (playerId: string) => {
 const GameProviderContext = createContext<IGameProviderContext | null>(null);
 
 function GameProvider({ children }: GameProviderProps): JSX.Element {
-  const { openNotification } = useNotifications();
+  const { openNotification, closeNotification } = useNotifications();
 
   const [results, setResults] = useState<any>(null);
   const [players, setPlayers] = useState<any>([]);
@@ -90,11 +90,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         console.log("Room updated: ", event.data.roomUsers);
         setPlayers(event.data.roomUsers);
       }
-      if (event.event === "choose-nft-cards" ) {
+      if (event.event === "choose-nft-cards") {
         console.log("choose-nft-cards sub: ", event);
-        // setPlayers(event.data.roomUsers);
       }
-      
 
       if (event.event === "create-room") {
         setRoomUrl(`https://play2.playingarts.com/join/${event.data.roomId}`);
@@ -105,7 +103,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           event.data.error.message ===
             "Its not allowed to create new room while being in game" ||
           event.data.error.message ===
-            "Joining while hosting a game is forbidden" || event.data.error.message.startsWith('User is in a active game for room')
+            "Joining while hosting a game is forbidden" ||
+          event.data.error.message.startsWith(
+            "User is in a active game for room"
+          )
         ) {
           WSProvider.send(
             JSON.stringify({
@@ -113,7 +114,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
               data: {},
             })
           );
-          window.location.reload()
+          window.location.reload();
           return;
         }
       }
@@ -123,14 +124,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         setResults(event.data);
       }
       if (event.event === "game-info") {
-        // setGameState({})
         setGameState({ ...gameState, ...event.data });
-        // setTimeout(() => {
-        //   // setGameState({ ...event.data });
-
-        //   if (event.data.state === "started") {
-        //     router.push("/play", null, { shallow: true });
-        //   }
 
         if (event.data.state === "ended" && !results) {
           openNotification({
@@ -145,35 +139,21 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           });
         }
 
-        // }, 100);
-
         console.log(event.data.state);
 
         if (event.data.state === "ended") {
-          // console.log('eneded')
-          // setResults(true)
         }
 
         console.log('game-info": ', event.data);
       }
 
       if (event.event === "game-updated") {
-        // setGameState({})
         setGameState({ ...event.data });
         setTimeout(() => {
-          // setGameState({ ...event.data });
-
           if (event.data.state === "started") {
+            closeNotification();
             router.push("/play");
-
-            // router.push("/play", null, { shallow: true });
           }
-
-          // setTimeout(() => {
-          //   if (event.data.state === "started") {
-          //     router.push("/play");
-          //   }
-          // }, 4000);
         }, 1000);
 
         console.log('game-updated": ', event.data);
@@ -202,7 +182,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         <Text variant="h1" css={{ fontSize: 30, lineHeight: 1 }}>
           {results.playersPoints.map((entry: any) => {
             return (
-              <div css={{marginBottom: 10}} key={entry.userId}>
+              <div css={{ marginBottom: 10 }} key={entry.userId}>
                 {players.find((player: any) => player.userId === entry.userId)
                   .username +
                   " : " +
