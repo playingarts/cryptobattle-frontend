@@ -6,6 +6,7 @@ import CardStats from "../CardStats";
 // type Props = HTMLAttributes<HTMLElement>;
 interface CardType {
   id: string;
+  uid: string;
   name: string;
   onSale: boolean;
   power: number;
@@ -33,7 +34,7 @@ const MostPlayedCards: FC<Props> = ({color, topCards, addCard, ...props }) => {
         <div
           onClick={handleClick(card)}
           style={{ width: "50%", display: "flex", alignItems: "center" }}
-          key={card.id}
+          key={card.uid}
         >
           <Card
             css={{ marginRight: "20px" }}

@@ -28,7 +28,7 @@ const getSuit = (suit: string) => {
   return Joker;
 };
 
-const getCard = (suit: string, value: string) => {
+const getCard = (suit: string, value: string, card:any) => {
   if (!suit) {
     throw Error ('no suit = getCard')
   }
@@ -50,12 +50,12 @@ const getCard = (suit: string, value: string) => {
       // throw Error ('Card not found in getCard')
   }
   foundCard.Icon = getSuit(suit);
-  foundCard.id = uuid()
+  foundCard.uid = uuid()
 
   // console.log(foundCard);
 
   // console.log(suit,value)
-  return foundCard
+  return {...foundCard, ...card}
 
 //   return {
 //     id: value,

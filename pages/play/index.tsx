@@ -53,7 +53,7 @@ const Play: NextPage = () => {
     }
 
     const cardsFormatted = cards.map((card: any) => {
-      return getCard(card.suit, card.value);
+      return getCard(card.suit, card.value, card);
     });
 
     setMyCards(cardsFormatted);
@@ -78,7 +78,7 @@ const Play: NextPage = () => {
           selectedCard={selectedCard}
           removeCard={(cardToRemove: any) =>
             setMyCards(
-              myCards.filter((card: any) => card.id !== cardToRemove.id)
+              myCards.filter((card: any) => card.uid !== cardToRemove.uid)
             )
           }
         ></GameBoard>

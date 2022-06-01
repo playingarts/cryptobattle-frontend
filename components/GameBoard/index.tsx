@@ -28,6 +28,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
   const { gameState } = useGame();
 
   const [board, setBoard] = useState(generateBoard(7, 5));
+  const [refresh, setRefresh] = useState(false);
 
   const addCard = useCallback(
     (rowIndex, columnIndex, card = selectedCard) =>
@@ -36,16 +37,21 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
           gameState.allowedUserCardsPlacement.additionalProperties[
             `${rowIndex}-${columnIndex}`
           ];
+          
 
-        console.log(rowIndex, columnIndex, allowedPlacement, "allowedPLacment");
+          if (!card) {
+            return
+          }
+
+        console.log(rowIndex, columnIndex, allowedPlacement, "allowedPlacement");
         console.log(card);
 
         if (
           allowedPlacement &&
           !allowedPlacement.find(
             (allowedCard: any) =>
-              allowedCard.suit.toLowerCase() === card.suit.toLowerCase() &&
-              allowedCard.value !== card.value
+              (allowedCard.suit.toLowerCase() === card.suit.toLowerCase() &&
+              allowedCard.value !== card.value) || (allowedCard.value.toLowerCase() === card.value.toLowerCase() && allowedCard.value.toLowerCase() === 'joker')
           )
         ) {
           console.log(rowIndex, columnIndex);
@@ -129,10 +135,12 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
 
   useEffect(() => {
     // console.log(gameState)
-
+    console.log("gameState:", gameState)
     if (!gameState) {
       return;
     }
+    setRefresh(true)
+
     const tableCards = gameState.gameTableCards?.additionalProperties;
     console.log("tableCards", tableCards);
     if (!tableCards) {
@@ -142,9 +150,10 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
     Object.keys(tableCards).forEach((key) => {
       const cards = gameState.gameTableCards?.additionalProperties;
       const indexes = key.split("-");
-      const card = getCard(cards[key].slice(-1)[0].suit, cards[key].slice(-1)[0].value);
+      const card = getCard(cards[key].slice(-1)[0].suit, cards[key].slice(-1)[0].value, cards[key].slice(-1)[0]);
       addCardOnce(Number(indexes[1]), Number(indexes[0]), card);
     });
+    setRefresh(false)
   }, [gameState]);
 
   return (
@@ -158,7 +167,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
       })}
     >
       <div>
-        {board.map((row: any, rowIndex: number) => {
+        {!refresh && board.map((row: any, rowIndex: number) => {
           return (
             <div
               key={rowIndex}

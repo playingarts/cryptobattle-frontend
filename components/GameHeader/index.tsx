@@ -33,8 +33,6 @@ const GameHeader: FC<Props> = ({
   useEffect(() => {
 
     if (!gameState ) {
-      console.log('!gameState')
-
       return;
     }
 
@@ -69,7 +67,7 @@ const GameHeader: FC<Props> = ({
       )[0].cards;
 
       const cardsOpponentsFormatted = cardsOpponents.map((card: any) => {
-        return getCard(card.suit, card.value);
+        return getCard(card.suit, card.value, card);
       });
       setOpponentsCards(cardsOpponentsFormatted);
     }

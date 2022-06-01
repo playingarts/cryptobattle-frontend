@@ -4,6 +4,8 @@ import { CardSuits } from "../../source/enums";
 import Button from "../../components/Button";
 import Skip from "../../components/Icons/Skip";
 import { useWS } from "../WsProvider";
+import { useGame } from "../GameProvider";
+import { useAuth } from "../AuthProvider";
 
 interface Card {
   id?: string;
@@ -19,12 +21,17 @@ interface Props {
   onChange?: (cardId: string) => void;
 }
 
-const GameInventory: FC<Props> = ({ children,  isOpponentsCards, cards, ...props }) => {
+const GameInventory: FC<Props> = ({
+  children,
+  isOpponentsCards,
+  cards,
+  ...props
+}) => {
   const [selectedCard, setSelectedCard] = useState<any>(null);
   const [cardsRegular, setCardsRegular] = useState<any>([]);
   const [cardsNft, setCardsNft] = useState<any>([]);
-
-  // const [cardsSorted, setSortedCards] = useState<any>([]);
+  const { gameState } = useGame();
+  const { user } = useAuth();
 
   const WSProvider = useWS();
 
@@ -40,11 +47,11 @@ const GameInventory: FC<Props> = ({ children,  isOpponentsCards, cards, ...props
   };
 
   useEffect(() => {
-    const cardsNft = cards.filter(card => !card.id)
-    const cardsRegular = cards.filter(card => card.id)
-    setCardsNft(cardsNft)
-    setCardsRegular(cardsRegular)
-  }, [cards])
+    const cardsNft = cards.filter((card) => card.id);
+    const cardsRegular = cards.filter((card) => !card.id);
+    setCardsNft(cardsNft);
+    setCardsRegular(cardsRegular);
+  }, [cards]);
 
   const selectCard = useCallback(
     (card) => () => {
@@ -73,13 +80,15 @@ const GameInventory: FC<Props> = ({ children,  isOpponentsCards, cards, ...props
     >
       <div
         style={{
-          background: "#fff",
+          background: (gameState?.turnForPlayer === user.userId && !isOpponentsCards) || (gameState?.turnForPlayer !== user.userId && isOpponentsCards) ? "#fff" : 'gray',
           borderRadius: "20px",
           padding: "15px 15px",
           height: "100%",
           marginBottom: "10px",
           display: "flex",
           justifyContent: "space-between",
+          zIndex: 999999,
+
         }}
       >
         {cardsRegular.length > 0 &&
@@ -89,7 +98,13 @@ const GameInventory: FC<Props> = ({ children,  isOpponentsCards, cards, ...props
                 onClick={selectCard(card)}
                 key={`${index}`}
                 isSelected={selectedCard ? selectedCard.id === card.id : false}
-                style={{ marginRight: "10px", pointerEvents:  !isOpponentsCards ? 'auto' : 'none' }}
+                style={{
+                  marginRight: "10px",
+                  pointerEvents:
+                    !isOpponentsCards && gameState?.turnForPlayer === user.userId
+                      ? "auto"
+                      : "none",
+                }}
                 cardValue={card.value}
                 {...card}
               />
@@ -102,7 +117,13 @@ const GameInventory: FC<Props> = ({ children,  isOpponentsCards, cards, ...props
                 onClick={selectCard(card)}
                 key={`${index}`}
                 isSelected={selectedCard ? selectedCard.id === card.id : false}
-                style={{ marginRight: "10px", pointerEvents:  !isOpponentsCards ? 'auto' : 'none',}}
+                style={{
+                  marginRight: "10px",
+                  pointerEvents:
+                    (!isOpponentsCards && gameState?.turnForPlayer === user.userId)
+                      ? "auto"
+                      : "none",
+                }}
                 background="purple"
                 cardValue={card.value}
                 {...card}
