@@ -45,16 +45,7 @@ const Player: FC<Player> = ({ color, player, isAdmin }) => {
     );
   }, []);
 
-  // const kickPlayer = (userId: string) => {
-  //   WSProvider.send(
-  //     JSON.stringify({
-  //       event: "kick-player",
-  //       data: {
-  //         userId,
-  //       },
-  //     })
-  //   );
-  // }
+
 
   useEffect(() => {
     if (!playerInfo.name && player.userId) {
@@ -70,16 +61,6 @@ const Player: FC<Player> = ({ color, player, isAdmin }) => {
 
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
-      {/* <div
-        style={{
-          borderRadius: "200px",
-          width: "70px",
-          height: "70px",
-          background: "black",
-          backgroundSize: "cover",
-          backgroundImage: "url(" + playerInfo.profilePictureUrl + ")",
-        }}
-      ></div> */}
 
       <UserAvatar
         profilePictureUrl={playerInfo.profilePictureUrl}

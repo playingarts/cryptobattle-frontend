@@ -6,6 +6,7 @@ import { useAuth } from "../AuthProvider";
 import axios from "axios";
 import Line from "../Line";
 // import Loader from "../Loader";
+import { useWS } from "../../components/WsProvider/index";
 
 import MetamaskLogin from "../MetamaskLogin/";
 import StatBlock from "../../components/StatBlock";
@@ -34,16 +35,17 @@ export type Props = HTMLAttributes<HTMLDivElement>;
 
 const NFTChoose: FC<Props> = () => {
   // const [NFTCards, setNFTCards] = useState([]);
+  const WSProvider = useWS();
 
   const { user } = useAuth();
 
-  const [firstCard, setFirstCard] = useState<CardType>();
-  const [secondCard, setSecondCard] = useState<CardType>();
+  const [firstCard, setFirstCard] = useState<any>();
+  const [secondCard, setSecondCard] = useState<any>();
 
   const [activeCard, setActiveCard] = useState(0);
 
   const [loading, setLoading] = useState(false);
-  const [topCards, setTopCards] = useState<Array<CardType>>([]);
+  const [topCards, setTopCards] = useState<Array<any>>([]);
 
   const setFirstCardActive = () => {
     setActiveCard(1);
@@ -64,6 +66,35 @@ const NFTChoose: FC<Props> = () => {
     },
     [setFirstCard, setSecondCard, activeCard]
   );
+
+  useEffect(() => {
+    if (!firstCard && !secondCard) {
+      return;
+    }
+
+    const data = []
+
+    if (firstCard) {
+      data.push({
+        id: firstCard.id,
+      });
+    }
+
+    if (secondCard) {
+      data.push({
+        id: secondCard.id,
+      });
+    }
+
+    WSProvider.send(
+      JSON.stringify({
+        event: "choose-nft-cards",
+        data: {
+          "cards": data
+        },
+      })
+    );
+  }, [firstCard, secondCard, WSProvider]);
 
   useEffect(() => {
     if (!user.isMetamaskConnected) {
