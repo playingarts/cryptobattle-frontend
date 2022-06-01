@@ -32,6 +32,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
 
   interface CardType {
     id: string;
+    uid: string;
     name: string;
     onSale: boolean;
     power: number;

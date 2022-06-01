@@ -1,5 +1,5 @@
 import { FC, HTMLAttributes, useRef } from "react";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { theme } from "../../pages/_app";
 import Image from "next/image";
 import Loader from "../Loader";
@@ -38,45 +38,45 @@ const Card: FC<Props> = ({
 
   animated = !card.img || (animated && !!card.video);
 
-  useEffect(() => {
-    if (animated || !video.current) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (animated || !video.current) {
+  //     return;
+  //   }
 
-    // Initializing values
-    const isPlaying = true;
+  //   // Initializing values
+  //   let isPlaying = true;
 
-    // On video playing toggle values
-    video.current.onplaying = function () {
-      isPlaying = true;
-    };
+  //   // On video playing toggle values
+  //   video.current.onplaying = function () {
+  //     isPlaying = true;
+  //   };
 
-    // On video pause toggle values
-    video.current.onpause = function () {
-      isPlaying = false;
-    };
+  //   // On video pause toggle values
+  //   video.current.onpause = function () {
+  //     isPlaying = false;
+  //   };
 
-    // Play video function
-    async function playVid() {
-      if (video.current.paused && !isPlaying) {
-        return video.current.play();
-      }
-    }
+  //   // Play video function
+  //   async function playVid() {
+  //     if (video.current?.paused && !isPlaying) {
+  //       return video.current?.play();
+  //     }
+  //   }
 
-    // Pause video function
-    function pauseVid() {
-      if (!video.current.paused && isPlaying) {
-        video.current.pause();
-      }
-    }
+  //   // Pause video function
+  //   function pauseVid() {
+  //     if (!video.current?.paused && isPlaying) {
+  //       video.current?.pause();
+  //     }
+  //   }
 
-    if (!hovered) {
-      pauseVid();
-      video.current.currentTime = 0;
-    } else {
-      playVid();
-    }
-  }, [hovered, animated]);
+  //   if (!hovered) {
+  //     pauseVid();
+  //     video.current.currentTime = 0;
+  //   } else {
+  //     playVid();
+  //   }
+  // }, [hovered, animated]);
 
   return (
     <div

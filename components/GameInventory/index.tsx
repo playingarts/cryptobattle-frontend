@@ -97,7 +97,7 @@ const GameInventory: FC<Props> = ({
               <CardSmall
                 onClick={selectCard(card)}
                 key={`${index}`}
-                isSelected={selectedCard ? selectedCard.id === card.id : false}
+                isSelected={selectedCard ? selectedCard.uid === card.uid : false}
                 style={{
                   marginRight: "10px",
                   pointerEvents:
@@ -116,7 +116,7 @@ const GameInventory: FC<Props> = ({
               <CardSmall
                 onClick={selectCard(card)}
                 key={`${index}`}
-                isSelected={selectedCard ? selectedCard.id === card.id : false}
+                isSelected={selectedCard ? selectedCard.uid === card.uid : false}
                 style={{
                   marginRight: "10px",
                   pointerEvents:
