@@ -90,7 +90,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         console.log("Room updated: ", event.data.roomUsers);
         setPlayers(event.data.roomUsers);
       }
-
+      if (event.event === "choose-nft-cards" ) {
+        console.log("choose-nft-cards sub: ", event);
+        // setPlayers(event.data.roomUsers);
+      }
       
 
       if (event.event === "create-room") {
@@ -102,7 +105,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           event.data.error.message ===
             "Its not allowed to create new room while being in game" ||
           event.data.error.message ===
-            "Joining while hosting a game is forbidden"
+            "Joining while hosting a game is forbidden" || event.data.error.message.startsWith('User is in a active game for room')
         ) {
           WSProvider.send(
             JSON.stringify({
@@ -110,6 +113,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
               data: {},
             })
           );
+          window.location.reload()
           return;
         }
       }
@@ -120,7 +124,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       }
       if (event.event === "game-info") {
         // setGameState({})
-        setGameState({ ...event.data });
+        setGameState({ ...gameState, ...event.data });
         // setTimeout(() => {
         //   // setGameState({ ...event.data });
 
