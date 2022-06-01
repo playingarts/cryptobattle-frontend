@@ -133,6 +133,14 @@ const JoinGame: NextPage = () => {
           },
         })
       );
+      setTimeout(() => {
+        WSProvider.send(
+          JSON.stringify({
+            event: "room-info",
+            data: {},
+          })
+        );
+      }, 500);
     };
 
     // WSProvider.addEventListener("close-room", (data) => {

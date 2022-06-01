@@ -117,12 +117,15 @@ const NewGame: NextPage = () => {
           },
         })
       );
-      WSProvider.send(
-        JSON.stringify({
-          event: "room-info",
-          data: {},
-        })
-      );
+      setTimeout(() => {
+        WSProvider.send(
+          JSON.stringify({
+            event: "room-info",
+            data: {},
+          })
+        );
+      }, 500);
+
     };
   });
   return (
