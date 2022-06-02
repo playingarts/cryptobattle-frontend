@@ -141,8 +141,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
         console.log(event.data.state);
 
-        if (event.data.state === "ended") {
-        }
+        // if (event.data.state === "ended") {
+        // }
 
         console.log('game-info": ', event.data);
       }
