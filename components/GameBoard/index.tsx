@@ -78,6 +78,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
               y: rowIndex,
               suit: card.suit,
               value: card.value.toString(),
+              nftId: card.id ? card.id : ''
             },
           })
         );
@@ -207,7 +208,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                       {column?.value && (
                         <Card
                           onClick={addCard(rowIndex, columnIndex)}
-                          animated={false}
+                          animated={column.id ? true : false}
                           card={column}
                         ></Card>
                       )}
