@@ -61,7 +61,7 @@ const GameHeader: FC<Props> = ({
     }
 
     // Show opponents cards if 2 players
-    if (gameState.opponentPlayers.length === 1) {
+    if (gameState.allGamePlayers.length === 2) {
       const cardsOpponents = gameState.gameUsersWithCards.filter(
         (userCards: any) => userCards.userId !== user.userId
       )[0].cards;
