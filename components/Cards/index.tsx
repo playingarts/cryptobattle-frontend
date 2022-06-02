@@ -7,7 +7,11 @@ import { v4 as uuid } from 'uuid';
 
 import cards from "./cards.json";
 
-const getSuit = (suit: string) => {
+const getSuit = (value: string, suit: string) => {
+
+  if (value === "joker") {
+    return Joker;
+  }
 
   if (suit === "hearts") {
     return Hearts;
@@ -18,10 +22,6 @@ const getSuit = (suit: string) => {
   if (suit === "diamonds") {
     return Diamonds;
   }
-  if (suit === "joker") {
-    return Joker;
-  }
-
   if (suit === "clubs") {
     return Clubs;
   }
@@ -47,20 +47,14 @@ const getCard = (suit: string, value: string, card:any) => {
 
   if (!foundCard) {
     return null
-      // throw Error ('Card not found in getCard')
+
   }
-  foundCard.Icon = getSuit(suit);
+  foundCard.Icon = getSuit(value, suit);
   foundCard.uid = uuid()
 
-  // console.log(foundCard);
 
-  // console.log(suit,value)
   return {...foundCard, ...card}
 
-//   return {
-//     id: value,
-//     suit: suit
-//   };
 };
 
 
