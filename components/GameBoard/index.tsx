@@ -35,26 +35,35 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
       () => {
         const allowedPlacement =
           gameState.allowedUserCardsPlacement.additionalProperties[
-            `${rowIndex}-${columnIndex}`
+            `${columnIndex}-${rowIndex}`
           ];
-          
 
-          if (!card) {
-            return
-          }
+        if (!card || !allowedPlacement) {
+          alert("Not allowed to place card there.");
 
-        console.log(rowIndex, columnIndex, allowedPlacement, "allowedPlacement");
-        console.log(card);
+          return;
+        }
+
+        console.log(
+          rowIndex,
+          columnIndex,
+          allowedPlacement,
+          "allowedPlacement"
+        );
+
 
         if (
           allowedPlacement &&
           !allowedPlacement.find(
             (allowedCard: any) =>
-              (allowedCard.suit.toLowerCase() === card.suit.toLowerCase() &&
-              allowedCard.value !== card.value) || (allowedCard.value.toLowerCase() === card.value.toLowerCase() && allowedCard.value.toLowerCase() === 'joker')
+              allowedCard.value === "joker" && allowedCard.value === card.value
+          ) &&
+          !allowedPlacement.find(
+            (allowedCard: any) =>
+              allowedCard.suit.toLowerCase() === card.suit.toLowerCase() &&
+              allowedCard.value === card.value
           )
         ) {
-          console.log(rowIndex, columnIndex);
           alert("Not allowed to place card there.");
           return;
         }
@@ -78,7 +87,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
           y: columnIndex,
           suit: card.suit,
           value: card.value.toString(),
-        })
+        });
       },
     [WSProvider, selectedCard, gameState]
   );
@@ -94,7 +103,6 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
     const localBoard = [...board];
 
     localBoard[row][column] = card;
-
 
     if (
       localBoard[row][column + 1] !== undefined &&
@@ -126,20 +134,18 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
 
     setBoard([...localBoard]);
 
-    console.log(board, ' :addCardOnce')
-
- 
+    console.log(board, " :addCardOnce");
 
     removeCard ? removeCard(card) : null;
   };
 
   useEffect(() => {
     // console.log(gameState)
-    console.log("gameState:", gameState)
+    console.log("gameState:", gameState);
     if (!gameState) {
       return;
     }
-    setRefresh(true)
+    setRefresh(true);
 
     const tableCards = gameState.gameTableCards?.additionalProperties;
     console.log("tableCards", tableCards);
@@ -150,10 +156,14 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
     Object.keys(tableCards).forEach((key) => {
       const cards = gameState.gameTableCards?.additionalProperties;
       const indexes = key.split("-");
-      const card = getCard(cards[key].slice(-1)[0].suit, cards[key].slice(-1)[0].value, cards[key].slice(-1)[0]);
+      const card = getCard(
+        cards[key].slice(-1)[0].suit,
+        cards[key].slice(-1)[0].value,
+        cards[key].slice(-1)[0]
+      );
       addCardOnce(Number(indexes[1]), Number(indexes[0]), card);
     });
-    setRefresh(false)
+    setRefresh(false);
   }, [gameState]);
 
   return (
@@ -167,45 +177,46 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
       })}
     >
       <div>
-        {!refresh && board.map((row: any, rowIndex: number) => {
-          return (
-            <div
-              key={rowIndex}
-              css={() => ({
-                display: "flex",
-                justifyContent: "center",
-              })}
-            >
-              {row.map((column: any, columnIndex: number) => {
-                return (
-                  <div
-                    key={column + columnIndex + Math.random()}
-                    css={() => ({
-                      margin: column ? "10px" : "10px",
-                    })}
-                  >
-                    {!column && (
-                      <div style={{ width: "210px", height: "300px" }}></div>
-                    )}
-                    {column === "empty" && (
-                      <CardEmpty
-                        onClick={addCard(rowIndex, columnIndex)}
-                      ></CardEmpty>
-                    )}
-                    {/* TODO */}
-                    {column?.value && (
-                      <Card
-                        onClick={addCard(rowIndex, columnIndex)}
-                        animated={false}
-                        card={column}
-                      ></Card>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
+        {!refresh &&
+          board.map((row: any, rowIndex: number) => {
+            return (
+              <div
+                key={rowIndex}
+                css={() => ({
+                  display: "flex",
+                  justifyContent: "center",
+                })}
+              >
+                {row.map((column: any, columnIndex: number) => {
+                  return (
+                    <div
+                      key={column + columnIndex + Math.random()}
+                      css={() => ({
+                        margin: column ? "10px" : "10px",
+                      })}
+                    >
+                      {!column && (
+                        <div style={{ width: "210px", height: "300px" }}></div>
+                      )}
+                      {column === "empty" && (
+                        <CardEmpty
+                          onClick={addCard(rowIndex, columnIndex)}
+                        ></CardEmpty>
+                      )}
+                      {/* TODO */}
+                      {column?.value && (
+                        <Card
+                          onClick={addCard(rowIndex, columnIndex)}
+                          animated={false}
+                          card={column}
+                        ></Card>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
       </div>
       {children}
     </div>
