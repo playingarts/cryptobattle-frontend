@@ -50,8 +50,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   const quit = () => {
     setResults(null);
+    closeNotification()
     router.push("/dashboard");
   };
+
   const WSProvider = useWS();
   const { user } = useAuth();
 
@@ -87,6 +89,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       console.log("Game Provider WS event:", event);
 
       if (event.event === "room-updated" || event.event === "room-info") {
+        if (!event.data.roomUsers) {
+          return
+        }
         console.log("Room updated: ", event.data.roomUsers);
         setPlayers(event.data.roomUsers);
       }
@@ -94,11 +99,28 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         console.log("choose-nft-cards sub: ", event);
       }
 
+      if (event.event === "user-info") {
+        if (event.data.inRoomId) {
+          setRoomUrl(`https://play2.playingarts.com/join/${event.data.inRoomId}`);
+        }
+      }
+
+
       if (event.event === "create-room") {
         setRoomUrl(`https://play2.playingarts.com/join/${event.data.roomId}`);
+        WSProvider.send(
+          JSON.stringify({
+            event: "room-info",
+            data: {},
+          })
+        );
       }
 
       if (event.data.error && event.data.error.message) {
+        if (event.data.error.message === "Player must be in a room") {
+          return;
+        }
+
         if (
           event.data.error.message ===
             "Its not allowed to create new room while being in game" ||
@@ -140,9 +162,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         }
 
         console.log(event.data.state);
-
-        // if (event.data.state === "ended") {
-        // }
 
         console.log('game-info": ', event.data);
       }
@@ -221,6 +240,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     }),
     [gameState, players, roomUrl]
   );
+
+
 
   return (
     <GameProviderContext.Provider value={memoedValue}>

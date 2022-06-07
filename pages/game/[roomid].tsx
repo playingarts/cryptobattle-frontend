@@ -18,12 +18,15 @@ import Lobby from "../../components/Lobby";
 import NFTChoose from "../../components/NFTChoose";
 
 import { useNotifications } from "../../components/NotificationProvider";
+import { useAuth } from "../../components/AuthProvider";
 
 const JoinGame: NextPage = () => {
   const WSProvider = useWS();
   const router = useRouter();
   const { roomid } = router.query;
   const { players } = useGame();
+  const { user } = useAuth();
+
   const [isReady, setReady] = useState(false);
   const { openNotification } = useNotifications();
 
@@ -67,30 +70,49 @@ const JoinGame: NextPage = () => {
   }, [isReady, openNotification]);
 
   useEffect(() => {
+    if (players.find((player) => player.userId === user.userId)) {
+      return;
+    }
+    WSProvider.send(
+      JSON.stringify({
+        event: "join-room",
+        data: {
+          roomId: roomid,
+        },
+      })
+    );
 
+    WSProvider.send(
+      JSON.stringify({
+        event: "room-info",
+        data: {},
+      })
+    );
+  }, [players]);
+
+  useEffect(() => {
+    console.log(roomid);
     if (!roomid) {
       return;
     }
 
-    WSProvider.onopen = function () {
+    WSProvider.send(
+      JSON.stringify({
+        event: "join-room",
+        data: {
+          roomId: roomid,
+        },
+      })
+    );
+
+    setTimeout(() => {
       WSProvider.send(
         JSON.stringify({
-          event: "join-room",
-          data: {
-            roomId: roomid,
-          },
+          event: "room-info",
+          data: {},
         })
       );
-      setTimeout(() => {
-        WSProvider.send(
-          JSON.stringify({
-            event: "room-info",
-            data: {},
-          })
-        );
-      }, 500);
-    };
-
+    }, 1000);
   }, [roomid]);
 
   return (

@@ -5,6 +5,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 type WSProviderProps = { children: ReactNode; url: string };
 
@@ -16,7 +17,7 @@ function WSProvider({ children }: WSProviderProps): JSX.Element {
   const wsInstance = useMemo(
     () =>
       typeof window != "undefined"
-        ? new WebSocket(
+        ? new ReconnectingWebSocket(
             `wss://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/socket?accesstoken=${accessToken}`
           )
         : null,
@@ -24,6 +25,24 @@ function WSProvider({ children }: WSProviderProps): JSX.Element {
   );
 
   useEffect(() => {
+    setInterval(() => {
+      if (!wsInstance) {
+        return
+      }
+      if (wsInstance.readyState === 2 || wsInstance.readyState === 3) {
+        console.log('CLOSING OR CLOSED')
+      }
+
+      console.log("ping")
+    }, 5000)
+
+  }, [wsInstance]);
+
+
+  useEffect(() => {
+    // wsInstance?.onclose(() => {
+
+    // })
     return () => {
       wsInstance?.close();
     };

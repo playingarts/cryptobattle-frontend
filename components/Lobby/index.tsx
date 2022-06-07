@@ -1,4 +1,4 @@
-import { FC, HTMLAttributes } from "react";
+import { FC, HTMLAttributes, useEffect } from "react";
 import StatBlock from "../StatBlock";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
@@ -21,9 +21,7 @@ import Player from "../Player";
 import PlayerEmpty from "../PlayerEmpty";
 
 const Lobby: FC<Stats> = ({ isAdmin, players}) => {
-  // const { players } = props;
-
-
+ 
   return (
     <StatBlock
       css={(theme) => ({
@@ -46,7 +44,7 @@ const Lobby: FC<Stats> = ({ isAdmin, players}) => {
           <Player color={player.color} isAdmin={isAdmin} player={player} key={player.userId} />
         ))}
 
-        {Array(4 - players.length)
+        {players && Array(4 - players.length)
           .fill(0)
           .map((_, i) => (
             <PlayerEmpty key={i} />

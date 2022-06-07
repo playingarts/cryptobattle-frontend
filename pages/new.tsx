@@ -78,6 +78,9 @@ const NewGame: NextPage = () => {
   const [startGameDisabled, setStartGameDisabled] = useState(true);
 
   useEffect(() => {
+    if(!players){
+      return
+    }
     const isEveryoneReady = players.every(
       (player: any) => player.state === "ready"
     );
@@ -90,24 +93,48 @@ const NewGame: NextPage = () => {
   const WSProvider = useWS();
 
   useEffect(() => {
-    WSProvider.addEventListener("create-room", (data) => {
-      // I am expecting 'Hello specific client'
-      console.log(data, "eventlistener");
-    });
+    // WSProvider.addEventListener("create-room", (data) => {
+    //   // I am expecting 'Hello specific client'
+    //   console.log(data, "eventlistener");
+    // });
 
-    WSProvider.addEventListener("close-room", (data) => {
-      console.log("close-room: ", data);
-    });
+    // WSProvider.addEventListener("close-room", (data) => {
+    //   console.log("close-room: ", data);
+    // });
 
-    WSProvider.addEventListener("player-ready", (data) => {
-      console.log("player-ready ", data);
-    });
+    // WSProvider.addEventListener("player-ready", (data) => {
+    //   console.log("player-ready ", data);
+    // });
 
-    WSProvider.addEventListener("start-game", (data) => {
-      console.log("start-game: ", data);
-    });
+    // WSProvider.addEventListener("start-game", (data) => {
+    //   console.log("start-game: ", data);
+    // });
 
-    WSProvider.onopen = function () {
+    // WSProvider.onopen = function () {
+    //   // WSProvider.send(
+    //   //   JSON.stringify({
+    //   //     event: "create-room",
+    //   //     data: {
+    //   //       type: "private",
+    //   //       maxPlayers: 10,
+    //   //     },
+    //   //   })
+    //   // );
+    //   // setTimeout(() => {
+    //   //   WSProvider.send(
+    //   //     JSON.stringify({
+    //   //       event: "room-info",
+    //   //       data: {},
+    //   //     })
+    //   //   );
+    //   // }, 500);
+
+    // };
+  });
+
+  useEffect(() => {
+    console.log(WSProvider.readyState)
+ if (WSProvider.readyState === 1) {
       WSProvider.send(
         JSON.stringify({
           event: "create-room",
@@ -117,17 +144,18 @@ const NewGame: NextPage = () => {
           },
         })
       );
-      setTimeout(() => {
-        WSProvider.send(
-          JSON.stringify({
-            event: "room-info",
-            data: {},
-          })
-        );
-      }, 500);
+      // setTimeout(() => {
+      //   WSProvider.send(
+      //     JSON.stringify({
+      //       event: "room-info",
+      //       data: {},
+      //     })
+      //   );
+      // }, 500);
 
-    };
-  });
+    }
+  
+  }, [WSProvider.readyState]);
   return (
     <ComposedGlobalLayout>
       <Layout

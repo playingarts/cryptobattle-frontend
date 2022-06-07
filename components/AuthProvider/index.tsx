@@ -66,7 +66,6 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const { accesstoken } = router.query;
 
   useEffect(() => {
-    console.log('auth thing happens')
     const isLoggedInCookie = () =>
       localStorage.getItem("accessToken") !== null ? true : false;
 
@@ -122,7 +121,6 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   }, [router.isReady]);
 
   function authCheck(url: string) {
-    console.log('auth check happens')
 
     const isLoggedInCookie = () =>
       localStorage.getItem("accessToken") !== null ? true : false;
