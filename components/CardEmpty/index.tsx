@@ -50,7 +50,7 @@ const Card: FC<Props> = ({
               height: theme.spacing(height),
               borderRadius: theme.spacing(1.5),
               border: isPlaceholder ? "0" : "3px dashed #333",
-              background: isPlaceholder ? '#111' : 'transparent'
+              background: isPlaceholder ? "#111" : "transparent",
             },
             hovered &&
               !interactive &&
@@ -75,7 +75,7 @@ const Card: FC<Props> = ({
           >
             {!isPlaceholder && (
               <div
-                style={{
+                css={{
                   width: "70px",
                   height: "70px",
                   background: "#181818",
@@ -84,6 +84,12 @@ const Card: FC<Props> = ({
                   alignItems: "center",
                   borderRadius: "100px",
                   cursor: "pointer",
+                  opacity: 0.6,
+                  transition: "all 400ms",
+
+                  "&:hover": {
+                    opacity: 1,
+                  },
                 }}
               >
                 <svg

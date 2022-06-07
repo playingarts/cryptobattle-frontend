@@ -8,11 +8,15 @@ interface Props extends HTMLAttributes<HTMLElement> {
   suit?: CardSuits;
   isSelected: boolean;
   background?: string
+  powerLevel?: string,
+  scoringLevel?: string
 }
 
 const CardSmall: FC<Props> = ({
   Icon,
   cardValue,
+  powerLevel,
+scoringLevel,
   suit,
   isSelected,
   background,
@@ -23,7 +27,11 @@ const CardSmall: FC<Props> = ({
       display: "inline-block",
       position: "relative",
     }}
+    scoringlevel={scoringLevel}
+    powerlevel={powerLevel}
     {...props}
+
+
   >
     <div
       css={(theme) => ({

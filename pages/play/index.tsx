@@ -14,6 +14,7 @@ const Play: NextPage = () => {
   const [selectedCard, setSelectedCard] = useState("");
   const WSProvider = useWS();
   const { user } = useAuth();
+  const [minWidth, setMinWidth] = useState(1400);
 
   const [myCards, setMyCards] = useState<Array<any>>([]);
 
@@ -35,6 +36,17 @@ const Play: NextPage = () => {
       );
     };
   }, []);
+
+
+  useEffect(() => {
+    if (!gameState ) {
+      return;
+    }
+    
+    setMinWidth(7*250)
+
+  }, [gameState]);
+
 
   useEffect(() => {
     if (!gameState || !user || !user.userId) {
@@ -72,6 +84,8 @@ const Play: NextPage = () => {
           backgroundColor: "#0A0A0A",
           backgroundSize: "cover",
           minHeight: "100vh",
+          padding: "20px 50px",
+          minWidth
         })}
       >
         <GameBoard

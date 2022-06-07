@@ -46,9 +46,37 @@ const GameInventory: FC<Props> = ({
     );
   };
 
+  const cardPriority: any = {
+    "2": 1,
+    "3": 2,
+    "4": 3,
+    "5": 4,
+    "6": 5,
+    "7": 6,
+    "8": 7,
+    "9": 8,
+    "10": 9,
+    jack: 10,
+    queen: 11,
+    king: 12,
+    ace: 13,
+    joker: 14,
+  };
+  const suitPriority: any = { spades: 1, hearts: 2, clubs: 3, diamonds: 4 };
+
+  const sortCards = (cards: any) => {
+    cards.sort(
+      (a: any, b: any) =>
+        cardPriority[a.value] - cardPriority[b.value] ||
+        suitPriority[a.suit] - suitPriority[b.suit]
+    );
+
+    return cards;
+  };
+
   useEffect(() => {
-    const cardsNft = cards.filter((card) => card.id);
-    const cardsRegular = cards.filter((card) => !card.id);
+    const cardsNft = sortCards(cards.filter((card) => card.id));
+    const cardsRegular = sortCards(cards.filter((card) => !card.id));
     setCardsNft(cardsNft);
     setCardsRegular(cardsRegular);
   }, [cards]);
@@ -80,7 +108,11 @@ const GameInventory: FC<Props> = ({
     >
       <div
         style={{
-          background: (gameState?.turnForPlayer === user.userId && !isOpponentsCards) || (gameState?.turnForPlayer !== user.userId && isOpponentsCards) ? "#fff" : 'gray',
+          background:
+            (gameState?.turnForPlayer === user.userId && !isOpponentsCards) ||
+            (gameState?.turnForPlayer !== user.userId && isOpponentsCards)
+              ? "#fff"
+              : "gray",
           borderRadius: "20px",
           padding: "15px 15px",
           height: "100%",
@@ -88,7 +120,6 @@ const GameInventory: FC<Props> = ({
           display: "flex",
           justifyContent: "space-between",
           zIndex: 999999,
-
         }}
       >
         {cardsRegular.length > 0 &&
@@ -97,11 +128,14 @@ const GameInventory: FC<Props> = ({
               <CardSmall
                 onClick={selectCard(card)}
                 key={`${index}`}
-                isSelected={selectedCard ? selectedCard.uid === card.uid : false}
+                isSelected={
+                  selectedCard ? selectedCard.uid === card.uid : false
+                }
                 style={{
                   marginRight: "10px",
                   pointerEvents:
-                    !isOpponentsCards && gameState?.turnForPlayer === user.userId
+                    !isOpponentsCards &&
+                    gameState?.turnForPlayer === user.userId
                       ? "auto"
                       : "none",
                 }}
@@ -116,11 +150,14 @@ const GameInventory: FC<Props> = ({
               <CardSmall
                 onClick={selectCard(card)}
                 key={`${index}`}
-                isSelected={selectedCard ? selectedCard.uid === card.uid : false}
+                isSelected={
+                  selectedCard ? selectedCard.uid === card.uid : false
+                }
                 style={{
                   marginRight: "10px",
                   pointerEvents:
-                    (!isOpponentsCards && gameState?.turnForPlayer === user.userId)
+                    !isOpponentsCards &&
+                    gameState?.turnForPlayer === user.userId
                       ? "auto"
                       : "none",
                 }}

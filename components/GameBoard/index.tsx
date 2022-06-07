@@ -25,10 +25,24 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
 
     return rows;
   };
-  const { gameState } = useGame();
+  const { gameState, players } = useGame();
 
   const [board, setBoard] = useState(generateBoard(7, 5));
   const [refresh, setRefresh] = useState(false);
+
+  const getColor = useCallback(
+    (userId) => () => {
+      if (userId === "system") {
+        return "#2D3038";
+      }
+      const foundPlayer = players.find(
+        (player: any) => player.userId === userId
+      );
+
+      return foundPlayer ? foundPlayer.color : "gray";
+    },
+    [players]
+  );
 
   const addCard = useCallback(
     (rowIndex, columnIndex, card = selectedCard) =>
@@ -50,7 +64,6 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
           allowedPlacement,
           "allowedPlacement"
         );
-
 
         if (
           allowedPlacement &&
@@ -78,17 +91,18 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
               y: rowIndex,
               suit: card.suit,
               value: card.value.toString(),
-              nftId: card.id ? card.id : ''
+              nftId: card.id ? card.id : "",
             },
           })
         );
-        console.log({
-          action: "move",
-          x: rowIndex,
-          y: columnIndex,
-          suit: card.suit,
-          value: card.value.toString(),
-        });
+        setTimeout(() => {
+          WSProvider.send(
+            JSON.stringify({
+              event: "game-info",
+              data: {},
+            })
+          );
+        }, 1000);
       },
     [WSProvider, selectedCard, gameState]
   );
@@ -193,7 +207,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                     <div
                       key={column + columnIndex + Math.random()}
                       css={() => ({
-                        margin: column ? "10px" : "10px",
+                        margin: column ? "20px" : "20px",
                       })}
                     >
                       {!column && (
@@ -210,6 +224,11 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                           onClick={addCard(rowIndex, columnIndex)}
                           animated={column.id ? true : false}
                           card={column}
+                          style={{
+                            outline: "6px solid black",
+                            outlineColor: getColor(column.userId)(),
+                            borderRadius: 16,
+                          }}
                         ></Card>
                       )}
                     </div>

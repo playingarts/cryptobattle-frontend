@@ -106,6 +106,7 @@ const Card: FC<Props> = ({
           justifyContent: "center",
           alignItems: "center",
           borderRadius: "100px",
+          transition: 'all 400ms',
           cursor: "pointer",
           opacity: 0.5,
           position: "absolute",
@@ -113,9 +114,9 @@ const Card: FC<Props> = ({
           left: "50%",
           marginLeft: "-35px",
           marginTop: "-35px",
-          zIndex: 9999,
+          zIndex: 55,
           "&:hover": {
-            opacity: 0.9,
+            opacity: 1,
           },
         }}
       >
@@ -180,7 +181,7 @@ const Card: FC<Props> = ({
             hovered &&
               !interactive &&
               !isStatic && {
-                transform: `translate(0, -${theme.spacing(0.2)}px)`,
+                transform: `translate(0, -${theme.spacing(0)}px)`,
                 boxShadow: "0 20px 10px rgba(0, 0, 0, 0.25)",
               },
           ]}

@@ -18,7 +18,7 @@ const GameLayout: FC<
     if (container.current) {
     // eslint-disable-next-line 
     // @ts-ignore: Unreachable code error
-      container.current?.scrollTo(0, 480);
+      container.current?.scrollTo(200, 400);
     }
   }, []);
 
@@ -28,7 +28,7 @@ const GameLayout: FC<
     // @ts-ignore: Unreachable code error */}
       <ScrollContainer
         className="scroll-container"
-        style={{ width: "100vw", height: "100vh" }}
+        style={{ width: "100vw", height: "100vh", padding: 90}}
         innerRef={container}
 
       >
