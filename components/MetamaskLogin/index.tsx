@@ -2,7 +2,6 @@ import { useMetaMask } from "metamask-react";
 import { useEffect, useState } from "react";
 import Button from "../Button";
 import store from "store";
-import { useRouter } from "next/router";
 import { HTMLAttributes, FC } from "react";
 import { useAuth } from "../AuthProvider";
 import Metamask from "../Icons/Metamask";
@@ -21,7 +20,6 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
         signing?: boolean;
       }) || {}
     );
-  const router = useRouter();
 
   const [metamaskSignKey, setMetamaskSignKey] = useState(null);
   const [regToken, setRegToken] = useState(null);

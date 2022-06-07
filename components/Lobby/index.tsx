@@ -1,4 +1,4 @@
-import { FC, HTMLAttributes, useEffect } from "react";
+import { FC, HTMLAttributes } from "react";
 import StatBlock from "../StatBlock";
 
 export type Props = HTMLAttributes<HTMLDivElement>;

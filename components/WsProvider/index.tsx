@@ -9,14 +9,13 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 
 type WSProviderProps = { children: ReactNode; url: string };
 
-const WSStateContext = createContext<WebSocket | null>(null);
+const WSStateContext = createContext<any | null>(null);
 
 function WSProvider({ children }: WSProviderProps): JSX.Element {
   const accessToken = localStorage.getItem("accessToken");
-
   const wsInstance = useMemo(
     () =>
-      typeof window != "undefined"
+      typeof window != "undefined"  
         ? new ReconnectingWebSocket(
             `wss://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/socket?accesstoken=${accessToken}`
           )
