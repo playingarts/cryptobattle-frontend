@@ -5,6 +5,7 @@ import {
   useEffect,
   ReactNode,
   useState,
+  useCallback,
 } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
@@ -28,6 +29,7 @@ export type IAuthProviderContext = {
   logout: () => void;
   loggedIn: boolean;
   user: User;
+  setToken: any;
 };
 
 const getUser = () => {
@@ -41,6 +43,14 @@ const getUser = () => {
       },
     }
   );
+};
+
+const formatUserData = (data: any) => {
+  data.isTwitterConnected =
+    data.authProvider === "twitter" || data.authProvider === "unified";
+  data.isMetamaskConnected =
+    data.authProvider === "metamask" || data.authProvider === "unified";
+  return data;
 };
 
 const AuthProviderContext = createContext<IAuthProviderContext | null>(null);
@@ -65,6 +75,21 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
   const { accesstoken } = router.query;
 
+  const setToken = useCallback((token: any) => {
+    console.log(token, "token");
+    localStorage.setItem("accessToken", token as string);
+    getUser().then(({ data }) => {
+      const formattedData = formatUserData(data);
+
+      setUser(formattedData);
+
+      const roomid = localStorage.getItem("roomid");
+
+      roomid ? router.push(`/game/${roomid}`) : router.push("/dashboard");
+      localStorage.removeItem("roomid");
+    });
+  }, []);
+
   useEffect(() => {
     const isLoggedInCookie = () =>
       localStorage.getItem("accessToken") !== null ? true : false;
@@ -73,18 +98,15 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
     if (isLoggedInCookie()) {
       getUser().then(({ data }) => {
-        console.log(data);
-        data.isTwitterConnected = data.authProvider === "twitter" || data.authProvider === "unified";
-        data.isMetamaskConnected =
-          data.authProvider === "metamask" || data.authProvider === "unified";
+        const formattedData = formatUserData(data);
 
-        setUser(data);
+        setUser(formattedData);
       });
     }
 
     authCheck(router.asPath);
     const hideContent = () => {
-    // setAuthorized(false)
+      // setAuthorized(false)
     };
     router.events.on("routeChangeStart", hideContent);
 
@@ -93,20 +115,19 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
     if (router.isReady) {
       if (accesstoken) {
-        localStorage.setItem("accessToken", accesstoken as string);
-        getUser().then(({ data }) => {
-          data.isTwitterConnected = data.authProvider === "twitter" || data.authProvider === "unified"
-          data.isMetamaskConnected =
-            data.authProvider === "metamask" || data.authProvider === "unified";
-  
-          setUser(data);
-          console.log("data");
-
-          const roomid = localStorage.getItem("roomid");
-
-          roomid ? router.push(`/game/${roomid}`) : router.push("/dashboard");
-          localStorage.removeItem("roomid");
-        });
+        // setToken(accessToken)
+        // localStorage.setItem("accessToken", accesstoken as string);
+        // getUser().then(({ data }) => {
+        //   data.isTwitterConnected =
+        //     data.authProvider === "twitter" || data.authProvider === "unified";
+        //   data.isMetamaskConnected =
+        //     data.authProvider === "metamask" || data.authProvider === "unified";
+        //   setUser(data);
+        //   console.log("data");
+        //   const roomid = localStorage.getItem("roomid");
+        //   roomid ? router.push(`/game/${roomid}`) : router.push("/dashboard");
+        //   localStorage.removeItem("roomid");
+        // });
         // )
       }
     }
@@ -121,7 +142,6 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   }, [router.isReady]);
 
   function authCheck(url: string) {
-
     const isLoggedInCookie = () =>
       localStorage.getItem("accessToken") !== null ? true : false;
 
@@ -172,12 +192,12 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const memoedValue = useMemo(
     () => ({
       authorized,
-
+      setToken,
       user,
       loggedIn,
       logout,
     }),
-    [authorized, loggedIn, user, logout]
+    [authorized, loggedIn, user, logout, setToken]
   );
 
   if (!authorized) {
