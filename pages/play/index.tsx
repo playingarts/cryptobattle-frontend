@@ -1,5 +1,6 @@
 import { NextPage } from "next";
 import Layout from "../../components/Layout";
+import Loader from "../../components/Loader";
 
 import GameLayout from "../../components/GameLayout";
 import GameBoard from "../../components/GameBoard";
@@ -15,6 +16,7 @@ const Play: NextPage = () => {
   const WSProvider = useWS();
   const { user } = useAuth();
   const [minWidth, setMinWidth] = useState(1400);
+  const [loading, setLoading] = useState(true);
 
   const [myCards, setMyCards] = useState<Array<any>>([]);
 
@@ -52,6 +54,10 @@ const Play: NextPage = () => {
     if (!gameState || !user || !user.userId) {
       return;
     }
+
+    setTimeout(() => {
+      setLoading(false)
+    }, 1000);
     console.log(gameState.gameUsersWithCards);
     console.log(user.userId, "id");
 
@@ -75,9 +81,39 @@ const Play: NextPage = () => {
 
   }, [gameState, user]);
 
+  if (loading) {
+    return (
+      <div
+        css={{
+          height: "100vh",
+          background: "#181818",
+          width: "100vw",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Loader
+          css={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%) scale(2)",
+            lineHeight: 1,
+            color: "#fff",
+          }}
+        />
+      </div>
+    );
+  }
+
+
+
   return (
-    <GameLayout>
+    <GameLayout loading={loading}
+    >
       <Layout
+      
         css={(theme) => ({
           background: theme.colors.dark_gray,
           color: theme.colors.text_title_light,
@@ -98,6 +134,7 @@ const Play: NextPage = () => {
         ></GameBoard>
       </Layout>
       <GameInventory
+        loading={loading}
         onChange={(selectedCard) => setSelectedCard(selectedCard)}
         cards={myCards}
       ></GameInventory>

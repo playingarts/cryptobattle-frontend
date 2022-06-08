@@ -2,6 +2,20 @@ body {
   padding: 0 !important;
 }
 
+.game-inventory { 
+  opacity: 0;
+  transform: translate(0, 0);
+  transition: opacity 2s, transform 1s;
+}
+
+.game-player { 
+  opacity: 0;
+  transform: translate(0, 0);
+  transition: opacity 2s, transform 1s;
+  /* transition: opacity 2s ease-out 0s, transform 0.8s linear 0s;
+  transform-origin: center center; */
+}
+
 .hamburger {
   cursor: pointer;
   display: block;
@@ -71,4 +85,82 @@ body {
 
 [data-radix-portal] {
   z-index: 4000!important;
+}
+
+
+.fadeOut{
+  opacity:0;
+  width:0;
+  height:0;
+  transition: width 0.5s 0.5s, height 0.5s 0.5s, opacity 0.5s;
+
+}
+.fadeIn{
+  opacity:1;
+  width:100px;
+  height:100px;
+  transition: width 0.5s, height 0.5s, opacity 0.5s 0.5s;
+
+}
+
+.draggable {
+  /* width: 25%;
+  min-height: 6.5em;
+  margin: 1rem 0 0 1rem;
+  background-color: #29e;
+  color: white;
+  border-radius: 0.75em;
+  padding: 4%; */
+  touch-action: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+#outer-dropzone {
+  height: 140px;
+}
+
+#inner-dropzone {
+  height: 80px;
+}
+
+.dropzone {
+  background-color: #bfe4ff;
+  border: dashed 4px transparent;
+  border-radius: 4px;
+  margin: 10px auto 30px;
+  padding: 10px;
+  width: 80%;
+  transition: background-color 0.3s;
+}
+
+.drop-active {
+  border-color: #aaa;
+}
+
+.drop-target {
+  background-color: #29e;
+  border-color: #fff;
+  border-style: solid;
+}
+
+.drag-drop {
+  display: inline-block;
+  min-width: 40px;
+  padding: 2em 0.5em;
+  margin: 1rem 0 0 1rem;
+
+  color: #fff;
+  background-color: #29e;
+  border: solid 2px #fff;
+
+  touch-action: none;
+  transform: translate(0px, 0px);
+
+  transition: background-color 0.3s;
+}
+
+.drag-drop.can-drop {
+  color: #000;
+  background-color: #4e4;
 }

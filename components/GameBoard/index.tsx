@@ -28,7 +28,9 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
   const { gameState, players } = useGame();
 
   const [board, setBoard] = useState(generateBoard(7, 5));
+
   const [refresh, setRefresh] = useState(false);
+  const [cardError, setCardError] = useState<any>([]);
 
   const getColor = useCallback(
     (userId) => () => {
@@ -47,13 +49,23 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
   const addCard = useCallback(
     (rowIndex, columnIndex, card = selectedCard) =>
       () => {
+        if (!card) {
+          return;
+        }
+
+        console.log(card);
         const allowedPlacement =
           gameState.allowedUserCardsPlacement.additionalProperties[
             `${columnIndex}-${rowIndex}`
           ];
 
         if (!card || !allowedPlacement) {
-          alert("Not allowed to place card there.");
+          // alert("Not allowed to place card there.");
+          setCardError([rowIndex, columnIndex]);
+
+          setTimeout(() => {
+            setCardError([]);
+          }, 1000);
 
           return;
         }
@@ -77,7 +89,11 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
               allowedCard.value === card.value
           )
         ) {
-          alert("Not allowed to place card there.");
+          // alert("Not allowed to place card there.");
+          setCardError([rowIndex, columnIndex]);
+          setTimeout(() => {
+            setCardError([]);
+          }, 0);
           return;
         }
 
@@ -95,14 +111,14 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
             },
           })
         );
-        setTimeout(() => {
-          WSProvider.send(
-            JSON.stringify({
-              event: "game-info",
-              data: {},
-            })
-          );
-        }, 1000);
+        // setTimeout(() => {
+        //   WSProvider.send(
+        //     JSON.stringify({
+        //       event: "game-info",
+        //       data: {},
+        //     })
+        //   );
+        // }, 1000);
       },
     [WSProvider, selectedCard, gameState]
   );
@@ -215,6 +231,15 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                       )}
                       {column === "empty" && (
                         <CardEmpty
+                          css={{
+                            outline:
+                              cardError[0] === rowIndex &&
+                              cardError[1] === columnIndex
+                                ? "#FA5252 6px solid"
+                                : "none",
+                            transition: "all 300ms",
+                            borderRadius: 10,
+                          }}
                           onClick={addCard(rowIndex, columnIndex)}
                         ></CardEmpty>
                       )}
@@ -225,8 +250,11 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                           animated={column.id ? true : false}
                           card={column}
                           style={{
-                            outline: "6px solid black",
-                            outlineColor: getColor(column.userId)(),
+                             outline:
+                              cardError[0] === rowIndex &&
+                              cardError[1] === columnIndex
+                                ? "#FA5252 6px solid"
+                                : `6px solid ${getColor(column.userId)()}`,
                             borderRadius: 16,
                           }}
                         ></Card>

@@ -15,25 +15,38 @@ export interface Props extends HTMLAttributes<HTMLElement> {
   showAltNav?: boolean;
   noNav?: boolean;
   isCardPage?: boolean;
+  loading?: boolean;
 }
 
 const GameHeader: FC<Props> = ({
   palette,
-
+  loading,
   ...props
 }) => {
-
-
   const { loggedIn, user } = useAuth();
   const { gameState, players } = useGame();
   const [playersWithPoints, setPlayersWithPoints] = useState<Array<any>>([]);
   const [currentPlayer, setCurrentPlayer] = useState<any>("");
   const [opponentsCards, setOpponentsCards] = useState<Array<any>>([]);
+  const [loadingDelayed, setLoadingDelayed] = useState(true);
+  
+  useEffect(() => {
+    setTimeout(() => {
+      setLoadingDelayed(false)
+
+    }, 0);
+  }, [loading]);
+
 
   useEffect(() => {
-
-    if (!gameState ) {
+    if (!gameState) {
       return;
+    }
+
+    const currentPlayer =  players.find((player: any) => player.userId === gameState.turnForPlayer)
+
+    const shiftArray = (arr: any, target: any) => {
+      return arr.concat(arr.splice(0, arr.indexOf(target)));
     }
 
     const playersWithPoints = [...players].map((player: any) => {
@@ -44,14 +57,15 @@ const GameHeader: FC<Props> = ({
       return { ...player };
     });
 
-    const playersSorted = playersWithPoints.sort(
-      (a: any, b: any) => b.points - a.points
-    );
+    const currentPlayerWithPoints = playersWithPoints.find((player: any) => player.userId === gameState.turnForPlayer)
+
+    const playersSorted = shiftArray(playersWithPoints, currentPlayerWithPoints)
+
 
     setPlayersWithPoints(playersSorted);
 
     setCurrentPlayer(
-      players.find((player: any) => player.userId === gameState.turnForPlayer)
+      currentPlayer
     );
   }, [gameState, players]);
 
@@ -154,37 +168,98 @@ const GameHeader: FC<Props> = ({
         >
           <GameInventory isOpponentsCards={true} cards={opponentsCards} />
         </div>
+        
 
+        <div css={{display: 'flex', justifyContent: 'space-between', minWidth: 180}}>
         {loggedIn &&
           user &&
           playersWithPoints.map((player: any) => {
             return (
               <div
+                className="game-player"
                 key={player.userId}
                 css={{
                   position: "relative",
-                  transition: "opacity 800ms",
-                  border: "10px solid" + player.color,
+                  borderRadius: 9999,
+                  cursor: 'default',
+                  opacity: loadingDelayed ? '0' : '1',
+                  transform: loadingDelayed ?  'translate(1500px, 0)' : 'translate(0, 0)' ,
+                  "&::after": {
+                    opacity: 0,
+                    content: `'${player.points}'`,
+                    display: "flex",
+                    lineHeight: 3,
+                    transition: 'all 400ms',
+                    borderRadius: 9999,
+                    outline: "6px solid" + player.color,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    fontSize: 60,
+                    fontFamily: 'Aldrich',
+                    position: "absolute",
+                    color: "#fff",
+                    background: player.color,
+                    zIndex: 9999,
+                    bottom: 0,
+                
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    pointerEvents: 'none',
+
+                  },
+                  "&::before": {
+                    opacity: 0,
+                    content: `'${player.username}'`,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    transition: 'all 400ms',
+                    color: "black",
+                    fontFamily: 'Aldrich',
+                    position: "absolute",
+                    background: "#ffff",
+                    borderRadius: 6,
+                    lineHeight: 3,
+
+          
+                    fontSize: 18,
+                    zIndex: 9999,
+                    bottom: -40,
+                    left: "50%",
+                    transform: "translate(-50%, 0)",
+                    padding: "12px 14px",
+                    paddingTop: 16,
+                    minWidth: 70,
+                    height: 30,
+                    pointerEvents: 'none',
+                    textTransform: 'uppercase'
+                  },
                   "&:hover": {
-                    opacity: 0.9,
+                    "&::after": {
+                      opacity: 1,
+                      fontSize: 42,
+                      pointerEvents: 'none',
+                      paddingTop: 10,
+                    },
                     "&::before": {
-                      content: `'${player.points}'`,
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      color: "black",
-                      position: "absolute",
-                      background: "#ffff",
-                      borderRadius: 10,
-                      zIndex: 9999,
-                      bottom: -20,
-                      width: 70,
-                      height: 30,
+                      opacity: 1,
+                      pointerEvents: 'none',
+                      transform: "translate(-50%, 8px)",
+
                     },
                   },
                 }}
               >
                 <UserAvatar
+                  css={{
+                    outline: "6px solid" + player.color,
+                    zIndex: 999999,
+                    "&:hover": {
+                      background: player.color,
+        
+                    },
+                  }}
                   profilePictureUrl={
                     player.profilePictureUrl
                       ? player.profilePictureUrl
@@ -194,6 +269,7 @@ const GameHeader: FC<Props> = ({
               </div>
             );
           })}
+          </div>
       </div>
     </header>
   );

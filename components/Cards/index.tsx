@@ -3,6 +3,8 @@ import Clubs from "../Icons/Clubs";
 import Diamonds from "../Icons/Diamonds";
 import Hearts from "../Icons/Hearts";
 import Joker from "../Icons/Joker";
+import QuestionMark from "../Icons/QuestionMark";
+
 import { v4 as uuid } from 'uuid';
 
 import cards from "./cards.json";
@@ -11,6 +13,10 @@ const getSuit = (value: string, suit: string) => {
 
   if (value === "joker") {
     return Joker;
+  }
+
+  if (value === "unknown") {
+    return QuestionMark;
   }
 
   if (suit === "hearts") {
@@ -25,7 +31,7 @@ const getSuit = (value: string, suit: string) => {
   if (suit === "clubs") {
     return Clubs;
   }
-  return Joker;
+  return QuestionMark;
 };
 
 const getCard = (suit: string, value: string, card:any) => {

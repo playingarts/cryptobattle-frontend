@@ -1,22 +1,25 @@
 import { FC, HTMLAttributes } from "react";
 import { CardSuits } from "../../source/enums";
 import Text from "../Text";
+import QuestionMark from "../Icons/QuestionMark";
 
 interface Props extends HTMLAttributes<HTMLElement> {
   Icon: FC<HTMLAttributes<SVGElement>>;
   cardValue: string;
   suit?: CardSuits;
   isSelected: boolean;
-  background?: string
-  powerLevel?: string,
-  scoringLevel?: string
+  background?: string;
+  color?: string;
+  powerLevel?: string;
+  scoringLevel?: string;
 }
 
 const CardSmall: FC<Props> = ({
   Icon,
   cardValue,
-  powerLevel,
-scoringLevel,
+  color,
+  // powerLevel?,
+  // scoringLevel?,
   suit,
   isSelected,
   background,
@@ -27,23 +30,16 @@ scoringLevel,
       display: "inline-block",
       position: "relative",
     }}
-    scoringlevel={scoringLevel}
-    powerlevel={powerLevel}
     {...props}
-
-
   >
     <div
       css={(theme) => ({
-        color: new RegExp(`${CardSuits.s}|${CardSuits.c}|${CardSuits.b}`).test(
-          suit as string
-        )
-          ? theme.colors.white
-          : theme.colors.white,
+        color: color ? color : "#fff",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
         alignItems: "center",
+        transition: "all 400ms",
         paddingTop: theme.spacing(1.5),
         paddingBottom: theme.spacing(1.5),
         borderRadius: theme.spacing(1),
@@ -54,18 +50,22 @@ scoringLevel,
         zIndex: 1,
         "&:hover": {
           transform: "translate(0, -10px)",
-          cursor: "grab"
+          cursor: "grab",
         },
-        transform: isSelected ? "translate(0, -10px)" : ''
+        transform: isSelected ? "translate(0, -10px)" : "",
       })}
     >
-      {cardValue !== "joker" && (
+      {cardValue !== "joker" && cardValue !== "unknown" && (
         <Text component="div" variant="h4" css={{ textTransform: "uppercase" }}>
           {Number(cardValue) || cardValue[0]}
         </Text>
       )}
 
-      <Icon css={{ margin: "auto" }} />
+      {cardValue === "unknown" ? (
+        <QuestionMark css={{ margin: "auto", transform: 'scale(1.2, 1.2)' }} />
+      ) : (
+        <Icon css={{ margin: "auto"}} />
+      )}
     </div>
   </div>
 );

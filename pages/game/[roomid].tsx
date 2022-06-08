@@ -70,7 +70,7 @@ const JoinGame: NextPage = () => {
   }, [isReady, openNotification]);
 
   useEffect(() => {
-    if (players.find((player) => player.userId === user.userId)) {
+    if (players.find((player: any) => player.userId === user.userId)) {
       return;
     }
     WSProvider.send(

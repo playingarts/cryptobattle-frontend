@@ -127,7 +127,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           event.data.error.message ===
             "Joining while hosting a game is forbidden" ||
           event.data.error.message.startsWith(
-            "User is in a active game for room"
+            "User is in a active game for rmeoom"
           )
         ) {
           WSProvider.send(
@@ -178,7 +178,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         console.log('game-updated": ', event.data);
       }
       if (event.data.error && event.data.error.message) {
-        alert(event.data.error.message);
+        // alert(event.data.error.message);
       }
 
       // console.log(JSON.parse(data));

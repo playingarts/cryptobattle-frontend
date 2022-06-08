@@ -1,4 +1,4 @@
-import { FC, HTMLAttributes} from "react";
+import { FC, HTMLAttributes } from "react";
 import LogoIcon from "../Icons/Logo";
 
 import { useAuth } from "../AuthProvider";
@@ -39,6 +39,7 @@ const Header: FC<Props> = ({
             alignItems: "center",
             position: "relative",
             zIndex: 1,
+            marginTop: 20,
             overflow: "hidden",
           },
           palette === "gradient"
@@ -51,7 +52,6 @@ const Header: FC<Props> = ({
               },
         ]}
       >
-
         <div
           css={{
             flexGrow: 1,
@@ -80,11 +80,12 @@ const Header: FC<Props> = ({
                   color: theme.colors.text_subtitle_light,
                 },
                 {
-                  transition: 'opacity 500ms',
+                  transition: "opacity 500ms",
 
-                "&:hover": {
-                  opacity: "0.6",
-                }}
+                  "&:hover": {
+                    opacity: "0.6",
+                  },
+                },
               ]}
             />
           </Link>
@@ -104,11 +105,7 @@ const Header: FC<Props> = ({
           </Button>
         )}
 
-
-
         {loggedIn && user && <NavProfile />}
-
-
       </div>
     </header>
   );

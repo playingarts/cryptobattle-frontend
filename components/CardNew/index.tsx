@@ -1,5 +1,5 @@
 import { FC, HTMLAttributes, useRef } from "react";
-import {  useState } from "react";
+import { useState } from "react";
 import { theme } from "../../pages/_app";
 import Image from "next/image";
 import Loader from "../Loader";
@@ -38,46 +38,6 @@ const Card: FC<Props> = ({
 
   animated = !card.img || (animated && !!card.video);
 
-  // useEffect(() => {
-  //   if (animated || !video.current) {
-  //     return;
-  //   }
-
-  //   // Initializing values
-  //   let isPlaying = true;
-
-  //   // On video playing toggle values
-  //   video.current.onplaying = function () {
-  //     isPlaying = true;
-  //   };
-
-  //   // On video pause toggle values
-  //   video.current.onpause = function () {
-  //     isPlaying = false;
-  //   };
-
-  //   // Play video function
-  //   async function playVid() {
-  //     if (video.current?.paused && !isPlaying) {
-  //       return video.current?.play();
-  //     }
-  //   }
-
-  //   // Pause video function
-  //   function pauseVid() {
-  //     if (!video.current?.paused && isPlaying) {
-  //       video.current?.pause();
-  //     }
-  //   }
-
-  //   if (!hovered) {
-  //     pauseVid();
-  //     video.current.currentTime = 0;
-  //   } else {
-  //     playVid();
-  //   }
-  // }, [hovered, animated]);
-
   return (
     <div
       {...props}
@@ -93,59 +53,84 @@ const Card: FC<Props> = ({
         fontsize: 18,
         lineheight: 21,
         position: "relative",
+        background: hovered ? "#fff" : "#181818",
       })}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
       <div
         css={{
-          width: "70px",
-          height: "70px",
-          background: "#181818",
+          width: "10",
+          background: hovered ? "rgba(10, 10, 10, 0.7)" : "#181818",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          borderRadius: "100px",
-          transition: 'all 400ms',
+          outline: "6px solid rgba(10, 10, 10, 0.7)",
+          transition: "all 400ms",
           cursor: "pointer",
-          opacity: 0.5,
+          opacity: hovered ? "1" : 0,
           position: "absolute",
-          top: "50%",
-          left: "50%",
-          marginLeft: "-35px",
-          marginTop: "-35px",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+
           zIndex: 55,
           "&:hover": {
             opacity: 1,
           },
         }}
       >
-        <svg
-          width="31"
-          height="31"
-          viewBox="0 0 31 31"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
+        <div
+          css={{
+            width: "70px",
+            height: "70px",
+            background: hovered ? "#fff" : "#181818",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: "100px",
+            transition: "all 400ms",
+            cursor: "pointer",
+            opacity: hovered ? "1" : 0,
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            marginLeft: "-35px",
+            marginTop: "-35px",
+            zIndex: 55,
+            "&:hover": {
+              opacity: 1,
+            },
+          }}
         >
-          <line
-            x1="16"
-            y1="1.5"
-            x2="16"
-            y2="29.5"
-            stroke="#8B8C8F"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <line
-            x1="29.5"
-            y1="16"
-            x2="1.5"
-            y2="16"
-            stroke="#8B8C8F"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
+          <svg
+            width="31"
+            height="31"
+            viewBox="0 0 31 31"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <line
+              x1="16"
+              y1="1.5"
+              x2="16"
+              y2="29.5"
+              stroke="#7B61FF"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <line
+              x1="29.5"
+              y1="16"
+              x2="1.5"
+              y2="16"
+              stroke="#7B61FF"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
       </div>
 
       <div

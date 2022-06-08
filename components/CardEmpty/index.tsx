@@ -1,6 +1,7 @@
 import { FC, HTMLAttributes, useRef } from "react";
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { theme } from "../../pages/_app";
+import interact from 'interactjs'
 
 interface Props extends HTMLAttributes<HTMLElement> {
   animated?: boolean;
@@ -23,6 +24,51 @@ const Card: FC<Props> = ({
   const height = size === "big" ? 52 : 29.4;
   const wrapper = useRef<HTMLDivElement>(null);
 
+
+useEffect(() => {
+  interact('.dropzone').dropzone({
+    // only accept elements matching this CSS selector
+    accept: '.draggable',
+    // Require a 75% element overlap for a drop to be possible
+    overlap: 0.75,
+  
+    // listen for drop related events:
+  
+    ondropactivate: function (event) {
+      console.log('active')
+      // add active dropzone feedback
+      event.target.classList.add('drop-active')
+    },
+    ondragenter: function (event) {
+      const draggableElement = event.relatedTarget
+      const dropzoneElement = event.target
+  
+      // feedback the possibility of a drop
+      dropzoneElement.classList.add('drop-target')
+      draggableElement.classList.add('can-drop')
+      draggableElement.textContent = 'Dragged in'
+    },
+    ondragleave: function (event) {
+      // remove the drop feedback style
+      event.target.classList.remove('drop-target')
+      event.relatedTarget.classList.remove('can-drop')
+      event.relatedTarget.textContent = 'Dragged out'
+    },
+    ondrop: function (event) {
+      event.relatedTarget.textContent = 'Dropped'
+    },
+    ondropdeactivate: function (event) {
+      // remove active dropzone feedback
+      event.target.classList.remove('drop-active')
+      event.target.classList.remove('drop-target')
+    }
+  })
+  
+}, [])
+
+
+  
+
   return (
     <div
       {...props}
@@ -37,20 +83,27 @@ const Card: FC<Props> = ({
         fontWeight: 500,
         fontsize: 18,
         lineheight: 21,
+        className: 'dropzone'
       })}
     >
       <div ref={wrapper}>
         <div
           css={(theme) => [
             {
-              transition: theme.transitions.fast(["transform", "box-shadow"]),
               overflow: "hidden",
               boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.25)",
               position: "relative",
               height: theme.spacing(height),
               borderRadius: theme.spacing(1.5),
-              border: isPlaceholder ? "0" : "3px dashed #333",
+              border: isPlaceholder ? "0" : "2px dashed #111",
               background: isPlaceholder ? "#111" : "transparent",
+              transition: 'all 400ms',
+              "&:hover": {
+              border: isPlaceholder ? "0" : "2px dashed #222",
+                ".plus-icon": {
+                  color: '#7B61FF'
+                }
+              }
             },
             hovered &&
               !interactive &&
@@ -75,6 +128,7 @@ const Card: FC<Props> = ({
           >
             {!isPlaceholder && (
               <div
+              className='plus-icon'
                 css={{
                   width: "70px",
                   height: "70px",
@@ -86,8 +140,9 @@ const Card: FC<Props> = ({
                   cursor: "pointer",
                   opacity: 0.6,
                   transition: "all 400ms",
-
+                  color: "#8B8C8F",
                   "&:hover": {
+                    color: "#7B61FF",
                     opacity: 1,
                   },
                 }}
@@ -104,7 +159,7 @@ const Card: FC<Props> = ({
                     y1="1.5"
                     x2="16"
                     y2="29.5"
-                    stroke="#8B8C8F"
+                    stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
@@ -113,7 +168,7 @@ const Card: FC<Props> = ({
                     y1="16"
                     x2="1.5"
                     y2="16"
-                    stroke="#8B8C8F"
+                    stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />

@@ -5,9 +5,9 @@ import ScrollContainer from "react-indiana-drag-scroll";
 const GameLayout: FC<
   Pick<
     HeaderProps,
-    "altNav" | "showAltNav" | "noNav" | "palette" | "isCardPage"
+    "altNav" | "showAltNav" | "noNav" | "palette" | "isCardPage" | "loading"
   >
-> = ({ palette, children }) => {
+> = ({ palette, loading, children }) => {
   const container = useRef(null);
   // const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
 
@@ -33,11 +33,12 @@ const GameLayout: FC<
 
       >
         <GameHeader
+          loading={loading}
           css={(theme) => ({
             position: "fixed",
             left: theme.spacing(1),
             right: theme.spacing(1),
-            top: theme.spacing(1),
+            top: theme.spacing(3),
             zIndex: 10,
 
             "@media (min-width: 1440px)": {
