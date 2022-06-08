@@ -20,7 +20,6 @@ const CardSmall: FC<Props> = ({
   color,
   // powerLevel?,
   // scoringLevel?,
-  suit,
   isSelected,
   background,
   ...props
