@@ -115,7 +115,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
     if (router.isReady) {
       if (accesstoken) {
-        // setToken(accessToken)
+        setToken(accesstoken as string)
         // localStorage.setItem("accessToken", accesstoken as string);
         // getUser().then(({ data }) => {
         //   data.isTwitterConnected =
