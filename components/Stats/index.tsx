@@ -44,6 +44,8 @@ const Stats: FC<Props> = ({ ...props }) => {
     gamesWon: 0,
     level: 0,
     nftCardsTotalXp: 0,
+    skill: 0,
+    strength: 0,
   });
 
   useEffect(() => {
@@ -95,7 +97,7 @@ const Stats: FC<Props> = ({ ...props }) => {
               gridColumn: "span 3",
             })}
             title="skill"
-            number={19}
+            number={userStats.skill}
           />
 
           <StatsEntry
@@ -103,7 +105,7 @@ const Stats: FC<Props> = ({ ...props }) => {
               gridColumn: "span 3",
             })}
             title="card strength"
-            number={74}
+            number={userStats.cardsStrength}
           />
         </div>
         <Text variant="body2" css={{ opacity: 0.5 }}>
