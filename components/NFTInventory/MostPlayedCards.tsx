@@ -30,11 +30,11 @@ const MostPlayedCards: FC<Props> = ({color, topCards, addCard, ...props }) => {
   const handleClick = (card: CardType) => addCard && addCard(card)
   return (
     <div css={{ display: "flex", justifyContent: "start" }} {...props}>
-      {topCards.map((card) => (
+      {topCards.map((card, index) => (
         <div
           onClick={handleClick(card)}
           style={{ width: "50%", display: "flex", alignItems: "center" }}
-          key={card.uid}
+          key={index}
         >
           <Card
             css={{ marginRight: "20px" }}

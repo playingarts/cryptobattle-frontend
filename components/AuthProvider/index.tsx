@@ -116,19 +116,6 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     if (router.isReady) {
       if (accesstoken) {
         setToken(accesstoken as string)
-        // localStorage.setItem("accessToken", accesstoken as string);
-        // getUser().then(({ data }) => {
-        //   data.isTwitterConnected =
-        //     data.authProvider === "twitter" || data.authProvider === "unified";
-        //   data.isMetamaskConnected =
-        //     data.authProvider === "metamask" || data.authProvider === "unified";
-        //   setUser(data);
-        //   console.log("data");
-        //   const roomid = localStorage.getItem("roomid");
-        //   roomid ? router.push(`/game/${roomid}`) : router.push("/dashboard");
-        //   localStorage.removeItem("roomid");
-        // });
-        // )
       }
     }
 
