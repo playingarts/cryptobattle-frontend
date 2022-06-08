@@ -91,15 +91,14 @@ useEffect(() => {
           css={(theme) => [
             {
               overflow: "hidden",
-              boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.25)",
               position: "relative",
               height: theme.spacing(height),
               borderRadius: theme.spacing(1.5),
-              border: isPlaceholder ? "0" : "2px dashed #111",
+              border: isPlaceholder ? "0" : "3px dashed #111",
               background: isPlaceholder ? "#111" : "transparent",
               transition: 'all 400ms',
               "&:hover": {
-              border: isPlaceholder ? "0" : "2px dashed #222",
+              border: isPlaceholder ? "0" : "3px dashed #222",
                 ".plus-icon": {
                   color: '#7B61FF'
                 }
