@@ -17,12 +17,15 @@ interface Props extends HTMLAttributes<HTMLElement> {
   isStatic?: boolean;
   size?: "big";
   interactive?: boolean;
+  isGameBoard?: boolean;
+
 }
 
 const Card: FC<Props> = ({
   card,
   animated,
   isStatic,
+  isGameBoard,
   size,
   interactive,
   ...props
@@ -53,12 +56,12 @@ const Card: FC<Props> = ({
         fontsize: 18,
         lineheight: 21,
         position: "relative",
-        background: hovered ? "#fff" : "#181818",
+        background: hovered && isGameBoard ? "#fff" : 'transparent',
       })}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      <div
+     {isGameBoard &&  <div
         css={{
           width: "10",
           background: hovered ? "rgba(10, 10, 10, 0.7)" : "#181818",
@@ -131,7 +134,7 @@ const Card: FC<Props> = ({
             />
           </svg>
         </div>
-      </div>
+      </div> }
 
       <div
         {...(interactive && {

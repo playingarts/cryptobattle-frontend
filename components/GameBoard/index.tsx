@@ -249,6 +249,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                           onClick={addCard(rowIndex, columnIndex)}
                           animated={column.id ? true : false}
                           card={column}
+                          isGameBoard={true}
                           style={{
                              outline:
                               cardError[0] === rowIndex &&
