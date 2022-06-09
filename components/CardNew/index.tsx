@@ -78,7 +78,7 @@ const Card: FC<Props> = ({
           bottom: 0,
           right: 0,
 
-          zIndex: 55,
+          zIndex: 2,
           "&:hover": {
             opacity: 1,
           },
@@ -223,7 +223,7 @@ const Card: FC<Props> = ({
               <source src={card.video} type="video/mp4" />
             </video>
           )}
-          {!loaded && (
+          {!loaded && !isGameBoard && (
             <Loader
               css={(theme) => ({
                 color: theme.colors.light_gray,
