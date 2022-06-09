@@ -209,10 +209,11 @@ const NewGame: NextPage = () => {
               })}
             />
           </StatBlock>
-          <NFTChoose />
+ 
           {/* // eslint-disable-next-line 
     // @ts-ignore: Unreachable code error */}
           <Lobby isAdmin={true} players={players} />
+          <NFTChoose />
           <Line />{" "}
           <div style={{ display: "flex", justifyItems: "center" }}>
             <Button

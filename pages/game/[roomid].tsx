@@ -148,11 +148,11 @@ const JoinGame: NextPage = () => {
             <Arrowed>Game Rules</Arrowed>
           </Text>
 
-          <NFTChoose />
+
           {/* // eslint-disable-next-line 
     // @ts-ignore: Unreachable code error */}
           <Lobby players={players} />
-
+          <NFTChoose />
           <Line />
           <div style={{ display: "flex", justifyItems: "center" }}>
             <Button

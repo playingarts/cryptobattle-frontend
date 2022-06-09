@@ -168,7 +168,7 @@ const NFTChoose: FC<Props> = () => {
               <Card
                 key={firstCard.id}
                 css={{
-                  marginRight: "20px",
+                  marginRight: "10px",
                   column: "span 3",
                   cursor: "pointer",
                 }}
@@ -194,7 +194,7 @@ const NFTChoose: FC<Props> = () => {
               <Card
                 key={secondCard.id}
                 css={{
-                  marginRight: "20px",
+                  marginRight: "10px",
                   column: "span 3",
                   cursor: "pointer",
                 }}
@@ -281,16 +281,16 @@ const NFTChoose: FC<Props> = () => {
                 {cardInventory
                   .filter((card: CardType) => !card.onSale)
                   .map((card: CardType) => (
-                    <div onClick={addCard(card)} key={card.id}>
+                    <div css={{cursor: 'pointer'}} onClick={addCard(card)} key={card.id}>
                       <DialogClose asChild>
                         <Card
                           css={{
                             marginRight: "20px",
                             column: "span 3",
-                            maxWidth: "180px",
+                            maxWidth: "160px",
                             cursor: "pointer",
                             background: "#fff",
-                            height: "224px",
+                            height: "200px",
                           }}
                           animated={false}
                           card={{ img: card.imageUrl }}
