@@ -45,7 +45,7 @@ const Stats: FC<Props> = ({ ...props }) => {
     level: 0,
     nftCardsTotalXp: 0,
     skill: 0,
-    strength: 0,
+    cardsStrength: 0,
   });
 
   useEffect(() => {
