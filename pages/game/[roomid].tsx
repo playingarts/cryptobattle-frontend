@@ -70,17 +70,13 @@ const JoinGame: NextPage = () => {
   }, [isReady, openNotification]);
 
   useEffect(() => {
+
+    if (!router.isReady) {
+      return
+    }
     if (players.find((player: any) => player.userId === user.userId)) {
       return;
     }
-    WSProvider.send(
-      JSON.stringify({
-        event: "join-room",
-        data: {
-          roomId: roomid,
-        },
-      })
-    );
 
     WSProvider.send(
       JSON.stringify({
@@ -88,10 +84,14 @@ const JoinGame: NextPage = () => {
         data: {},
       })
     );
-  }, [players]);
+  }, [players, router.isReady]);
 
   useEffect(() => {
     console.log(roomid);
+
+    if (!router.isReady) {
+      return
+    }
     if (!roomid) {
       return;
     }
@@ -113,7 +113,7 @@ const JoinGame: NextPage = () => {
         })
       );
     }, 1000);
-  }, [roomid]);
+  }, [router.isReady]);
 
   return (
     <ComposedGlobalLayout>
