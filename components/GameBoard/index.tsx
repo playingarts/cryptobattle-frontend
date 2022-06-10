@@ -29,8 +29,19 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
 
   const [board, setBoard] = useState(generateBoard(7, 5));
 
+
+useEffect(() => {
+ console.log('board changed:')
+}, [board])
+
+
+useEffect(() => {
+  console.log(selectedCard, 'changed')
+ }, [selectedCard])
+
   const [refresh, setRefresh] = useState(false);
   const [cardError, setCardError] = useState<any>([]);
+  const [tableCardsLocal, setTableCards] = useState<any>([false]);
 
   const getColor = useCallback(
     (userId) => () => {
@@ -52,6 +63,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
         if (!card) {
           return;
         }
+        console.log('addCard')
 
         console.log(card);
         const allowedPlacement =
@@ -111,14 +123,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
             },
           })
         );
-        // setTimeout(() => {
-        //   WSProvider.send(
-        //     JSON.stringify({
-        //       event: "game-info",
-        //       data: {},
-        //     })
-        //   );
-        // }, 1000);
+
       },
     [WSProvider, selectedCard, gameState]
   );
@@ -176,7 +181,6 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
     if (!gameState) {
       return;
     }
-    setRefresh(true);
 
     const tableCards = gameState.gameTableCards?.additionalProperties;
     console.log("tableCards", tableCards);
@@ -194,7 +198,6 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
       );
       addCardOnce(Number(indexes[1]), Number(indexes[0]), card);
     });
-    setRefresh(false);
   }, [gameState]);
 
   return (
@@ -208,7 +211,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
       })}
     >
       <div>
-        {!refresh &&
+         {
           board.map((row: any, rowIndex: number) => {
             return (
               <div
@@ -221,7 +224,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                 {row.map((column: any, columnIndex: number) => {
                   return (
                     <div
-                      key={column + columnIndex + Math.random()}
+                      key={`${columnIndex}${rowIndex}`}
                       css={() => ({
                         margin: column ? "20px" : "20px",
                       })}

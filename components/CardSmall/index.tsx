@@ -18,8 +18,6 @@ const CardSmall: FC<Props> = ({
   Icon,
   cardValue,
   color,
-  // powerLevel?,
-  // scoringLevel?,
   isSelected,
   background,
   ...props

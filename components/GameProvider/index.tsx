@@ -116,6 +116,16 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         );
       }
 
+
+      if (event.event === "join-room") {
+        WSProvider.send(
+          JSON.stringify({
+            event: "room-info",
+            data: {},
+          })
+        );
+      }
+
       if (event.data.error && event.data.error.message) {
         if (event.data.error.message === "Player must be in a room") {
           return;
