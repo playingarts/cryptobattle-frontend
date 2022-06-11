@@ -223,7 +223,7 @@ const Card: FC<Props> = ({
               <source src={card.video} type="video/mp4" />
             </video>
           )}
-          {!loaded && !isGameBoard && (
+          {!loaded && (
             <Loader
               css={(theme) => ({
                 color: theme.colors.light_gray,
