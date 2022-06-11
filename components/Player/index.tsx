@@ -1,6 +1,7 @@
 import { HTMLAttributes, FC, useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useWS } from "../../components/WsProvider/index";
+import { formatUsername } from "../../utils/helpers";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
 
@@ -16,6 +17,7 @@ const Player: FC<Player> = ({ color, player, isAdmin }) => {
   const [playerInfo, setPlayerInfo] = useState({
     name: "",
     profilePictureUrl: "",
+    username: ""
   });
 
   const WSProvider = useWS();
@@ -119,7 +121,7 @@ const Player: FC<Player> = ({ color, player, isAdmin }) => {
       </div>
       <div style={{ marginLeft: "10px" }}>
         <Text component="div" variant="label">
-          {playerInfo.name}
+          {formatUsername(playerInfo.username)}
         </Text>
 
         {/* <div>LVL 04</div> */}

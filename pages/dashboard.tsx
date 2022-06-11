@@ -10,34 +10,16 @@ import PromoSection from "../components/PromoSection";
 import Grid from "../components/Grid/";
 import Twitter from "../components/Icons/Twitter";
 import Line from "../components/Line/";
+import { formatUsername } from "../utils/helpers";
 
 import { useWS } from "../components/WsProvider/index";
 import { useAuth } from "../components/AuthProvider";
 
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 
-// import MetamaskLogin from "../components/MetamaskLogin/";
 
-// import { useMetaMask } from "metamask-react";
 import { useEffect } from "react";
 
-function truncateMiddle(word: string) {
-  if (!word) {
-    return ""
-  }
-  const tooLongChars = 19; // arbitrary
-
-  if (word.length < tooLongChars) {
-    return word;
-  }
-
-  const ellipsis = "...";
-  const charsOnEitherSide = Math.floor(tooLongChars / 2) - ellipsis.length;
-
-  return (
-    word.slice(0, charsOnEitherSide) + ellipsis + word.slice(-charsOnEitherSide)
-  );
-}
 
 const Home: NextPage = () => {
   // const { account } = useMetaMask();
@@ -83,7 +65,7 @@ const Home: NextPage = () => {
             }}
           >
             <Text component="h1" css={{ margin: "0", marginTop:"10px", fontSize: "60px", verticalAlign: "bottom" }}>
-              GM, {truncateMiddle(user.username)}
+              GM, {formatUsername(user.username)}
             </Text>
 
             <Button

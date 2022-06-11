@@ -2,6 +2,7 @@ import { FC, HTMLAttributes, useEffect, useState } from "react";
 
 import { useAuth } from "../AuthProvider";
 import { useGame } from "../GameProvider";
+import { formatUsername } from "../../utils/helpers";
 
 import Text from "../Text";
 import LogoMenu from "../LogoMenu";
@@ -17,6 +18,9 @@ export interface Props extends HTMLAttributes<HTMLElement> {
   isCardPage?: boolean;
   loading?: boolean;
 }
+
+
+
 
 const GameHeader: FC<Props> = ({
   palette,
@@ -37,6 +41,12 @@ const GameHeader: FC<Props> = ({
     }, 0);
   }, [loading]);
 
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setPlayersWithPoints(playersWithPoints.reverse())
+  //   }, 3000);
+  // }, [playersWithPoints]);
+
 
   useEffect(() => {
     if (!gameState) {
@@ -50,7 +60,7 @@ const GameHeader: FC<Props> = ({
     }
 
     const playersWithPoints = [...players].map((player: any) => {
-      player.points = gameState.playersCurrentPoints[player.userId]
+      player.points = gameState?.playersCurrentPoints[player.userId]
         ? gameState.playersCurrentPoints[player.userId]
         : 0;
 
@@ -60,6 +70,7 @@ const GameHeader: FC<Props> = ({
     const currentPlayerWithPoints = playersWithPoints.find((player: any) => player.userId === gameState.turnForPlayer)
 
     const playersSorted = shiftArray(playersWithPoints, currentPlayerWithPoints)
+
 
 
     setPlayersWithPoints(playersSorted);
@@ -81,6 +92,10 @@ const GameHeader: FC<Props> = ({
       )[0].cards;
 
       const cardsOpponentsFormatted = cardsOpponents.map((card: any) => {
+
+        if (!card.suit) {
+          return {value: 'unknown', suit: 'spades'}
+        }
         return getCard(card.suit, card.value, card);
       });
       setOpponentsCards(cardsOpponentsFormatted);
@@ -135,7 +150,7 @@ const GameHeader: FC<Props> = ({
                     color: "#fff",
                   }}
                 >
-                  {currentPlayer ? currentPlayer.username : ""}
+                  {currentPlayer ? formatUsername(currentPlayer.username) : 'sadsa'}
                 </Text>
                 <svg
                   width="16"
