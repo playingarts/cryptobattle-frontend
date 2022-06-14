@@ -6,7 +6,6 @@ import Skip from "../../components/Icons/Skip";
 import { useWS } from "../WsProvider";
 import { useGame } from "../GameProvider";
 import { useAuth } from "../AuthProvider";
-import interact from "interactjs";
 
 interface Card {
   id?: string;
@@ -80,37 +79,25 @@ const GameInventory: FC<Props> = ({
   };
 
   useEffect(() => {
-    const position = { x: 0, y: 0 };
-
-    interact(".draggable").draggable({
-      listeners: {
-        start(event) {
-          console.log(event.type, event.target);
-        },
-        move(event) {
-          position.x += event.dx;
-          position.y += event.dy;
-          event.target.style.transform = `translate(${position.x}px, ${position.y}px)`;
-        },
-      },
-    });
-  }, []);
-
-  useEffect(() => {
     setTimeout(() => {
       setLoadingDelayed(false);
     }, 0);
   }, [loading]);
 
   useEffect(() => {
-    const cardsNft = sortCards(cards.filter((card) => card.id));
-    const cardsRegular = sortCards(cards.filter((card) => !card.id));
+    const cardsNft = sortCards(
+      cards.filter((card) => card.id || card.value === "unknown")
+    );
+    const cardsRegular = sortCards(
+      cards.filter((card) => !card.id && card.value !== "unknown")
+    );
     setCardsNft(cardsNft);
     setCardsRegular(cardsRegular);
   }, [cards]);
 
   const selectCard = useCallback(
     (card) => () => {
+      console.log('selected Card event')
       if (selectedCard === card) {
         setSelectedCard(null);
         return;
@@ -174,31 +161,10 @@ const GameInventory: FC<Props> = ({
           >
             {cardsRegular.map((card: any, index: number) => {
               return (
-                <CardSmall
-                  className="draggable"
-                  onClick={selectCard(card)}
-                  key={`${index}`}
-                  isSelected={
-                    selectedCard ? selectedCard.uid === card.uid : false
-                  }
-                  background={
-                    gameState?.turnForPlayer === user.userId && isOpponentsCards
-                      ? "#181818"
-                      : isOpponentsCards
-                      ? "white"
-                      : "#0C0E11"
-                  }
-                  color={
-                    gameState?.turnForPlayer === user.userId && isOpponentsCards
-                      ? !isOpponentsCards
-                        ? "#0C0E11"
-                        : "white"
-                      : isOpponentsCards
-                      ? "#0C0E11"
-                      : "white"
-                  }
-                  css={{
-                    transition: "all 400ms",
+                <div
+                  style={{
+                    width:    gameState?.turnForPlayer === user.userId &&
+                    !isOpponentsCards ? 72 : 84,
                     marginRight:
                       gameState?.turnForPlayer === user.userId &&
                       !isOpponentsCards
@@ -206,25 +172,66 @@ const GameInventory: FC<Props> = ({
                           ? 0
                           : 10
                         : 0,
-                    borderRight: !isOpponentsCards
-                      ? "none"
-                      : index + 1 === cardsRegular.length
-                      ? "none"
-                      : `1px solid ${gameState?.turnForPlayer === user.userId ? 'rgba(221, 221, 221, 0.2)' : 'rgba(221, 221, 221, 0.8)'} `,
-                    padding:
-                      gameState?.turnForPlayer === user.userId &&
-                      !isOpponentsCards
-                        ? "0 0"
-                        :  isOpponentsCards ? "0 10px" : '0 6px',
-                    pointerEvents:
-                      !isOpponentsCards &&
-                      gameState?.turnForPlayer === user.userId
-                        ? "auto"
-                        : "none",
+                    height: 91,
                   }}
-                  cardValue={card.value}
-                  {...card}
-                />
+                  key={`${index}`}
+                >
+                  <CardSmall
+                    className={"draggable"}
+                    onClick={selectCard(card)}
+                    key={`${index}`}
+                                     
+
+                    isSelected={
+                      selectedCard ? selectedCard.uid === card.uid : false
+                    }
+                    background={
+                      gameState?.turnForPlayer === user.userId &&
+                      isOpponentsCards
+                        ? "#181818"
+                        : isOpponentsCards
+                        ? "white"
+                        : "#0C0E11"
+                    }
+                    color={
+                      gameState?.turnForPlayer === user.userId &&
+                      isOpponentsCards
+                        ? !isOpponentsCards
+                          ? "#0C0E11"
+                          : "white"
+                        : isOpponentsCards
+                        ? "#0C0E11"
+                        : "white"
+                    }
+                    css={{
+                      transition: "all 400ms",
+
+                      borderRight: !isOpponentsCards
+                        ? "none"
+                        : index + 1 === cardsRegular.length
+                        ? "none"
+                        : `1px solid ${
+                            gameState?.turnForPlayer === user.userId
+                              ? "rgba(221, 221, 221, 0.2)"
+                              : "rgba(221, 221, 221, 0.8)"
+                          } `,
+                      padding:
+                        gameState?.turnForPlayer === user.userId &&
+                        !isOpponentsCards
+                          ? "0 0"
+                          : isOpponentsCards
+                          ? "0 10px"
+                          : "0 6px",
+                      pointerEvents:
+                        !isOpponentsCards &&
+                        gameState?.turnForPlayer === user.userId
+                          ? "auto"
+                          : "none",
+                    }}
+                    cardValue={card.value}
+                    {...card}
+                  />
+                </div>
               );
             })}{" "}
           </div>
@@ -242,87 +249,111 @@ const GameInventory: FC<Props> = ({
                 ? gameState?.turnForPlayer === user.userId
                   ? "#282828"
                   : "#E5E5E5"
-                : gameState?.turnForPlayer === user.userId ? "linear-gradient(90.19deg, #8482F8 14%, #A6FBF6 86.07%)" : '#282828'
+                : gameState?.turnForPlayer === user.userId
+                ? "linear-gradient(90.19deg, #8482F8 14%, #A6FBF6 86.07%)"
+                : "#282828",
             }}
           >
             {cardsNft.map((card: any, index: number) => {
               return (
-                <CardSmall
-                  onClick={selectCard(card)}
-                  key={`${index}`}
-                  isSelected={
-                    selectedCard ? selectedCard.uid === card.uid : false
-                  }
-                  background={
-                    gameState?.turnForPlayer === user.userId && isOpponentsCards
-                      ? "#282828"
-                      : isOpponentsCards
-                      ? "E5E5E5"
-                      : gameState?.turnForPlayer === user.userId  ? "#0C0E11" : "#0C0E11" 
-                  }
-                  color={
-                    gameState?.turnForPlayer === user.userId && isOpponentsCards
-                      ? "#fff"
-                      : isOpponentsCards 
-                      ? "#0C0E11"
-                      : '#fff'
-                  }
-                  css={{
-                    marginRight: index + 1 === cardsNft.length && !isOpponentsCards ? 0 : 10,
-                    pointerEvents:
-                      !isOpponentsCards &&
-                      gameState?.turnForPlayer === user.userId
-                        ? "auto"
-                        : "none",
-                    borderRight:
+                <div
+                style={{
+                  width:    gameState?.turnForPlayer === user.userId &&
+                  !isOpponentsCards ? 72 : 84,
+                  marginRight:
+                    gameState?.turnForPlayer === user.userId &&
+                    !isOpponentsCards
+                      ? index + 1 === cardsNft.length
+                        ? 0
+                        : 10
+                      : 0,
+                  height: 91,
+                }}
+                key={`${index + 'nft'}`}
+              >
+                  <CardSmall
+                    onClick={selectCard(card)}
+                    isSelected={
+                      selectedCard ? selectedCard.uid === card.uid : false
+                    }
+                    background={
                       gameState?.turnForPlayer === user.userId &&
-                      !isOpponentsCards &&
-                      index + 1 === cardsRegular.length
-                        ? "none"
-                        : "px solid rgba(221, 221, 221, 0.1)",
-                    "&::before": {
-                      opacity: 0,
-                      content: `"${card.power}"`,
-                      display: "flex",
-
-                      justifyContent: "center",
-                      alignItems: "center",
-                      transition: "all  400ms",
-                      color: "#fff",
-                      fontFamily: "Aldrich",
-                      background: "#7B61FF",
-                      backgroundImage:
-                        'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAxNCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEzLjkxNzIgNy4zMTE4Mkw3LjU1MzU3IDE4Ljc2NjRDNy40MzkwMyAxOC45NyA3LjIyOTAzIDE5LjA5MDkgNi45OTk5NCAxOS4wOTA5QzYuOTQ5MDMgMTkuMDkwOSA2Ljg5MTc1IDE5LjA4NDUgNi44NDA4NCAxOS4wNzE4QzYuNTYwODQgMTguOTk1NCA2LjM2MzU3IDE4Ljc0NzMgNi4zNjM1NyAxOC40NTQ1VjExLjQ1NDVIMC42MzYzMDFDMC40MTk5MzggMTEuNDU0NSAwLjIyMjY2NSAxMS4zNDY0IDAuMTAxNzU2IDExLjE2ODJDLTAuMDEyNzg5NSAxMC45OSAtMC4wMzE4ODAzIDEwLjc2MDkgMC4wNTA4NDY5IDEwLjU2MzZMNC41MDUzOSAwLjM4MTgxOEM0LjYwNzIxIDAuMTUyNzI3IDQuODM2MyAwIDUuMDkwODUgMEg4LjkwOTAzQzkuMTE5MDMgMCA5LjMxNjMgMC4xMDE4MTggOS40MzcyMSAwLjI4QzkuNTUxNzUgMC40NTE4MTggOS41NzcyMSAwLjY3NDU0NSA5LjUwMDg0IDAuODcxODE4TDcuMzA1MzkgNi4zNjM2M0gxMy4zNjM2QzEzLjU4NjMgNi4zNjM2MyAxMy43OTYzIDYuNDg0NTQgMTMuOTEwOCA2LjY3NTQ1QzE0LjAyNTQgNi44NzI3MiAxNC4wMzE4IDcuMTE0NTQgMTMuOTE3MiA3LjMxMTgyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==")',
-                      backgroundRepeat: "no-repeat",
-                      backgroundPosition: "12px 8px",
-
-                      position: "absolute",
-                      borderRadius: 20,
-                      fontSize: 28,
-                      zIndex: 9999,
-                      top: -72,
-                      left: "50%",
-                      transform: "translate(-50%, 0)",
-                      padding: "12px 0",
-                      paddingTop: 18,
-                      paddingLeft: 20,
-                      minWidth: 70,
-                      height: 36,
-                      pointerEvents: "none",
-                      textTransform: "uppercase",
-                    },
-                    "&:hover": {
-                      color: "#7B61FF",
+                      isOpponentsCards
+                        ? "#282828"
+                        : isOpponentsCards
+                        ? "E5E5E5"
+                        : gameState?.turnForPlayer === user.userId
+                        ? "#0C0E11"
+                        : "#0C0E11"
+                    }
+                    color={
+                      gameState?.turnForPlayer === user.userId &&
+                      isOpponentsCards
+                        ? "#fff"
+                        : isOpponentsCards
+                        ? "#0C0E11"
+                        : "#fff"
+                    }
+                    css={{
+                      marginRight:
+                        index + 1 === cardsNft.length && !isOpponentsCards
+                          ? 0
+                          : 10,
+                      pointerEvents:
+                        !isOpponentsCards &&
+                        gameState?.turnForPlayer === user.userId
+                          ? "auto"
+                          : "none",
+                      borderRight:
+                        gameState?.turnForPlayer === user.userId &&
+                        !isOpponentsCards &&
+                        index + 1 === cardsRegular.length
+                          ? "none"
+                          : "px solid rgba(221, 221, 221, 0.1)",
                       "&::before": {
-                        opacity: 1,
+                        opacity: 0,
+                        content: `"${card.power}"`,
+                        display: "flex",
+
+                        justifyContent: "center",
+                        alignItems: "center",
+                        transition: "all  400ms",
+                        color: "#fff",
+                        fontFamily: "Aldrich",
+                        background: "#7B61FF",
+                        backgroundImage:
+                          'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAxNCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEzLjkxNzIgNy4zMTE4Mkw3LjU1MzU3IDE4Ljc2NjRDNy40MzkwMyAxOC45NyA3LjIyOTAzIDE5LjA5MDkgNi45OTk5NCAxOS4wOTA5QzYuOTQ5MDMgMTkuMDkwOSA2Ljg5MTc1IDE5LjA4NDUgNi44NDA4NCAxOS4wNzE4QzYuNTYwODQgMTguOTk1NCA2LjM2MzU3IDE4Ljc0NzMgNi4zNjM1NyAxOC40NTQ1VjExLjQ1NDVIMC42MzYzMDFDMC40MTk5MzggMTEuNDU0NSAwLjIyMjY2NSAxMS4zNDY0IDAuMTAxNzU2IDExLjE2ODJDLTAuMDEyNzg5NSAxMC45OSAtMC4wMzE4ODAzIDEwLjc2MDkgMC4wNTA4NDY5IDEwLjU2MzZMNC41MDUzOSAwLjM4MTgxOEM0LjYwNzIxIDAuMTUyNzI3IDQuODM2MyAwIDUuMDkwODUgMEg4LjkwOTAzQzkuMTE5MDMgMCA5LjMxNjMgMC4xMDE4MTggOS40MzcyMSAwLjI4QzkuNTUxNzUgMC40NTE4MTggOS41NzcyMSAwLjY3NDU0NSA5LjUwMDg0IDAuODcxODE4TDcuMzA1MzkgNi4zNjM2M0gxMy4zNjM2QzEzLjU4NjMgNi4zNjM2MyAxMy43OTYzIDYuNDg0NTQgMTMuOTEwOCA2LjY3NTQ1QzE0LjAyNTQgNi44NzI3MiAxNC4wMzE4IDcuMTE0NTQgMTMuOTE3MiA3LjMxMTgyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==")',
+                        backgroundRepeat: "no-repeat",
+                        backgroundPosition: "12px 8px",
+
+                        position: "absolute",
+                        borderRadius: 20,
+                        fontSize: 28,
+                        zIndex: 9999,
+                        top: -72,
+                        left: "50%",
+                        transform: "translate(-50%, 0)",
+                        padding: "12px 0",
+                        paddingTop: 18,
+                        paddingLeft: 20,
+                        minWidth: 70,
+                        height: 36,
                         pointerEvents: "none",
-                        transform: "translate(-50%, 8px)",
+                        textTransform: "uppercase",
                       },
-                    },
-                  }}
-                  cardValue={isOpponentsCards ? "unknown" : card.value}
-                  {...card}
-                />
+                      "&:hover": {
+                        color: "#7B61FF",
+                        "&::before": {
+                          opacity: 1,
+                          pointerEvents: "none",
+                          transform: "translate(-50%, 8px)",
+                        },
+                      },
+                    }}
+                    cardValue={isOpponentsCards ? "unknown" : card.value}
+                    {...card}
+                  />
+                </div>
               );
             })}
           </div>

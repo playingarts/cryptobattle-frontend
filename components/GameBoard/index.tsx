@@ -5,6 +5,7 @@ import { getCard } from "../../components/Cards";
 import CardEmpty from "../../components/CardEmpty";
 import { useGame } from "../GameProvider";
 import { useWS } from "../WsProvider";
+import interact from "interactjs";
 
 interface Props extends HTMLAttributes<HTMLElement> {
   selectedCard?: string;
@@ -28,20 +29,14 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
   const { gameState, players } = useGame();
 
   const [board, setBoard] = useState(generateBoard(7, 5));
+  const [startPosition, setStartPosition] = useState<any>(0, 0);
 
+  useEffect(() => {
+    console.log(selectedCard, "changed");
+  }, [selectedCard]);
 
-useEffect(() => {
- console.log('board changed:')
-}, [board])
-
-
-useEffect(() => {
-  console.log(selectedCard, 'changed')
- }, [selectedCard])
-
-  const [refresh, setRefresh] = useState(false);
   const [cardError, setCardError] = useState<any>([]);
-  const [tableCardsLocal, setTableCards] = useState<any>([false]);
+  const [lastPlayedCard, setLastPlayedCard] = useState<any>(null);
 
   const getColor = useCallback(
     (userId) => () => {
@@ -57,13 +52,27 @@ useEffect(() => {
     [players]
   );
 
+
+  const getSkew = useCallback(
+    (index) => () => {
+      if (!index  || index === 0) {
+        return "";
+      }
+      return `rotate(${index * 4}deg)`
+    },
+    []
+  );
+
+
   const addCard = useCallback(
     (rowIndex, columnIndex, card = selectedCard) =>
       () => {
+        console.log("addCard no card", card);
+
         if (!card) {
           return;
         }
-        console.log('addCard')
+        console.log("addCard");
 
         console.log(card);
         const allowedPlacement =
@@ -74,10 +83,10 @@ useEffect(() => {
         if (!card || !allowedPlacement) {
           // alert("Not allowed to place card there.");
           setCardError([rowIndex, columnIndex]);
-
+          console.log("card error");
           setTimeout(() => {
             setCardError([]);
-          }, 1000);
+          }, 2000);
 
           return;
         }
@@ -103,9 +112,12 @@ useEffect(() => {
         ) {
           // alert("Not allowed to place card there.");
           setCardError([rowIndex, columnIndex]);
+          console.log("card error 2");
+          console.log(rowIndex, columnIndex);
+
           setTimeout(() => {
             setCardError([]);
-          }, 0);
+          }, 1000);
           return;
         }
 
@@ -123,12 +135,11 @@ useEffect(() => {
             },
           })
         );
-
       },
-    [WSProvider, selectedCard, gameState]
+    [WSProvider, selectedCard, gameState, setCardError]
   );
 
-  const addCardOnce = (
+  const addCardToBoard = (
     rowIndex: number,
     columnIndex: number,
     card: any = selectedCard
@@ -138,7 +149,19 @@ useEffect(() => {
 
     const localBoard = [...board];
 
-    localBoard[row][column] = card;
+    const placeToPutCard = localBoard[row][column];
+
+    if (
+      placeToPutCard &&
+      placeToPutCard !== "empty" &&
+      Array.isArray(placeToPutCard)
+    ) {
+      if(!placeToPutCard.find(existingCard =>  existingCard.value === card.value && existingCard.suit === card.suit )) {
+        localBoard[row][column].push(card);
+      }
+    } else {
+      localBoard[row][column] = [card];
+    }
 
     if (
       localBoard[row][column + 1] !== undefined &&
@@ -170,8 +193,6 @@ useEffect(() => {
 
     setBoard([...localBoard]);
 
-    console.log(board, " :addCardOnce");
-
     removeCard ? removeCard(card) : null;
   };
 
@@ -182,23 +203,173 @@ useEffect(() => {
       return;
     }
 
+
     const tableCards = gameState.gameTableCards?.additionalProperties;
-    console.log("tableCards", tableCards);
     if (!tableCards) {
       return;
+    }
+
+    console.log(Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties).length === 0, "length")
+
+    if (Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties).length === 0) {
+
+      setTimeout(() => {
+        WSProvider.send(
+          JSON.stringify({
+            event: "play-card",
+            data: {
+              action: "pass",
+  
+            }}))
+      }, 2000);
+ 
+
     }
 
     Object.keys(tableCards).forEach((key) => {
       const cards = gameState.gameTableCards?.additionalProperties;
       const indexes = key.split("-");
-      const card = getCard(
-        cards[key].slice(-1)[0].suit,
-        cards[key].slice(-1)[0].value,
-        cards[key].slice(-1)[0]
-      );
-      addCardOnce(Number(indexes[1]), Number(indexes[0]), card);
+
+      cards[key].forEach((card: any) => {
+        const cardF = getCard(card.suit, card.value, card);
+        addCardToBoard(Number(indexes[1]), Number(indexes[0]), cardF);
+      });
+
+      // const card = getCard(
+      //   cards[key].slice(-1)[0].suit,
+      //   cards[key].slice(-1)[0].value,
+      //   cards[key].slice(-1)[0]
+      // );
+      // addCardToBoard(Number(indexes[1]), Number(indexes[0]), card);
     });
+
+    function getOffset(el: any) {
+      const rect = el.getBoundingClientRect();
+      console.log(rect);
+      return {
+        left: rect.left + window.scrollX,
+        top: rect.top + window.scrollY + 100,
+      };
+    }
+
+    setLastPlayedCard(
+      gameState.lastPlayedCard ? gameState.lastPlayedCard : null
+    );
+
+    setTimeout(() => {
+      const latestCard = document.getElementsByClassName("game-latest-card")[0];
+
+      console.log(latestCard, 'latestCard')
+
+      const container = document.getElementsByClassName("scroll-container")[0];
+      if (!latestCard) {
+        return;
+      }
+      console.log(latestCard, 'latestCard')
+
+      container.scrollTo({
+        top: getOffset(latestCard).top,
+        left: getOffset(latestCard).left,
+        behavior: "smooth",
+      });
+
+      setTimeout(
+        () => latestCard.classList.add("game-latest-card__animation"),
+        1000
+      );
+    }, 0);
+
+    // setTimeout(() => {
+    //   window.scrollTo(1000, 900)
+
+    // }, 400)
   }, [gameState]);
+
+  useEffect(() => {
+    interact.dynamicDrop(true);
+
+    const position = { x: 0, y: 0 };
+
+    interact(".draggable").draggable({
+      autoScroll: { container: ".scroll-container", margin: 70, speed: 1000 },
+
+      inertia: true,
+      max: 1,
+      // modifiers: [
+      //   interact.modifiers.restrictRect({
+      //     restriction: 'parent',
+      //     endOnly: true
+      //   })
+      // ],
+      listeners: {
+        start(event) {
+          console.log("start");
+
+          event.target.style.transform = `translate(0px, 0px)`
+
+        },
+        end(event) {
+          console.log("ended", event);
+          // event.target.style.display = `none`;
+          position.x = 0;
+          position.y = 0;
+  
+          event.target.style.transform = `translate(0px, 0px)`;
+        },
+        move(event) {
+          position.x += event.dx;
+          position.y += event.dy;
+
+          event.target.style.position = "absolute";
+          event.target.style.transform = `translate(${position.x}px, ${position.y}px)`;
+        },
+      },
+    });
+
+    interact(".dropzone").dropzone({
+      // only accept elements matching this CSS selector
+      accept: ".draggable",
+      // Require a 75% element overlap for a drop to be possible
+      overlap: 0.4,
+
+      // listen for drop related events:
+
+      ondropactivate: function (event) {
+        // add active dropzone feedback
+        event.target.classList.add("drop-active");
+      },
+      ondragenter: function (event) {
+        // const draggableElement = event.relatedTarget;
+        const dropzoneElement = event.target;
+
+        // feedback the possibility of a drop
+        dropzoneElement.classList.add("drop-target");
+        // draggableElement.classList.add("can-drop");
+        // draggableElement.textContent = 'Dragged in'
+      },
+      ondragleave: function (event) {
+        // remove the drop feedback style
+        event.target.classList.remove("drop-target");
+        // event.relatedTarget.classList.remove("can-drop");
+        // event.draggable.snap({ anchors: [startPosition] });
+
+        // event.relatedTarget.textContent = 'Dragged out'
+      },
+      ondrop: function (event) {
+        console.log(event, 'ondrop')
+        const target = event.currentTarget.id.split("-");
+        console.log(target, "target");
+        addCard(Number(target[0]), Number(target[1]))();
+
+      },
+
+      ondropdeactivate: function (event) {
+        // remove active dropzone feedback
+        event.target.classList.remove("drop-active");
+        event.target.classList.remove("drop-target");
+      },
+    });
+  }, [addCard]);
 
   return (
     <div
@@ -211,64 +382,146 @@ useEffect(() => {
       })}
     >
       <div>
-         {
-          board.map((row: any, rowIndex: number) => {
-            return (
-              <div
-                key={rowIndex}
-                css={() => ({
-                  display: "flex",
-                  justifyContent: "center",
-                })}
-              >
-                {row.map((column: any, columnIndex: number) => {
-                  return (
-                    <div
-                      key={`${columnIndex}${rowIndex}`}
-                      css={() => ({
-                        margin: column ? "20px" : "20px",
-                      })}
-                    >
-                      {!column && (
-                        <div style={{ width: "210px", height: "300px" }}></div>
-                      )}
-                      {column === "empty" && (
-                        <CardEmpty
+        {board.map((row: any, rowIndex: number) => {
+          return (
+            <div
+              key={rowIndex}
+              css={() => ({
+                display: "flex",
+                justifyContent: "center",
+              })}
+            >
+              {row.map((column: any, columnIndex: number) => {
+                return (
+                  <div
+                    key={`${columnIndex}${rowIndex}-${columnIndex}${rowIndex}`}
+                    css={() => ({
+                      margin: column ? "20px" : "20px",
+                      borderRadius: 10,
+                      position: "relative",
+                      outline:
+                        cardError[0] === rowIndex &&
+                        cardError[1] === columnIndex
+                          ? "#FA5252 6px solid!important"
+                          : "none",
+                    })}
+                  >
+                    {!column && (
+                      <div style={{ width: "210px", height: "300px" }}></div>
+                    )}
+
+                    {column &&
+                      column[column.length -1 ].suit &&
+                      column[column.length -1 ].value &&
+                      lastPlayedCard?.value === column[column.length -1].value &&
+                      lastPlayedCard?.suit === column[column.length -1].suit && (
+                        <div
+                          className="game-latest-card"
                           css={{
-                            outline:
-                              cardError[0] === rowIndex &&
-                              cardError[1] === columnIndex
-                                ? "#FA5252 6px solid"
-                                : "none",
-                            transition: "all 300ms",
-                            borderRadius: 10,
+                            background: getColor(column[column.length -1].userId)(),
+                            outlineColor: getColor(column[column.length -1].userId)(),
+                            zIndex: 9999,
                           }}
-                          onClick={addCard(rowIndex, columnIndex)}
-                        ></CardEmpty>
-                      )}
-                      {/* TODO */}
-                      {column?.value && (
-                        <Card
-                          onClick={addCard(rowIndex, columnIndex)}
-                          animated={column.id ? true : false}
-                          card={column}
-                          isGameBoard={true}
-                          style={{
-                             outline:
-                              cardError[0] === rowIndex &&
-                              cardError[1] === columnIndex
-                                ? "#FA5252 6px solid"
-                                : `6px solid ${getColor(column.userId)()}`,
-                            borderRadius: 16,
-                          }}
-                        ></Card>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            );
-          })}
+                        >
+                          <div className="game-latest-card__score">
+                            {" "}
+                            +{lastPlayedCard.scoring}
+                          </div>
+                        </div>
+                      ) 
+                    
+
+                      }
+
+                    {column === "empty" && (
+                      <CardEmpty
+                        key={`${columnIndex}${rowIndex}-${columnIndex}${rowIndex}`}
+                        css={{
+                          transition: "all 300ms",
+                          borderRadius: 10,
+                        }}
+                        onClick={addCard(rowIndex, columnIndex)}
+                        id={rowIndex + "-" + columnIndex}
+                      ></CardEmpty>
+                    )}
+                    {column && column !== "empty" && (
+                      <div className="stack">
+                        {[...column].map((card: any, index) => (
+                          <Card
+                            key={`${card.value} ${card.suit}`}
+                            onClick={addCard(rowIndex, columnIndex)}
+                            animated={card.id ? true : false}
+                            card={card}
+                            index={index}
+                            className={`${
+                              index + 1 === column.length ? "dropzone" : ""
+                            }`}
+                            
+                            id={rowIndex + "-" + columnIndex}
+                            data-row={rowIndex}
+                            data-column={columnIndex}
+                            isGameBoard={true}
+                            css={{
+                              zIndex:  10 + index,
+                              outline:
+                              index + 1 === column.length &&
+                                cardError[0] === rowIndex &&
+                                cardError[1] === columnIndex
+                                  ? "#FA5252 6px solid"
+                                  : `6px solid ${getColor(card.userId)()}`,
+                              borderRadius: 16,
+                              position: "relative",
+                              // animationDuration: "10s",
+                              opacity: lastPlayedCard?.value === card.value &&
+                              lastPlayedCard?.suit === card.suit ? 0 : 1,
+                              animation: lastPlayedCard?.value === card.value &&
+                              lastPlayedCard?.suit === card.suit ?  'example3  0.3s linear 0.3s 1 normal forwards' : '',
+                              animationDelay: "1.6s",
+                              // animationName: 'example3',
+                              transform: getSkew(index)(),
+                              "&::after": {
+                                opacity: card.id ? 1 : 0,
+                                content: `"${card.power}"`,
+                                display: card ? "flex" : "none",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                transition: "all  400ms",
+                                zIndex:  999 + index,
+                                transform: getSkew(index)(),
+
+                                color: "#fff",
+                                fontFamily: "Aldrich",
+                                background: `#FAB005`,
+                                backgroundImage:
+                                  'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAxNCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEzLjkxNzIgNy4zMTE4Mkw3LjU1MzU3IDE4Ljc2NjRDNy40MzkwMyAxOC45NyA3LjIyOTAzIDE5LjA5MDkgNi45OTk5NCAxOS4wOTA5QzYuOTQ5MDMgMTkuMDkwOSA2Ljg5MTc1IDE5LjA4NDUgNi44NDA4NCAxOS4wNzE4QzYuNTYwODQgMTguOTk1NCA2LjM2MzU3IDE4Ljc0NzMgNi4zNjM1NyAxOC40NTQ1VjExLjQ1NDVIMC42MzYzMDFDMC40MTk5MzggMTEuNDU0NSAwLjIyMjY2NSAxMS4zNDY0IDAuMTAxNzU2IDExLjE2ODJDLTAuMDEyNzg5NSAxMC45OSAtMC4wMzE4ODAzIDEwLjc2MDkgMC4wNTA4NDY5IDEwLjU2MzZMNC41MDUzOSAwLjM4MTgxOEM0LjYwNzIxIDAuMTUyNzI3IDQuODM2MyAwIDUuMDkwODUgMEg4LjkwOTAzQzkuMTE5MDMgMCA5LjMxNjMgMC4xMDE4MTggOS40MzcyMSAwLjI4QzkuNTUxNzUgMC40NTE4MTggOS41NzcyMSAwLjY3NDU0NSA5LjUwMDg0IDAuODcxODE4TDcuMzA1MzkgNi4zNjM2M0gxMy4zNjM2QzEzLjU4NjMgNi4zNjM2MyAxMy43OTYzIDYuNDg0NTQgMTMuOTEwOCA2LjY3NTQ1QzE0LjAyNTQgNi44NzI3MiAxNC4wMzE4IDcuMTE0NTQgMTMuOTE3MiA3LjMxMTgyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==")',
+                                backgroundRepeat: "no-repeat",
+                                backgroundPosition: "12px 8px",
+                                position: "absolute",
+                                borderRadius: 20,
+                                fontSize: 24,
+                                top: -10,
+                                right: 0,
+                                left: 160,
+                                padding: "14px 0",
+                                paddingTop: 18,
+                                paddingLeft: 20,
+                                width: 40,
+                                minWidth: 62,
+                                height: 38,
+                                pointerEvents: "none",
+                                textTransform: "uppercase",
+                              },
+                            }}
+                          ></Card>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
       {children}
     </div>

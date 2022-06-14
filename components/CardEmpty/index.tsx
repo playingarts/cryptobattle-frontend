@@ -24,54 +24,10 @@ const Card: FC<Props> = ({
   const height = size === "big" ? 52 : 29.4;
   const wrapper = useRef<HTMLDivElement>(null);
 
-
-useEffect(() => {
-  interact('.dropzone').dropzone({
-    // only accept elements matching this CSS selector
-    accept: '.draggable',
-    // Require a 75% element overlap for a drop to be possible
-    overlap: 0.75,
-  
-    // listen for drop related events:
-  
-    ondropactivate: function (event) {
-      console.log('active')
-      // add active dropzone feedback
-      event.target.classList.add('drop-active')
-    },
-    ondragenter: function (event) {
-      const draggableElement = event.relatedTarget
-      const dropzoneElement = event.target
-  
-      // feedback the possibility of a drop
-      dropzoneElement.classList.add('drop-target')
-      draggableElement.classList.add('can-drop')
-      draggableElement.textContent = 'Dragged in'
-    },
-    ondragleave: function (event) {
-      // remove the drop feedback style
-      event.target.classList.remove('drop-target')
-      event.relatedTarget.classList.remove('can-drop')
-      event.relatedTarget.textContent = 'Dragged out'
-    },
-    ondrop: function (event) {
-      event.relatedTarget.textContent = 'Dropped'
-    },
-    ondropdeactivate: function (event) {
-      // remove active dropzone feedback
-      event.target.classList.remove('drop-active')
-      event.target.classList.remove('drop-target')
-    }
-  })
-  
-}, [])
-
-
-  
-
   return (
     <div
       {...props}
+      className="dropzone"
       css={(theme) => ({
         "&:hover": {
           color: "rgba(10, 10, 10, 0.7)",
@@ -83,8 +39,8 @@ useEffect(() => {
         fontWeight: 500,
         fontsize: 18,
         lineheight: 21,
-        className: 'dropzone'
       })}
+
     >
       <div ref={wrapper}>
         <div

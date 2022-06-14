@@ -74,7 +74,7 @@ const GameHeader: FC<Props> = ({
 
 
     setPlayersWithPoints(playersSorted);
-
+    console.log('setPlayersWithPoints')
     setCurrentPlayer(
       currentPlayer
     );
@@ -103,7 +103,7 @@ const GameHeader: FC<Props> = ({
   }, [gameState, user]);
 
   return (
-    <header {...props}>
+    <header  {...props}  style={{        zIndex: 9999099   }}>
       <div
         css={(theme) => [
           {
@@ -129,6 +129,8 @@ const GameHeader: FC<Props> = ({
             position: "relative",
             marginTop: "0px",
             fontSize: "30px",
+            zIndex: 9999999,
+
           }}
         >
           <LogoMenu

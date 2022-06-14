@@ -20,6 +20,8 @@ const CardSmall: FC<Props> = ({
   color,
   isSelected,
   background,
+  powerLevel,
+scoringLevel,
   ...props
 }) => (
   <div
@@ -27,6 +29,8 @@ const CardSmall: FC<Props> = ({
       display: "inline-block",
       position: "relative",
     }}
+    powerlevel={powerLevel}
+    scroinglevel={scoringLevel}
     {...props}
   >
     <div
@@ -36,7 +40,6 @@ const CardSmall: FC<Props> = ({
         flexDirection: "column",
         justifyContent: "space-between",
         alignItems: "center",
-        transition: "all 400ms",
         paddingTop: theme.spacing(1.5),
         paddingBottom: theme.spacing(1.5),
         borderRadius: theme.spacing(1),
@@ -45,7 +48,10 @@ const CardSmall: FC<Props> = ({
         width: theme.spacing(6.5),
         position: "relative",
         zIndex: 1,
+        transition: "transform 400ms",
+
         "&:hover": {
+     
           transform: "translate(0, -10px)",
           cursor: "grab",
         },

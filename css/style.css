@@ -2,18 +2,180 @@ body {
   padding: 0 !important;
 }
 
-.game-inventory { 
+/* Fix rounded corners Safari */
+html {
+  -webkit-backface-visibility: hidden;
+-webkit-transform: translate3d(0, 0, 0);
+}
+
+.game-inventory {
   opacity: 0;
   transform: translate(0, 0);
   transition: opacity 2s, transform 1s;
 }
 
-.game-player { 
+.game-player {
   opacity: 0;
   transform: translate(0, 0);
   transition: opacity 2s, transform 1s;
   /* transition: opacity 2s ease-out 0s, transform 0.8s linear 0s;
   transform-origin: center center; */
+}
+
+/* .game-latest-card__animation {
+  position: "relative";
+} */
+
+.game-latest-card {
+  background: red;
+  position: absolute;
+  display: flex;
+  font-family: Aldrich;
+  justify-content: center;
+  align-items: center;
+  color: #fff !important;
+  font-size: 100px;
+  top: 0;
+  border-radius: 10px;
+  outline: 6px red solid;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 999999999;
+  transform: translate(-150px, -150px) rotate(-10deg);
+  opacity: 0;
+  z-index:9999;
+  pointer-events: none;
+  animation-name: example;
+  animation-delay: 1s;
+  animation-duration: 800ms;
+  transform-origin: center center;
+}
+
+.game-latest-card__score {
+  opacity: 0;
+  z-index:9999;
+  pointer-events: none;
+  animation-name: example2;
+  animation-delay: 1s;
+
+  animation-duration: 800ms;
+  transform-origin: center center;
+
+}
+
+/* .game-latest-card__animation {
+  opacity: 0;
+  z-index:9999;
+  pointer-events: none;
+  animation-name: example;
+  animation-duration: 3s;
+  transform-origin: center center;
+} */
+
+
+
+@keyframes example {
+  0% {
+    opacity: 0;
+    transform: translate(-150px, -150px) rotate(-10deg) scale(2, 2);
+
+  }
+  30% {
+    opacity: 0.4;
+    /* opacity: 0; */
+    transform: translate(-100px, -100px) rotate(-5deg) scale(2, 2);
+
+  }
+  68%,
+  72% {
+    opacity: 1;
+    transform: translate(0, 0)  rotate(0) scale(1, 1);
+
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 0)  rotate(0) scale(1, 1);
+
+  }
+}
+
+@keyframes example2 {
+  0% {
+    opacity: 1;
+
+  }
+  30% {
+    opacity: 1;
+
+  }
+  68%,
+  72% {
+    opacity: 1;
+    transform: scale(1, 1);
+  }
+  80% {
+    opacity: 0.5;
+    transform: scale(2, 2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3, 3);
+  }
+}
+
+
+@keyframes example3 {
+  0% {
+    opacity: 0,
+
+  }
+  30% {
+    opacity: 0,
+
+  }
+  68%,
+  72% {
+    opacity: 0,
+
+  }
+  100% {
+    opacity: 1
+  }
+}
+
+.stack {
+  display: grid;
+}
+.stack > * {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+
+
+.player-queue > .game-player {
+  transition: all 5s linear;
+}
+
+.all-slides {
+  display: flex;
+  /* width: 80vw; */
+  margin: 0 auto;
+  perspective: 70px;
+  height: 70px;
+}
+
+.single-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: auto;
+  position: absolute;
+  transition: 400ms ease;
 }
 
 .hamburger {
@@ -82,38 +244,34 @@ body {
   transition: 1s ease 0.3s;
 }
 
-
 [data-radix-portal] {
-  z-index: 4000!important;
+  z-index: 4000 !important;
 }
 
-
-.fadeOut{
-  opacity:0;
-  width:0;
-  height:0;
+.fadeOut {
+  opacity: 0;
+  width: 0;
+  height: 0;
   transition: width 0.5s 0.5s, height 0.5s 0.5s, opacity 0.5s;
-
 }
-.fadeIn{
-  opacity:1;
-  width:100px;
-  height:100px;
+.fadeIn {
+  opacity: 1;
+  width: 100px;
+  height: 100px;
   transition: width 0.5s, height 0.5s, opacity 0.5s 0.5s;
-
 }
 
 .draggable {
   /* width: 25%;
   min-height: 6.5em;
-  margin: 1rem 0 0 1rem;
-  background-color: #29e;
+  margin: 1rem 0 0 1rem; */
+  /* background-color: #29e; */
   color: white;
-  border-radius: 0.75em;
-  padding: 4%; */
+  /* padding: 4%; */
   touch-action: none;
   user-select: none;
   pointer-events: none;
+  transition: none!important;
 }
 
 #outer-dropzone {
@@ -125,27 +283,30 @@ body {
 }
 
 .dropzone {
-  background-color: #bfe4ff;
-  border: dashed 4px transparent;
+  /* background-color: #bfe4ff; */
+  /* border: dashed 4px transparent; */
   border-radius: 4px;
-  margin: 10px auto 30px;
+  /* margin: 10px auto 30px;
   padding: 10px;
-  width: 80%;
-  transition: background-color 0.3s;
+  width: 80%; */
+  transition: all 0.3;
+
+  /* transition: background-color 0.3s; */
 }
 
 .drop-active {
   border-color: #aaa;
 }
 
+
 .drop-target {
-  background-color: #29e;
-  border-color: #fff;
-  border-style: solid;
-}
+  background-color: rgb(23, 23, 23);
+  border-color: #fff !important;
+  filter: brightness(130%);}
+
 
 .drag-drop {
-  display: inline-block;
+  /* display: inline-block;
   min-width: 40px;
   padding: 2em 0.5em;
   margin: 1rem 0 0 1rem;
@@ -155,7 +316,7 @@ body {
   border: solid 2px #fff;
 
   touch-action: none;
-  transform: translate(0px, 0px);
+  transform: translate(0px, 0px); */
 
   transition: background-color 0.3s;
 }

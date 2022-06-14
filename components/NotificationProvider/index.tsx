@@ -27,6 +27,8 @@ function NotificationProvider({
       description: null,
       footer: null,
     });
+    document.body.style.overflow = "auto";
+
   };
 
 useEffect(() => {

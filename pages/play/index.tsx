@@ -23,7 +23,8 @@ const Play: NextPage = () => {
   const { gameState } = useGame();
 
   useEffect(() => {
-    WSProvider.onopen = function () {
+    console.log('play use effect')
+    // WSProvider.onopen = function () {
       WSProvider.send(
         JSON.stringify({
           event: "game-info",
@@ -36,7 +37,7 @@ const Play: NextPage = () => {
           data: {},
         })
       );
-    };
+    // };
   }, []);
 
 

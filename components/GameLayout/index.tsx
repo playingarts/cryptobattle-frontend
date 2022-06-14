@@ -9,10 +9,7 @@ const GameLayout: FC<
   >
 > = ({ palette, loading, children }) => {
   const container = useRef(null);
-  // const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
-
-
-
+  
 
   useEffect(() => {
     if (container.current) {
@@ -23,11 +20,13 @@ const GameLayout: FC<
   }, []);
 
   return (
-    <div style={{ background: "#0a0a0a", minHeight: "100vh", cursor: "move"}}>
+    <div style={{ background: "#0a0a0a", minHeight: "100vh", }}>
           {/* // eslint-disable-next-line 
     // @ts-ignore: Unreachable code error */}
+
       <ScrollContainer
         className="scroll-container"
+        ignoreElements='.draggable'
         style={{ width: "100vw", height: "100vh", padding: 90}}
         innerRef={container}
 
@@ -38,7 +37,7 @@ const GameLayout: FC<
             position: "fixed",
             left: theme.spacing(1),
             right: theme.spacing(1),
-            top: theme.spacing(3),
+            top: theme.spacing(2),
             zIndex: 10,
 
             "@media (min-width: 1440px)": {
@@ -51,11 +50,10 @@ const GameLayout: FC<
  
           palette={palette}
         />
-        {/* <Draggable >
-          <div className="box">I can be dragged anywhere</div>
-        </Draggable> */}
+
         {children}
       </ScrollContainer>
+
     </div>
   );
 };

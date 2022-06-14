@@ -9,7 +9,7 @@ import {
 import { useNotifications } from "../NotificationProvider";
 import Text from "../Text/";
 import Button from "../Button/";
-
+import { formatUsername } from "../../utils/helpers";
 import { useRouter } from "next/router";
 
 import { useWS } from "../../components/WsProvider/index";
@@ -187,11 +187,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
         console.log('game-updated": ', event.data);
       }
-      if (event.data.error && event.data.error.message) {
-        // alert(event.data.error.message);
-      }
+      // if (event.data.error && event.data.error.message) {
+      // }
 
-      // console.log(JSON.parse(data));
+
     };
   }, []);
 
@@ -212,8 +211,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           {results.playersPoints.map((entry: any) => {
             return (
               <div css={{ marginBottom: 10 }} key={entry.userId}>
-                {players.find((player: any) => player.userId === entry.userId)
-                  .username +
+                {formatUsername(players.find((player: any) => player.userId === entry.userId)
+                  .username) +
                   " : " +
                   entry.points}
               </div>

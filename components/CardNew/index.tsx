@@ -18,6 +18,7 @@ interface Props extends HTMLAttributes<HTMLElement> {
   size?: "big";
   interactive?: boolean;
   isGameBoard?: boolean;
+  index?: number;
 
 }
 
@@ -28,6 +29,7 @@ const Card: FC<Props> = ({
   isGameBoard,
   size,
   interactive,
+  index,
   ...props
 }) => {
   const [hovered, setHover] = useState(false);
@@ -68,7 +70,7 @@ const Card: FC<Props> = ({
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          outline: "6px solid rgba(10, 10, 10, 0.7)",
+          outline: "7px solid rgba(10, 10, 10, 0.7)",
           transition: "all 400ms",
           cursor: "pointer",
           opacity: hovered ? "1" : 0,
@@ -77,8 +79,7 @@ const Card: FC<Props> = ({
           left: 0,
           bottom: 0,
           right: 0,
-
-          zIndex: 2,
+          zIndex: 99,
           "&:hover": {
             opacity: 1,
           },
@@ -155,7 +156,6 @@ const Card: FC<Props> = ({
         ref={wrapper}
       >
         <div
-          {...props}
           css={(theme) => [
             {
               transition: theme.transitions.fast(["transform", "box-shadow"]),
