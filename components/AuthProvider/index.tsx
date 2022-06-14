@@ -73,16 +73,17 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     isTwitterConnected: false,
   });
 
+
+
   const { accesstoken } = router.query;
 
   const setToken = useCallback((token: any) => {
     console.log(token, "token");
     localStorage.setItem("accessToken", token as string);
     getUser().then(({ data }) => {
-      const formattedData = formatUserData(data);
+      const user = formatUserData(data);
 
-      setUser(formattedData);
-
+      setUser(user);
       const roomid = localStorage.getItem("roomid");
 
       roomid ? router.push(`/game/${roomid}`) : router.push("/dashboard");
@@ -98,9 +99,11 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
     if (isLoggedInCookie()) {
       getUser().then(({ data }) => {
-        const formattedData = formatUserData(data);
-
-        setUser(formattedData);
+        const user = formatUserData(data);
+        setUser(user);
+          if (user.inGameId) {
+            router.push(`/play`)
+          }
       });
     }
 
