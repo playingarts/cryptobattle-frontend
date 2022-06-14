@@ -48,10 +48,8 @@ const Home: NextPage = () => {
       >
         <div>
 
-
         <div
             css={{
-
               padding: "0 42px",
             }}
           >
@@ -68,7 +66,7 @@ const Home: NextPage = () => {
               GM, {formatUsername(user.username)}
             </Text>
 
-            <Button
+           {!user.isTwitterConnected && <Button
               component={Link}
               href={`https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter?accesstoken=${localStorage.getItem(
                 "accessToken"
@@ -80,11 +78,8 @@ const Home: NextPage = () => {
                 color: "#489BE9",
                 pointerEvents:  user.isTwitterConnected ? 'none' : 'unset',
               })}
-            >
-              {(user.isTwitterConnected)
-                ? "Connected"
-                : "Connect"}
-            </Button>
+            >Connect
+            </Button>}
           </div>
           <Line></Line>
           </div>
