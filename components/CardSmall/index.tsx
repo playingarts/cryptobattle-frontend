@@ -29,11 +29,10 @@ scoringLevel,
       display: "inline-block",
       position: "relative",
     }}
-    powerlevel={powerLevel}
-    scroinglevel={scoringLevel}
     {...props}
   >
     <div
+    key={`${powerLevel}${scoringLevel}`}
       css={(theme) => ({
         color: color ? color : "#fff",
         display: "flex",
@@ -49,9 +48,7 @@ scoringLevel,
         position: "relative",
         zIndex: 1,
         transition: "transform 400ms",
-
-        "&:hover": {
-     
+        "&:hover": {     
           transform: "translate(0, -10px)",
           cursor: "grab",
         },

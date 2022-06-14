@@ -29,7 +29,6 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
   const { gameState, players } = useGame();
 
   const [board, setBoard] = useState(generateBoard(7, 5));
-  const [startPosition, setStartPosition] = useState<any>(0, 0);
 
   useEffect(() => {
     console.log(selectedCard, "changed");

@@ -29,7 +29,6 @@ const Card: FC<Props> = ({
   isGameBoard,
   size,
   interactive,
-  index,
   ...props
 }) => {
   const [hovered, setHover] = useState(false);

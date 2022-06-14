@@ -1,7 +1,6 @@
 import { FC, HTMLAttributes, useRef } from "react";
-import { useState, useEffect} from "react";
+import { useState} from "react";
 import { theme } from "../../pages/_app";
-import interact from 'interactjs'
 
 interface Props extends HTMLAttributes<HTMLElement> {
   animated?: boolean;

@@ -4,7 +4,6 @@ import UserAvatar from "../UserAvatar";
 import { useState, useEffect } from "react";
 export type Props = HTMLAttributes<HTMLDivElement>;
 import { formatUsername } from "../../utils/helpers";
-import AnimateBubbles from "./AnimateBubbles";
 
 interface PlayerQueue extends Props {
   playersWithPoints: any;
@@ -16,7 +15,7 @@ const PlayerQueue: FC<PlayerQueue> = ({
   playersWithPoints,
 }) => {
   const [players, setPlayers] = useState([]);
-  const [order, setOrder] = useState([]);
+  // const [order, setOrder] = useState([]);
 
   useEffect(() => {
     console.log(playersWithPoints)
@@ -29,10 +28,10 @@ const PlayerQueue: FC<PlayerQueue> = ({
   }, [playersWithPoints]);
 
 
-  useEffect(() => {
-    setOrder(playersWithPoints.map((player) => player.userId));
+  // useEffect(() => {
+  //   setOrder(playersWithPoints.map((player:any) => player.userId));
 
-  }, [ playersWithPoints]);
+  // }, [ playersWithPoints]);
 
 
   // useEffect(() => {
