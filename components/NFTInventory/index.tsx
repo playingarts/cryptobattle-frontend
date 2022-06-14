@@ -175,12 +175,13 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
         <Text variant="h6" css={{ opacity: 0.6 }}>
           {user && user.metamask && user.metamask.address}
         </Text>
+       {user && !user.isMetamaskConnected && 
         <MetamaskLogin
           css={{
             background: "rgba(255, 255, 255, 0.05)",
             color: "#F89D35",
           }}
-        ></MetamaskLogin>
+        ></MetamaskLogin>}
       </div>
       <Line spacing={2}></Line>
 
