@@ -24,8 +24,6 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
   const [metamaskSignKey, setMetamaskSignKey] = useState(null);
   const [regToken, setRegToken] = useState(null);
 
-  // const { metamaskSignKey } = router.query;
-
   const { loggedIn, user, setToken } = useAuth();
 
   useEffect(() => {
@@ -42,14 +40,10 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
     store.set("signature", { expiry, signature, account });
   }, [account, signature, expiry, signedAccount]);
 
-  useEffect(() => {
-    if (!metamaskSignKey || !ethereum) {
-      return;
-    }
 
-    console.log("h");
 
-    // First call backend url /auth/metamask?walletAddress=0x1yxysy. It will return a JSON object:
+  const sendSignature = async () => {
+
 
     ethereum
       .request({
@@ -57,8 +51,6 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
         params: [metamaskSignKey, account],
       })
       .then((signature: string) => {
-
-
 
         axios
         .get(
@@ -78,23 +70,11 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
           console.log(err);
         });
 
-        console.log("signature", signature, "regtoken", regToken);
-        // let url = `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask/callback?walletAddress=${account}&signature=${signature}`;
 
-        // if (loggedIn) {
-        //   url = url + `&?accesstoken=${localStorage.getItem("accessToken")}`;
-        // }
-
-        // if (user.metamask.address && user.metamask.address !== account) {
-        //   url = url + `&?&swap=1`;
-        // }
-
-        // window.location.href = url;
-
-        // router.push("/dashboard");
       })
       .catch(() => setSignature((prev) => ({ ...prev, signing: false })));
-  }, [ metamaskSignKey, account, regToken]);
+  }
+
 
   const requestSignature = async () => {
     setSignature((prev) => ({ ...prev, signing: true }));
@@ -106,7 +86,6 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
       .get(
         "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=" +
           address,
-
         {
           headers: {
             // accesstoken: localStorage.getItem("accessToken"),
@@ -116,16 +95,14 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
       )
       .then((result: any) => {
         setMetamaskSignKey(result.data.metamaskSignKey);
-
         setRegToken(result.data.regtoken);
+        sendSignature()
       })
       .catch((err) => {
         console.log(err);
       });
 
-    // window.location.href =
-    //   "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=" +
-    //   address;
+
   };
 
   if (!ethereum) {
