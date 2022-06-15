@@ -4,6 +4,7 @@ import Text from "../../components/Text";
 import { useWS } from "../../components/WsProvider/index";
 import { useRouter } from "next/router";
 import { useGame } from "../../components/GameProvider";
+import { CSSObject } from "@emotion/serialize";
 
 import ComposedGlobalLayout from "../../components/_composed/GlobalLayout";
 
@@ -25,7 +26,7 @@ const JoinGame: NextPage = () => {
   const WSProvider = useWS();
   const router = useRouter();
   const { roomid } = router.query;
-  const { players, userInfo, roomInfo } = useGame();
+  const { players, roomInfo } = useGame();
   const { user } = useAuth();
 
   const [isReady, setReady] = useState(false);
@@ -177,30 +178,48 @@ const JoinGame: NextPage = () => {
   }, [isReady, openNotification]);
 
   useEffect(() => {
-    if (!router.isReady) {
-      return
-    }
-    const exitingFunction = () => {
-
-      
-        //  WSProvider.send(
-        //     JSON.stringify({
-        //       event: "close-room",
-        //       data: {}
-        // //     })
-console.log("Exiting Function router", router)
-
-      
-   
+    const handleRouteChange = (url: string) => {
+      if (url !== "/play") {
+        WSProvider.send(
+          JSON.stringify({
+            event: "quit-room",
+            data: {},
+          })
+        );
+      }
     };
 
-    router.events.on("routeChangeStart", exitingFunction);
+    router.events.on("routeChangeStart", handleRouteChange);
 
+    // If the component is unmounted, unsubscribe
+    // from the event with the `off` method:
     return () => {
-      console.log("unmounting component...");
-      router.events.off("routeChangeStart", exitingFunction);
+      router.events.off("routeChangeStart", handleRouteChange);
     };
-  }, [router.isReady, isOwner]);
+  }, []);
+
+  //   useEffect(() => {
+  //     if (!router.isReady) {
+  //       return
+  //     }
+  //     const exitingFunction = () => {
+
+  //         //  WSProvider.send(
+  //         //     JSON.stringify({
+  //         //       event: "close-room",
+  //         //       data: {}
+  //         // //     })
+  // console.log("Exiting Function router", router)
+
+  //     };
+
+  //     router.events.on("routeChangeStart", exitingFunction);
+
+  //     return () => {
+  //       console.log("unmounting component...");
+  //       router.events.off("routeChangeStart", exitingFunction);
+  //     };
+  //   }, [router.isReady, isOwner]);
 
   useEffect(() => {
     if (!roomInfo) {
