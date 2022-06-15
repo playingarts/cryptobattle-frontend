@@ -178,7 +178,9 @@ const GameInventory: FC<Props> = ({
                 >
                   <CardSmall
                     className={"draggable"}
-                    onClick={selectCard(card)}
+                    onMouseOver={selectCard(card)}
+                    // onClick={selectCard(card)}
+
                     key={`${index}`}
                                      
 

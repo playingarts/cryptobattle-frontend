@@ -22,7 +22,9 @@ type GameProviderProps = { children: ReactNode };
 export type IGameProviderContext = {
   gameState: any;
   players: any;
-  roomUrl: any;
+  roomId: any;
+  userInfo: any;
+  roomInfo: any;
 };
 
 const getUser = async (playerId: string) => {
@@ -44,13 +46,16 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   const [results, setResults] = useState<any>(null);
   const [players, setPlayers] = useState<any>([]);
-  const [roomUrl, setRoomUrl] = useState("");
+  const [userInfo, setUserInfo] = useState<any>([]);
+  const [roomInfo, setRoomInfo] = useState<any>([]);
+
+  const [roomId, setRoomId] = useState("");
 
   const router = useRouter();
 
   const quit = () => {
     setResults(null);
-    closeNotification()
+    closeNotification();
     router.push("/dashboard");
   };
 
@@ -89,8 +94,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       console.log("Game Provider WS event:", event);
 
       if (event.event === "room-updated" || event.event === "room-info") {
+        setRoomInfo(event.data);
         if (!event.data.roomUsers) {
-          return
+          return;
         }
         console.log("Room updated: ", event.data.roomUsers);
         setPlayers(event.data.roomUsers);
@@ -100,14 +106,15 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       }
 
       if (event.event === "user-info") {
+        setUserInfo(event.data);
         if (event.data.inRoomId) {
-          setRoomUrl(`https://play2.playingarts.com/join/${event.data.inRoomId}`);
+          setRoomId(event.data.inRoomId);
         }
       }
-
 
       if (event.event === "create-room") {
-        setRoomUrl(`https://play2.playingarts.com/join/${event.data.roomId}`);
+        console.log("create-room happens");
+        setRoomId(event.data.roomId);
         WSProvider.send(
           JSON.stringify({
             event: "room-info",
@@ -116,8 +123,34 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         );
       }
 
+      // if (event.event === "close-room") {
+      //   openNotification({
+      //     title: "Room closed by host",
+      //     dark: true,
+      //     iconColor: "blue",
+      //     footer: (
+      //       <div css={{ display: "flex" }}>
+      //         <Button onClick={quit}>Quit</Button>
+      //       </div>
+      //     ),
+      //   });
+      // }
+
+      if (event.event === "quit-room") {
+        openNotification({
+          title: "You left the game",
+          dark: true,
+          iconColor: "blue",
+          footer: (
+            <div css={{ display: "flex" }}>
+              <Button onClick={quit}>Quit</Button>
+            </div>
+          ),
+        });
+      }
 
       if (event.event === "join-room") {
+        console.log("joined room");
         WSProvider.send(
           JSON.stringify({
             event: "room-info",
@@ -126,30 +159,61 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         );
       }
 
-      if (event.data.error && event.data.error.message) {
-        if (event.data.error.message === "Player must be in a room") {
-          return;
-        }
+      // if (event.data.error && event.data.error.message) {
+      //     if (event.data.error.message === "Player must be in a room") {
+      //       return;
+      //     }
 
-        if (
-          event.data.error.message ===
-            "Its not allowed to create new room while being in game" ||
-          event.data.error.message ===
-            "Joining while hosting a game is forbidden" ||
-          event.data.error.message.startsWith(
-            "User is in a active game for room"
-          )
-        ) {
-          WSProvider.send(
-            JSON.stringify({
-              event: "purge-rooms-and-games",
-              data: {},
-            })
-          );
-          window.location.reload();
-          return;
-        }
-      }
+      //     if (
+      //       event.data.error.message ===
+      //         "Its not allowed to create new room while being in game" ||
+      //       event.data.error.message ===
+      //         "Joining while hosting a game is forbidden" ||
+      //       event.data.error.message.startsWith(
+      //         "User is in a active game for room"
+      //       )
+      //     ) {
+      //       WSProvider.send(
+      //         JSON.stringify({
+      //           event: "purge-rooms-and-games",
+      //           data: {},
+      //         })
+      //       );
+      //       window.location.reload();
+      //       return;
+      //     }
+      // }
+
+    //   if (event.data.error && event.data.error.message) {
+    //     if (event.data.error.message === "Player must be in a room") {
+    //       return;
+    //     }
+
+    //     if (
+
+    //       event.data.error.message ===
+    //         "Joining while hosting a game is forbidden"
+
+    //     ) {
+    //       WSProvider.send(
+    //         JSON.stringify({
+    //           event: "close-room",
+    //           data: {},
+    //         })
+    //       );
+
+    //     //   // WSProvider.send(
+    //     //   //   JSON.stringify({
+    //     //   //     event: "purge-rooms-and-games",
+    //     //   //     data: {},
+    //     //   //   })
+    //     //   // );
+    //     //   // window.location.reload();
+    //     //   return;
+    //     // }
+    //   }
+
+    // }
 
       if (event.event === "game-results") {
         console.log("game-results", event.data);
@@ -169,6 +233,15 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
               </div>
             ),
           });
+          if (event.data.state === "ended") {
+            WSProvider.send(
+              JSON.stringify({
+                event: "purge-rooms-and-games",
+                data: {},
+              })
+            );
+          }
+
         }
 
         console.log(event.data.state);
@@ -189,8 +262,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       }
       // if (event.data.error && event.data.error.message) {
       // }
-
-
     };
   }, []);
 
@@ -200,7 +271,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   useEffect(() => {
     if (!results) {
-      openNotification(null);
+      closeNotification();
 
       return;
     }
@@ -211,8 +282,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           {results.playersPoints.map((entry: any) => {
             return (
               <div css={{ marginBottom: 10 }} key={entry.userId}>
-                {formatUsername(players.find((player: any) => player.userId === entry.userId)
-                  .username) +
+                {formatUsername(
+                  players.find((player: any) => player.userId === entry.userId)
+                    .username
+                ) +
                   " : " +
                   entry.points}
               </div>
@@ -245,12 +318,12 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     () => ({
       gameState,
       players,
-      roomUrl,
+      roomId,
+      userInfo,
+      roomInfo,
     }),
-    [gameState, players, roomUrl]
+    [gameState, players, roomId, userInfo]
   );
-
-
 
   return (
     <GameProviderContext.Provider value={memoedValue}>

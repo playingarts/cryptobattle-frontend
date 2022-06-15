@@ -98,11 +98,19 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     setLoggedIn(isLoggedInCookie());
 
     if (isLoggedInCookie()) {
+      console.log('isloggedin')
       getUser().then(({ data }) => {
         const user = formatUserData(data);
         setUser(user);
+
+        console.log('isloggedin success')
+
           if (user.inGameId) {
             router.push(`/play`)
+            return
+          }
+          if (user.inRoomId) {
+            router.push(`/game/${user.inRoomId}`)
           }
       });
     }

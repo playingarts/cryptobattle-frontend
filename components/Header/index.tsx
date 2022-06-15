@@ -20,12 +20,7 @@ const Header: FC<Props> = ({
 
   ...props
 }) => {
-  // const { deck } = useDeck({ variables: { slug: deckId } });
 
-  // const [expanded, setExpanded] = useState(true);
-  // const [hovered, setHovered] = useState(false);
-  // const mouseEnter = () => setHovered(true);
-  // const mouseLeave = () => setHovered(false);
 
   const { loggedIn, user } = useAuth();
 

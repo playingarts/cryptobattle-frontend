@@ -12,26 +12,24 @@ import Twitter from "../components/Icons/Twitter";
 import Line from "../components/Line/";
 import { formatUsername } from "../utils/helpers";
 
-import { useWS } from "../components/WsProvider/index";
 import { useAuth } from "../components/AuthProvider";
 
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 
 
-import { useEffect } from "react";
 
 
 const Home: NextPage = () => {
-  // const { account } = useMetaMask();
-  const WSProvider = useWS();
+  // // const { account } = useMetaMask();
+  // const WSProvider = useWS();
 
   const { user } = useAuth();
 
-  useEffect(() => {
-    WSProvider.onmessage = function (event) {
-      console.log(event.data);
-    };
-  });
+  // useEffect(() => {
+  //   WSProvider.onmessage = function (event) {
+  //     console.log(event.data);
+  //   };
+  // });
 
   return (
     <ComposedGlobalLayout>
