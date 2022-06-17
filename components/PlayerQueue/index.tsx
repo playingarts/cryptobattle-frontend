@@ -86,6 +86,8 @@ const PlayerQueue: FC<PlayerQueue> = ({
                 lineHeight: 3,
                 transition: "all 400ms",
                 borderRadius: 9999,
+                zIndex: 999999,
+                paddingTop: 10,
                 outline: "6px solid" + player.color,
                 justifyContent: "center",
                 alignItems: "center",
