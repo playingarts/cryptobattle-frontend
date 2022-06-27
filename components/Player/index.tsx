@@ -12,7 +12,9 @@ interface Player extends Props {
   color: string,
   isAdmin: boolean;
 }
-
+// eslint-disable-next-line 
+// @ts-ignore
+// eslint-disable-next-line 
 const Player: FC<Player> = forwardRef(
   ({ color, player, isAdmin }, ref) => {
     
@@ -64,6 +66,8 @@ const Player: FC<Player> = forwardRef(
   }, [player]);
 
   return (
+    // eslint-disable-next-line 
+    // @ts-ignore
     <div ref={ref} style={{ display: "flex", alignItems: "center" }}>
 
       <UserAvatar

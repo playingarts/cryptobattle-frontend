@@ -27,7 +27,6 @@ const GameInventory: FC<Props> = ({
   loading,
   isOpponentsCards,
   cards,
-  ...props
 }) => {
   // const [selectedCard, setSelectedCard] = useState<any>(null);
   const [cardsRegular, setCardsRegular] = useState<any>([]);

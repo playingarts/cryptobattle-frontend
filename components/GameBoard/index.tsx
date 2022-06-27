@@ -57,10 +57,14 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   );
  
   useEffect(() => {
+    // eslint-disable-next-line 
+    // @ts-ignore
     window.selectedCard = selectedCard;
   }, [selectedCard]);
 
   useEffect(() => {
+    // eslint-disable-next-line 
+    // @ts-ignore
     window.state = gameState;
   }, [gameState]);
 
@@ -351,16 +355,14 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       ondragleave: function (event) {
         // remove the drop feedback style
         event.target.classList.remove("drop-target");
-        // event.relatedTarget.classList.remove("can-drop");
-        // event.draggable.snap({ anchors: [startPosition] });
-
-        // event.relatedTarget.textContent = 'Dragged out'
       },
       ondrop: function (event) {
         console.log(selectedCard, "ondrop");
         console.log(event, "ondrop event");
-        console.log(window.selectedCard, "on drop");
+
         const target = event.currentTarget.id.split("-");
+        // eslint-disable-next-line 
+        // @ts-ignore
         addCard(Number(target[0]), Number(target[1]), window.selectedCard, window.state)();
         event.stopImmediatePropagation();
       },

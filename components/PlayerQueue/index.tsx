@@ -1,7 +1,6 @@
 import {
   useState,
   useEffect,
-  useCallback,
   FC,
   HTMLAttributes,
   createRef,
@@ -41,17 +40,17 @@ const PlayerQueue: FC<PlayerQueue> = ({
 
   }, [playersWithPoints, currentPlayerWithPoints]);
 
-  const shuffle = useCallback(() => {
-    if (!players) {
-      return;
-    }
+  // const shuffle = useCallback(() => {
+  //   if (!players) {
+  //     return;
+  //   }
 
-    const shiftArray = (arr: any, target: any) => {
-      return arr.concat(arr.splice(0, arr.indexOf(target)));
-    };
+  //   const shiftArray = (arr: any, target: any) => {
+  //     return arr.concat(arr.splice(0, arr.indexOf(target)));
+  //   };
 
-    setPlayers(shiftArray(players, players[1]));
-  }, [players]);
+  //   setPlayers(shiftArray(players, players[1]));
+  // }, [players]);
 
   //
   return (
@@ -65,6 +64,8 @@ const PlayerQueue: FC<PlayerQueue> = ({
             {players.map((player: any) => {
               return (
                 <Player
+                  // eslint-disable-next-line 
+                  // @ts-ignore
                   player={player}
                   loadingDelayed={loadingDelayed}
                   key={player.userId}

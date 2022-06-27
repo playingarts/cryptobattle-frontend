@@ -27,6 +27,7 @@ export type IGameProviderContext = {
   roomInfo: any;
   selectedCard: any;
   setSelectedCard: any;
+  isMyTurn: any;
 };
 
 const getUser = async (playerId: string) => {

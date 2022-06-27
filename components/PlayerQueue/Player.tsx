@@ -2,9 +2,12 @@ import { forwardRef } from "react";
 import UserAvatar from "../UserAvatar";
 
 import { formatUsername } from "../../utils/helpers";
-// tslint:disable
+// eslint-disable-next-line 
+// @ts-ignore
 // eslint-disable-next-line 
 const Player = forwardRef(({ player, loadingDelayed }, ref) => (
+  // eslint-disable-next-line 
+  // @ts-ignore
   <div ref={ref}>
     <div
       css={{

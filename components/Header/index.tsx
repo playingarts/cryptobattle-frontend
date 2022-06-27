@@ -10,7 +10,7 @@ export interface Props extends HTMLAttributes<HTMLElement> {
   showAltNav?: boolean;
   noNav?: boolean;
   isCardPage?: boolean;
-  headerTitle?: string;
+  headerTitle?: any;
   headerMiddle?: any;
   headerRight?: any;
 }
