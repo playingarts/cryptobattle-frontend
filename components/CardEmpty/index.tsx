@@ -5,6 +5,7 @@ import { theme } from "../../pages/_app";
 interface Props extends HTMLAttributes<HTMLElement> {
   animated?: boolean;
   isStatic?: boolean;
+  selectedCard?: any;
   size?: "big";
   interactive?: boolean;
   noInfo?: boolean;
@@ -14,11 +15,12 @@ interface Props extends HTMLAttributes<HTMLElement> {
 const Card: FC<Props> = ({
   isStatic,
   size,
+  selectedCard,
   isPlaceholder = false,
   interactive,
   ...props
 }) => {
-  const [hovered] = useState(false);
+  const [hovered, setHover] = useState(false);
   const width = size === "big" ? 37 : 21;
   const height = size === "big" ? 52 : 29.4;
   const wrapper = useRef<HTMLDivElement>(null);
@@ -39,7 +41,8 @@ const Card: FC<Props> = ({
         fontsize: 18,
         lineheight: 21,
       })}
-
+    onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
     >
       <div ref={wrapper}>
         <div
@@ -80,7 +83,7 @@ const Card: FC<Props> = ({
               alignItems: "center",
             }}
           >
-            {!isPlaceholder && (
+            {!isPlaceholder && hovered && selectedCard &&  (
               <div
               className='plus-icon'
                 css={{
@@ -101,6 +104,7 @@ const Card: FC<Props> = ({
                   },
                 }}
               >
+                {hovered &&
                 <svg
                   width="31"
                   height="31"
@@ -126,7 +130,7 @@ const Card: FC<Props> = ({
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
-                </svg>
+                </svg>   }
               </div>
             )}
           </div>

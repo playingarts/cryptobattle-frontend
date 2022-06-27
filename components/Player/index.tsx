@@ -1,4 +1,4 @@
-import { HTMLAttributes, FC, useEffect, useState, useCallback } from "react";
+import { HTMLAttributes, FC, useEffect, useState, useCallback, forwardRef } from "react";
 import axios from "axios";
 import { useWS } from "../../components/WsProvider/index";
 import { formatUsername } from "../../utils/helpers";
@@ -13,7 +13,9 @@ interface Player extends Props {
   isAdmin: boolean;
 }
 
-const Player: FC<Player> = ({ color, player, isAdmin }) => {
+const Player: FC<Player> = forwardRef(
+  ({ color, player, isAdmin }, ref) => {
+    
   const [playerInfo, setPlayerInfo] = useState({
     name: "",
     profilePictureUrl: "",
@@ -62,7 +64,7 @@ const Player: FC<Player> = ({ color, player, isAdmin }) => {
   }, [player]);
 
   return (
-    <div style={{ display: "flex", alignItems: "center" }}>
+    <div ref={ref} style={{ display: "flex", alignItems: "center" }}>
 
       <UserAvatar
         profilePictureUrl={playerInfo.profilePictureUrl}
@@ -127,7 +129,7 @@ const Player: FC<Player> = ({ color, player, isAdmin }) => {
         {/* <div>LVL 04</div> */}
       </div>
     </div>
-  );
-};
+  )
+});
 
 export default Player;

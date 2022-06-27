@@ -136,6 +136,8 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
         color: theme.colors.text_title_light,
         position: "relative",
         margin: "20px 0",
+        padding: "20px 78px",
+
       })}
     >
       {/* // carousel */}
@@ -145,6 +147,8 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "left",
+
+
         }}
       >
         <Text

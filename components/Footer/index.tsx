@@ -21,7 +21,7 @@ const Footer: FC<HTMLAttributes<HTMLDivElement>> = (props) => (
       color: "#fff",
       borderRadius: theme.spacing(1),
     })}
-  ><Line spacing={10}></Line>
+  ><Line spacing={2}></Line>
     <Grid>
       <div
         css={(theme) => ({

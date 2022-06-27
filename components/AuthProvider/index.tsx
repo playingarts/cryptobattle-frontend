@@ -103,7 +103,6 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
         const user = formatUserData(data);
         setUser(user);
 
-        console.log('isloggedin success')
 
           if (user.inGameId) {
             router.push(`/play`)

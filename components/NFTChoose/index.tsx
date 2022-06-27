@@ -216,7 +216,7 @@ const NFTChoose: FC<Props> = () => {
 
   return (
     <StatBlock
-      title={"Choose up to 2 NFTS (optional"}
+      title={"Choose up to 2 NFTS (optional)"}
       css={(theme) => ({
         background: `#181818`,
         backgroundSize: "85%",

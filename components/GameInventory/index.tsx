@@ -29,12 +29,12 @@ const GameInventory: FC<Props> = ({
   cards,
   ...props
 }) => {
-  const [selectedCard, setSelectedCard] = useState<any>(null);
+  // const [selectedCard, setSelectedCard] = useState<any>(null);
   const [cardsRegular, setCardsRegular] = useState<any>([]);
   const [cardsNft, setCardsNft] = useState<any>([]);
   const [loadingDelayed, setLoadingDelayed] = useState(true);
 
-  const { gameState } = useGame();
+  const { gameState, selectedCard, setSelectedCard} = useGame();
   const { user } = useAuth();
 
   const WSProvider = useWS();
@@ -97,15 +97,11 @@ const GameInventory: FC<Props> = ({
 
   const selectCard = useCallback(
     (card) => () => {
-      console.log('selected Card event')
-      if (selectedCard === card) {
-        setSelectedCard(null);
-        return;
-      }
-      props.onChange ? props.onChange(card) : null;
       setSelectedCard(card);
+
+
     },
-    []
+    [setSelectedCard]
   );
 
   return (
@@ -163,8 +159,11 @@ const GameInventory: FC<Props> = ({
               return (
                 <div
                   style={{
-                    width:    gameState?.turnForPlayer === user.userId &&
-                    !isOpponentsCards ? 72 : 84,
+                    width:
+                      gameState?.turnForPlayer === user.userId &&
+                      !isOpponentsCards
+                        ? 72
+                        : 84,
                     marginRight:
                       gameState?.turnForPlayer === user.userId &&
                       !isOpponentsCards
@@ -178,12 +177,9 @@ const GameInventory: FC<Props> = ({
                 >
                   <CardSmall
                     className={"draggable"}
-                    onMouseOver={selectCard(card)}
-                    // onClick={selectCard(card)}
+                    onMouseDown={selectCard(card)}
 
                     key={`${index}`}
-                                     
-
                     isSelected={
                       selectedCard ? selectedCard.uid === card.uid : false
                     }
@@ -259,22 +255,26 @@ const GameInventory: FC<Props> = ({
             {cardsNft.map((card: any, index: number) => {
               return (
                 <div
-                style={{
-                  width:    gameState?.turnForPlayer === user.userId &&
-                  !isOpponentsCards ? 72 : 84,
-                  marginRight:
-                    gameState?.turnForPlayer === user.userId &&
-                    !isOpponentsCards
-                      ? index + 1 === cardsNft.length
-                        ? 0
-                        : 10
-                      : 0,
-                  height: 91,
-                }}
-                key={`${index + 'nft'}`}
-              >
+                  style={{
+                    width:
+                      gameState?.turnForPlayer === user.userId &&
+                      !isOpponentsCards
+                        ? 72
+                        : 84,
+                    marginRight:
+                      gameState?.turnForPlayer === user.userId &&
+                      !isOpponentsCards
+                        ? index + 1 === cardsNft.length
+                          ? 0
+                          : 10
+                        : 0,
+                    height: 91,
+                  }}
+                  key={`${index + "nft"}`}
+                >
                   <CardSmall
-                    onClick={selectCard(card)}
+                    className={"draggable"}
+                    onMouseDown={selectCard(card)}
                     isSelected={
                       selectedCard ? selectedCard.uid === card.uid : false
                     }

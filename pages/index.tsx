@@ -16,9 +16,21 @@ import MetamaskLogin from "../components/MetamaskLogin/";
 
 const Home: NextPage = () => {
   const { loggedIn } = useAuth();
-
+  const headerRight = (
+    <Button
+      style={{
+        marginRight: "15px",
+        background: "#7B61FF",
+        color: "#fff",
+      }}
+      component={Link}
+      href="/new"
+    >
+      New Game
+    </Button>
+  );
   return (
-    <ComposedGlobalLayout>
+    <ComposedGlobalLayout headerRight={headerRight}>
       <Layout
         css={(theme) => ({
           background: theme.colors.dark_gray,
@@ -84,11 +96,8 @@ const Home: NextPage = () => {
               </Button>
             )}
           </div>
-
-          {/* <Hero css={{ gridColumn: "8 / span 5" }} /> */}
         </Grid>
         <PromoSection />
-
       </Layout>
     </ComposedGlobalLayout>
   );

@@ -16,23 +16,25 @@ import { useAuth } from "../components/AuthProvider";
 
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 
-
-
-
 const Home: NextPage = () => {
-  // // const { account } = useMetaMask();
-  // const WSProvider = useWS();
-
   const { user } = useAuth();
 
-  // useEffect(() => {
-  //   WSProvider.onmessage = function (event) {
-  //     console.log(event.data);
-  //   };
-  // });
+  const headerRight = (
+    <Button
+      style={{
+        marginRight: "15px",
+        background: "#7B61FF",
+        color: "#fff",
+      }}
+      component={Link}
+      href="/new"
+    >
+      New Game
+    </Button>
+  );
 
   return (
-    <ComposedGlobalLayout>
+    <ComposedGlobalLayout headerTitle="DASHBOARD" headerRight={headerRight}>
       <Layout
         css={(theme) => ({
           background: theme.colors.dark_gray,
@@ -45,41 +47,50 @@ const Home: NextPage = () => {
         })}
       >
         <div>
-
-        <div
+          <div
             css={{
               padding: "0 42px",
             }}
           >
+            <div
+              css={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "20px 40px",
+              }}
+            >
+              <Text
+                component="h1"
+                css={{
+                  margin: "0",
+                  marginTop: "10px",
+                  fontSize: "60px",
+                  verticalAlign: "bottom",
+                }}
+              >
+                GM, {formatUsername(user.username)}
+              </Text>
 
-          <div
-            css={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems:"center",
-              padding: "20px 40px",
-            }}
-          >
-            <Text component="h1" css={{ margin: "0", marginTop:"10px", fontSize: "60px", verticalAlign: "bottom" }}>
-              GM, {formatUsername(user.username)}
-            </Text>
-
-           {!user.isTwitterConnected && <Button
-              component={Link}
-              href={`https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter?accesstoken=${localStorage.getItem(
-                "accessToken"
-              )}`}
-              Icon={Twitter}
-              css={(theme) => ({
-                background: "rgba(255, 255, 255, 0.05)",
-                marginRight: theme.spacing(1),
-                color: "#489BE9",
-                pointerEvents:  user.isTwitterConnected ? 'none' : 'unset',
-              })}
-            >Connect
-            </Button>}
-          </div>
-          <Line></Line>
+              {!user.isTwitterConnected && (
+                <Button
+                  component={Link}
+                  href={`https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter?accesstoken=${localStorage.getItem(
+                    "accessToken"
+                  )}`}
+                  Icon={Twitter}
+                  css={(theme) => ({
+                    background: "rgba(255, 255, 255, 0.05)",
+                    marginRight: theme.spacing(1),
+                    color: "#489BE9",
+                    pointerEvents: user.isTwitterConnected ? "none" : "unset",
+                  })}
+                >
+                  Connect
+                </Button>
+              )}
+            </div>
+            <Line></Line>
           </div>
 
           <Grid

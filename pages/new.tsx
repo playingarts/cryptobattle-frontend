@@ -32,6 +32,9 @@ const NewGame: NextPage = () => {
 
   const WSProvider = useWS();
 
+  const headerMiddle = <div></div>
+
+
   useEffect(() => {
     console.log(WSProvider.readyState);
     if (WSProvider.readyState === 1) {
@@ -47,7 +50,7 @@ const NewGame: NextPage = () => {
     }
   }, [WSProvider.readyState]);
   return (
-    <ComposedGlobalLayout>
+    <ComposedGlobalLayout headerTitle="NEW GAME" headerMiddle={headerMiddle}>
       <Layout
         css={(theme) => ({
           background: theme.colors.dark_gray,

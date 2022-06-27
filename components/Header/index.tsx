@@ -1,11 +1,8 @@
 import { FC, HTMLAttributes } from "react";
 import LogoIcon from "../Icons/Logo";
 
-import { useAuth } from "../AuthProvider";
-import Button from "../Button";
 import Link from "../Link";
 import LogoMenu from "../LogoMenu";
-import NavProfile from "../NavProfile";
 
 export interface Props extends HTMLAttributes<HTMLElement> {
   palette?: "gradient";
@@ -13,17 +10,18 @@ export interface Props extends HTMLAttributes<HTMLElement> {
   showAltNav?: boolean;
   noNav?: boolean;
   isCardPage?: boolean;
+  headerTitle?: string;
+  headerMiddle?: any;
+  headerRight?: any;
 }
 
 const Header: FC<Props> = ({
   palette,
-
+  headerTitle,
+  headerMiddle,
+  headerRight,
   ...props
 }) => {
-
-
-  const { loggedIn, user } = useAuth();
-
   return (
     <header {...props}>
       <div
@@ -34,15 +32,18 @@ const Header: FC<Props> = ({
             alignItems: "center",
             position: "relative",
             zIndex: 1,
-            marginTop: 20,
+            height: 70,
+            marginTop: 0,
+            padding: 5,
             overflow: "hidden",
           },
+
           palette === "gradient"
             ? {
                 background: theme.colors.gradient,
               }
             : {
-                background: "transparent",
+                background: "#181818",
                 color: theme.colors.text_subtitle_light,
               },
         ]}
@@ -55,7 +56,7 @@ const Header: FC<Props> = ({
             fontSize: "30px",
           }}
         >
-          <LogoMenu logo={null}></LogoMenu>
+          <LogoMenu headerTitle={headerTitle} logo={null}></LogoMenu>
         </div>
 
         <div
@@ -68,39 +69,30 @@ const Header: FC<Props> = ({
             transform: "translate(-50%, -50%)",
           })}
         >
-          <Link href="/">
-            <LogoIcon
-              css={(theme) => [
-                palette !== "gradient" && {
-                  color: theme.colors.text_subtitle_light,
-                },
-                {
-                  transition: "opacity 500ms",
-
-                  "&:hover": {
-                    opacity: "0.6",
+          {headerMiddle ? (
+            headerMiddle
+          ) : (
+            <Link href="/">
+              <LogoIcon
+                css={(theme) => [
+                  palette !== "gradient" && {
+                    color: theme.colors.text_subtitle_light,
                   },
-                },
-              ]}
-            />
-          </Link>
+                  {
+                    transition: "opacity 500ms",
+
+                    "&:hover": {
+                      opacity: "0.6",
+                    },
+                  },
+                ]}
+              />
+            </Link>
+          )}
+
         </div>
 
-        {loggedIn && (
-          <Button
-            style={{
-              marginRight: "15px",
-              background: "#7B61FF",
-              color: "#fff",
-            }}
-            component={Link}
-            href="/new"
-          >
-            New Game
-          </Button>
-        )}
-
-        {loggedIn && user && <NavProfile />}
+        {headerRight && headerRight}
       </div>
     </header>
   );

@@ -80,6 +80,7 @@ const NavProfile: FC<Props> = (props) => {
           <UserAvatar
             css={{
               transition: "opacity 400ms",
+              transform: "scale(0.9,0.9)",
               "&:hover": {
                 opacity: 0.9,
               },

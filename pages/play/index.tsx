@@ -12,7 +12,6 @@ import { useAuth } from "../../components/AuthProvider";
 
 import { useState, useEffect } from "react";
 const Play: NextPage = () => {
-  const [selectedCard, setSelectedCard] = useState("");
   const WSProvider = useWS();
   const { user } = useAuth();
   const [minWidth, setMinWidth] = useState(1400);
@@ -56,9 +55,14 @@ const Play: NextPage = () => {
       return;
     }
 
+    // if (!gameState.gameUsersWitchCards) {
+    //   return
+    // }
+
     setTimeout(() => {
       setLoading(false)
     }, 1000);
+
     console.log(gameState.gameUsersWithCards);
     console.log(user.userId, "id");
 
@@ -114,7 +118,6 @@ const Play: NextPage = () => {
     <GameLayout loading={loading}
     >
       <Layout
-      
         css={(theme) => ({
           background: theme.colors.dark_gray,
           color: theme.colors.text_title_light,
@@ -126,7 +129,6 @@ const Play: NextPage = () => {
         })}
       >
         <GameBoard
-          selectedCard={selectedCard}
           removeCard={(cardToRemove: any) =>
             setMyCards(
               myCards.filter((card: any) => card.uid !== cardToRemove.uid)
@@ -136,7 +138,6 @@ const Play: NextPage = () => {
       </Layout>
       <GameInventory
         loading={loading}
-        onChange={(selectedCard) => setSelectedCard(selectedCard)}
         cards={myCards}
       ></GameInventory>
     </GameLayout>

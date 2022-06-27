@@ -10,8 +10,8 @@ import ComposedGlobalLayout from "../../components/_composed/GlobalLayout";
 
 import Arrowed from "../../components/Arrowed";
 import Button from "../../components/Button";
+import GameRules from "../../components/GameRules/";
 
-import Link from "../../components/Link";
 import { useEffect, useState } from "react";
 
 import Line from "../../components/Line";
@@ -21,6 +21,7 @@ import StatBlock from "../../components/StatBlock";
 
 import { useNotifications } from "../../components/NotificationProvider";
 import { useAuth } from "../../components/AuthProvider";
+import NavProfile from "../../components/NavProfile";
 
 const JoinGame: NextPage = () => {
   const WSProvider = useWS();
@@ -30,7 +31,9 @@ const JoinGame: NextPage = () => {
   const { user } = useAuth();
 
   const [isReady, setReady] = useState(false);
-  const [isOwner, setIsOwner] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  const [isOwner, setIsOwner] = useState<any>(null);
 
   const { openNotification, closeNotification } = useNotifications();
 
@@ -96,48 +99,6 @@ const JoinGame: NextPage = () => {
     setStartGameDisabled(startGameDisabled);
   }, [players]);
 
-  // useEffect(() => {
-  //   const confirmationMessage = 'Are you sure you want to quit the lobby?';
-  //   const beforeUnloadHandler = (e: BeforeUnloadEvent) => {
-  //     (e || window.event).returnValue = confirmationMessage;
-  //     return confirmationMessage; // Gecko + Webkit, Safari, Chrome etc.
-  //   };
-  //   const beforeRouteHandler = (url: string) => {
-  //     // if (confirm(confirmationMessage)) {
-  //     //   WSProvider.send(
-  //     //     JSON.stringify({
-  //     //       event: "quit-room",
-  //     //     })
-  //     //   );
-  //     // }
-
-  //     if (router.pathname !== url && !confirm(confirmationMessage)) {
-  //       // to inform NProgress or something ...
-  //       router.events.emit('routeChangeError');
-  //       // tslint:disable-next-line: no-string-throw
-  //       throw `Route change to "${url}" was aborted (this error can be safely ignored). See https://github.com/zeit/next.js/issues/2476.`;
-  //     }
-  //     else {
-  //       WSProvider.send(
-  //         JSON.stringify({
-  //           event: "close-room",
-  //         })
-  //       );
-  //     }
-  //   };
-  //   if (unsaved) {
-  //     window.addEventListener('beforeunload', beforeUnloadHandler);
-  //     router.events.on('routeChangeStart', beforeRouteHandler);
-  //   } else {
-  //     window.removeEventListener('beforeunload', beforeUnloadHandler);
-  //     router.events.off('routeChangeStart', beforeRouteHandler);
-  //   }
-  //   return () => {
-  //     window.removeEventListener('beforeunload', beforeUnloadHandler);
-  //     router.events.off('routeChangeStart', beforeRouteHandler);
-  //   };
-  // }, [unsaved])
-
   const toggleReady = () => {
     const ready = isReady ? false : true;
     console.log("Setting Ready: ", ready);
@@ -178,11 +139,17 @@ const JoinGame: NextPage = () => {
   }, [isReady, openNotification]);
 
   useEffect(() => {
+    console.log(isOwner, "handleRouteChange");
+
+    if (isOwner === null) {
+      return;
+    }
     const handleRouteChange = (url: string) => {
+      console.log("handleRouteChange");
       if (url !== "/play") {
         WSProvider.send(
           JSON.stringify({
-            event: "quit-room",
+            event: isOwner ? "close-room" : "quit-room",
             data: {},
           })
         );
@@ -196,7 +163,7 @@ const JoinGame: NextPage = () => {
     return () => {
       router.events.off("routeChangeStart", handleRouteChange);
     };
-  }, []);
+  }, [isOwner]);
 
   //   useEffect(() => {
   //     if (!router.isReady) {
@@ -227,6 +194,10 @@ const JoinGame: NextPage = () => {
     }
     if (roomInfo.ownderId === user.userId) {
       setIsOwner(true);
+      setLoaded(true);
+    } else {
+      setIsOwner(false);
+      setLoaded(true);
     }
   }, [roomInfo, user]);
 
@@ -289,8 +260,42 @@ const JoinGame: NextPage = () => {
     }, 1000);
   }, [router.isReady]);
 
+  const headerMiddle = <NavProfile />;
+  const headerRight = isOwner ? (
+    <Button
+      disabled={startGameDisabled}
+      css={() => ({
+        background: "#7B61FF",
+        color: "#fff",
+        margin: "20px auto",
+      })}
+      onClick={startGame}
+    >
+      Start the game
+    </Button>
+  ) : (
+    <Button
+      onClick={toggleReady}
+      disabled={isReady}
+      css={() => ({
+        background: "#7B61FF",
+        color: "#fff",
+        margin: "20px auto",
+      })}
+    >
+      {"I'M READY"}
+    </Button>
+  );
+  if (!loaded) {
+    return <div>loading</div>;
+  }
+
   return (
-    <ComposedGlobalLayout>
+    <ComposedGlobalLayout
+      headerTitle={isOwner ? "New Game" : "Join The Game"}
+      headerMiddle={headerMiddle}
+      headerRight={headerRight}
+    >
       <Layout
         css={(theme) => ({
           background: theme.colors.dark_gray,
@@ -305,17 +310,8 @@ const JoinGame: NextPage = () => {
         })}
       >
         <div>
-          <Text component="h1" css={{ margin: "1px", fontSize: "80px" }}>
-            {isOwner ? "New Game" : "Join The Game"}
-          </Text>
-
           {isOwner && (
             <div>
-              <Text variant="body2" css={{ margin: "20px 0", color: "#fff" }}>
-                Share your unique link with friends, wait for them to connect
-                and click “Start The Game”. Choose the NFTs you want to level up
-                (optional).
-              </Text>
               <StatBlock
                 css={(theme) => ({
                   background: `#181818`,
@@ -331,7 +327,7 @@ const JoinGame: NextPage = () => {
                   css={(theme) => ({
                     ...(theme.typography.body2 as CSSObject),
                     paddingLeft: theme.spacing(2),
-                    height: theme.spacing(5),
+                    height: theme.spacing(8),
                     flexGrow: 1,
                     borderRadius: "10px",
                     width: "100%",
@@ -343,52 +339,75 @@ const JoinGame: NextPage = () => {
             </div>
           )}
 
-          <Text
-            component={Link}
-            variant="label"
-            href="/"
-            css={(theme) => ({
-              opacity: 0.7,
-              marginTop: theme.spacing(6),
-              paddingTop: theme.spacing(6),
-            })}
-          >
-            <Arrowed>Game Rules</Arrowed>
-          </Text>
-
           {/* // eslint-disable-next-line 
-    // @ts-ignore: Unreachable code error */}
+          // @ts-ignore: Unreachable code error */}
           <Lobby isAdmin={isOwner} players={players} />
           <NFTChoose />
-          <Line />
-          <div style={{ display: "flex", justifyItems: "center" }}>
-            {isOwner ? (
-              <Button
-                disabled={startGameDisabled}
-                css={() => ({
-                  background: "#7B61FF",
-                  color: "#fff",
-                  margin: "20px auto",
-                })}
-                onClick={startGame}
+          {isOwner && (
+            <div>
+              <Line />
+
+              <Text
+                variant="body2"
+                css={{ margin: "20px 0", color: "#fff", opacity: 0.75 }}
               >
-                Start the game
-              </Button>
-            ) : (
-              <Button
-                onClick={toggleReady}
-                disabled={isReady}
-                css={() => ({
-                  background: "#7B61FF",
-                  color: "#fff",
-                  margin: "20px auto",
-                })}
-              >
-                {"I'M READY"}
-              </Button>
-            )}
-          </div>
+                Share your unique link with friends, wait for them to connect
+                and click “Start The Game”. Choose the NFTs you want to level up
+                (optional).
+              </Text>
+              <GameRules>
+                <Text
+                  component="div"
+                  variant="label"
+                  css={() => ({
+                    opacity: 0.7,
+                    cursor: "pointer",
+                  })}
+                >
+                  <Arrowed>Game Rules</Arrowed>
+                </Text>
+              </GameRules>
+            </div>
+          )}
         </div>
+
+        <GameRules>
+          <div
+            css={{
+              position: "fixed",
+              bottom: 60,
+              right: 40,
+              height: 60,
+              width: 60,
+              borderRadius: 4000,
+              zIndex: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "300ms all",
+              background: "#181818",
+              cursor: "pointer",
+              color: "rgba(255, 255, 255, 0.3)",
+              "&:hover": {
+                color: "#fff",
+              },
+            }}
+          >
+            <svg
+              width="16"
+              height="25"
+              viewBox="0 0 16 25"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5.13208 13.105C5.13208 12.6259 5.17943 12.1982 5.27414 11.8218C5.38069 11.4455 5.53459 11.109 5.73585 10.8125C5.93711 10.5159 6.19756 10.2479 6.5172 10.0084C6.84869 9.75745 7.23344 9.52934 7.67148 9.32404L12.3596 7.15128V3.50721H3.6404V6.67225H0V3.50721C0 3.02817 0.0947096 2.57765 0.284129 2.15565C0.473548 1.72224 0.733999 1.35156 1.06548 1.04361C1.39697 0.724252 1.78172 0.47333 2.21976 0.290841C2.66963 0.0969472 3.14317 0 3.6404 0H12.3596C12.8568 0 13.3245 0.0969472 13.7625 0.290841C14.2124 0.47333 14.603 0.724252 14.9345 1.04361C15.266 1.35156 15.5265 1.72224 15.7159 2.15565C15.9053 2.57765 16 3.02817 16 3.50721V6.51827C16 6.9973 15.9526 7.42501 15.8579 7.80139C15.7632 8.17778 15.6152 8.51994 15.414 8.82789C15.2127 9.12444 14.9464 9.39247 14.6149 9.63198C14.2952 9.8715 13.9105 10.0996 13.4606 10.3163L8.75472 12.472V15.4317H5.13208V13.105ZM4.404 19.4179H9.71365V24.5333H4.404V19.4179Z"
+                fill="currentColor"
+                fillOpacity="1"
+              />
+            </svg>
+          </div>
+        </GameRules>
       </Layout>
     </ComposedGlobalLayout>
   );

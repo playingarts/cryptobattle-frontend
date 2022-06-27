@@ -19,7 +19,7 @@ interface Props extends HTMLAttributes<HTMLElement> {
   interactive?: boolean;
   isGameBoard?: boolean;
   index?: number;
-
+selectedCard?: any;
 }
 
 const Card: FC<Props> = ({
@@ -29,6 +29,7 @@ const Card: FC<Props> = ({
   isGameBoard,
   size,
   interactive,
+  selectedCard,
   ...props
 }) => {
   const [hovered, setHover] = useState(false);
@@ -62,7 +63,7 @@ const Card: FC<Props> = ({
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-     {isGameBoard &&  <div
+     {isGameBoard && selectedCard&& <div
         css={{
           width: "10",
           background: hovered ? "rgba(10, 10, 10, 0.7)" : "#181818",

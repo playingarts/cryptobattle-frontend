@@ -19,33 +19,23 @@ export interface Props extends HTMLAttributes<HTMLElement> {
   loading?: boolean;
 }
 
-
-
-
-const GameHeader: FC<Props> = ({
-  palette,
-  loading,
-  ...props
-}) => {
+const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
   const { user } = useAuth();
   const { gameState, players } = useGame();
   const [playersWithPoints, setPlayersWithPoints] = useState<Array<any>>([]);
   const [currentPlayer, setCurrentPlayer] = useState<any>("");
+  const [currentPlayerWithPoints, setCurrentPlayerWithPoints] =
+    useState<any>("");
+
   const [opponentsCards, setOpponentsCards] = useState<Array<any>>([]);
   const [loadingDelayed, setLoadingDelayed] = useState(true);
-  
+
   useEffect(() => {
     setTimeout(() => {
-      setLoadingDelayed(false)
-
+      setLoadingDelayed(false);
     }, 0);
   }, [loading]);
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setPlayersWithPoints(playersWithPoints.reverse())
-  //   }, 3000);
-  // }, [playersWithPoints]);
 
 
   useEffect(() => {
@@ -53,11 +43,13 @@ const GameHeader: FC<Props> = ({
       return;
     }
 
-    const currentPlayer =  players.find((player: any) => player.userId === gameState.turnForPlayer)
+    const currentPlayer = players.find(
+      (player: any) => player.userId === gameState.turnForPlayer
+    );
 
-    const shiftArray = (arr: any, target: any) => {
-      return arr.concat(arr.splice(0, arr.indexOf(target)));
-    }
+    // const shiftArray = (arr: any, target: any) => {
+    //   return arr.concat(arr.splice(0, arr.indexOf(target)));
+    // };
 
     const playersWithPoints = [...players].map((player: any) => {
       player.points = gameState?.playersCurrentPoints[player.userId]
@@ -67,17 +59,15 @@ const GameHeader: FC<Props> = ({
       return { ...player };
     });
 
-    const currentPlayerWithPoints = playersWithPoints.find((player: any) => player.userId === gameState.turnForPlayer)
-
-    const playersSorted = shiftArray(playersWithPoints, currentPlayerWithPoints)
-
-
-
-    setPlayersWithPoints(playersSorted);
-    console.log('setPlayersWithPoints')
-    setCurrentPlayer(
-      currentPlayer
+    const currentPlayerWithPoints = playersWithPoints.find(
+      (player: any) => player.userId === gameState.turnForPlayer
     );
+
+    // const playersSorted = shiftArray(playersWithPoints, currentPlayerWithPoints)
+    setCurrentPlayerWithPoints(currentPlayerWithPoints);
+
+    setPlayersWithPoints(playersWithPoints);
+    setCurrentPlayer(currentPlayer);
   }, [gameState, players]);
 
   useEffect(() => {
@@ -92,9 +82,8 @@ const GameHeader: FC<Props> = ({
       )[0].cards;
 
       const cardsOpponentsFormatted = cardsOpponents.map((card: any) => {
-
         if (!card.suit) {
-          return {value: 'unknown', suit: 'spades'}
+          return { value: "unknown", suit: "spades" };
         }
         return getCard(card.suit, card.value, card);
       });
@@ -103,7 +92,7 @@ const GameHeader: FC<Props> = ({
   }, [gameState, user]);
 
   return (
-    <header  {...props}  style={{        zIndex: 9999099   }}>
+    <header {...props} style={{ zIndex: 3800 }}>
       <div
         css={(theme) => [
           {
@@ -111,7 +100,7 @@ const GameHeader: FC<Props> = ({
             display: "flex",
             alignItems: "center",
             position: "relative",
-            zIndex: 9999999,
+            zIndex: 3800,
           },
           palette === "gradient"
             ? {
@@ -129,11 +118,13 @@ const GameHeader: FC<Props> = ({
             position: "relative",
             marginTop: "0px",
             fontSize: "30px",
-            zIndex: 9999999,
-
+            zIndex: 3800,
           }}
         >
           <LogoMenu
+            headerTitle={
+              currentPlayer ? formatUsername(currentPlayer.username) : ""
+            }
             logo={
               <div
                 css={{
@@ -152,7 +143,7 @@ const GameHeader: FC<Props> = ({
                     color: "#fff",
                   }}
                 >
-                  {currentPlayer ? formatUsername(currentPlayer.username) : 'sadsa'}
+                  {currentPlayer ? formatUsername(currentPlayer.username) : ""}
                 </Text>
                 <svg
                   width="16"
@@ -186,10 +177,11 @@ const GameHeader: FC<Props> = ({
           <GameInventory isOpponentsCards={true} cards={opponentsCards} />
         </div>
 
-
-        <PlayerQueue loadingDelayed={loadingDelayed} playersWithPoints={playersWithPoints}  />
-
-
+        <PlayerQueue
+          currentPlayerWithPoints={currentPlayerWithPoints}
+          loadingDelayed={loadingDelayed}
+          playersWithPoints={playersWithPoints}
+        />
       </div>
     </header>
   );

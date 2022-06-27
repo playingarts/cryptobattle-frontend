@@ -8,11 +8,10 @@ import { useWS } from "../WsProvider";
 import interact from "interactjs";
 
 interface Props extends HTMLAttributes<HTMLElement> {
-  selectedCard?: string;
   removeCard?: (cardId: string) => void;
 }
 
-const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
+const GameBoard: FC<Props> = ({ children, removeCard }) => {
   const WSProvider = useWS();
 
   const generateBoard = (x: number, y: number) => {
@@ -26,17 +25,13 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
 
     return rows;
   };
-  const { gameState, players } = useGame();
+  const { gameState, isMyTurn, players, selectedCard } = useGame();
 
   const [board, setBoard] = useState(generateBoard(7, 5));
 
-  useEffect(() => {
-    console.log(selectedCard, "changed");
-  }, [selectedCard]);
-
   const [cardError, setCardError] = useState<any>([]);
   const [lastPlayedCard, setLastPlayedCard] = useState<any>(null);
-
+  
   const getColor = useCallback(
     (userId) => () => {
       if (userId === "system") {
@@ -50,34 +45,44 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
     },
     [players]
   );
-
-
+ 
   const getSkew = useCallback(
     (index) => () => {
-      if (!index  || index === 0) {
+      if (!index || index === 0) {
         return "";
       }
-      return `rotate(${index * 4}deg)`
+      return `rotate(${index * 4}deg)`;
     },
     []
   );
+ 
+  useEffect(() => {
+    window.selectedCard = selectedCard;
+  }, [selectedCard]);
+
+  useEffect(() => {
+    window.state = gameState;
+  }, [gameState]);
 
 
   const addCard = useCallback(
-    (rowIndex, columnIndex, card = selectedCard) =>
+    (rowIndex, columnIndex, card = selectedCard, state = gameState) =>
       () => {
-        console.log("addCard no card", card);
 
         if (!card) {
-          return;
-        }
-        console.log("addCard");
+          console.log("addCard no card", card, rowIndex, columnIndex);
 
-        console.log(card);
+          return;
+        }     
+        console.log("addCard", card,  rowIndex, columnIndex);
+
         const allowedPlacement =
-          gameState.allowedUserCardsPlacement.additionalProperties[
+          state.allowedUserCardsPlacement.additionalProperties[
             `${columnIndex}-${rowIndex}`
           ];
+
+          console.log(rowIndex, columnIndex, state)
+
 
         if (!card || !allowedPlacement) {
           // alert("Not allowed to place card there.");
@@ -135,7 +140,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
           })
         );
       },
-    [WSProvider, selectedCard, gameState, setCardError]
+    [WSProvider, selectedCard, setCardError]
   );
 
   const addCardToBoard = (
@@ -155,7 +160,12 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
       placeToPutCard !== "empty" &&
       Array.isArray(placeToPutCard)
     ) {
-      if(!placeToPutCard.find(existingCard =>  existingCard.value === card.value && existingCard.suit === card.suit )) {
+      if (
+        !placeToPutCard.find(
+          (existingCard) =>
+            existingCard.value === card.value && existingCard.suit === card.suit
+        )
+      ) {
         localBoard[row][column].push(card);
       }
     } else {
@@ -202,27 +212,33 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
       return;
     }
 
-
     const tableCards = gameState.gameTableCards?.additionalProperties;
     if (!tableCards) {
       return;
     }
 
-    console.log(Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties).length === 0, "length")
+    console.log(
+      Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties)
+        .length === 0,
+      "length"
+    );
 
-    if (Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties).length === 0) {
 
+  
+    if (
+      Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties)
+        .length === 0
+    ) {
       setTimeout(() => {
         WSProvider.send(
           JSON.stringify({
             event: "play-card",
             data: {
               action: "pass",
-  
-            }}))
+            },
+          })
+        );
       }, 2000);
- 
-
     }
 
     Object.keys(tableCards).forEach((key) => {
@@ -241,15 +257,15 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
       // );
       // addCardToBoard(Number(indexes[1]), Number(indexes[0]), card);
     });
-
-    function getOffset(el: any) {
-      const rect = el.getBoundingClientRect();
-      console.log(rect);
-      return {
-        left: rect.left + window.scrollX,
-        top: rect.top + window.scrollY + 100,
-      };
-    }
+     
+    // function getOffset(el: any) {
+    //   const rect = el.getBoundingClientRect();
+    //   console.log(rect);
+    //   return {
+    //     left: rect.left + window.scrollX,
+    //     top: rect.top + window.scrollY + 100,
+    //   };
+    // }
 
     setLastPlayedCard(
       gameState.lastPlayedCard ? gameState.lastPlayedCard : null
@@ -258,33 +274,24 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
     setTimeout(() => {
       const latestCard = document.getElementsByClassName("game-latest-card")[0];
 
-      console.log(latestCard, 'latestCard')
+      // const container = document.getElementsByClassName("scroll-container")[0];
 
-      const container = document.getElementsByClassName("scroll-container")[0];
       if (!latestCard) {
         return;
       }
-      console.log(latestCard, 'latestCard')
 
-      container.scrollTo({
-        top: getOffset(latestCard).top,
-        left: getOffset(latestCard).left,
-        behavior: "smooth",
-      });
-
+      latestCard.scrollIntoView({block: "center", behavior: 'smooth'});
+      
       setTimeout(
         () => latestCard.classList.add("game-latest-card__animation"),
         1000
       );
     }, 0);
 
-    // setTimeout(() => {
-    //   window.scrollTo(1000, 900)
-
-    // }, 400)
   }, [gameState]);
 
   useEffect(() => {
+    console.log("interact happens");
     interact.dynamicDrop(true);
 
     const position = { x: 0, y: 0 };
@@ -294,32 +301,26 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
 
       inertia: true,
       max: 1,
-      // modifiers: [
-      //   interact.modifiers.restrictRect({
-      //     restriction: 'parent',
-      //     endOnly: true
-      //   })
-      // ],
+
       listeners: {
         start(event) {
           console.log("start");
 
-          event.target.style.transform = `translate(0px, 0px)`
-
+          event.target.style.transform = `translate(0px, 0px)`;
         },
         end(event) {
           console.log("ended", event);
           // event.target.style.display = `none`;
           position.x = 0;
           position.y = 0;
-  
+
           event.target.style.transform = `translate(0px, 0px)`;
         },
         move(event) {
           position.x += event.dx;
           position.y += event.dy;
 
-          event.target.style.position = "absolute";
+          // event.target.style.position = "absolute";
           event.target.style.transform = `translate(${position.x}px, ${position.y}px)`;
         },
       },
@@ -333,13 +334,14 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
 
       // listen for drop related events:
 
-      ondropactivate: function (event) {
-        // add active dropzone feedback
-        event.target.classList.add("drop-active");
-      },
+      // ondropactivate: function (event) {
+      //   // add active dropzone feedback
+      //   event.target.classList.add("drop-active");
+      // },
       ondragenter: function (event) {
         // const draggableElement = event.relatedTarget;
         const dropzoneElement = event.target;
+        // event.stopImmediatePropagation()
 
         // feedback the possibility of a drop
         dropzoneElement.classList.add("drop-target");
@@ -355,11 +357,12 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
         // event.relatedTarget.textContent = 'Dragged out'
       },
       ondrop: function (event) {
-        console.log(event, 'ondrop')
+        console.log(selectedCard, "ondrop");
+        console.log(event, "ondrop event");
+        console.log(window.selectedCard, "on drop");
         const target = event.currentTarget.id.split("-");
-        console.log(target, "target");
-        addCard(Number(target[0]), Number(target[1]))();
-
+        addCard(Number(target[0]), Number(target[1]), window.selectedCard, window.state)();
+        event.stopImmediatePropagation();
       },
 
       ondropdeactivate: function (event) {
@@ -368,7 +371,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
         event.target.classList.remove("drop-target");
       },
     });
-  }, [addCard]);
+  }, []);
 
   return (
     <div
@@ -410,15 +413,21 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                     )}
 
                     {column &&
-                      column[column.length -1 ].suit &&
-                      column[column.length -1 ].value &&
-                      lastPlayedCard?.value === column[column.length -1].value &&
-                      lastPlayedCard?.suit === column[column.length -1].suit && (
+                      column[column.length - 1].suit &&
+                      column[column.length - 1].value &&
+                      lastPlayedCard?.value ===
+                        column[column.length - 1].value &&
+                      lastPlayedCard?.suit ===
+                        column[column.length - 1].suit && (
                         <div
                           className="game-latest-card"
                           css={{
-                            background: getColor(column[column.length -1].userId)(),
-                            outlineColor: getColor(column[column.length -1].userId)(),
+                            background: getColor(
+                              column[column.length - 1].userId
+                            )(),
+                            outlineColor: getColor(
+                              column[column.length - 1].userId
+                            )(),
                             zIndex: 9999,
                           }}
                         >
@@ -427,26 +436,31 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                             +{lastPlayedCard.scoring}
                           </div>
                         </div>
-                      ) 
-                    
-
-                      }
+                      )}
 
                     {column === "empty" && (
                       <CardEmpty
+                      selectedCard={selectedCard}
                         key={`${columnIndex}${rowIndex}-${columnIndex}${rowIndex}`}
                         css={{
                           transition: "all 300ms",
                           borderRadius: 10,
+
+                        }}
+                        style={{
+                          pointerEvents: isMyTurn ? 'unset' : 'none',
+
                         }}
                         onClick={addCard(rowIndex, columnIndex)}
                         id={rowIndex + "-" + columnIndex}
                       ></CardEmpty>
-                    )}
+                    )}   
                     {column && column !== "empty" && (
                       <div className="stack">
                         {[...column].map((card: any, index) => (
                           <Card
+                          selectedCard={selectedCard}
+
                             key={`${card.value} ${card.suit}`}
                             onClick={addCard(rowIndex, columnIndex)}
                             animated={card.id ? true : false}
@@ -455,15 +469,15 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                             className={`${
                               index + 1 === column.length ? "dropzone" : ""
                             }`}
-                            
                             id={rowIndex + "-" + columnIndex}
                             data-row={rowIndex}
                             data-column={columnIndex}
                             isGameBoard={true}
                             css={{
-                              zIndex:  10 + index,
+                              pointerEvents: isMyTurn ? 'unset' : 'none',
+                              zIndex: 10 + index,
                               outline:
-                              index + 1 === column.length &&
+                                index + 1 === column.length &&
                                 cardError[0] === rowIndex &&
                                 cardError[1] === columnIndex
                                   ? "#FA5252 6px solid"
@@ -471,10 +485,16 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                               borderRadius: 16,
                               position: "relative",
                               // animationDuration: "10s",
-                              opacity: lastPlayedCard?.value === card.value &&
-                              lastPlayedCard?.suit === card.suit ? 0 : 1,
-                              animation: lastPlayedCard?.value === card.value &&
-                              lastPlayedCard?.suit === card.suit ?  'example3  0.3s linear 0.3s 1 normal forwards' : '',
+                              opacity:
+                                lastPlayedCard?.value === card.value &&
+                                lastPlayedCard?.suit === card.suit
+                                  ? 0
+                                  : 1,
+                              animation:
+                                lastPlayedCard?.value === card.value &&
+                                lastPlayedCard?.suit === card.suit
+                                  ? "example3  0.3s linear 0.3s 1 normal forwards"
+                                  : "",
                               animationDelay: "1.6s",
                               // animationName: 'example3',
                               transform: getSkew(index)(),
@@ -485,7 +505,7 @@ const GameBoard: FC<Props> = ({ children, selectedCard, removeCard }) => {
                                 justifyContent: "center",
                                 alignItems: "center",
                                 transition: "all  400ms",
-                                zIndex:  999 + index,
+                                zIndex: 999 + index,
                                 transform: getSkew(index)(),
 
                                 color: "#fff",
