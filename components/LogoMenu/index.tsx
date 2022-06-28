@@ -151,7 +151,7 @@ export default function LogoMenu({
         }}
       >
         <Popover open={open} onOpenChange={setOpen}>
-          <PopoverAnchor css={{ padding: "0 20px" }}>
+          <PopoverAnchor css={{ padding: "0 20px", background: '#181818', borderRadius: 10 }}>
             <PopoverTrigger asChild>
               <div
                 css={{

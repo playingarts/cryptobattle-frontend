@@ -41,7 +41,7 @@ const GameLayout: FC<
             zIndex: 10,
 
             "@media (min-width: 1440px)": {
-              maxWidth: theme.spacing(142),
+              maxWidth: theme.spacing(170),
               left: "50%",
               transform: "translate(-50%, 0)",
               width: "100%",

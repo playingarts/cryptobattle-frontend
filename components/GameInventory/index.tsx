@@ -108,7 +108,7 @@ const GameInventory: FC<Props> = ({
       className="game-inventory"
       style={{
         position: "fixed",
-        bottom: 0,
+        bottom: -8,
         left: 0,
         width: "100%",
         background: "transparent",
