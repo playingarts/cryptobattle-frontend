@@ -5,6 +5,7 @@ import Text from "../Text";
 import GameRules from "../GameRules";
 import Leaderboard from "../Leaderboard";
 import { useWS } from "../WsProvider";
+import { useAuth } from "../AuthProvider";
 
 import Discord from "../Icons/Discord";
 import Youtube from "../Icons/Youtube";
@@ -75,9 +76,8 @@ const StyledContent = styled(PopoverPrimitive.Content, {
   width: 380,
   backgroundColor: "white",
   marginTop: -60,
-  minHeight: 500,
-  zIndex: 4000
-  ,
+  minHeight: 550,
+  zIndex: 4000,
   // paddingLeft: 40,
   boxShadow:
     "hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px",
@@ -121,6 +121,9 @@ export default function LogoMenu({
   headerTitle: string;
 }) {
   const [open, setOpen] = useState(false);
+  const { loggedIn, logout} = useAuth();
+
+
   const WSProvider = useWS();
   const router = useRouter();
   const purgeGames = () => {
@@ -133,7 +136,6 @@ export default function LogoMenu({
     router.push("/dashboard");
 
     setTimeout(() => {
-
       window.location.reload();
     }, 2000);
   };
@@ -151,7 +153,9 @@ export default function LogoMenu({
         }}
       >
         <Popover open={open} onOpenChange={setOpen}>
-          <PopoverAnchor css={{ padding: "0 20px", background: '#181818', borderRadius: 10 }}>
+          <PopoverAnchor
+            css={{ padding: "0 20px", background: "#181818", borderRadius: 10 }}
+          >
             <PopoverTrigger asChild>
               <div
                 css={{
@@ -182,7 +186,7 @@ export default function LogoMenu({
                     {headerTitle ? headerTitle : "CRYPTOBATTLE"}
                   </Text>
                 )}
-                {logo &&logo}
+                {logo && logo}
               </div>
             </PopoverTrigger>
           </PopoverAnchor>
@@ -279,10 +283,28 @@ export default function LogoMenu({
                       "&:hover": {
                         opacity: "0.6",
                       },
+                      marginBottom: 20,
                     }}
                   >
                     Purge rooms and games
                   </li>
+
+                  {loggedIn && (
+                    <li
+                      onClick={logout}
+                      css={{
+                        cursor: "pointer",
+                        paddingBottom: 0,
+                        transition: "all 300ms",
+                        listStyle: "none",
+                        "&:hover": {
+                          opacity: "0.6",
+                        },
+                      }}
+                    >
+                      Logout
+                    </li>
+                  )}
 
                   <div css={{ paddingBottom: 20 }}>
                     <Line spacing={2}></Line>

@@ -98,17 +98,15 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     setLoggedIn(isLoggedInCookie());
 
     if (isLoggedInCookie()) {
-      console.log('isloggedin')
       getUser().then(({ data }) => {
         const user = formatUserData(data);
         setUser(user);
-
 
           if (user.inGameId) {
             router.push(`/play`)
             return
           }
-          if (user.inRoomId) {
+          if (user.inRoomId && !router.pathname.startsWith('/join')) {
             router.push(`/game/${user.inRoomId}`)
           }
       });
@@ -163,27 +161,30 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   }
 
   const logout = () => {
-    // axios
-    //   .get(
-    //     "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/logout?accesstoken=" +
-    //       localStorage.getItem("accessToken"),
-    //     {
-    //       headers: {
-    //         accesstoken: localStorage.getItem("accessToken"),
-    //         "content-type": "application/json",
-    //       },
-    //     }
-    //   )
-    //   .then(() => {
-    //     localStorage.removeItem("accessToken");
-    //     localStorage.removeItem("signature");
-    //   });
+    axios
+      .get(
+        "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/logout?accesstoken=" +
+          localStorage.getItem("accessToken"),
+        {
+          headers: {
+            accesstoken: localStorage.getItem("accessToken"),
+            "content-type": "application/json",
+          },
+        }
+      )
+      .then(() => {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("signature");
+        setTimeout(() => {
+          router.push("/");
+        }, 0);
+      }).catch((err) => {
+        console.log(err)
+      })
 
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("signature");
-    setTimeout(() => {
-      router.push("/");
-    }, 0);
+    // localStorage.removeItem("accessToken");
+    // localStorage.removeItem("signature");
+
   };
 
   const memoedValue = useMemo(
