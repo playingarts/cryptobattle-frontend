@@ -17,6 +17,7 @@ import MetamaskLogin from "../components/MetamaskLogin/";
 const Home: NextPage = () => {
   const { loggedIn } = useAuth();
   const headerRight = (
+    loggedIn && 
     <Button
       style={{
         marginRight: "15px",
