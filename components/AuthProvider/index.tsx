@@ -9,6 +9,7 @@ import {
 } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import {api} from "../../api"
 type AuthProviderProps = { children: ReactNode };
 
 type MetamaskUser = { address: string; signature: string };
@@ -33,16 +34,7 @@ export type IAuthProviderContext = {
 };
 
 const getUser = () => {
-  return axios.get(
-    "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/rest/me",
-
-    {
-      headers: {
-        accesstoken: localStorage.getItem("accessToken"),
-        "content-type": "application/json",
-      },
-    }
-  );
+  return api.get('/api/rest/me')
 };
 
 const formatUserData = (data: any) => {
@@ -80,8 +72,15 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const setToken = useCallback((token: any) => {
     console.log(token, "token");
     localStorage.setItem("accessToken", token as string);
-    getUser().then(({ data }) => {
+    getUser().then((data) => {
+      console.log(data)
       const user = formatUserData(data);
+
+      if (data.refreshToken) {
+        localStorage.setItem("refreshToken", data.refreshToken )
+                localStorage.setItem("accessTokenExpire", data.accessTokenExpire )
+
+      }
 
       setUser(user);
       const roomid = localStorage.getItem("roomid");
@@ -98,7 +97,15 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     setLoggedIn(isLoggedInCookie());
 
     if (isLoggedInCookie()) {
-      getUser().then(({ data }) => {
+      getUser().then((data) => {
+        console.log(data)
+
+        if (data.refreshToken) {
+          localStorage.setItem("refreshToken", data.refreshToken )
+                  localStorage.setItem("accessTokenExpire", data.accessTokenExpire )
+
+        }
+
         const user = formatUserData(data);
         setUser(user);
 
@@ -175,6 +182,8 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       .then(() => {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("signature");
+        localStorage.removeItem("refreshToken")
+        localStorage.removeItem("accessTokenExpire")
         setTimeout(() => {
           router.push("/");
         }, 0);

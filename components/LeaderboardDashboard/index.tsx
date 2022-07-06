@@ -2,7 +2,7 @@ import { FC, HTMLAttributes, useEffect } from "react";
 // import { useAuth } from "../AuthProvider";
 export type Props = HTMLAttributes<HTMLDivElement>;
 import StatBlock from "../../components/StatBlock";
-import axios from "axios";
+import { api } from "../../api";
 
 import Line from "../Line";
 import Text from "../Text";
@@ -15,17 +15,24 @@ const getLeaderboard = () => {
     page: 1,
     limit: 10,
   };
-  return axios.get(
-    "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/rest/leaderboard",
 
-    {
-      params,
-      headers: {
-        accesstoken: localStorage.getItem("accessToken"),
-        "content-type": "application/json",
-      },
-    }
-  );
+
+
+  return api.get(`api/rest/leaderboard`, params)
+
+
+
+  // return axios.get(
+  //   "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/rest/leaderboard",
+
+  //   {
+  //     params,
+  //     headers: {
+  //       accesstoken: localStorage.getItem("accessToken"),
+  //       "content-type": "application/json",
+  //     },
+  //   }
+  // );
 };
 
 const LeaderboardDashboard: FC<Props> = ({ ...props }) => {
@@ -33,7 +40,7 @@ const LeaderboardDashboard: FC<Props> = ({ ...props }) => {
 
   useEffect(() => {
     getLeaderboard()
-      .then(({ data }) => {
+      .then((data) => {
         console.log(data);
       })
       .catch((err) => {

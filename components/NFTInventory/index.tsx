@@ -3,7 +3,7 @@ import { FC, HTMLAttributes, useEffect, useState } from "react";
 import Line from "../Line";
 import Text from "../Text";
 import { useAuth } from "../AuthProvider";
-import axios from "axios";
+import { api } from "../../api";
 import Loader from "../Loader";
 import MetamaskLogin from "../../components/MetamaskLogin/";
 import Card from "../../components/CardNew";
@@ -11,16 +11,8 @@ import CardEmpty from "../../components/CardEmpty";
 import MostPlayedCards from "./MostPlayedCards";
 
 const getUserNftCards = () => {
-  return axios.get(
-    "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/rest/user-nft-cards",
+  return api.get('/api/rest/user-nft-cards')
 
-    {
-      headers: {
-        accesstoken: localStorage.getItem("accessToken"),
-        "content-type": "application/json",
-      },
-    }
-  );
 };
 
 export type Props = HTMLAttributes<HTMLDivElement>;
@@ -56,7 +48,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
     setLoading(true);
 
     getUserNftCards()
-      .then(({ data }) => {
+      .then((data) => {
         setLoading(false);
         setNFTCards(data.cards);
       })

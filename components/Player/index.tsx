@@ -1,5 +1,12 @@
-import { HTMLAttributes, FC, useEffect, useState, useCallback, forwardRef } from "react";
-import axios from "axios";
+import {
+  HTMLAttributes,
+  FC,
+  useEffect,
+  useState,
+  useCallback,
+  forwardRef,
+} from "react";
+import { api } from "../../api";
 import { useWS } from "../../components/WsProvider/index";
 import { formatUsername } from "../../utils/helpers";
 
@@ -9,19 +16,17 @@ import Text from "../Text";
 import UserAvatar from "../../components/UserAvatar";
 interface Player extends Props {
   player: { userId: string; state: string };
-  color: string,
+  color: string;
   isAdmin: boolean;
 }
-// eslint-disable-next-line 
+// eslint-disable-next-line
 // @ts-ignore
-// eslint-disable-next-line 
-const Player: FC<Player> = forwardRef(
-  ({ color, player, isAdmin }, ref) => {
-    
+// eslint-disable-next-line
+const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
   const [playerInfo, setPlayerInfo] = useState({
     name: "",
     profilePictureUrl: "",
-    username: ""
+    username: "",
   });
 
   const WSProvider = useWS();
@@ -29,34 +34,30 @@ const Player: FC<Player> = forwardRef(
   const [hovered, setHover] = useState(false);
 
   const getUser = (playerId: string) => {
-    return axios.get(
-      `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/rest/user-info/${playerId}`,
-      {
-        headers: {
-          accesstoken: localStorage.getItem("accessToken"),
-          "content-type": "application/json",
-        },
-      }
-    );
+    if (!playerId) {
+      return
+    }
+    return api.get(`/api/rest/user-info/${playerId}`);
   };
 
-  const kickPlayer = useCallback((e: React.MouseEvent<HTMLDivElement>, userId: string) => {
-    WSProvider.send(
-      JSON.stringify({
-        event: "kick-player",
-        data: {
-          userId,
-        },
-      })
-    );
-  }, []);
-
-
+  const kickPlayer = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>, userId: string) => {
+      WSProvider.send(
+        JSON.stringify({
+          event: "kick-player",
+          data: {
+            userId,
+          },
+        })
+      );
+    },
+    []
+  );
 
   useEffect(() => {
     if (!playerInfo.name && player.userId) {
       getUser(player.userId)
-        .then(({ data }) => {
+        .then((data) => {
           setPlayerInfo(data);
         })
         .catch((err) => {
@@ -66,13 +67,12 @@ const Player: FC<Player> = forwardRef(
   }, [player]);
 
   return (
-    // eslint-disable-next-line 
+    // eslint-disable-next-line
     // @ts-ignore
     <div ref={ref} style={{ display: "flex", alignItems: "center" }}>
-
       <UserAvatar
         profilePictureUrl={playerInfo.profilePictureUrl}
-        css={{ border: "solid 5px " + color}}
+        css={{ border: "solid 5px " + color }}
       />
 
       <div
@@ -106,8 +106,10 @@ const Player: FC<Player> = forwardRef(
           </svg>
         )}
 
-        {hovered && isAdmin && <div onClick={(e) => kickPlayer(e, player.userId)}>x</div>}
-        
+        {hovered && isAdmin && (
+          <div onClick={(e) => kickPlayer(e, player.userId)}>x</div>
+        )}
+
         {player.state === "waiting" && (
           <div>
             <svg
@@ -133,7 +135,7 @@ const Player: FC<Player> = forwardRef(
         {/* <div>LVL 04</div> */}
       </div>
     </div>
-  )
+  );
 });
 
 export default Player;

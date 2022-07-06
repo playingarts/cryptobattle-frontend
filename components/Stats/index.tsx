@@ -6,7 +6,7 @@ import Line from "../Line";
 import Text from "../Text";
 import StatBlock from "../../components/StatBlock";
 
-import axios from "axios";
+import { api } from "../../api";
 import { useAuth } from "../AuthProvider";
 // import Progress from '../../components/Progress';
 import GameRules from "../GameRules/";
@@ -15,24 +15,10 @@ import Arrowed from "../Arrowed";
 import StatsEntry from "./StatsEntry";
 
 const getUserStats = (userId: string) => {
-  // const params = {
-  //   period: "week",
-  //   page: 1,
-  //   limit: 10,
-  // };
 
-  // PUB /api/rest/player-stats/{userId}
-
-  return axios.get(
-    "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/rest/player-stats/" +
+  return api.get(
+    "/api/rest/player-stats/" +
       userId,
-
-    {
-      headers: {
-        accesstoken: localStorage.getItem("accessToken"),
-        "content-type": "application/json",
-      },
-    }
   );
 };
 
@@ -53,7 +39,7 @@ const Stats: FC<Props> = ({ ...props }) => {
       return;
     }
     getUserStats(user.userId)
-      .then(({ data }) => {
+      .then((data) => {
         console.log("User Stats: ", data);
         setUserStats(data);
       })
