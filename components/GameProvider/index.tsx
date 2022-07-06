@@ -22,6 +22,7 @@ type GameProviderProps = { children: ReactNode };
 export type IGameProviderContext = {
   gameState: any;
   players: any;
+  playersGame: any;
   roomId: any;
   userInfo: any;
   roomInfo: any;
@@ -48,13 +49,16 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   const { openNotification, closeNotification } = useNotifications();
 
   const [results, setResults] = useState<any>(null);
+
   const [players, setPlayers] = useState<any>([]);
+  const [playersGame, setPlayersGame] = useState<any>([]);
+
   const [userInfo, setUserInfo] = useState<any>([]);
   const [roomInfo, setRoomInfo] = useState<any>([]);
 
   const [selectedCard, setSelectedCard] = useState<any>(null);
 
-  const [roomId, setRoomId] = useState("");
+  const [roomId, setRoomId] = useState<any>("");
 
   const router = useRouter();
 
@@ -65,10 +69,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   };
 
   useEffect(() => {
-    console.log(selectedCard)
-  }, [selectedCard])
-  
-
+    console.log(selectedCard);
+  }, [selectedCard]);
 
   const WSProvider = useWS();
   const { user } = useAuth();
@@ -83,37 +85,42 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
     players.forEach((player: any) => {
       if (!player.username) {
-        getUser(player.userId)
-          .then(({ data }) => {
-            const playersFiltered = players.map((player: any) => {
-              if (player.userId === data.userId) {
-                return { ...player, ...data };
-              }
-              return player;
-            });
-            setPlayers(playersFiltered);
-          })
-          .catch((err) => {
-            console.log(err);
+      getUser(player.userId)
+        .then(({ data }) => {
+          const playersFiltered = players.map((player: any) => {
+            if (player.userId === data.userId) {
+              return { ...player, ...data };
+            }
+            return player;
           });
+          setPlayers(playersFiltered);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
       }
     });
   }, [players]);
 
   useEffect(() => {
     if (!gameState) {
-      return
+      return;
     }
-    setIsMyTurn(user.userId === gameState.turnForPlayer)
-  
-  }, [gameState])
-  
+    setIsMyTurn(user.userId === gameState.turnForPlayer);
+
+    setPlayersGame(gameState.allGamePlayers);
+  }, [gameState]);
 
   useEffect(() => {
     WSProvider.onmessage = function ({ data }) {
       const event = JSON.parse(data);
       console.log("Game Provider WS event:", event);
-
+      // WSProvider.send(
+      //   JSON.stringify({
+      //     event: "room-info",
+      //     data: {},
+      //   })
+      // );
       if (event.event === "room-updated" || event.event === "room-info") {
         setRoomInfo(event.data);
         if (!event.data.roomUsers) {
@@ -121,7 +128,20 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         }
         console.log("Room updated: ", event.data.roomUsers);
         setPlayers(event.data.roomUsers);
+
+
       }
+
+      if (event.data.error && event.data.error.message) {
+        if (
+          event.data.error.message === "Player must be in a room"
+        ) {
+          setRoomId(null)
+          return;
+        }
+      }
+
+
       if (event.event === "choose-nft-cards") {
         console.log("choose-nft-cards sub: ", event);
       }
@@ -145,22 +165,20 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       }
 
       if (event.event === "close-room") {
-
-        event.ownerId !== user.userId && 
-        openNotification({
-          title: "Room closed by host",
-          dark: true,
-          iconColor: "blue",
-          footer: (
-            <div css={{ display: "flex" }}>
-              <Button onClick={quit}>Quit</Button>
-            </div>
-          ),
-        })
+        event.ownerId !== user.userId &&
+          openNotification({
+            title: "Room closed by host",
+            dark: true,
+            iconColor: "blue",
+            footer: (
+              <div css={{ display: "flex" }}>
+                <Button onClick={quit}>Quit</Button>
+              </div>
+            ),
+          });
       }
 
       if (event.event === "join-room") {
-        console.log("joined room");
         WSProvider.send(
           JSON.stringify({
             event: "room-info",
@@ -169,15 +187,49 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         );
       }
 
-      if (event.data.error && event.data.error.message) {
-          if (event.data.error.message === "No valid server instance for the room'") {
-            quit()
-            return;
-          }
 
-
+      if (event.event === "quit-room" && event.data.reason === 'KICKED_BY_ROOM_OWNER') {
+        openNotification({
+          title: "You were kicked!",
+          dark: true,
+          iconColor: "blue",
+          footer: (
+            <div css={{ display: "flex" }}>
+              <Button onClick={quit}>Quit</Button>
+            </div>
+          ),
+        });
       }
 
+      if (event.data.error && event.data.error.message) {
+        if (
+          event.data.error.message === "No valid server instance for the room"
+        ) {
+          setRoomId(null)
+          return;
+        }
+      }
+
+      if (event.data.error && event.data.error.message) {
+        if (
+          event.data.error.message === "Joining while hosting a game is forbidden"
+        ) {
+
+          openNotification({
+            title: "Cannot join room while hosting a game",
+            dark: true,
+            iconColor: "red",
+            footer: (
+              <div css={{ display: "flex" }}>
+                <Button onClick={quit}>Quit game</Button>
+              </div>
+            ),
+          });
+
+
+          return;
+        }
+      }
 
       if (event.event === "game-results") {
         console.log("game-results", event.data);
@@ -219,7 +271,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
             closeNotification();
             router.push("/play");
           }
-        }, 1000);
+        }, 0);
 
         console.log('game-updated": ', event.data);
       }
@@ -281,14 +333,24 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     () => ({
       gameState,
       players,
+      playersGame,
       roomId,
       userInfo,
       roomInfo,
       selectedCard,
       setSelectedCard,
-      isMyTurn
+      isMyTurn,
     }),
-    [gameState, players, roomId, userInfo, selectedCard, setSelectedCard, isMyTurn]
+    [
+      gameState,
+      players,
+      playersGame,
+      roomId,
+      userInfo,
+      selectedCard,
+      setSelectedCard,
+      isMyTurn,
+    ]
   );
 
   return (

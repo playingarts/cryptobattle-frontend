@@ -21,7 +21,7 @@ export interface Props extends HTMLAttributes<HTMLElement> {
 
 const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
   const { user } = useAuth();
-  const { gameState, players } = useGame();
+  const { gameState, playersGame } = useGame();
   const [playersWithPoints, setPlayersWithPoints] = useState<Array<any>>([]);
   const [currentPlayer, setCurrentPlayer] = useState<any>("");
   const [currentPlayerWithPoints, setCurrentPlayerWithPoints] =
@@ -34,31 +34,39 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
     setTimeout(() => {
       setLoadingDelayed(false);
     }, 0);
-  }, [loading]);
-
+  }, [loading]); 
 
 
   useEffect(() => {
-    if (!gameState) {
+    console.log(currentPlayer)
+  }, [currentPlayer]); 
+
+
+  useEffect(() => {
+    if (!gameState || !playersGame) {
       return;
     }
-
-    const currentPlayer = players.find(
+    if (playersGame.length === 0) {
+      return
+    }
+ 
+   
+    const currentPlayer = playersGame.find(
       (player: any) => player.userId === gameState.turnForPlayer
     );
 
     // const shiftArray = (arr: any, target: any) => {
     //   return arr.concat(arr.splice(0, arr.indexOf(target)));
     // };
-
-    const playersWithPoints = [...players].map((player: any) => {
+     
+    const playersWithPoints = [...playersGame].map((player: any) => {
       player.points = gameState?.playersCurrentPoints[player.userId]
         ? gameState.playersCurrentPoints[player.userId]
         : 0;
 
       return { ...player };
     });
-
+ 
     const currentPlayerWithPoints = playersWithPoints.find(
       (player: any) => player.userId === gameState.turnForPlayer
     );
@@ -68,7 +76,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
 
     setPlayersWithPoints(playersWithPoints);
     setCurrentPlayer(currentPlayer);
-  }, [gameState, players]);
+  }, [gameState, playersGame]);
 
   useEffect(() => {
     if (!gameState || !user || !user.userId) {

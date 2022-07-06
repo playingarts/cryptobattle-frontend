@@ -86,7 +86,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       setUser(user);
       const roomid = localStorage.getItem("roomid");
 
-      roomid ? router.push(`/game/${roomid}`) : router.push("/dashboard");
+      roomid ? router.push(`/game/${roomid}?join=true`) : router.push("/dashboard");
       localStorage.removeItem("roomid");
     });
   }, []);

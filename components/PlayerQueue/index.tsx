@@ -4,6 +4,7 @@ import {
   FC,
   HTMLAttributes,
   createRef,
+  useCallback
 } from "react";
 export type Props = HTMLAttributes<HTMLDivElement>;
 import Player from "./Player";
@@ -23,10 +24,11 @@ const PlayerQueue: FC<PlayerQueue> = ({
   currentPlayerWithPoints,
 }) => {
   const [players, setPlayers] = useState([]);
-  // const [order, setOrder] = useState([]);
+  const [order, setOrder] = useState([]);
 
   useEffect(() => {
     const shiftArray = (arr: any, target: any) => {
+      return arr
       return arr.concat(arr.splice(0, arr.indexOf(target)));
     };
 
@@ -34,28 +36,49 @@ const PlayerQueue: FC<PlayerQueue> = ({
       return;
     }
 
-      setPlayers(shiftArray(playersWithPoints, currentPlayerWithPoints));
+      console.log('indexOf',  playersWithPoints.indexOf(currentPlayerWithPoints) )
+      console.log('indexOf',  currentPlayerWithPoints )
+
+      setOrder(shiftArray(playersWithPoints, currentPlayerWithPoints));
     
 
 
   }, [playersWithPoints, currentPlayerWithPoints]);
 
-  // const shuffle = useCallback(() => {
-  //   if (!players) {
-  //     return;
-  //   }
 
-  //   const shiftArray = (arr: any, target: any) => {
-  //     return arr.concat(arr.splice(0, arr.indexOf(target)));
-  //   };
+  useEffect(() => {
+ console.log('setting players', order)
 
-  //   setPlayers(shiftArray(players, players[1]));
-  // }, [players]);
+    // if (playersWithPoints.length === 0) {
+    //   return;
+    // }
+
+    //   console.log('indexOf',  playersWithPoints.indexOf(currentPlayerWithPoints) )
+
+
+      setPlayers(order);
+    
+
+
+  }, [order]);
+
+
+  const shuffle = useCallback(() => {
+    if (!players) {
+      return;
+    }
+
+    const shiftArray = (arr: any, target: any) => {
+      return arr.concat(arr.splice(0, arr.indexOf(target)));
+    };
+
+    setPlayers(shiftArray(players, players[1]));
+  }, [players]);
 
   //
   return (
     <div>
-      {/* <div onClick={shuffle}>Shuffle </div> */}
+      <div onClick={shuffle}>Shuffle </div>
 
       <div className="bubbles-wrapper">
         <div className="bubbles-group"></div>

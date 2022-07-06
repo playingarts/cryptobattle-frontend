@@ -26,7 +26,7 @@ import NavProfile from "../../components/NavProfile";
 const JoinGame: NextPage = () => {
   const WSProvider = useWS();
   const router = useRouter();
-  const { roomid } = router.query;
+  const { roomid, join} = router.query;
   const { players, roomInfo } = useGame();
   const { user } = useAuth();
 
@@ -139,14 +139,12 @@ const JoinGame: NextPage = () => {
   }, [isReady, openNotification]);
 
   useEffect(() => {
-    console.log(isOwner, "handleRouteChange");
-
     if (isOwner === null) {
       return;
     }
     const handleRouteChange = (url: string) => {
-      console.log("handleRouteChange");
-      if (url !== "/play") {
+      console.log("handleRouteChange", url);
+      if (url !== "/play" && !url.startsWith("/game/")) {
         WSProvider.send(
           JSON.stringify({
             event: isOwner ? "close-room" : "quit-room",
@@ -165,29 +163,6 @@ const JoinGame: NextPage = () => {
     };
   }, [isOwner]);
 
-  //   useEffect(() => {
-  //     if (!router.isReady) {
-  //       return
-  //     }
-  //     const exitingFunction = () => {
-
-  //         //  WSProvider.send(
-  //         //     JSON.stringify({
-  //         //       event: "close-room",
-  //         //       data: {}
-  //         // //     })
-  // console.log("Exiting Function router", router)
-
-  //     };
-
-  //     router.events.on("routeChangeStart", exitingFunction);
-
-  //     return () => {
-  //       console.log("unmounting component...");
-  //       router.events.off("routeChangeStart", exitingFunction);
-  //     };
-  //   }, [router.isReady, isOwner]);
-
   useEffect(() => {
     if (!roomInfo) {
       return;
@@ -197,8 +172,10 @@ const JoinGame: NextPage = () => {
       setLoaded(true);
     } else {
       setIsOwner(false);
+ 
       setLoaded(true);
     }
+
   }, [roomInfo, user]);
 
   useEffect(() => {
@@ -218,47 +195,30 @@ const JoinGame: NextPage = () => {
   }, [players, router.isReady]);
 
   useEffect(() => {
-    console.log(roomid, "game");
+    setInterval(() => {
+      WSProvider.send(
+        JSON.stringify({
+          event: "room-info",
+          data: {},
+        })
+      );
+      console.log("Interval: Room-info")
+    }, 5000)
+  }, [])
 
-    // if (!router.isReady) {
-    //   return;
-    // }
-    // WSProvider.send(
-    //   JSON.stringify({
-    //     event: "room-info",
-    //     data: {},
-    //   })
-    // );
-
-    if (!roomid) {
+  useEffect(() => {
+    if (!router.isReady) {
       return;
     }
-    console.log(roomid, "game");
-
-    // WSProvider.send(
-    //   JSON.stringify({
-    //     event: "room-info",
-    //     data: {},
-    //   })
-    // );
-    setTimeout(() => {
-      // WSProvider.send(
-      //   JSON.stringify({
-      //     event: "room-info",
-      //     data: {},
-      //   })
-      // );
-
+    if (join) {
       WSProvider.send(
         JSON.stringify({
           event: "join-room",
-          data: {
-            roomId: roomid,
-          },
+          data: {roomId: roomid},
         })
       );
-    }, 1000);
-  }, [router.isReady]);
+    }
+  }, [router.isReady, join]);
 
   const headerMiddle = <NavProfile />;
   const headerRight = isOwner ? (

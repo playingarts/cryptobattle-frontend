@@ -31,7 +31,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
 
   const [cardError, setCardError] = useState<any>([]);
   const [lastPlayedCard, setLastPlayedCard] = useState<any>(null);
-  
+
   const getColor = useCallback(
     (userId) => () => {
       if (userId === "system") {
@@ -45,7 +45,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     },
     [players]
   );
- 
+
   const getSkew = useCallback(
     (index) => () => {
       if (!index || index === 0) {
@@ -55,38 +55,35 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     },
     []
   );
- 
+
   useEffect(() => {
-    // eslint-disable-next-line 
+    // eslint-disable-next-line
     // @ts-ignore
     window.selectedCard = selectedCard;
   }, [selectedCard]);
 
   useEffect(() => {
-    // eslint-disable-next-line 
+    // eslint-disable-next-line
     // @ts-ignore
     window.state = gameState;
   }, [gameState]);
 
-
   const addCard = useCallback(
     (rowIndex, columnIndex, card = selectedCard, state = gameState) =>
       () => {
-
         if (!card) {
           console.log("addCard no card", card, rowIndex, columnIndex);
 
           return;
-        }     
-        console.log("addCard", card,  rowIndex, columnIndex);
+        }
+        console.log("addCard", card, rowIndex, columnIndex);
 
         const allowedPlacement =
           state.allowedUserCardsPlacement.additionalProperties[
             `${columnIndex}-${rowIndex}`
           ];
 
-          console.log(rowIndex, columnIndex, state)
-
+        console.log(rowIndex, columnIndex, state);
 
         if (!card || !allowedPlacement) {
           // alert("Not allowed to place card there.");
@@ -227,8 +224,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       "length"
     );
 
-
-  
     if (
       Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties)
         .length === 0
@@ -253,23 +248,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         const cardF = getCard(card.suit, card.value, card);
         addCardToBoard(Number(indexes[1]), Number(indexes[0]), cardF);
       });
-
-      // const card = getCard(
-      //   cards[key].slice(-1)[0].suit,
-      //   cards[key].slice(-1)[0].value,
-      //   cards[key].slice(-1)[0]
-      // );
-      // addCardToBoard(Number(indexes[1]), Number(indexes[0]), card);
     });
-     
-    // function getOffset(el: any) {
-    //   const rect = el.getBoundingClientRect();
-    //   console.log(rect);
-    //   return {
-    //     left: rect.left + window.scrollX,
-    //     top: rect.top + window.scrollY + 100,
-    //   };
-    // }
 
     setLastPlayedCard(
       gameState.lastPlayedCard ? gameState.lastPlayedCard : null
@@ -284,14 +263,13 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         return;
       }
 
-      latestCard.scrollIntoView({block: "center", behavior: 'smooth'});
-      
-      setTimeout(
-        () => latestCard.classList.add("game-latest-card__animation"),
-        1000
-      );
-    }, 0);
+      latestCard.scrollIntoView({ block: "center", behavior: "smooth" });
 
+      // setTimeout(
+      //   () => latestCard.classList.add("game-latest-card__animation"),
+      //   1000
+      // );
+    }, 0);
   }, [gameState]);
 
   useEffect(() => {
@@ -361,9 +339,14 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         console.log(event, "ondrop event");
 
         const target = event.currentTarget.id.split("-");
-        // eslint-disable-next-line 
+        // eslint-disable-next-line
         // @ts-ignore
-        addCard(Number(target[0]), Number(target[1]), window.selectedCard, window.state)();
+        addCard(
+          Number(target[0]),
+          Number(target[1]),
+          window.selectedCard,
+          window.state
+        )();
         event.stopImmediatePropagation();
       },
 
@@ -435,34 +418,31 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                         >
                           <div className="game-latest-card__score">
                             {" "}
-                            +{lastPlayedCard.scoring}
+                            +{lastPlayedCard.score}
                           </div>
                         </div>
                       )}
 
                     {column === "empty" && (
                       <CardEmpty
-                      selectedCard={selectedCard}
+                        selectedCard={selectedCard}
                         key={`${columnIndex}${rowIndex}-${columnIndex}${rowIndex}`}
                         css={{
                           transition: "all 300ms",
                           borderRadius: 10,
-
                         }}
                         style={{
-                          pointerEvents: isMyTurn ? 'unset' : 'none',
-
+                          pointerEvents: isMyTurn ? "unset" : "none",
                         }}
                         onClick={addCard(rowIndex, columnIndex)}
                         id={rowIndex + "-" + columnIndex}
                       ></CardEmpty>
-                    )}   
+                    )}
                     {column && column !== "empty" && (
                       <div className="stack">
                         {[...column].map((card: any, index) => (
                           <Card
-                          selectedCard={selectedCard}
-
+                            selectedCard={selectedCard}
                             key={`${card.value} ${card.suit}`}
                             onClick={addCard(rowIndex, columnIndex)}
                             animated={card.id ? true : false}
@@ -476,7 +456,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                             data-column={columnIndex}
                             isGameBoard={true}
                             css={{
-                              pointerEvents: isMyTurn ? 'unset' : 'none',
+                              pointerEvents: isMyTurn ? "unset" : "none",
                               zIndex: 10 + index,
                               outline:
                                 index + 1 === column.length &&

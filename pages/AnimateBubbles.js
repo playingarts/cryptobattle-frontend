@@ -47,7 +47,7 @@ const AnimateBubbles = ({ children }) => {
               // After the previous frame, remove
               // the transistion to play the animation
               domNode.style.transform = "";
-              domNode.style.transition = "transform 6s";
+              domNode.style.transition = "transform 500ms";
             });
           });
         }
