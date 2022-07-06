@@ -344,7 +344,11 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         addCard(
           Number(target[0]),
           Number(target[1]),
+        // eslint-disable-next-line
+        // @ts-ignore
           window.selectedCard,
+        // eslint-disable-next-line
+        // @ts-ignore
           window.state
         )();
         event.stopImmediatePropagation();

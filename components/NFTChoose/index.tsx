@@ -95,11 +95,11 @@ const NFTChoose: FC<Props> = () => {
     setLoading(true);
 
     getUserNftCards()
-      .then((data) => {
+      .then((data: any) => {
         setLoading(false);
         setNFTCards(data.cards);
       })
-      .catch((err) => {
+      .catch((err: any) => {
         console.log(err);
         setLoading(false);
       });

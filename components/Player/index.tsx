@@ -57,10 +57,10 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
   useEffect(() => {
     if (!playerInfo.name && player.userId) {
       getUser(player.userId)
-        .then((data) => {
+        .then((data: any) => {
           setPlayerInfo(data);
         })
-        .catch((err) => {
+        .catch((err: any) => {
           console.log(err);
         });
     }

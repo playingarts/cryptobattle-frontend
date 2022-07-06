@@ -39,11 +39,11 @@ const Stats: FC<Props> = ({ ...props }) => {
       return;
     }
     getUserStats(user.userId)
-      .then((data) => {
+      .then((data : any) => {
         console.log("User Stats: ", data);
         setUserStats(data);
       })
-      .catch((err) => {
+      .catch((err : any) => {
         console.log(err);
       });
 

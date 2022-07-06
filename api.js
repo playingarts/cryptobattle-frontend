@@ -60,7 +60,7 @@ const request = function (options) {
   return client(options).then(onSuccess).catch(onError);
 };
 
-function get(url) {
+function get(url, params) {
   return request({
     url: url,
     method: "GET",
@@ -68,6 +68,7 @@ function get(url) {
       accesstoken: localStorage.getItem("accessToken"),
       "content-type": "application/json",
     },
+    params
   });
 }
 

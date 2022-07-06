@@ -72,7 +72,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const setToken = useCallback((token: any) => {
     console.log(token, "token");
     localStorage.setItem("accessToken", token as string);
-    getUser().then((data) => {
+    getUser().then((data: any) => {
       console.log(data)
       const user = formatUserData(data);
 
@@ -97,7 +97,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     setLoggedIn(isLoggedInCookie());
 
     if (isLoggedInCookie()) {
-      getUser().then((data) => {
+      getUser().then((data : any) => {
         console.log(data)
 
         if (data.refreshToken) {
