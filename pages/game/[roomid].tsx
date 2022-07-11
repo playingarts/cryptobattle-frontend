@@ -27,7 +27,7 @@ const JoinGame: NextPage = () => {
   const WSProvider = useWS();
   const router = useRouter();
   const { roomid, join} = router.query;
-  const { players, roomInfo } = useGame();
+  const { players, setPlayers, roomInfo } = useGame();
   const { user } = useAuth();
 
   const [isReady, setReady] = useState(false);
@@ -145,6 +145,7 @@ const JoinGame: NextPage = () => {
     const handleRouteChange = (url: string) => {
       console.log("handleRouteChange", url);
       if (url !== "/play" && !url.startsWith("/game/")) {
+        setPlayers(null)
         WSProvider.send(
           JSON.stringify({
             event: isOwner ? "close-room" : "quit-room",
@@ -182,6 +183,9 @@ const JoinGame: NextPage = () => {
     if (!router.isReady) {
       return;
     }
+    if (!players) {
+      return
+    }
     if (players.find((player: any) => player.userId === user.userId)) {
       return;
     }
@@ -195,7 +199,7 @@ const JoinGame: NextPage = () => {
   }, [players, router.isReady]);
 
   useEffect(() => {
-    setInterval(() => {
+   const updateRoom =  setInterval(() => {
       WSProvider.send(
         JSON.stringify({
           event: "room-info",
@@ -203,8 +207,17 @@ const JoinGame: NextPage = () => {
         })
       );
       console.log("Interval: Room-info")
-    }, 5000)
+    }, 3000)
+    return () => clearInterval(updateRoom)
   }, [])
+
+
+  // useEffect(() => {
+  // console.log('[roomid]', players)
+  // return () => console.log('leaving [rromid]')
+
+  //  }, [players])
+
 
   useEffect(() => {
     if (!router.isReady) {

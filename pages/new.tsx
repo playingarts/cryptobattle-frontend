@@ -18,7 +18,7 @@ const NewGame: NextPage = () => {
   // const { user } = useAuth();
   // const { openNotification, closeNotification } = useNotifications();
 
-  const { roomId } = useGame();
+  const { roomId, setRoomId} = useGame();
   const router = useRouter();
   useEffect(() => {
     console.log('roomid happens', roomId)
@@ -27,7 +27,10 @@ const NewGame: NextPage = () => {
       return;
     }
 
+
     router.push(`/game/${roomId}`);
+
+    return () => setRoomId(null)
   }, [roomId]);
 
   const WSProvider = useWS();

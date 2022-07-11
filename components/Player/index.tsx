@@ -55,7 +55,8 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
   );
 
   useEffect(() => {
-    if (!playerInfo.name && player.userId) {
+    console.log('player', playerInfo)
+    if (!playerInfo.username && player.userId) {
       getUser(player.userId)
         .then((data: any) => {
           setPlayerInfo(data);
@@ -64,7 +65,7 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
           console.log(err);
         });
     }
-  }, [player]);
+  }, [player, playerInfo]);
 
   return (
     // eslint-disable-next-line

@@ -28,7 +28,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   const { gameState, isMyTurn, players, selectedCard } = useGame();
 
   const [board, setBoard] = useState(generateBoard(7, 5));
-
   const [cardError, setCardError] = useState<any>([]);
   const [lastPlayedCard, setLastPlayedCard] = useState<any>(null);
 
@@ -55,6 +54,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     },
     []
   );
+
 
   useEffect(() => {
     // eslint-disable-next-line
@@ -207,11 +207,11 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   };
 
   useEffect(() => {
-    // console.log(gameState)
     console.log("gameState:", gameState);
     if (!gameState) {
       return;
     }
+
 
     const tableCards = gameState.gameTableCards?.additionalProperties;
     if (!tableCards) {
@@ -372,6 +372,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         minHeight: "100vh",
       })}
     >
+
+      
       <div>
         {board.map((row: any, rowIndex: number) => {
           return (

@@ -389,3 +389,7 @@ html {
   display: flex;
   margin: 1rem auto;
 }
+
+.bubbles-group div {
+  margin-right: 200px
+}

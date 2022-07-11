@@ -20,10 +20,8 @@ const Play: NextPage = () => {
   const [myCards, setMyCards] = useState<Array<any>>([]);
 
   const { gameState } = useGame();
-
   useEffect(() => {
-    console.log('play use effect')
-    // WSProvider.onopen = function () {
+
       WSProvider.send(
         JSON.stringify({
           event: "game-info",
@@ -36,7 +34,7 @@ const Play: NextPage = () => {
           data: {},
         })
       );
-    // };
+
   }, []);
 
 
@@ -49,22 +47,30 @@ const Play: NextPage = () => {
 
   }, [gameState]);
 
+  useEffect(() => {
+    const updateGame =  setInterval(() => {
+       WSProvider.send(
+         JSON.stringify({
+           event: "game-info",
+           data: {},
+         })
+       );
+       console.log("Interval: game-info")
+     }, 3000)
+     return () => clearInterval(updateGame)
+   }, [])
 
   useEffect(() => {
     if (!gameState || !user || !user.userId) {
+
       return;
     }
-
-    // if (!gameState.gameUsersWitchCards) {
-    //   return
-    // }
 
     setTimeout(() => {
       setLoading(false)
     }, 1000);
 
-    console.log(gameState.gameUsersWithCards);
-    console.log(user.userId, "id");
+    console.log("Game users with cards: ", gameState.gameUsersWithCards);
 
     const cards = gameState.gameUsersWithCards.filter(
       (userCards: any) => userCards.userId === user.userId
@@ -80,9 +86,6 @@ const Play: NextPage = () => {
     });
 
     setMyCards(cardsFormatted);
-
-
-
 
   }, [gameState, user]);
 

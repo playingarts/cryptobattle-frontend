@@ -16,8 +16,6 @@ interface PlayerType {
 
 import Player from "../Player";
 
-
-
 import PlayerEmpty from "../PlayerEmpty";
 
 const Lobby: FC<Stats> = ({ isAdmin, players}) => {
