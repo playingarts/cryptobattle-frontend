@@ -4,7 +4,6 @@ import Text from "../../components/Text";
 import { useWS } from "../../components/WsProvider/index";
 import { useRouter } from "next/router";
 import { useGame } from "../../components/GameProvider";
-import { CSSObject } from "@emotion/serialize";
 
 import ComposedGlobalLayout from "../../components/_composed/GlobalLayout";
 
@@ -17,11 +16,11 @@ import { useEffect, useState } from "react";
 import Line from "../../components/Line";
 import Lobby from "../../components/Lobby";
 import NFTChoose from "../../components/NFTChoose";
-import StatBlock from "../../components/StatBlock";
 
 import { useNotifications } from "../../components/NotificationProvider";
 import { useAuth } from "../../components/AuthProvider";
 import NavProfile from "../../components/NavProfile";
+import LobbyUrl from "../../components/LobbyUrl";
 
 const JoinGame: NextPage = () => {
   const WSProvider = useWS();
@@ -284,32 +283,7 @@ const JoinGame: NextPage = () => {
       >
         <div>
           {isOwner && (
-            <div>
-              <StatBlock
-                css={(theme) => ({
-                  background: `#181818`,
-                  backgroundSize: "85%",
-                  color: theme.colors.text_title_light,
-                  position: "relative",
-                  margin: "20px 0",
-                })}
-              >
-                <input
-                  disabled
-                  defaultValue={`https://play2.playingarts.com/join/${roomid}`}
-                  css={(theme) => ({
-                    ...(theme.typography.body2 as CSSObject),
-                    paddingLeft: theme.spacing(2),
-                    height: theme.spacing(8),
-                    flexGrow: 1,
-                    borderRadius: "10px",
-                    width: "100%",
-                    backgroundColor: "#fff",
-                    color: "black",
-                  })}
-                />
-              </StatBlock>
-            </div>
+            <LobbyUrl roomid={roomid}/>
           )}
 
           {/* // eslint-disable-next-line 
