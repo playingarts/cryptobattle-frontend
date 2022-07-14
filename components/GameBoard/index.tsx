@@ -411,10 +411,12 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                     {column &&
                       column[column.length - 1].suit &&
                       column[column.length - 1].value &&
+                      column[column.length - 1].id &&
                       lastPlayedCard?.value ===
                         column[column.length - 1].value &&
                       lastPlayedCard?.suit ===
-                        column[column.length - 1].suit && (
+                        column[column.length - 1].suit && lastPlayedCard?.id ===
+                        column[column.length - 1].id && (
                         <div
                           className="game-latest-card"
                           css={{
@@ -429,7 +431,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                         >
                           <div className="game-latest-card__score">
                             {" "}
-                            +{lastPlayedCard.score}
+                            +{lastPlayedCard.scoringLevel}
                           </div>
                         </div>
                       )}

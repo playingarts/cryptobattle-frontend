@@ -50,7 +50,6 @@ const Player = forwardRef(
           // eslint-disable-next-line
     // @ts-ignore
       <div css={{marginRight: 10}} ref={ref}>
-        {totalSeconds}
         <CircularProgressbarWithChildren
           styles={{
             // Customize the root svg element
