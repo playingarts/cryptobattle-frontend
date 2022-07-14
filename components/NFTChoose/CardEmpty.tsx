@@ -5,21 +5,14 @@ import { theme } from "../../pages/_app";
 interface Props extends HTMLAttributes<HTMLElement> {
   animated?: boolean;
   isStatic?: boolean;
-  selectedCard?: any;
   size?: "big";
-  interactive?: boolean;
   noInfo?: boolean;
-  isPlaceholder?: boolean;
   isNftChoose?: boolean;
 }
 
 const CardEmpty: FC<Props> = ({
-  isStatic,
   size,
-  selectedCard,
-  isPlaceholder = false,
-  isNftChoose = false,
-  interactive,
+  isNftChoose = true,
   ...props
 }) => {
   const [hovered, setHover] = useState(false);
@@ -43,7 +36,7 @@ const CardEmpty: FC<Props> = ({
         fontWeight: 500,
         fontsize: 18,
         cursor: "pointer",
-        lineheight: 21,
+        lineheight: hovered ? 21 : 21
       })}
     onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}

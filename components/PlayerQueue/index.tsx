@@ -4,14 +4,12 @@ import {
   FC,
   HTMLAttributes,
   createRef,
-  useCallback
 } from "react";
 export type Props = HTMLAttributes<HTMLDivElement>;
 import Player from "./Player";
 
 
 // import AnimateBubbles from "../../pages/AnimateBubbles";
-import { useGame } from "../GameProvider";
 // import  from "../../pages/AnimateBubbles";
 
 interface PlayerQueue extends Props {
@@ -27,7 +25,6 @@ const PlayerQueue: FC<PlayerQueue> = ({
 }) => {
   const [players, setPlayers] = useState([]);
   const [order, setOrder] = useState([]);
-const {gameState} = useGame()
 
   useEffect(() => {
     const shiftArray = (arr: any, target: any) => {

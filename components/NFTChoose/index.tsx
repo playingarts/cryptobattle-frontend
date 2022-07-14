@@ -472,7 +472,7 @@ const NFTChoose: FC<Props> = () => {
               >
                 {cardInventory
                   .filter((card: CardType) => !card.onSale)
-                  .map((card: CardType, index: number) => (
+                  .map((card: CardType) => (
                     <div
                       css={{
                         cursor: "pointer",

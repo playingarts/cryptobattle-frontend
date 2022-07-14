@@ -29,7 +29,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
     onSale: boolean;
     power: number;
     scoring: number;
-    scoringLevel: number
+    scoringLevel: number;
     xp: number;
     suit: string;
     value: string;
@@ -51,7 +51,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
 
     getUserNftCards()
       .then((data: any) => {
-        const computedData = data.cards.map((card) => {
+        const computedData = data.cards.map((card: any) => {
           const foundCard = getCard(card.suit, card.value, card);
           return { ...foundCard, ...card };
         });
@@ -118,7 +118,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
               <CardEmpty
                 isPlaceholder={true}
                 key={index}
-                css={{ marginRight: "20px", pointerEvents: 'none' }}
+                css={{ marginRight: "20px", pointerEvents: "none" }}
               ></CardEmpty>
             ))}
         </div>
@@ -183,11 +183,11 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
       </div>
       <Line spacing={2}></Line>
 
-
-        {topCards.length > 0 &&
-          <Text variant="h6" css={{ opacity: 0.6, marginBottom: 40 }}>
-            Most played cards
-          </Text>}
+      {topCards.length > 0 && (
+        <Text variant="h6" css={{ opacity: 0.6, marginBottom: 40 }}>
+          Most played cards
+        </Text>
+      )}
       <div
         css={{
           display: "flex",
@@ -201,7 +201,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                 width: "50%",
                 display: "flex",
                 alignItems: "center",
-                pointerEvents: "none"
+                pointerEvents: "none",
               }}
               key={index}
             >
@@ -210,9 +210,9 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                   css={{
                     marginRight: "0px",
                     width: 300,
-                    boxShadow: 'none',
+                    boxShadow: "none",
                     marginBottom: 120,
-                    transform: 'scale(1.3, 1.3)',
+                    transform: "scale(1.3, 1.3)",
                     transformOrigin: "0 0",
                   }}
                   noShadow={true}
@@ -223,17 +223,17 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                   css={{
                     marginBottom: 70,
                     marginTop: 6,
-                    maxWidth:   280,
-     
+                    maxWidth: 280,
+
                     marginLeft: 0,
                     textAlign: "center",
                     color: "rgba(255, 255, 255, 0.5)",
                   }}
                 >
-                  {card.artist }
+                  {card.artist}
                 </div>
               </div>
-              <div css={{marginLeft: 20, marginTop: -100}}>
+              <div css={{ marginLeft: 20, marginTop: -100 }}>
                 <CardStats
                   color={"light"}
                   xp={card.xp}
@@ -268,7 +268,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
               <CardEmpty
                 isPlaceholder={true}
                 key={index}
-                css={{ marginRight: "30px", pointerEvents: 'none' }}
+                css={{ marginRight: "30px", pointerEvents: "none" }}
               ></CardEmpty>
             ))}
         </div>
@@ -283,14 +283,14 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
 
           <div
             css={{
-       display: "flex",
+              display: "flex",
               flexWrap: "wrap",
             }}
           >
             {cardInventory.map((card, index) => (
               <div key={index}>
                 <Card
-                  css={{ marginRight: "50px", pointerEvents: 'none' }}
+                  css={{ marginRight: "50px", pointerEvents: "none" }}
                   animated={true}
                   card={{ img: card.imageUrl }}
                 ></Card>
@@ -320,29 +320,29 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
 
           <div
             css={{
-       display: "flex",
+              display: "flex",
               flexWrap: "wrap",
             }}
           >
             {cardsOnSale.map((card, index) => (
-        <div key={index}>
-        <Card
-          css={{ marginRight: "50px", pointerEvents: 'none' }}
-          animated={true}
-          card={{ img: card.imageUrl }}
-        ></Card>
-        <div
-          css={{
-            marginBottom: 50,
-            marginTop: 15,
-            maxWidth: 210,
-            textAlign: "center",
-            color: "rgba(255, 255, 255, 0.5)",
-          }}
-        >
-          {card.artist}
-        </div>
-      </div>
+              <div key={index}>
+                <Card
+                  css={{ marginRight: "50px", pointerEvents: "none" }}
+                  animated={true}
+                  card={{ img: card.imageUrl }}
+                ></Card>
+                <div
+                  css={{
+                    marginBottom: 50,
+                    marginTop: 15,
+                    maxWidth: 210,
+                    textAlign: "center",
+                    color: "rgba(255, 255, 255, 0.5)",
+                  }}
+                >
+                  {card.artist}
+                </div>
+              </div>
             ))}
           </div>
         </div>
