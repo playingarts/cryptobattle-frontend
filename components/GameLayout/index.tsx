@@ -9,27 +9,32 @@ const GameLayout: FC<
   >
 > = ({ palette, loading, children }) => {
   const container = useRef(null);
-  
 
   useEffect(() => {
     if (container.current) {
-    // eslint-disable-next-line 
-    // @ts-ignore: Unreachable code error
-      container.current?.scrollTo(200, 400);
+      // eslint-disable-next-line
+      // @ts-ignore: Unreachable code error
+      container.current?.scrollTo(
+              // eslint-disable-next-line
+      // @ts-ignore: Unreachable code error
+        container.current.scrollLeftMax / 2,
+              // eslint-disable-next-line
+      // @ts-ignore: Unreachable code error
+        container.current.scrollHeight / 2   - container.current.clientHeight / 2
+      );
     }
   }, []);
 
   return (
-    <div style={{ background: "#0a0a0a", minHeight: "100vh", }}>
-          {/* // eslint-disable-next-line 
+    <div style={{ background: "#0a0a0a", minHeight: "100vh" }}>
+      {/* // eslint-disable-next-line 
     // @ts-ignore: Unreachable code error */}
 
       <ScrollContainer
         className="scroll-container"
-        ignoreElements='.draggable'
-        style={{ width: "100vw", height: "100vh", padding: 90}}
+        ignoreElements=".draggable"
+        style={{ width: "100vw", height: "100vh", padding: 90 }}
         innerRef={container}
-
       >
         <GameHeader
           loading={loading}
@@ -47,13 +52,11 @@ const GameLayout: FC<
               width: "100%",
             },
           })}
- 
           palette={palette}
         />
 
         {children}
       </ScrollContainer>
-
     </div>
   );
 };
