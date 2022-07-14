@@ -29,26 +29,6 @@ const PlayerQueue: FC<PlayerQueue> = ({
   const [order, setOrder] = useState([]);
 const {gameState} = useGame()
 
-const [timer, setTimer] = useState<any>(15);
-
-const startTimer = useCallback(
-  () => {
-
-    let time = 15;
-    const timer = setInterval(() => {
-      if (time === 0) {
-        clearInterval(timer)
-        return
-      }
-      console.log(time)
-      time = time -1
-      setTimer(time)
-    }, 1000)
-  },
-
-  [timer]
-);
-
   useEffect(() => {
     const shiftArray = (arr: any, target: any) => {
       // return arr
@@ -69,16 +49,6 @@ const startTimer = useCallback(
   }, [playersWithPoints, currentPlayerWithPoints]);
 
 
-  useEffect(() => {
-    if (!gameState) {
-      return
-    }
-    
-    startTimer()
-
-    
-  }, [gameState]);
-  
 
   useEffect(() => {
  console.log('setting players', order)
@@ -129,7 +99,6 @@ const startTimer = useCallback(
                 <Player
                   // eslint-disable-next-line 
                   // @ts-ignore
-                  timer={timer}
                   currentPlayerWithPoints={currentPlayerWithPoints}
                   player={player}
                   loadingDelayed={loadingDelayed}

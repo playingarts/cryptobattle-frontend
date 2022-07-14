@@ -10,7 +10,6 @@ interface Props extends HTMLAttributes<HTMLElement> {
   interactive?: boolean;
   noInfo?: boolean;
   isPlaceholder?: boolean;
-  isNftChoose?: boolean;
 }
 
 const Card: FC<Props> = ({
@@ -18,7 +17,6 @@ const Card: FC<Props> = ({
   size,
   selectedCard,
   isPlaceholder = false,
-  isNftChoose = false,
   interactive,
   ...props
 }) => {
@@ -85,7 +83,7 @@ const Card: FC<Props> = ({
               alignItems: "center",
             }}
           >
-            {(!isPlaceholder && hovered && selectedCard) || isNftChoose &&  (
+            {!isPlaceholder && hovered && selectedCard &&  (
               <div
               className='plus-icon'
                 css={{
@@ -106,7 +104,7 @@ const Card: FC<Props> = ({
                   },
                 }}
               >
-                {hovered || isNftChoose &&
+                {hovered &&
                 <svg
                   width="31"
                   height="31"

@@ -15,26 +15,28 @@ const Player = forwardRef(
   ({ player, loadingDelayed, currentPlayerWithPoints }, ref) => {
     const [progress, setProgress] = useState(100)
     const [first, setFirst] = useState(false)
-    const { timer, results } = useGame()
+    const { timer, totalSeconds, results } = useGame()
     useEffect(() => {
       if (!currentPlayerWithPoints) {
         return
       }
 
+      const seconds = totalSeconds / 1000
+
       if (!first) {
         setFirst(true)
-        setProgress(timer * 6.69)
+        setProgress(timer * (100 / seconds))
         return
       }
 
       if (currentPlayerWithPoints.userId !== player.userId && !results) {
-        setProgress(timer * 6.69)
+        setProgress(timer * (100 / seconds))
         return
       }
       setProgress(0)
     
 
-    }, [currentPlayerWithPoints, player, timer, results])
+    }, [currentPlayerWithPoints, player, timer, totalSeconds, results])
     
     useEffect(() => {
       if (results) {
@@ -48,6 +50,7 @@ const Player = forwardRef(
           // eslint-disable-next-line
     // @ts-ignore
       <div css={{marginRight: 10}} ref={ref}>
+        {totalSeconds}
         <CircularProgressbarWithChildren
           styles={{
             // Customize the root svg element
@@ -59,7 +62,7 @@ const Player = forwardRef(
               // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
               strokeLinecap: "butt",
               // Customize transition animation
-              transition: "stroke-dashoffset 15s",
+              transition: "stroke-dashoffset " + totalSeconds + 'ms',
               // Rotate the path
               transform: "rotate(0.25turn)",
               transformOrigin: "center center",

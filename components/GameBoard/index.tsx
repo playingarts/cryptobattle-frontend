@@ -260,6 +260,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       // const container = document.getElementsByClassName("scroll-container")[0];
 
       if (!latestCard) {
+              // const latestCard = document.getElementsByClassName("game-latest-card")[0];
+
         return;
       }
 
@@ -271,6 +273,9 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       // );
     }, 0);
   }, [gameState]);
+
+  
+
 
   useEffect(() => {
     console.log("interact happens");

@@ -65,7 +65,7 @@ const Card: FC<Props> = ({
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {isGameBoard && selectedCard && (
+      {isGameBoard && selectedCard && 
         <div
           css={{
             width: "10",
@@ -139,7 +139,7 @@ const Card: FC<Props> = ({
             </svg>
           </div>
         </div>
-      )}
+      }
 
       <div
         {...(interactive && {

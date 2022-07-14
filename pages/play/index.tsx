@@ -47,18 +47,18 @@ const Play: NextPage = () => {
 
   }, [gameState]);
 
-  useEffect(() => {
-    const updateGame =  setInterval(() => {
-       WSProvider.send(
-         JSON.stringify({
-           event: "game-info",
-           data: {},
-         })
-       );
-       console.log("Interval: game-info")
-     }, 3000)
-     return () => clearInterval(updateGame)
-   }, [])
+  // useEffect(() => {
+  //   const updateGame =  setInterval(() => {
+  //      WSProvider.send(
+  //        JSON.stringify({
+  //          event: "game-info",
+  //          data: {},
+  //        })
+  //      );
+  //      console.log("Interval: game-info")
+  //    }, 3000)
+  //    return () => clearInterval(updateGame)
+  //  }, [])
 
   useEffect(() => {
     if (!gameState || !user || !user.userId) {

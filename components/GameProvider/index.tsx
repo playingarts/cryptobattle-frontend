@@ -214,6 +214,12 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       }
 
 
+      // Timeout ended
+      if (event.event === 'close-room' && event.data.reason === 'TIMEOUT') {
+        quit()
+        return
+      } 
+
       // Play againjoin/62c999531f743708ecebd3ab
       if (event.event === 'next-game') {
          console.log('next-game', event)
@@ -235,11 +241,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         return;
       }
 
-      // Timeout ended
-      if (event.event === 'close-room' && event.data.reason === 'TIMEOUT') {
-        quit()
-        return
-      } 
+
 
       if (event.event === "close-room") {
         event.ownerId !== user.userId &&
@@ -406,7 +408,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
             onClick={playAgain}
             disabled={playingAgain}
           >
-            {playingAgain ?  'Waiting' : 'Play again ' + '(' + timer + ')'}
+            {playingAgain ?  'Waiting' : 'Play again ' + '(' + timer / 1000 + ')'}
           </Button>
           <Button onClick={quit}>Quit</Button>
         </div>

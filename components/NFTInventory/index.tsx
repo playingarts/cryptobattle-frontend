@@ -184,9 +184,10 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
       <Line spacing={2}></Line>
 
 
+        {topCards.length > 0 &&
           <Text variant="h6" css={{ opacity: 0.6, marginBottom: 40 }}>
             Most played cards
-          </Text>
+          </Text>}
       <div
         css={{
           display: "flex",
@@ -257,13 +258,19 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
           css={{
             minHeight: 300,
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "space-between",
             alignItems: "center",
           }}
         >
-          <Text variant="h3" css={{ opacity: 0.6 }}>
-            No NFTs
-          </Text>
+          {Array(4)
+            .fill(0)
+            .map((card, index) => (
+              <CardEmpty
+                isPlaceholder={true}
+                key={index}
+                css={{ marginRight: "30px", pointerEvents: 'none' }}
+              ></CardEmpty>
+            ))}
         </div>
       )}
 
