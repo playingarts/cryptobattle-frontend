@@ -63,6 +63,8 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
       return;
     }
 
+    console.log(NFTCards)
+
     const filteredCards = NFTCards.filter((card) => card.onSale);
 
     const topCard = NFTCards.reduce((prev: CardType, current: CardType) =>

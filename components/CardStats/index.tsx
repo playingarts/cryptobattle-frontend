@@ -17,21 +17,22 @@ const CardStats: FC<CardStats> = ({ color, xp, power, scoring, ...props }) => {
       {...props}
       css={() => ({
         minWidth: 120,
+        fontSize: 12,
         maxWidth: 120,
         color: color === 'light' ? '#fff' : '#000'
       })}
     >
     <Line />
-      <Text variant="body" css={{ opacity: 0.9, margin: 0, display: 'flex', justifyContent: 'space-between'}}>
+      <Text variant="body" css={{ fontSize: 14, opacity: 0.9, margin: 0, display: 'flex', justifyContent: 'space-between'}}>
         <span>XP</span><span>{xp}</span>
       </Text>
       <Line />
-      <Text variant="body" css={{ opacity: 0.9, margin: 0, display: 'flex', justifyContent: 'space-between' }}>
-        <span>Power</span>{power}
+      <Text variant="body" css={{fontSize: 14,  opacity: 0.9, margin: 0, display: 'flex', justifyContent: 'space-between' }}>
+        <span>Power</span>{power} / 10
       </Text>
       <Line />
-      <Text variant="body" css={{ opacity: 0.9, margin: 0, display: 'flex', justifyContent: 'space-between' }}>
-        <span>Scoring</span>{scoring}
+      <Text variant="body" css={{ fontSize: 14, opacity: 0.9, margin: 0, display: 'flex', justifyContent: 'space-between' }}>
+        <span>Scoring</span>{scoring} / 10
       </Text>
       <Line />
     </div>

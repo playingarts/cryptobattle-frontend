@@ -13,7 +13,7 @@ interface Props extends HTMLAttributes<HTMLElement> {
   isNftChoose?: boolean;
 }
 
-const Card: FC<Props> = ({
+const CardEmpty: FC<Props> = ({
   isStatic,
   size,
   selectedCard,
@@ -30,17 +30,19 @@ const Card: FC<Props> = ({
   return (
     <div
       {...props}
-      className="dropzone"
       css={(theme) => ({
         "&:hover": {
           color: "rgba(10, 10, 10, 0.7)",
         },
+        transform: "scale(0.9,0.9)",
+        transformOrigin: "0 0",
         transition: theme.transitions.fast("color"),
         width: theme.spacing(width),
         textAlign: "center",
         color: theme.colors.text_subtitle_dark,
         fontWeight: 500,
         fontsize: 18,
+        cursor: "pointer",
         lineheight: 21,
       })}
     onMouseEnter={() => setHover(true)}
@@ -54,22 +56,11 @@ const Card: FC<Props> = ({
               position: "relative",
               height: theme.spacing(height),
               borderRadius: theme.spacing(1.5),
-              border: isPlaceholder ? "0" : "3px dashed #111",
-              background: isPlaceholder ? "#111" : "transparent",
+              background: 'rgba(255, 255, 255, 0.05)',
               transition: 'all 400ms',
-              "&:hover": {
-              border: isPlaceholder ? "0" : "3px dashed #222",
-                ".plus-icon": {
-                  color: '#7B61FF'
-                }
-              }
+    
             },
-            hovered &&
-              !interactive &&
-              !isStatic && {
-                transform: `translate(0, -${theme.spacing(0)}px)`,
-                boxShadow: "0 20px 10px rgba(0, 0, 0, 0.25)",
-              },
+
           ]}
         >
           <div
@@ -77,7 +68,6 @@ const Card: FC<Props> = ({
               position: "absolute",
               opacity: 1,
               transition: theme.transitions.slow("opacity"),
-              zIndex: hovered ? -1 : 1,
               display: "flex",
               justifyContent: "center",
               height: "100%",
@@ -85,14 +75,14 @@ const Card: FC<Props> = ({
               alignItems: "center",
             }}
           >
-            {(!isPlaceholder && hovered && selectedCard) || isNftChoose &&  (
+            { isNftChoose &&  (
               <div
               className='plus-icon'
                 css={{
                   width: "70px",
                   height: "70px",
-                  background: "#181818",
                   display: "flex",
+                  background: '#181818',
                   justifyContent: "center",
                   alignItems: "center",
                   borderRadius: "100px",
@@ -100,13 +90,14 @@ const Card: FC<Props> = ({
                   opacity: 0.6,
                   transition: "all 400ms",
                   color: "#8B8C8F",
+
                   "&:hover": {
                     color: "#7B61FF",
                     opacity: 1,
                   },
                 }}
               >
-                {hovered || isNftChoose &&
+        
                 <svg
                   width="31"
                   height="31"
@@ -132,7 +123,7 @@ const Card: FC<Props> = ({
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
-                </svg>   }
+                </svg>   
               </div>
             )}
           </div>
@@ -142,4 +133,4 @@ const Card: FC<Props> = ({
   );
 };
 
-export default Card;
+export default CardEmpty;

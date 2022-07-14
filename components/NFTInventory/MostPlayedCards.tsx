@@ -21,11 +21,12 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   topCards: Array<CardType>;
   addCard?: any,
   color: "light" | "dark"
+  buttonSlot: any;
 }
 
 
 
-const MostPlayedCards: FC<Props> = ({color, topCards, addCard, ...props }) => {
+const MostPlayedCards: FC<Props> = ({color, topCards, buttonSlot, addCard, ...props }) => {
 
   const handleClick = (card: CardType) => addCard && addCard(card)
   return (
@@ -33,7 +34,7 @@ const MostPlayedCards: FC<Props> = ({color, topCards, addCard, ...props }) => {
       {topCards.map((card, index) => (
         <div
           onClick={handleClick(card)}
-          style={{ width: "50%", display: "flex", alignItems: "center" }}
+          style={{ width: "50%", display: "flex", alignItems: "center", maxWidth: 400 }}
           key={index}
         >
           <Card
@@ -42,7 +43,10 @@ const MostPlayedCards: FC<Props> = ({color, topCards, addCard, ...props }) => {
             card={{ img: card.imageUrl }}
           ></Card>
 
-          <CardStats color={color} xp={card.xp} power={card.power} scoring={card.scoring} />
+          
+          <div><CardStats color={color} xp={card.xp} power={card.power} scoring={card.scoring} />
+            {buttonSlot}
+          </div>
 
         </div>
       ))}
