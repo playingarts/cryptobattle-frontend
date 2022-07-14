@@ -101,8 +101,8 @@ const NFTChoose: FC<Props> = () => {
     getUserNftCards()
       .then((data: any) => {
         setLoading(false);
- 
-        const computedData = data.cards.map((card:any) => {
+
+        const computedData = data.cards.map((card: any) => {
           const foundCard = getCard(card.suit, card.value, card);
           return { ...foundCard, ...card };
         });
@@ -152,7 +152,10 @@ const NFTChoose: FC<Props> = () => {
   const trigger = () => {
     return (
       <div css={{ display: "flex" }}>
-        <div onClick={setFirstCardActive} css={{ display: "flex", marginRight: 20}}>
+        <div
+          onClick={setFirstCardActive}
+          css={{ display: "flex", marginRight: 20 }}
+        >
           {!firstCard ? (
             <div css={{ display: "flex" }}>
               <CardEmpty isNftChoose={true} />
@@ -208,9 +211,9 @@ const NFTChoose: FC<Props> = () => {
                 animated={false}
                 card={{ img: firstCard.imageUrl }}
               ></Card>
-              <div css={{ marginTop: 40}}>
+              <div css={{ marginTop: 40 }}>
                 <CardStats
-                css={{minWidth: 130}}
+                  css={{ minWidth: 130 }}
                   color="light"
                   xp={firstCard && firstCard.xp}
                   power={firstCard && firstCard.power}
@@ -292,7 +295,7 @@ const NFTChoose: FC<Props> = () => {
               ></Card>
               <div css={{ marginTop: 40 }}>
                 <CardStats
-                css={{minWidth: 130}}
+                  css={{ minWidth: 130 }}
                   color="light"
                   xp={secondCard && secondCard.xp}
                   power={secondCard && secondCard.power}
@@ -367,7 +370,9 @@ const NFTChoose: FC<Props> = () => {
             />
           )}
 
-          <Text variant="h6">Most Played</Text>
+          {topCards && topCards.length > 0 && (
+            <Text variant="h6">Most Played</Text>
+          )}
 
           <div
             css={{
@@ -376,6 +381,7 @@ const NFTChoose: FC<Props> = () => {
             }}
           >
             {topCards &&
+              topCards.length > 0 &&
               topCards.map((card, index) => (
                 <div
                   onClick={
@@ -398,7 +404,13 @@ const NFTChoose: FC<Props> = () => {
                   key={index}
                 >
                   <DialogClose asChild>
-                    <div css={{ display: "flex", justifyContent: "start", maxWidth: 180 }}>
+                    <div
+                      css={{
+                        display: "flex",
+                        justifyContent: "start",
+                        maxWidth: 180,
+                      }}
+                    >
                       <div>
                         <Card
                           css={{
@@ -485,7 +497,7 @@ const NFTChoose: FC<Props> = () => {
                             flexDirection: "column",
                             alignItems: "flex-start",
                             maxWidth: 190,
-                            marginRight: 12
+                            marginRight: 12,
                           }}
                         >
                           <Card
