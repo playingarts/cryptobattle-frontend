@@ -50,7 +50,7 @@ const LobbyUrl: FC<LobbyUrl> = ({ roomid }) => {
             paddingLeft: theme.spacing(2),
             height: theme.spacing(8),
             flexGrow: 1,
-            fontSize: 20,
+            fontSize: 19.5,
             borderRadius: "10px",
             width: "100%",
             backgroundColor: "#fff",

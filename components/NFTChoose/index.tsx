@@ -63,20 +63,6 @@ const NFTChoose: FC<Props> = () => {
     [setFirstCard, setSecondCard, activeCard]
   );
 
-  const clearCard = useCallback(
-    (cardId: string) => () => {
-      console.log(firstCard?.id === cardId);
-      if (firstCard?.id === cardId) {
-        setFirstCard(null);
-      }
-
-      if (secondCard?.id === cardId) {
-        setSecondCard(null);
-      }
-    },
-    [setFirstCard, setSecondCard, firstCard, secondCard]
-  );
-
   useEffect(() => {
     if (!firstCard && !secondCard) {
       return;
@@ -113,161 +99,13 @@ const NFTChoose: FC<Props> = () => {
     setLoading(true);
 
     getUserNftCards()
-      .then((data2: any) => {
+      .then((data: any) => {
         setLoading(false);
-        const data = [
-          {
-            id: "7074",
-            name: "5 of Spades",
-            onSale: false,
-            power: 4,
-            scoring: 4,
-            xp: 0,
-            suit: "spades",
-            value: "5",
-            imageUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/5-s-gd8kN968.jpg",
-            videoUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/5-s-gd8kN968.mp4",
-            powerLevel: 1,
-            scoringLevel: 1,
-          },
-          {
-            id: "45",
-            name: "7 of Hearts",
-            onSale: false,
-            power: 4,
-            scoring: 24,
-            xp: 2,
-            suit: "hearts",
-            value: "7",
-            imageUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-            videoUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.mp4",
-            powerLevel: 1,
-            scoringLevel: 2,
-          },
-          {
-            id: "43",
-            name: "9 of Hearts",
-            onSale: false,
-            power: 4,
-            scoring: 24,
-            xp: 10,
-            suit: "hearts",
-            value: "7",
-            imageUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-            videoUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.mp4",
-            powerLevel: 1,
-            scoringLevel: 2,
-          },
-          {
-            id: "41",
-            name: "7 of Hearts",
-            onSale: false,
-            power: 4,
-            scoring: 24,
-            xp: 22,
-            suit: "hearts",
-            value: "7",
-            imageUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-            videoUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.mp4",
-            powerLevel: 1,
-            scoringLevel: 2,
-          },
-          {
-            id: "49",
-            name: "7 of Hearts",
-            onSale: false,
-            power: 4,
-            scoring: 24,
-            xp: 0,
-            suit: "hearts",
-            value: "7",
-            imageUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-            videoUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.mp4",
-            powerLevel: 1,
-            scoringLevel: 2,
-          },
-          {
-            id: "3333",
-            name: "7 of Hearts",
-            onSale: false,
-            power: 4,
-            scoring: 24,
-            xp: 0,
-            suit: "hearts",
-            value: "7",
-            imageUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-            videoUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.mp4",
-            powerLevel: 1,
-            scoringLevel: 2,
-          },
-          {
-            id: "33233",
-            name: "7 of Hearts",
-            onSale: false,
-            power: 4,
-            scoring: 24,
-            xp: 0,
-            suit: "hearts",
-            value: "7",
-            imageUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-            videoUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.mp4",
-            powerLevel: 1,
-            scoringLevel: 2,
-          },
-          {
-            id: "32133",
-            name: "7 of Hearts",
-            onSale: false,
-            power: 4,
-            scoring: 24,
-            xp: 0,
-            suit: "hearts",
-            value: "7",
-            imageUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-            videoUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.mp4",
-            powerLevel: 1,
-            scoringLevel: 2,
-          },
-          {
-            id: "336633",
-            name: "7 of Hearts",
-            onSale: false,
-            power: 4,
-            scoring: 24,
-            xp: 0,
-            suit: "hearts",
-            value: "7",
-            imageUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.jpg",
-            videoUrl:
-              "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.mp4",
-            powerLevel: 1,
-            scoringLevel: 2,
-          },
-        ];
-
-        const computedData = data.map((card) => {
+ 
+        const computedData = data.cards.map((card:any) => {
           const foundCard = getCard(card.suit, card.value, card);
           return { ...foundCard, ...card };
         });
-
-        console.log("computedData", computedData);
 
         setNFTCards(computedData);
       })
@@ -534,7 +372,6 @@ const NFTChoose: FC<Props> = () => {
           <div
             css={{
               display: "flex",
-              justifyContent: "space-between",
               flexWrap: "wrap",
             }}
           >

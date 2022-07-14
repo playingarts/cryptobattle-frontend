@@ -18,8 +18,9 @@ interface Props extends HTMLAttributes<HTMLElement> {
   size?: "big";
   interactive?: boolean;
   isGameBoard?: boolean;
+  noShadow?: boolean;
   index?: number;
-selectedCard?: any;
+  selectedCard?: any;
 }
 
 const Card: FC<Props> = ({
@@ -28,6 +29,7 @@ const Card: FC<Props> = ({
   isStatic,
   isGameBoard,
   size,
+  noShadow,
   interactive,
   selectedCard,
   ...props
@@ -58,84 +60,86 @@ const Card: FC<Props> = ({
         fontsize: 18,
         lineheight: 21,
         position: "relative",
-        background: hovered && isGameBoard ? "#fff" : 'transparent',
+        background: hovered && isGameBoard ? "#fff" : "transparent",
       })}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-     {isGameBoard && selectedCard&& <div
-        css={{
-          width: "10",
-          background: hovered ? "rgba(10, 10, 10, 0.7)" : "#181818",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          outline: "7px solid rgba(10, 10, 10, 0.7)",
-          transition: "all 400ms",
-          cursor: "pointer",
-          opacity: hovered ? "1" : 0,
-          position: "absolute",
-          top: 0,
-          left: 0,
-          bottom: 0,
-          right: 0,
-          zIndex: 99,
-          "&:hover": {
-            opacity: 1,
-          },
-        }}
-      >
+      {isGameBoard && selectedCard && (
         <div
           css={{
-            width: "70px",
-            height: "70px",
-            background: hovered ? "#fff" : "#181818",
+            width: "10",
+            background: hovered ? "rgba(10, 10, 10, 0.7)" : "#181818",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            borderRadius: "100px",
+            outline: "7px solid rgba(10, 10, 10, 0.7)",
             transition: "all 400ms",
             cursor: "pointer",
             opacity: hovered ? "1" : 0,
             position: "absolute",
-            top: "50%",
-            left: "50%",
-            marginLeft: "-35px",
-            marginTop: "-35px",
-            zIndex: 55,
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+            zIndex: 99,
             "&:hover": {
               opacity: 1,
             },
           }}
         >
-          <svg
-            width="31"
-            height="31"
-            viewBox="0 0 31 31"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
+          <div
+            css={{
+              width: "70px",
+              height: "70px",
+              background: hovered ? "#fff" : "#181818",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: "100px",
+              transition: "all 400ms",
+              cursor: "pointer",
+              opacity: hovered ? "1" : 0,
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              marginLeft: "-35px",
+              marginTop: "-35px",
+              zIndex: 55,
+              "&:hover": {
+                opacity: 1,
+              },
+            }}
           >
-            <line
-              x1="16"
-              y1="1.5"
-              x2="16"
-              y2="29.5"
-              stroke="#7B61FF"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            <line
-              x1="29.5"
-              y1="16"
-              x2="1.5"
-              y2="16"
-              stroke="#7B61FF"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+            <svg
+              width="31"
+              height="31"
+              viewBox="0 0 31 31"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <line
+                x1="16"
+                y1="1.5"
+                x2="16"
+                y2="29.5"
+                stroke="#7B61FF"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <line
+                x1="29.5"
+                y1="16"
+                x2="1.5"
+                y2="16"
+                stroke="#7B61FF"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </div>
         </div>
-      </div> }
+      )}
 
       <div
         {...(interactive && {
@@ -160,7 +164,7 @@ const Card: FC<Props> = ({
             {
               transition: theme.transitions.fast(["transform", "box-shadow"]),
               overflow: "hidden",
-              boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.25)",
+              boxShadow: noShadow ? 'none' : "0px 2px 10px rgba(0, 0, 0, 0.25)",
               position: "relative",
               height: theme.spacing(height),
               borderRadius: theme.spacing(1.5),
