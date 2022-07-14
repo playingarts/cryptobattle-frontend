@@ -62,7 +62,7 @@ const Player = forwardRef(
               // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
               strokeLinecap: "butt",
               // Customize transition animation
-              transition: "stroke-dashoffset " + totalSeconds + 'ms',
+              transition: "stroke-dashoffset linear " +  totalSeconds + 'ms',
               // Rotate the path
               transform: "rotate(0.25turn)",
               transformOrigin: "center center",
