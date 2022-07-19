@@ -216,7 +216,7 @@ const NFTChoose: FC<Props> = () => {
                   css={{ minWidth: 130 }}
                   color="light"
                   xp={firstCard && firstCard.xp}
-                  power={firstCard && firstCard.power}
+                  power={firstCard && firstCard.powerLevel}
                   scoring={firstCard && firstCard.scoringLevel}
                 />
                 <div
@@ -298,7 +298,7 @@ const NFTChoose: FC<Props> = () => {
                   css={{ minWidth: 130 }}
                   color="light"
                   xp={secondCard && secondCard.xp}
-                  power={secondCard && secondCard.power}
+                  power={secondCard && secondCard.powerLevel}
                   scoring={secondCard && secondCard.scoringLevel}
                 />
                 <div
@@ -438,7 +438,7 @@ const NFTChoose: FC<Props> = () => {
                           css={{ marginBottom: 20 }}
                           color={"dark"}
                           xp={card.xp}
-                          power={card.power}
+                          power={card.powerLevel}
                           scoring={card.scoringLevel}
                         />
 

@@ -237,7 +237,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                 <CardStats
                   color={"light"}
                   xp={card.xp}
-                  power={card.power}
+                  power={card.powerLevel}
                   scoring={card.scoringLevel}
                 />
               </div>

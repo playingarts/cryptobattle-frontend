@@ -11,6 +11,8 @@ interface CardType {
   onSale: boolean;
   power: number;
   scoring: number;
+  powerLevel: number;
+  scoringLevel: number;
   xp: number;
   suit: string;
   value: string;
@@ -44,7 +46,7 @@ const MostPlayedCards: FC<Props> = ({color, topCards, buttonSlot, addCard, ...pr
           ></Card>
 
           
-          <div><CardStats color={color} xp={card.xp} power={card.power} scoring={card.scoring} />
+          <div><CardStats color={color} xp={card.xp} power={card.powerLevel} scoring={card.scoringLevel} />
             {buttonSlot}
           </div>
 
