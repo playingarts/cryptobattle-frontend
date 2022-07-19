@@ -28,6 +28,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
     name: string;
     onSale: boolean;
     power: number;
+    powerLevel: number;
     scoring: number;
     scoringLevel: number;
     xp: number;
