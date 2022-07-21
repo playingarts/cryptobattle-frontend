@@ -36,9 +36,6 @@ const PlayerQueue: FC<PlayerQueue> = ({
       return;
     }
 
-      console.log('indexOf',  playersWithPoints.indexOf(currentPlayerWithPoints) )
-      console.log('indexOf',  currentPlayerWithPoints )
-
       setOrder(shiftArray(playersWithPoints, currentPlayerWithPoints));
     
 
@@ -48,7 +45,6 @@ const PlayerQueue: FC<PlayerQueue> = ({
 
 
   useEffect(() => {
- console.log('setting players', order)
 
     // if (playersWithPoints.length === 0) {
     //   return;

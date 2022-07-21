@@ -74,6 +74,20 @@ body {
   animation-duration: 3s;
   transform-origin: center center;
 } */
+.rotate-spinner  {
+  
+  animation: rotate 8s linear 0s infinite backwards;
+
+  }
+
+@-webkit-keyframes rotate {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to { 
+    -webkit-transform: rotate(360deg);
+  }
+}
 
 
 

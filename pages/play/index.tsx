@@ -19,9 +19,14 @@ const Play: NextPage = () => {
 
   const [myCards, setMyCards] = useState<Array<any>>([]);
 
-  const { gameState } = useGame();
+  const { gameState, isBackendReady } = useGame();
   useEffect(() => {
 
+    if (!isBackendReady) {
+      return
+    }
+
+    setTimeout(() => {
       WSProvider.send(
         JSON.stringify({
           event: "game-info",
@@ -35,7 +40,10 @@ const Play: NextPage = () => {
         })
       );
 
-  }, []);
+    }, 0);
+
+
+  }, [isBackendReady]);
 
 
   useEffect(() => {

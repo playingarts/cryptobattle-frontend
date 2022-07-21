@@ -113,7 +113,8 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
 
         {player.state === "waiting" && (
           <div>
-            <svg
+            <svg 
+            className="rotate-spinner"
               width="24"
               height="24"
               viewBox="0 0 24 24"

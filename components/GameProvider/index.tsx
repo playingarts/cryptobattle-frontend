@@ -16,6 +16,9 @@ import Refresh from "../Icons/Refresh";
 import { useWS } from "../../components/WsProvider/index";
 import { useAuth } from "../../components/AuthProvider";
 import { api } from "../../api";
+
+
+
 type GameProviderProps = { children: ReactNode };
 
 // eslint-disable
@@ -24,6 +27,7 @@ export type IGameProviderContext = {
   gameState: any;
   players: any;
   playersGame: any;
+  isBackendReady: boolean;
   roomId: any;
   userInfo: any;
   roomInfo: any;
@@ -62,6 +66,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
 
   const [userInfo, setUserInfo] = useState<any>([]);
+
+  const [isBackendReady, setIsBackendReady] = useState(false);
+
   const [roomInfo, setRoomInfo] = useState<any>([]);
   const [selectedCard, setSelectedCard] = useState<any>(null);
 
@@ -86,14 +93,14 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     return () => setPlayingAgain(false)
   }, []);
 
-  const WSProvider = useWS();
+  const x = useWS();
   const { user } = useAuth();
 
 
 
   const playAgain = () => {
     setPlayingAgain(true)
-         WSProvider.send(
+         x.send(
         JSON.stringify({
           event: "next-game",
           data: {
@@ -156,19 +163,19 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   }, [roomId]);
 
   useEffect(() => {
-    WSProvider.onerror = function (event: any) {
+    x.onerror = function (event: any) {
       console.log("WebSocket error: " + event.code);
       console.log(event);
     };
 
-    WSProvider.onclose = function (e) {
+    x.onclose = function (e) {
       console.log("on close: " + e.code);
     };
 
-    WSProvider.onmessage = function ({ data }) {
+    x.onmessage = function ({ data }) {
       const event = JSON.parse(data);
       console.log("Game Provider WS event:", event);
-      // WSProvider.send(
+      // x.send(
       //   JSON.stringify({
       //     event: "room-info",
       //     data: {},
@@ -197,6 +204,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       if (event.event === "user-info") {
         setUserInfo(event.data);
+        setIsBackendReady(true)
         // if (event.data.inRoomId) {
         //   setRoomId(event.data.inRoomId);
         // }
@@ -205,7 +213,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       if (event.event === "create-room") {
         console.log("create-room happens");
         setRoomId(event.data.roomId);
-        WSProvider.send(
+        x.send(
           JSON.stringify({
             event: "room-info",
             data: {},
@@ -268,7 +276,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         setPlayers(event.data.roomUsers);
       }
       if (event.event === "join-room") {
-        WSProvider.send(
+        x.send(
           JSON.stringify({
             event: "room-info",
             data: {},
@@ -372,9 +380,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     };
   }, []);
 
-  useEffect(() => {
-    setPlayers([{ ...user, state: "ready" }]);
-  }, [user]);
+  // useEffect(() => {
+  //   setPlayers([{ ...user, state: "ready" }]);
+  // }, [user]);
 
   useEffect(() => {
     if (!results) {
@@ -431,7 +439,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       setPlayers,
       timer,
       totalSeconds,
-      results
+      results,
+      isBackendReady
     }),
     [
       gameState,
@@ -446,7 +455,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       setPlayers,
       timer,
       totalSeconds,
-      results
+      results,
+      isBackendReady
     ]
   );
 

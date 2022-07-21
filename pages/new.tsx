@@ -39,8 +39,7 @@ const NewGame: NextPage = () => {
 
 
   useEffect(() => {
-    console.log(WSProvider.readyState);
-    if (WSProvider.readyState === 1) {
+
       WSProvider.send(
         JSON.stringify({
           event: "create-room",
@@ -50,8 +49,9 @@ const NewGame: NextPage = () => {
           },
         })
       );
-    }
-  }, [WSProvider.readyState]);
+    
+  }, []);
+
   return (
     <ComposedGlobalLayout headerTitle="NEW GAME" headerMiddle={headerMiddle}>
       <Layout

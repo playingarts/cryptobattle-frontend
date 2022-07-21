@@ -17,7 +17,7 @@ const GameLayout: FC<
       container.current?.scrollTo(
               // eslint-disable-next-line
       // @ts-ignore: Unreachable code error
-        container.current.scrollLeftMax / 2,
+         ((container.current.scrollWidth - container.current.clientWidth)   / 2) ,
               // eslint-disable-next-line
       // @ts-ignore: Unreachable code error
         container.current.scrollHeight / 2   - container.current.clientHeight / 2

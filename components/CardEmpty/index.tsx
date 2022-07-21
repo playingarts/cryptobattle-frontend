@@ -52,11 +52,11 @@ const Card: FC<Props> = ({
               position: "relative",
               height: theme.spacing(height),
               borderRadius: theme.spacing(1.5),
-              border: isPlaceholder ? "0" : "3px dashed #111",
+              border: isPlaceholder ? "0" : "3px dashed #333",
               background: isPlaceholder ? "#111" : "transparent",
               transition: 'all 400ms',
               "&:hover": {
-              border: isPlaceholder ? "0" : "3px dashed #222",
+              border: isPlaceholder ? "0" : "3px dashed #444",
                 ".plus-icon": {
                   color: '#7B61FF'
                 }
@@ -83,56 +83,7 @@ const Card: FC<Props> = ({
               alignItems: "center",
             }}
           >
-            {!isPlaceholder && hovered && selectedCard &&  (
-              <div
-              className='plus-icon'
-                css={{
-                  width: "70px",
-                  height: "70px",
-                  background: "#181818",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  borderRadius: "100px",
-                  cursor: "pointer",
-                  opacity: 0.6,
-                  transition: "all 400ms",
-                  color: "#8B8C8F",
-                  "&:hover": {
-                    color: "#7B61FF",
-                    opacity: 1,
-                  },
-                }}
-              >
-                {hovered &&
-                <svg
-                  width="31"
-                  height="31"
-                  viewBox="0 0 31 31"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <line
-                    x1="16"
-                    y1="1.5"
-                    x2="16"
-                    y2="29.5"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  <line
-                    x1="29.5"
-                    y1="16"
-                    x2="1.5"
-                    y2="16"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>   }
-              </div>
-            )}
+
           </div>
         </div>
       </div>

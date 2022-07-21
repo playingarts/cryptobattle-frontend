@@ -26,7 +26,7 @@ const JoinGame: NextPage = () => {
   const WSProvider = useWS();
   const router = useRouter();
   const { roomid, join} = router.query;
-  const { players, setPlayers, roomInfo } = useGame();
+  const { players, setPlayers, roomInfo, isBackendReady} = useGame();
   const { user } = useAuth();
 
   const [isReady, setReady] = useState(false);
@@ -179,44 +179,44 @@ const JoinGame: NextPage = () => {
   }, [roomInfo, user]);
 
   useEffect(() => {
-    if (!router.isReady) {
-      return;
-    }
-    if (!players) {
-      return
-    }
-    if (players.find((player: any) => player.userId === user.userId)) {
-      return;
+    // if (!router.isReady) {
+    //   return;
+    // }
+    // if (!players) {
+    //   return
+    // }
+    // if (players.find((player: any) => player.userId === user.userId)) {
+    //   return;
+    // }
+
+    console.log("isBackendReady", isBackendReady)
+    if (!isBackendReady) {
+      return 
     }
 
-    WSProvider.send(
-      JSON.stringify({
-        event: "room-info",
-        data: {},
-      })
-    );
-  }, [players, router.isReady]);
-
-  useEffect(() => {
-   const updateRoom =  setInterval(() => {
+    setTimeout(() => {
       WSProvider.send(
         JSON.stringify({
           event: "room-info",
           data: {},
         })
       );
-      console.log("Interval: Room-info")
-    }, 3000)
-    return () => clearInterval(updateRoom)
-  }, [])
+    }, 0);
 
+  }, [isBackendReady]);
 
   // useEffect(() => {
-  // console.log('[roomid]', players)
-  // return () => console.log('leaving [rromid]')
-
-  //  }, [players])
-
+  //  const updateRoom =  setInterval(() => {
+  //     WSProvider.send(
+  //       JSON.stringify({
+  //         event: "room-info",
+  //         data: {},
+  //       })
+  //     );
+  //     console.log("Interval: Room-info")
+  //   }, 3000)
+  //   return () => clearInterval(updateRoom)
+  // }, [])
 
   useEffect(() => {
     if (!router.isReady) {

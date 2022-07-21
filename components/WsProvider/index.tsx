@@ -3,6 +3,7 @@ import {
   useContext,
   useMemo,
   ReactNode,
+
 } from "react";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
@@ -12,18 +13,16 @@ const WSStateContext = createContext<any | null>(null);
 
 function WSProvider({ children }: WSProviderProps): JSX.Element {
   const accessToken = localStorage.getItem("accessToken");
-  const wsInstance = useMemo(
-    () => {
-     return typeof window != "undefined"
-      ? new ReconnectingWebSocket(
-          `wss://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/socket?accesstoken=${accessToken}`
-        )
-      : null
+  const wsInstance = useMemo(() => {
+    if (typeof window != "undefined") {
+      return new ReconnectingWebSocket(
+        `wss://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/socket?accesstoken=${accessToken}`
+      );
+    }
+    return null;
+  }, []);
 
-    },
- 
-    [accessToken]
-  );
+
 
 
   return (

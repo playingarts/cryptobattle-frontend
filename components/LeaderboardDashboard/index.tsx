@@ -20,19 +20,6 @@ const getLeaderboard = () => {
 
   return api.get(`api/rest/leaderboard`, params)
 
-
-
-  // return axios.get(
-  //   "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/rest/leaderboard",
-
-  //   {
-  //     params,
-  //     headers: {
-  //       accesstoken: localStorage.getItem("accessToken"),
-  //       "content-type": "application/json",
-  //     },
-  //   }
-  // );
 };
 
 const LeaderboardDashboard: FC<Props> = ({ ...props }) => {
