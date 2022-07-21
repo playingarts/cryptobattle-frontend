@@ -15,7 +15,6 @@ interface Props extends HTMLAttributes<HTMLElement> {
 const Card: FC<Props> = ({
   isStatic,
   size,
-  selectedCard,
   isPlaceholder = false,
   interactive,
   ...props
