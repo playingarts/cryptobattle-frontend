@@ -1,17 +1,17 @@
 import { NextPage } from "next";
 import Layout from "../components/Layout";
-import Text from "../components/Text";
+// import Text from "../components/Text";
 import Button from "../components/Button";
-import Link from "../components/Link";
+// import Link from "../components/Link";
 import GameRules from "../components/GameRules/";
 
 // import Stats from "../components/Stats";
 // import LeaderboardDashboard from "../components/LeaderboardDashboard";
 import NFTInventory from "../components/NFTInventory";
-import PromoSection from "../components/PromoSection";
+// import PromoSection from "../components/PromoSection";
 // import Grid from "../components/Grid/";
-import Twitter from "../components/Icons/Twitter";
-import { formatUsername } from "../utils/helpers";
+// import Twitter from "../components/Icons/Twitter";
+// import { formatUsername } from "../utils/helpers";
 
 import { useAuth } from "../components/AuthProvider";
 import NavProfile from "../components/NavProfile";

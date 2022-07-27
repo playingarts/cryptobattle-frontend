@@ -31,7 +31,6 @@ const Card: FC<Props> = ({
   size,
   noShadow,
   interactive,
-  selectedCard,
   ...props
 }) => {
   const [hovered, setHover] = useState(false);

@@ -5,7 +5,7 @@ interface UserAvatar extends Props {
   profilePictureUrl: string;
 }
 
-const UserAvatar: FC<UserAvatar> = ({ profilePictureUrl, color, ...props }) => {
+const UserAvatar: FC<UserAvatar> = ({ profilePictureUrl, ...props }) => {
   if (
     profilePictureUrl &&
     profilePictureUrl !==

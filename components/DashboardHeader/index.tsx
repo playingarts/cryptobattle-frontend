@@ -6,8 +6,6 @@ import Line from "../Line";
 import Text from "../Text";
 import StatBlock from "../../components/StatBlock";
 
-import { formatUsername } from "../../utils/helpers";
-
 import { api } from "../../api";
 import { useAuth } from "../AuthProvider";
 // import Progress from '../../components/Progress';

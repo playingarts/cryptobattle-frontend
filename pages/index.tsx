@@ -4,13 +4,13 @@ import Grid from "../components/Grid";
 import Text from "../components/Text";
 import Link from "../components/Link";
 import Button from "../components/Button";
-import PromoSection from "../components/PromoSection";
+// import PromoSection from "../components/PromoSection";
 
 import Twitter from "../components/Icons/Twitter";
 
 import Line from "../components/Line";
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
-import Arrowed from "../components/Arrowed";
+// import Arrowed from "../components/Arrowed";
 import { useAuth } from "../components/AuthProvider";
 import MetamaskLogin from "../components/MetamaskLogin/";
 import GameRules from "../components/GameRules";
