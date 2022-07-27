@@ -1,11 +1,10 @@
 import { NextPage } from "next";
 import Layout from "../../components/Layout";
-import Grid from "../../components/Grid";
 import Text from "../../components/Text";
+import Line from "../../components/Line";
 import Link from "../../components/Link";
 import Button from "../../components/Button";
 import Twitter from "../../components/Icons/Twitter";
-
 import ComposedGlobalLayout from "../../components/_composed/GlobalLayout";
 import { useAuth } from "../../components/AuthProvider";
 import MetamaskLogin from "../../components/MetamaskLogin/";
@@ -36,23 +35,52 @@ const Home: NextPage = () => {
           paddingBottom: theme.spacing(6.5),
           backgroundColor: "#0A0A0A",
           backgroundSize: "cover",
+          position: "relative",
         })}
       >
-        <Grid>
-          <div css={{ gridColumn: "2 / span 10" }}>
-            <Text component="h1" css={{ margin: "1px", fontSize: "60px" }}>
+        <div css={{position: 'relative'}}>
+          <img
+            css={{ position: "absolute", left: 100, zIndex: 2 }}
+            src="/img/card.png"
+          />
+          <img
+            css={{ position: "absolute", left: 750, zIndex: 2 }}
+            src="/img/card2.png"
+          />
+          <div
+            css={{
+              background: "#fff",
+              color: "#333",
+              borderRadius: 20,
+              textAlign: "center",
+              maxWidth: 600,
+              margin: "0 auto",
+              padding: "80px 60px",
+              zIndex: 99,
+              position: "relative",
+            }}
+          >
+            <Text component="h1" css={{ margin: "1px", fontSize: "35px" }}>
               Hey there!
             </Text>
 
-            <Text variant="body3">
-              USERNAME invited you to play a free and fun card game featuring
-              cards from Crypto Edition NFT deck!
+            <Text variant="body3" css={{ fontSize: 22, lineHeight: "33px" }}>
+              You were invited to play a free and fun card game featuring cards
+              from Crypto Edition NFT deck!
             </Text>
 
             {!loggedIn && (
               <div>
-                <Text variant="h6">ready to play? log in with: </Text>
-                <div style={{ display: "flex", justifyContent: "start" }}>
+                <Line></Line>
+                <Text
+                  variant="h6"
+                  css={{ textAlign: "center", color: "rgba(0, 0, 0, 0.3)" }}
+                >
+                  to accept, log in with:{" "}
+                </Text>
+                <div
+                  style={{ display: "flex", justifyContent: "space-around" }}
+                >
                   <Button
                     component={Link}
                     href="https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter"
@@ -71,7 +99,7 @@ const Home: NextPage = () => {
               </div>
             )}
           </div>
-        </Grid>
+        </div>
       </Layout>
     </ComposedGlobalLayout>
   );
