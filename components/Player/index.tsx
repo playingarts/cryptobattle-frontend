@@ -9,8 +9,8 @@ import {
 import { api } from "../../api";
 import { useWS } from "../../components/WsProvider/index";
 import { formatUsername } from "../../utils/helpers";
-
 export type Props = HTMLAttributes<HTMLDivElement>;
+import { useAuth } from "../AuthProvider";
 
 import Text from "../Text";
 import UserAvatar from "../../components/UserAvatar";
@@ -29,13 +29,16 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
     username: "",
   });
 
+
+  const { user } = useAuth();
+
   const WSProvider = useWS();
 
   const [hovered, setHover] = useState(false);
 
   const getUser = (playerId: string) => {
     if (!playerId) {
-      return
+      return;
     }
     return api.get(`/api/rest/user-info/${playerId}`);
   };
@@ -55,7 +58,7 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
   );
 
   useEffect(() => {
-    console.log('player', playerInfo)
+    console.log("player", playerInfo);
     if (!playerInfo.username && player.userId) {
       getUser(player.userId)
         .then((data: any) => {
@@ -75,7 +78,7 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
         profilePictureUrl={playerInfo.profilePictureUrl}
         css={{ border: "solid 5px " + color }}
       />
-
+      z
       <div
         css={{
           borderRadius: "200px",
@@ -92,7 +95,7 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
-        {player.state === "ready" && (
+        {player.state === "ready" && (!hovered || !isAdmin || user.userId === player.userId) && (
           <svg
             width="16"
             height="12"
@@ -107,14 +110,95 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
           </svg>
         )}
 
-        {hovered && isAdmin && (
-          <div onClick={(e) => kickPlayer(e, player.userId)}>x</div>
+        {hovered && isAdmin && user.userId !== player.userId && (
+          <div css={{ position: "relative" }}>
+            <div
+              css={{
+                cursor: "pointer",
+                position: "absolute",
+                right: 0,
+                top: -20,
+                left: -20,
+                bottom: 0,
+                width: 40,
+                height: 40,
+                borderRadius: 5000,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                transition: "all 400ms",
+                "&::before": {
+                  opacity: 0,
+                  content: `"Kick"`,
+                  display: "flex",
+                  background: "#fff",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  transition: "all  400ms",
+                  color: "#404040",
+                  fontFamily: "Aldrich",
+                  position: "absolute",
+                  borderRadius: 20,
+                  fontSize: 14,
+                  zIndex: 9999,
+                  top: -50,
+                  left: "50%",
+                  transform: "translate(-50%, 0)",
+                  padding: "12px 0",
+                  paddingTop: 18,
+                  paddingLeft: 0,
+                  minWidth: 60,
+                  height: 30,
+                  pointerEvents: "none",
+                  textTransform: "uppercase",
+                },
+                "&:hover": {
+                  color: "#7B61FF",
+
+                  "&::before": {
+                    opacity: 1,
+                    pointerEvents: "none",
+                    transform: "translate(-50%, 8px)",
+                  },
+                },
+              }}
+              onClick={(e) => kickPlayer(e, player.userId)}
+            >
+              {" "}
+              <svg
+                width="31"
+                height="31"
+                viewBox="0 0 31 31"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="21.8641"
+                  y="23.9852"
+                  width="21"
+                  height="3"
+                  rx="1.5"
+                  transform="rotate(-135 21.8641 23.9852)"
+                  fill="white"
+                />
+                <rect
+                  x="23.9854"
+                  y="9.13605"
+                  width="21"
+                  height="3"
+                  rx="1.5"
+                  transform="rotate(135 23.9854 9.13605)"
+                  fill="white"
+                />
+              </svg>
+            </div>
+          </div>
         )}
 
-        {player.state === "waiting" && (
+        {player.state === "waiting" && (!hovered || !isAdmin || user.userId === player.userId) && (
           <div>
-            <svg 
-            className="rotate-spinner"
+            <svg
+              className="rotate-spinner"
               width="24"
               height="24"
               viewBox="0 0 24 24"

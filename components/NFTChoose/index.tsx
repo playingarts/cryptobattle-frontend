@@ -18,6 +18,7 @@ import CardStats from "../../components/CardStats";
 import Loader from "../Loader";
 
 import Button from "../Button";
+import Link from "../Link";
 
 const getUserNftCards = () => {
   return api.get(`api/rest/user-nft-cards`);
@@ -126,6 +127,7 @@ const NFTChoose: FC<Props> = () => {
     value: string;
     imageUrl: string;
     artist: string;
+    url: string;
   }
 
   const [cardInventory, setCardInventory] = useState<Array<CardType>>([]);
@@ -151,14 +153,19 @@ const NFTChoose: FC<Props> = () => {
 
   const trigger = () => {
     return (
-      <div css={{ display: "flex" }}>
+      <div
+        css={{
+          display: "flex",
+          pointerEvents: NFTCards.length === 0 ? "none" : "unset",
+        }}
+      >
         <div
           onClick={setFirstCardActive}
           css={{ display: "flex", marginRight: 20 }}
         >
           {!firstCard ? (
             <div css={{ display: "flex" }}>
-              <CardEmpty isNftChoose={true} />
+              <CardEmpty isNftChoose={NFTCards.length !== 0} />
               <svg
                 css={{ marginTop: 70 }}
                 width="140"
@@ -245,7 +252,7 @@ const NFTChoose: FC<Props> = () => {
         <div onClick={setSecondCardActive} css={{ display: "flex" }}>
           {!secondCard ? (
             <div css={{ minWidth: 360, display: "flex" }}>
-              <CardEmpty isNftChoose={true} />
+              <CardEmpty isNftChoose={NFTCards.length !== 0} />
               <svg
                 css={{ marginTop: 70 }}
                 width="140"
@@ -354,163 +361,69 @@ const NFTChoose: FC<Props> = () => {
       )}
 
       {user.isMetamaskConnected && (
-        <Modal
-          trigger={trigger()}
-          description="Share your game link, wait for players to connect and click “Start”!
+        <div>
+          <Modal
+            trigger={trigger()}
+            description="Share your game link, wait for players to connect and click “Start”!
         Choose the NFTs you want to level up (optional)."
-          title="Choose your NFTs"
-        >
-          {loading && (
-            <Loader
-              css={{
-                textAlign: "center",
-                alignSelf: "center",
-                marginLeft: 20,
-              }}
-            />
-          )}
-
-          {topCards && topCards.length > 0 && (
-            <Text variant="h6">Most Played</Text>
-          )}
-
-          <div
-            css={{
-              display: "flex",
-              flexWrap: "wrap",
-            }}
+            title="Choose your NFTs"
           >
-            {topCards &&
-              topCards.length > 0 &&
-              topCards.map((card, index) => (
-                <div
-                  onClick={
-                    firstCard?.id === card.id || secondCard?.id === card.id
-                      ? addCard(null)
-                      : addCard(card)
-                  }
-                  css={{ cursor: "pointer" }}
-                  style={{
-                    width: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    maxWidth: 400,
-
-                    pointerEvents:
-                      firstCard?.id === card.id || secondCard?.id === card.id
-                        ? "none"
-                        : "unset",
-                  }}
-                  key={index}
-                >
-                  <DialogClose asChild>
-                    <div
-                      css={{
-                        display: "flex",
-                        justifyContent: "start",
-                        maxWidth: 180,
-                      }}
-                    >
-                      <div>
-                        <Card
-                          css={{
-                            marginRight: "0px",
-                            marginBottom: 0,
-                            transform: "scale(0.9, 0.9)",
-                            transformOrigin: "0 0",
-                          }}
-                          animated={false}
-                          card={{ img: card.imageUrl }}
-                        ></Card>
-                        <div
-                          css={{
-                            marginBottom: 30,
-                            maxWidth: 190,
-                            textAlign: "center",
-                            color: "rgba(0, 0, 0, 0.5)",
-                          }}
-                        >
-                          {card.artist}
-                        </div>
-                      </div>
-                      <div css={{ marginLeft: 20 }}>
-                        <CardStats
-                          css={{ marginBottom: 20 }}
-                          color={"dark"}
-                          xp={card.xp}
-                          power={card.powerLevel}
-                          scoring={card.scoringLevel}
-                        />
-
-                        {firstCard?.id === card.id ||
-                        secondCard?.id === card.id ? (
-                          <Button disabled={true}>Selected</Button>
-                        ) : (
-                          <Button
-                            css={{ color: "#fff", background: "#7B61FF" }}
-                          >
-                            Select
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </DialogClose>
-                </div>
-              ))}
-          </div>
-
-          {cardInventory.length !== 0 && (
-            <div>
-              <Line css={{ margin: "50px 0 10px 0" }}></Line>
-
-              <Text variant="h6">Never Played</Text>
-              <div
+            {loading && (
+              <Loader
                 css={{
-                  display: "flex",
-                  flexWrap: "wrap",
+                  textAlign: "center",
+                  alignSelf: "center",
+                  marginLeft: 20,
                 }}
-              >
-                {cardInventory
-                  .filter((card: CardType) => !card.onSale)
-                  .map((card: CardType) => (
-                    <div
-                      css={{
-                        cursor: "pointer",
-                        pointerEvents:
-                          firstCard?.id === card.id ||
-                          secondCard?.id === card.id
-                            ? "none"
-                            : "unset",
-                        marginBottom: 40,
-                      }}
-                      onClick={
+              />
+            )}
+
+            {topCards && topCards.length > 0 && (
+              <Text variant="h6">Most Played</Text>
+            )}
+
+            <div
+              css={{
+                display: "flex",
+                flexWrap: "wrap",
+              }}
+            >
+              {topCards &&
+                topCards.length > 0 &&
+                topCards.map((card, index) => (
+                  <div
+                    onClick={
+                      firstCard?.id === card.id || secondCard?.id === card.id
+                        ? addCard(null)
+                        : addCard(card)
+                    }
+                    css={{ cursor: "pointer" }}
+                    style={{
+                      width: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      maxWidth: 400,
+
+                      pointerEvents:
                         firstCard?.id === card.id || secondCard?.id === card.id
-                          ? addCard(null)
-                          : addCard(card)
-                      }
-                      key={card.id}
-                    >
-                      <DialogClose asChild>
-                        <div
-                          css={{
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "flex-start",
-                            maxWidth: 190,
-                            marginRight: 12,
-                          }}
-                        >
+                          ? "none"
+                          : "unset",
+                    }}
+                    key={index}
+                  >
+                    <DialogClose asChild>
+                      <div
+                        css={{
+                          display: "flex",
+                          justifyContent: "start",
+                          maxWidth: 180,
+                        }}
+                      >
+                        <div>
                           <Card
                             css={{
-                              marginRight: "20px",
-                              cursor: "pointer",
-                              marginBottom: "0px",
-                              background: "#fff",
-                              pointerEvents:
-                                firstCard?.id === card.id ||
-                                secondCard?.id === card.id
-                                  ? "none"
-                                  : "unset",
+                              marginRight: "0px",
+                              marginBottom: 0,
                               transform: "scale(0.9, 0.9)",
                               transformOrigin: "0 0",
                             }}
@@ -519,41 +432,179 @@ const NFTChoose: FC<Props> = () => {
                           ></Card>
                           <div
                             css={{
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "center",
-                              width: "100%",
+                              marginBottom: 30,
+                              maxWidth: 190,
+                              textAlign: "center",
+                              color: "rgba(0, 0, 0, 0.5)",
                             }}
                           >
-                            <div
+                            <Link
                               css={{
-                                marginBottom: 15,
-                                color: "rgba(0, 0, 0, 0.5)",
+                                pointerEvents: "auto",
+                                textDecoration: "none",
+                                color: "rgba(255, 255, 255, 0.9)",
+                                transition: "all 500ms",
+                                "&:hover": {
+                                  color: "rgba(255, 255, 255, 0.8)",
+                                },
                               }}
+                              href={card.url}
+                              target="_blank"
                             >
-                              {" "}
                               {card.artist}
-                            </div>
-
-                            {firstCard?.id === card.id ||
-                            secondCard?.id === card.id ? (
-                              <Button disabled={true}>Selected</Button>
-                            ) : (
-                              <Button
-                                css={{ color: "#fff", background: "#7B61FF" }}
-                              >
-                                Select
-                              </Button>
-                            )}
+                            </Link>
                           </div>
                         </div>
-                      </DialogClose>
-                    </div>
-                  ))}{" "}
-              </div>
+                        <div css={{ marginLeft: 20 }}>
+                          <CardStats
+                            css={{ marginBottom: 20 }}
+                            color={"dark"}
+                            xp={card.xp}
+                            power={card.powerLevel}
+                            scoring={card.scoringLevel}
+                          />
+
+                          {firstCard?.id === card.id ||
+                          secondCard?.id === card.id ? (
+                            <Button disabled={true}>Selected</Button>
+                          ) : (
+                            <Button
+                              css={{ color: "#fff", background: "#7B61FF" }}
+                            >
+                              Select
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </DialogClose>
+                  </div>
+                ))}
             </div>
-          )}
-        </Modal>
+
+            {cardInventory.length !== 0 && (
+              <div>
+                <Line css={{ margin: "50px 0 10px 0" }}></Line>
+
+                <Text variant="h6">Never Played</Text>
+                <div
+                  css={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {cardInventory
+                    .filter((card: CardType) => !card.onSale)
+                    .map((card: CardType) => (
+                      <div
+                        css={{
+                          cursor: "pointer",
+                          pointerEvents:
+                            firstCard?.id === card.id ||
+                            secondCard?.id === card.id
+                              ? "none"
+                              : "unset",
+                          marginBottom: 40,
+                        }}
+                        onClick={
+                          firstCard?.id === card.id ||
+                          secondCard?.id === card.id
+                            ? addCard(null)
+                            : addCard(card)
+                        }
+                        key={card.id}
+                      >
+                        <DialogClose asChild>
+                          <div
+                            css={{
+                              display: "flex",
+                              flexDirection: "column",
+                              alignItems: "flex-start",
+                              maxWidth: 190,
+                              marginRight: 12,
+                            }}
+                          >
+                            <Card
+                              css={{
+                                marginRight: "20px",
+                                cursor: "pointer",
+                                marginBottom: "0px",
+                                background: "#fff",
+                                pointerEvents:
+                                  firstCard?.id === card.id ||
+                                  secondCard?.id === card.id
+                                    ? "none"
+                                    : "unset",
+                                transform: "scale(0.9, 0.9)",
+                                transformOrigin: "0 0",
+                              }}
+                              animated={false}
+                              card={{ img: card.imageUrl }}
+                            ></Card>
+                            <div
+                              css={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                width: "100%",
+                              }}
+                            >
+                              <div
+                                css={{
+                                  marginBottom: 15,
+                                  color: "rgba(0, 0, 0, 0.5)",
+                                }}
+                              >
+                                {" "}
+                                <Link
+                                  css={{
+                                    pointerEvents: "auto",
+                                    textDecoration: "none",
+                                    color: "rgba(255, 255, 255, 0.9)",
+                                    transition: "all 500ms",
+                                    "&:hover": {
+                                      color: "rgba(255, 255, 255, 0.8)",
+                                    },
+                                  }}
+                                  href={card.url}
+                                  target="_blank"
+                                >
+                                  {card.artist}
+                                </Link>
+                              </div>
+
+                              {firstCard?.id === card.id ||
+                              secondCard?.id === card.id ? (
+                                <Button disabled={true}>Selected</Button>
+                              ) : (
+                                <Button
+                                  css={{ color: "#fff", background: "#7B61FF" }}
+                                >
+                                  Select
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        </DialogClose>
+                      </div>
+                    ))}{" "}
+                </div>
+              </div>
+            )}
+          </Modal>
+          <Line />
+
+          <Text
+            css={{
+              textAlign: "center",
+              color: "rgba(255, 255, 255, 0.25)",
+              fontSize: 15,
+              marginBottom: 20,
+              marginTop: 30,
+            }}
+          >
+            You will be able to use these cards during the game.
+          </Text>
+        </div>
       )}
     </StatBlock>
   );

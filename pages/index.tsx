@@ -13,23 +13,21 @@ import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 import Arrowed from "../components/Arrowed";
 import { useAuth } from "../components/AuthProvider";
 import MetamaskLogin from "../components/MetamaskLogin/";
+import GameRules from "../components/GameRules";
 
 const Home: NextPage = () => {
   const { loggedIn } = useAuth();
+
   const headerRight = (
-    loggedIn && 
-    <Button
-      style={{
-        marginRight: "15px",
-        background: "#7B61FF",
-        color: "#fff",
-      }}
-      component={Link}
-      href="/new"
-    >
-      New Game
-    </Button>
+    <GameRules>
+      <Button css={{ color: "#fff", background: "rgba(255, 255, 255, 0.05)" }}>
+        Game Rules
+      </Button>
+    </GameRules>
   );
+
+
+
   return (
     <ComposedGlobalLayout headerRight={headerRight}>
       <Layout
@@ -45,29 +43,18 @@ const Home: NextPage = () => {
           backgroundSize: "cover",
         })}
       >
-        <Grid>
-          <div css={{ gridColumn: "0 / span 6" }}>
+        <Grid css={{marginBottom: 200}}>
+          <div css={{ gridColumn: "0 / span 5" }}>
             <div css={{ width: "400px", height: "400px" }}></div>
           </div>
 
-          <div css={{ gridColumn: "8 / span 5" }}>
-            <Text component="h1" css={{ margin: "1px", fontSize: "40px" }}>
+          <div css={{ gridColumn: "7 / span 10" }}>
+            <Text component="h1" css={{ margin: "1px", fontSize: "50px", lineHeight: '65px' }}>
               Go head to head with opponents in turn-based play-2-earn card
               battle.
             </Text>
 
-            <Text
-              component={Link}
-              variant="label"
-              href="/"
-              css={(theme) => ({
-                opacity: 0.7,
-                marginTop: theme.spacing(6),
-                paddingTop: theme.spacing(6),
-              })}
-            >
-              <Arrowed>About the game</Arrowed>
-            </Text>
+
 
             <Line spacing={2} />
 
@@ -98,7 +85,7 @@ const Home: NextPage = () => {
             )}
           </div>
         </Grid>
-        <PromoSection />
+        {/* <PromoSection /> */}
       </Layout>
     </ComposedGlobalLayout>
   );

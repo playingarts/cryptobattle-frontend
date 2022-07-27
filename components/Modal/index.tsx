@@ -1,5 +1,5 @@
 import { styled, keyframes } from "@stitches/react";
-import { mauve,  } from "@radix-ui/colors";
+import { mauve } from "@radix-ui/colors";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { FC, HTMLAttributes, ReactNode } from "react";
 
@@ -37,14 +37,12 @@ const StyledOverlay = styled(DialogPrimitive.Overlay, {
 
 const StyledContent = styled(DialogPrimitive.Content, {
   minWidth: 300,
-  minHeight: 800,
-
   marginTop: 14,
   maxWidth: 1020,
   borderRadius: 20,
   zIndex: 9999,
+  padding: "20px 5px",
   background: "white",
-  padding: "90px 105px",
   // boxShadow: 'hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px',
   position: "relative",
   // '@media (prefers-reduced-motion: no-preference)': {
@@ -57,7 +55,14 @@ const Content: FC<Props> = ({ children, ...props }) => {
     <DialogPrimitive.Portal>
       <StyledOverlay>
         {" "}
-        <StyledContent {...props}>{children}</StyledContent>
+        <StyledContent {...props}>
+          <div
+            id="modal"
+            css={{ padding: "90px 105px", height: 800, overflow: "auto" }}
+          >
+            {children}
+          </div>
+        </StyledContent>
       </StyledOverlay>
     </DialogPrimitive.Portal>
   );
@@ -88,21 +93,24 @@ export const DialogClose = DialogPrimitive.Close;
 // Your app...
 const Flex = styled("div", { display: "flex" });
 
-
-
 export type Props = HTMLAttributes<HTMLDivElement>;
 
 interface Modal extends Props {
   title: string;
   trigger: ReactNode;
-  description: string;
+  description?: string;
+  onClose?: any;
 }
 
-export const Modal: FC<Modal> = ({ title, description, trigger, children }) => {
-
-  
+export const Modal: FC<Modal> = ({
+  title,
+  description,
+  trigger,
+  onClose,
+  children,
+}) => {
   return (
-    <Dialog>
+    <Dialog onOpenChange={onClose}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
         <DialogTitle>
@@ -114,19 +122,21 @@ export const Modal: FC<Modal> = ({ title, description, trigger, children }) => {
           </Text>
         </DialogTitle>
 
-        <DialogDescription>
-          <Text
-            variant="body2"
-            css={{
-              fontSize: "22px",
-              color: "#000",
-              marginTop: 20,
-              marginBottom: 20,
-            }}
-          >
-            {description}
-          </Text>
-        </DialogDescription>
+        {description && (
+          <DialogDescription>
+            <Text
+              variant="body2"
+              css={{
+                fontSize: "22px",
+                color: "#000",
+                marginTop: 20,
+                marginBottom: 20,
+              }}
+            >
+              {description}
+            </Text>
+          </DialogDescription>
+        )}
         <Line></Line>
         {children}
         <Flex css={{ marginTop: 25, justifyContent: "flex-end" }}></Flex>
@@ -138,7 +148,7 @@ export const Modal: FC<Modal> = ({ title, description, trigger, children }) => {
               padding: 8,
               position: "absolute",
               top: 23,
-              right: 24,
+              right: 30,
               cursor: "pointer",
               transition: "all 600ms",
               "&:hover": {

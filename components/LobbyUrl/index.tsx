@@ -2,13 +2,17 @@ import { FC, HTMLAttributes } from "react";
 import StatBlock from "../StatBlock";
 import { CSSObject } from "@emotion/serialize";
 import { useState, useEffect } from "react";
+import Text from "../Text";
+import Line from "../Line";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
 interface LobbyUrl extends Props {
   roomid: string | string[] | undefined;
+  startGame?: any;
+  isOwner?: boolean;
 }
 
-const LobbyUrl: FC<LobbyUrl> = ({ roomid }) => {
+const LobbyUrl: FC<LobbyUrl> = ({ roomid, isOwner, startGame }) => {
   const [isCopied, setCopied] = useState(false);
   const [roomUrl, setRoomUrl] = useState("");
   const [hovered, setHover] = useState(false);
@@ -28,7 +32,6 @@ const LobbyUrl: FC<LobbyUrl> = ({ roomid }) => {
   const copy = () => {
     setCopied(true);
     navigator.clipboard.writeText(roomUrl);
-
   };
 
   return (
@@ -41,6 +44,7 @@ const LobbyUrl: FC<LobbyUrl> = ({ roomid }) => {
           position: "relative",
           margin: "20px 0",
         })}
+        title="game link"
       >
         <input
           disabled
@@ -53,10 +57,39 @@ const LobbyUrl: FC<LobbyUrl> = ({ roomid }) => {
             fontSize: 19.5,
             borderRadius: "10px",
             width: "100%",
-            backgroundColor: "#fff",
-            color: "black",
+            border: isOwner
+              ? "3px solid #7B61FF"
+              : "3px solid rgba(255, 255, 255, 0.05)",
+            backgroundColor: "rgba(255, 255, 255, 0.05)",
+            color: isOwner ? "#fff" : "rgba(255, 255, 255, 0.5)",
           })}
         />
+        <Text
+          css={{
+            textAlign: "center",
+            color: "rgba(255, 255, 255, 0.25)",
+            fontSize: 15,
+            marginBottom: 30,
+            marginTop: 20,
+          }}
+        >
+          {isOwner ? (
+            <span>
+              Share with your friends and wait for them to connect. Press START
+              when everyone are ready!
+            </span>
+          ) : (
+            "Share this link if you want to invite more players!"
+          )}
+        </Text>
+        {isOwner && <Line />}
+
+        {startGame && (
+          <div css={{ display: "flex", justifyContent: "center" }}>
+            {startGame}
+          </div>
+        )}
+
         <div
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
@@ -64,7 +97,7 @@ const LobbyUrl: FC<LobbyUrl> = ({ roomid }) => {
           css={{
             position: "absolute",
             right: 60,
-            top: 55,
+            top: 105,
             width: 50,
             height: 50,
             borderRadius: 5000,

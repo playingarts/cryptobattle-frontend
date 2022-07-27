@@ -3,44 +3,49 @@ import Layout from "../components/Layout";
 import Text from "../components/Text";
 import Button from "../components/Button";
 import Link from "../components/Link";
-import Stats from "../components/Stats";
-import LeaderboardDashboard from "../components/LeaderboardDashboard";
+import GameRules from "../components/GameRules/";
+
+// import Stats from "../components/Stats";
+// import LeaderboardDashboard from "../components/LeaderboardDashboard";
 import NFTInventory from "../components/NFTInventory";
 import PromoSection from "../components/PromoSection";
-import Grid from "../components/Grid/";
+// import Grid from "../components/Grid/";
 import Twitter from "../components/Icons/Twitter";
-import Line from "../components/Line/";
 import { formatUsername } from "../utils/helpers";
 
 import { useAuth } from "../components/AuthProvider";
+import NavProfile from "../components/NavProfile";
 
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
+import DashboardHeader from "../components/DashboardHeader";
+import PlayingArtsinfo from "../components/PlayingartsInfo";
+import LinkTwitter from "../components/LinkTwitter";
 
 const Home: NextPage = () => {
   const { user } = useAuth();
 
   const headerRight = (
-    <Button
-      style={{
-        marginRight: "15px",
-        background: "#7B61FF",
-        color: "#fff",
-      }}
-      component={Link}
-      href="/new"
-    >
-      New Game
-    </Button>
+    <GameRules>
+      <Button css={{ color: "#fff", background: "rgba(255, 255, 255, 0.05)" }}>
+        Game Rules
+      </Button>
+    </GameRules>
   );
 
+  const headerMiddle = <NavProfile />;
+
   return (
-    <ComposedGlobalLayout headerTitle="DASHBOARD" headerRight={headerRight}>
+    <ComposedGlobalLayout
+      headerTitle="DASHBOARD"
+      headerMiddle={headerMiddle}
+      headerRight={headerRight}
+    >
       <Layout
         css={(theme) => ({
           background: theme.colors.dark_gray,
           color: theme.colors.text_title_light,
           overflow: "hidden",
-          paddingTop: theme.spacing(26),
+          paddingTop: theme.spacing(10),
           paddingBottom: theme.spacing(6.5),
           backgroundColor: "#0A0A0A",
           backgroundSize: "cover",
@@ -50,9 +55,14 @@ const Home: NextPage = () => {
           <div
             css={{
               padding: "0 42px",
+              marginTop: 70,
             }}
           >
-            <div
+            <DashboardHeader/>
+
+
+            {user && !user.isTwitterConnected && <LinkTwitter />}
+            {/* <div
               css={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -64,8 +74,8 @@ const Home: NextPage = () => {
                 component="h1"
                 css={{
                   margin: "0",
-                  marginTop: "10px",
-                  fontSize: "60px",
+                  marginTop: "0",
+                  fontSize: "50px",
                   verticalAlign: "bottom",
                 }}
               >
@@ -89,11 +99,11 @@ const Home: NextPage = () => {
                   Connect
                 </Button>
               )}
-            </div>
-            <Line></Line>
+            </div> */}
+            {/* <Line css={{marginBottom: 80}}></Line> */}
           </div>
 
-          <Grid
+          {/* <Grid
             css={(theme) => ({
               marginTop: theme.spacing(4),
               marginBottom: theme.spacing(3),
@@ -113,11 +123,11 @@ const Home: NextPage = () => {
                 color: theme.colors.text_title_light,
               })}
             ></LeaderboardDashboard>
-          </Grid>
+          </Grid> */}
 
           <NFTInventory></NFTInventory>
 
-          <PromoSection></PromoSection>
+          <PlayingArtsinfo></PlayingArtsinfo>
         </div>
       </Layout>
     </ComposedGlobalLayout>

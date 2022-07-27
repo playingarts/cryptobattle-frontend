@@ -20,6 +20,7 @@ const Player = forwardRef(
       if (!currentPlayerWithPoints) {
         return
       }
+      console.log('happens timer', timer)
 
       const seconds = totalSeconds / 1000
 

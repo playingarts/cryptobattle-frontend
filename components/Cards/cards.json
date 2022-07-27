@@ -4,385 +4,442 @@
     "value": 2,
     "artist": "Totemical",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/2-c-jpi8Q728.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/2-c-jpi8Q728.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/2-c-jpi8Q728.mp4",
+    "url": "https://new.playingarts.com/crypto/totemical"
+    
   },
   {
     "suit": "diamonds",
     "value": 2,
     "artist": "REO",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/2-d-QK444t2B.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/2-d-QK444t2B.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/2-d-QK444t2B.mp4",
+    "url": "https://new.playingarts.com/crypto/reo"
+    
   },
   {
     "suit": "hearts",
     "value": 2,
     "artist": "Khyati Trehan",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/2-h-4si4nh43.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/2-h-4si4nh43.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/2-h-4si4nh43.mp4",
+    "url": "https://new.playingarts.com/crypto/khyati-trehan"
   },
   {
     "suit": "spades",
     "value": 2,
     "artist": "Leonardoworx",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/2-s-7Tw67g2w.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/2-s-7Tw67g2w.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/2-s-7Tw67g2w.mp4",
+    "url": "https://new.playingarts.com/crypto/leonardoworx"
   },
   {
     "suit": "clubs",
     "value": 3,
     "artist": "Velvetspectrum",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/3-c-74h8P8ea.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/3-c-74h8P8ea.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/3-c-74h8P8ea.mp4",
+    "url": "https://new.playingarts.com/crypto/velvetspectrum"
   },
   {
     "suit": "diamonds",
     "value": 3,
     "artist": "Oscar Pettersson",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/3-d-49uM72Vj.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/3-d-49uM72Vj.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/3-d-49uM72Vj.mp4",
+    "url": "https://new.playingarts.com/crypto/oscar-pettersson"
   },
   {
     "suit": "hearts",
     "value": 3,
     "artist": "Victor Vector",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/3-h-4J4x76NB.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/3-h-4J4x76NB.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/3-h-4J4x76NB.mp4",
+    "url": "https://new.playingarts.com/crypto/victor-vector"
   },
   {
     "suit": "spades",
     "value": 3,
     "artist": "Arbenl1berateme",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/3-s-i8m8y6K6.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/3-s-i8m8y6K6.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/3-s-i8m8y6K6.mp4",
+    "url": "https://new.playingarts.com/crypto/arbenl1berateme"
   },
   {
     "suit": "clubs",
     "value": 4,
     "artist": "Igor Šćekić",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/4-c-977Jh2ML.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/4-c-977Jh2ML.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/4-c-977Jh2ML.mp4",
+    "url": "https://new.playingarts.com/crypto/igor-scekic"
   },
   {
     "suit": "diamonds",
     "value": 4,
     "artist": "Prateek Vatash",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/4-d-9Egv9F37.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/4-d-9Egv9F37.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/4-d-9Egv9F37.mp4",
+    "url": "https://new.playingarts.com/crypto/prateek-vatash"
   },
   {
     "suit": "hearts",
     "value": 4,
     "artist": "Eloh",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/4-h-sB7393iz.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/4-h-sB7393iz.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/4-h-sB7393iz.mp4",
+    "url": "https://new.playingarts.com/crypto/eloh"
   },
   {
     "suit": "spades",
     "value": 4,
     "artist": "Igor Garybaldi",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/4-s-23Yoz7D8.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/4-s-23Yoz7D8.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/4-s-23Yoz7D8.mp4",
+    "url": "https://new.playingarts.com/crypto/igor-garybaldi"
   },
   {
     "suit": "clubs",
     "value": 5,
     "artist": "RWR2",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/5-c-k44Q6m9v.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/5-c-k44Q6m9v.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/5-c-k44Q6m9v.mp4",
+    "url": "https://new.playingarts.com/crypto/rwr2"
   },
   {
     "suit": "diamonds",
     "value": 5,
     "artist": "fesq",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/5-d-2Yb48c3D.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/5-d-2Yb48c3D.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/5-d-2Yb48c3D.mp4",
+    "url": "https://new.playingarts.com/crypto/fesq"
   },
   {
     "suit": "hearts",
     "value": 5,
     "artist": "Jonathan Monaghan",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/5-h-4zt6a92h.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/5-h-4zt6a92h.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/5-h-4zt6a92h.mp4",
+    "url": "https://new.playingarts.com/crypto/jonathan-monaghan"
   },
   {
     "suit": "spades",
     "value": 5,
     "artist": "Bram Vanhaeren",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/5-s-gd8kN968.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/5-s-gd8kN968.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/5-s-gd8kN968.mp4",
+    "url": "https://new.playingarts.com/crypto/bram-vanhaeren"
   },
   {
     "suit": "clubs",
     "value": 6,
     "artist": "Nicole Ruggiero",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/6-c-in3B49g6.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-c-in3B49g6.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-c-in3B49g6.mp4",
+    "url": "https://new.playingarts.com/crypto/nicoleruggiero"
   },
   {
     "suit": "diamonds",
     "value": 6,
     "artist": "Kidmograph",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/6-d-6mH3F99H.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-d-6mH3F99H.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-d-6mH3F99H.mp4",
+    "url": "https://new.playingarts.com/crypto/kidmograph"
   },
   {
     "suit": "hearts",
     "value": 6,
     "artist": "Andy Needham",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/6-h-8d9idu23.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-h-8d9idu23.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-h-8d9idu23.mp4",
+    "url": "https://new.playingarts.com/crypto/andy-needham"
   },
   {
     "suit": "spades",
     "value": 6,
     "artist": "Magdiel Lopez",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/6-s-sx39U4U8.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-s-sx39U4U8.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/6-s-sx39U4U8.mp4",
+    "url": "https://new.playingarts.com/crypto/magdiel-lopez"
   },
   {
     "suit": "clubs",
     "value": 7,
     "artist": "David Ariew",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/7-c-D8q934nr.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-c-D8q934nr.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-c-D8q934nr.mp4",
+    "url": "https://new.playingarts.com/crypto/david-ariew"
   },
   {
     "suit": "diamonds",
     "value": 7,
     "artist": "Renderfruit",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/7-d-3H4G33ZA.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-d-3H4G33ZA.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-d-3H4G33ZA.mp4",
+    "url": "https://new.playingarts.com/crypto/renderfruit"
   },
   {
     "suit": "hearts",
     "value": 7,
     "artist": "Gabriel Punsalang",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/7-h-XW4Qx464.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-h-XW4Qx464.mp4",
+    "url": "https://new.playingarts.com/crypto/gabriel-punsalang"
   },
   {
     "suit": "spades",
     "value": 7,
     "artist": "Mark Constantine Inducil",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/7-s-4293BgEn.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-s-4293BgEn.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/7-s-4293BgEn.mp4",
+    "url": "https://new.playingarts.com/crypto/markinducil"
   },
   {
     "suit": "clubs",
     "value": 8,
     "artist": "Ryan Hawthorne",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/8-c-cZ76N43Z.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/8-c-cZ76N43Z.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/8-c-cZ76N43Z.mp4",
+    "url": "https://new.playingarts.com/crypto/ryan-hawthorne"
   },
   {
     "suit": "diamonds",
     "value": 8,
     "artist": "KidEight",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/8-d-6Z3H92Kv.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/8-d-6Z3H92Kv.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/8-d-6Z3H92Kv.mp4",
+    "url": "https://new.playingarts.com/crypto/kideight"
   },
   {
     "suit": "hearts",
     "value": 8,
     "artist": "Eleven",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/8-h-V3AR64f2.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/8-h-V3AR64f2.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/8-h-V3AR64f2.mp4",
+    "url": "https://new.playingarts.com/crypto/eleven"
   },
   {
     "suit": "spades",
     "value": 8,
     "artist": "Josh Pierce",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/8-s-n2B4b6T3.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/8-s-n2B4b6T3.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/8-s-n2B4b6T3.mp4",
+    "url": "https://new.playingarts.com/crypto/josh-pierce"
   },
   {
     "suit": "clubs",
     "value": 9,
     "artist": "Rolzay",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/9-c-y6x3v47U.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/9-c-y6x3v47U.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/9-c-y6x3v47U.mp4",
+    "url": "https://new.playingarts.com/crypto/rolzay"
   },
   {
     "suit": "diamonds",
     "value": 9,
     "artist": "Trippyogi",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/9-d-8w3v6JM6.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/9-d-8w3v6JM6.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/9-d-8w3v6JM6.mp4",
+    "url": "https://new.playingarts.com/crypto/trippyogi"
   },
   {
     "suit": "hearts",
     "value": 9,
     "artist": "Marterium",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/9-h-Hj4nb676.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/9-h-Hj4nb676.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/9-h-Hj4nb676.mp4",
+    "url": "https://new.playingarts.com/crypto/marterium"
   },
   {
     "suit": "spades",
     "value": 9,
     "artist": "Omar Aqil",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/9-s-g43c26dj.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/9-s-g43c26dj.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/9-s-g43c26dj.mp4",
+    "url": "https://new.playingarts.com/crypto/omaraqil"
   },
   {
     "suit": "clubs",
     "value": 10,
     "artist": "Sebastian Onufszak",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/10-c-okp7333D.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/10-c-okp7333D.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/10-c-okp7333D.mp4",
+    "url": "https://new.playingarts.com/crypto/sebastian-onufszak"
   },
   {
     "suit": "diamonds",
     "value": 10,
     "artist": "Vansdesign",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/10-d-49RMR27K.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/10-d-49RMR27K.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/10-d-49RMR27K.mp4",
+    "url": "https://new.playingarts.com/crypto/vansdesign"
   },
   {
     "suit": "hearts",
     "value": 10,
     "artist": "Kaloian Toshev MZK",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/10-h-383VH3zR.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/10-h-383VH3zR.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/10-h-383VH3zR.mp4",
+    "url": "https://new.playingarts.com/crypto/kaloian-toshev"
   },
   {
     "suit": "spades",
     "value": 10,
     "artist": "Tim Riopelle",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/10-s-239yn6fp.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/10-s-239yn6fp.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/10-s-239yn6fp.mp4",
+    "url": "https://new.playingarts.com/crypto/tim-riopelle"
   },
   {
     "suit": "clubs",
     "value": "jack",
     "artist": "Mr Misang",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/j-c-93y2dRL8.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/j-c-93y2dRL8.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/j-c-93y2dRL8.mp4",
+    "url": "https://new.playingarts.com/crypto/mr-misang"
   },
   {
     "suit": "diamonds",
     "value": "jack",
     "artist": "ExitSimulation",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/j-d-X37rjw98.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/j-d-X37rjw98.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/j-d-X37rjw98.mp4",
+    "url": "https://new.playingarts.com/crypto/exitsimulation"
   },
   {
     "suit": "hearts",
     "value": "jack",
     "artist": "Auguste Lefou",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/j-h-2H49J7bj.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/j-h-2H49J7bj.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/j-h-2H49J7bj.mp4",
+    "url": "https://new.playingarts.com/crypto/auguste-lefou"
   },
   {
     "suit": "spades",
     "value": "jack",
     "artist": "Mathis Burmeister",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/j-s-3NE4b2t4.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/j-s-3NE4b2t4.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/j-s-3NE4b2t4.mp4",
+    "url": "https://new.playingarts.com/crypto/mathis-burmeister"
   },
   {
     "suit": "clubs",
     "value": "queen",
     "artist": "Skio",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/q-c-jE72m69y.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/q-c-jE72m69y.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/q-c-jE72m69y.mp4",
+    "url": "https://new.playingarts.com/crypto/skio"
   },
   {
     "suit": "diamonds",
     "value": "queen",
     "artist": "Lindon Schaab ",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/q-d-4N4a42sM.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/q-d-4N4a42sM.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/q-d-4N4a42sM.mp4",
+    "url": "https://new.playingarts.com/crypto/ghost-girl"
   },
   {
     "suit": "hearts",
     "value": "queen",
     "artist": "Beryl Bilici",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/q-h-9m4cg37g.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/q-h-9m4cg37g.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/q-h-9m4cg37g.mp4",
+    "url": "https://new.playingarts.com/crypto/beryl-bilici"
   },
   {
     "suit": "spades",
     "value": "queen",
     "artist": "Diberkato",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/q-s-4F8hN98q.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/q-s-4F8hN98q.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/q-s-4F8hN98q.mp4",
+    "url": "https://new.playingarts.com/crypto/diberkato"
   },
   {
     "suit": "clubs",
     "value": "king",
     "artist": "Vini Nascimento",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/k-c-w47o9Vp8.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/k-c-w47o9Vp8.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/k-c-w47o9Vp8.mp4",
+    "url": "https://new.playingarts.com/crypto/vini-naso"
   },
   {
     "suit": "diamonds",
     "value": "king",
     "artist": "SeerLight",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/k-d-9ex8HW27.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/k-d-9ex8HW27.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/k-d-9ex8HW27.mp4",
+    "url": "https://new.playingarts.com/crypto/seerlight"
   },
   {
     "suit": "hearts",
     "value": "king",
     "artist": "Odious",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/k-h-36QTB8R9.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/k-h-36QTB8R9.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/k-h-36QTB8R9.mp4",
+    "url": "https://new.playingarts.com/crypto/odious"
   },
   {
     "suit": "spades",
     "value": "king",
     "artist": "Peter Mohrbacher",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/k-s-b2dD263P.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/k-s-b2dD263P.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/k-s-b2dD263P.mp4",
+    "url": "https://new.playingarts.com/crypto/peter-mohrbacher"
   },
   {
     "suit": "clubs",
     "value": "ace",
     "artist": "Robbie Trevino",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/a-c-R22N86fN.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/a-c-R22N86fN.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/a-c-R22N86fN.mp4",
+    "url": "https://new.playingarts.com/crypto/robbie-trevino"
   },
   {
     "suit": "diamonds",
     "value": "ace",
     "artist": "Baugasm",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/a-d-Mk33LV47.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/a-d-Mk33LV47.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/a-d-Mk33LV47.mp4",
+    "url": "https://new.playingarts.com/crypto/baugasm"
   },
   {
     "suit": "hearts",
     "value": "ace",
     "artist": "Chuck Anderson",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/a-h-x89CxW27.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/a-h-x89CxW27.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/a-h-x89CxW27.mp4",
+    "url": "https://new.playingarts.com/crypto/chuck-anderson"
   },
   {
     "suit": "spades",
     "value": "ace",
     "artist": "Jason Naylor",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/a-s-26vr86EL.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/a-s-26vr86EL.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/a-s-26vr86EL.mp4",
+    "url": "https://new.playingarts.com/crypto/jason-naylor"
   },
   {
     "value": "joker",
     "suit": "clubs",
     "artist": "BakaArts",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/joker2-aB2fC925.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/joker2-aB2fC925.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/joker2-aB2fC925.mp4",
+    "url": "https://new.playingarts.com/crypto/bakaarts"
   },
   {
     "value": "joker",
     "suit": "spades",
     "artist": "BakaArts",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/joker2-aB2fC925.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/joker2-aB2fC925.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/joker2-aB2fC925.mp4",
+    "url": "https://new.playingarts.com/crypto/bakaarts"
   },
   {
     "value": "joker",
     "suit": "diamonds",
     "artist": "Glass Crane",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/joker-PQy3C426.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/joker-PQy3C426.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/joker-PQy3C426.mp4",
+    "url": "https://new.playingarts.com/crypto/glasscrane"
   },
   {
     "value": "joker",
@@ -390,12 +447,14 @@
 
     "artist": "Glass Crane",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/joker-PQy3C426.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/joker-PQy3C426.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/joker-PQy3C426.mp4",
+    "url": "https://new.playingarts.com/crypto/glasscrane"
   },
   {
     "value": "Backside",
     "artist": "Stu Ballinger",
     "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/back-iV67Z67p.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/back-iV67Z67p.mp4"
+    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/back-iV67Z67p.mp4",
+    "url": "https://new.playingarts.com/crypto/stu-ballinger"
   }
 ]
