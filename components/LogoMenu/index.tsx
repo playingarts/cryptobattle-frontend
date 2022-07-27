@@ -165,7 +165,6 @@ export default function LogoMenu({
                   color: "white",
                   height: "60px",
                   marginTop: "0",
-                  width: 340,
                 }}
               >
                 <div style={{ marginRight: "36px" }} className="hamburger">

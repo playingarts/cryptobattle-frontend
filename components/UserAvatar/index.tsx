@@ -5,7 +5,7 @@ interface UserAvatar extends Props {
   profilePictureUrl: string;
 }
 
-const UserAvatar: FC<UserAvatar> = ({ profilePictureUrl, ...props }) => {
+const UserAvatar: FC<UserAvatar> = ({ profilePictureUrl, color, ...props }) => {
   if (
     profilePictureUrl &&
     profilePictureUrl !==
@@ -33,7 +33,7 @@ const UserAvatar: FC<UserAvatar> = ({ profilePictureUrl, ...props }) => {
         borderRadius: "200px",
         width: "70px",
         height: "70px",
-        overflow: "hidden"
+        overflow: "hidden",
       }}
     >
       <svg

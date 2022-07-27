@@ -118,8 +118,12 @@ const JoinGame: NextPage = () => {
 
     openNotification({
       title: "You are ready!",
-      description:
-        "Please wait for others to connect. The game will start soon.",
+      description: (
+        <span>
+          Please wait for others to connect. <br></br>The game will start soon.
+        </span>
+      ),
+      icon: <NavProfile color={"red"}></NavProfile>,
       footer: (
         <Button
           onClick={toggleReady}
@@ -229,7 +233,7 @@ const JoinGame: NextPage = () => {
         margin: "20px auto",
       })}
     >
-      {"I'M READY"}
+      {"LET'S GO"}
     </Button>
   );
 
@@ -265,7 +269,13 @@ const JoinGame: NextPage = () => {
         })}
       >
         <div>
-          {isOwner && <LobbyUrl startGame={startGameButton} roomid={roomid} />}
+          {isOwner && (
+            <LobbyUrl
+              isOwner={isOwner}
+              startGame={startGameButton}
+              roomid={roomid}
+            />
+          )}
 
           {!isOwner && <Ready readyButton={readyButton} />}
 
@@ -275,7 +285,7 @@ const JoinGame: NextPage = () => {
 
           <NFTChoose />
 
-          {!isOwner && <LobbyUrl roomid={roomid} />}
+          {!isOwner && <LobbyUrl isOwner={isOwner} roomid={roomid} />}
         </div>
       </Layout>
     </ComposedGlobalLayout>

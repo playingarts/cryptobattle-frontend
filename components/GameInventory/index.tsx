@@ -33,10 +33,26 @@ const GameInventory: FC<Props> = ({
   const [cardsNft, setCardsNft] = useState<any>([]);
   const [loadingDelayed, setLoadingDelayed] = useState(true);
 
-  const { gameState, selectedCard, setSelectedCard} = useGame();
+  const { gameState, selectedCard, setSelectedCard, players} = useGame();
   const { user } = useAuth();
 
   const WSProvider = useWS();
+
+
+  const getColor = useCallback(
+    (userId) => () => {
+      if (userId === "system") {
+        return "#2D3038";
+      }
+      const foundPlayer = players.find(
+        (player: any) => player.userId === userId
+      );
+
+      return foundPlayer ? foundPlayer.color : "gray";
+    },
+    [players]
+  );
+
 
   const skip = () => {
     WSProvider.send(
@@ -313,7 +329,7 @@ const GameInventory: FC<Props> = ({
                           : "px solid rgba(221, 221, 221, 0.1)",
                       "&::before": {
                         opacity: 0,
-                        content: `"${card.power}"`,
+                        content: `"${card.powerLevel}"`,
                         display: "flex",
 
                         justifyContent: "center",
@@ -321,7 +337,7 @@ const GameInventory: FC<Props> = ({
                         transition: "all  400ms",
                         color: "#fff",
                         fontFamily: "Aldrich",
-                        background: "#7B61FF",
+                        background: getColor(user.userId)(),
                         backgroundImage:
                           'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAxNCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEzLjkxNzIgNy4zMTE4Mkw3LjU1MzU3IDE4Ljc2NjRDNy40MzkwMyAxOC45NyA3LjIyOTAzIDE5LjA5MDkgNi45OTk5NCAxOS4wOTA5QzYuOTQ5MDMgMTkuMDkwOSA2Ljg5MTc1IDE5LjA4NDUgNi44NDA4NCAxOS4wNzE4QzYuNTYwODQgMTguOTk1NCA2LjM2MzU3IDE4Ljc0NzMgNi4zNjM1NyAxOC40NTQ1VjExLjQ1NDVIMC42MzYzMDFDMC40MTk5MzggMTEuNDU0NSAwLjIyMjY2NSAxMS4zNDY0IDAuMTAxNzU2IDExLjE2ODJDLTAuMDEyNzg5NSAxMC45OSAtMC4wMzE4ODAzIDEwLjc2MDkgMC4wNTA4NDY5IDEwLjU2MzZMNC41MDUzOSAwLjM4MTgxOEM0LjYwNzIxIDAuMTUyNzI3IDQuODM2MyAwIDUuMDkwODUgMEg4LjkwOTAzQzkuMTE5MDMgMCA5LjMxNjMgMC4xMDE4MTggOS40MzcyMSAwLjI4QzkuNTUxNzUgMC40NTE4MTggOS41NzcyMSAwLjY3NDU0NSA5LjUwMDg0IDAuODcxODE4TDcuMzA1MzkgNi4zNjM2M0gxMy4zNjM2QzEzLjU4NjMgNi4zNjM2MyAxMy43OTYzIDYuNDg0NTQgMTMuOTEwOCA2LjY3NTQ1QzE0LjAyNTQgNi44NzI3MiAxNC4wMzE4IDcuMTE0NTQgMTMuOTE3MiA3LjMxMTgyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==")',
                         backgroundRepeat: "no-repeat",

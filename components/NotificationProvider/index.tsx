@@ -109,8 +109,8 @@ useEffect(() => {
                 <Text variant="h4">{notification.title}</Text>
               )}
               {notification.description && (
-                <div>
-                  <Text variant="body">{notification.description}</Text>
+                <div css={{maxWidth: '90%',}}>
+                  <Text variant="body" css={{ fontSize: '22px', textAlign: 'center'}}>{notification.description}</Text>
                 </div>
               )}
               {notification.footer && <div>{notification.footer}</div>}

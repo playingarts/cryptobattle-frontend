@@ -143,12 +143,14 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
                 }}
               >
                 <Text
-                  component="div"
+                  component="h3"
                   css={{
                     opacity: 0.9,
-                    marginRight: 14,
-                    fontSize: 23,
+                    marginRight: 10,
+                    fontSize: 20,
                     color: "#fff",
+                    textTransform: 'uppercase',
+                    marginTop: 26
                   }}
                 >
                   {currentPlayer ? formatUsername(currentPlayer.username) : ""}

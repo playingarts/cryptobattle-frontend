@@ -65,18 +65,17 @@ const Card: FC<Props> = ({
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {isGameBoard && selectedCard && 
+      {/* {isGameBoard && selectedCard && 
         <div
           css={{
             width: "10",
-            background: hovered ? "rgba(10, 10, 10, 0.7)" : "#181818",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
             outline: "7px solid rgba(10, 10, 10, 0.7)",
             transition: "all 400ms",
             cursor: "pointer",
-            opacity: hovered ? "1" : 0,
+            opacity: hovered ? "0" : 0,
             position: "absolute",
             top: 0,
             left: 0,
@@ -139,7 +138,7 @@ const Card: FC<Props> = ({
             </svg>
           </div>
         </div>
-      }
+      } */}
 
       <div
         {...(interactive && {
