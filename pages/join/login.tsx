@@ -9,20 +9,67 @@ import ComposedGlobalLayout from "../../components/_composed/GlobalLayout";
 import { useAuth } from "../../components/AuthProvider";
 import MetamaskLogin from "../../components/MetamaskLogin/";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { api } from "../../api";
+import { formatUsername } from "../../utils/helpers";
+import Loader from "../../components/Loader";
+
 const Home: NextPage = () => {
   const { loggedIn } = useAuth();
 
   const router = useRouter();
 
   const { roomid } = router.query;
+  const [loading, setLoading] = useState(true);
+
+  const [roomInfo, setRoomInfo] = useState<any>(null);
+  const getRoomInfo = (roomId: any) => {
+    return api.get("/api/rest/join-info/" + roomId);
+  };
 
   useEffect(() => {
     if (!roomid) {
       return;
     }
+    setLoading(true);
+    getRoomInfo(roomid)
+      .then((data: any) => {
+        console.log(data);
+        setRoomInfo(data);
+        setLoading(false);
+      })
+      .catch((err: any) => {
+        console.log(err);
+        setLoading(false);
+      });
     localStorage.setItem("roomid", roomid as string);
   }, [roomid]);
+
+  if (loading) {
+    return (
+      <div
+        css={{
+          height: "100vh",
+          background: "#181818",
+          width: "100vw",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Loader
+          css={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%) scale(2)",
+            lineHeight: 1,
+            color: "#fff",
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <ComposedGlobalLayout>
@@ -38,7 +85,7 @@ const Home: NextPage = () => {
           position: "relative",
         })}
       >
-        <div css={{position: 'relative'}}>
+        <div css={{ position: "relative" }}>
           <img
             css={{ position: "absolute", left: 100, zIndex: 2 }}
             src="/img/card.png"
@@ -65,8 +112,8 @@ const Home: NextPage = () => {
             </Text>
 
             <Text variant="body3" css={{ fontSize: 22, lineHeight: "33px" }}>
-              You were invited to play a free and fun card game featuring cards
-              from Crypto Edition NFT deck!
+              {formatUsername(roomInfo.inviterUsername)} invited to play a free
+              and fun card game featuring cards from Crypto Edition NFT deck!
             </Text>
 
             {!loggedIn && (
