@@ -58,7 +58,7 @@ const Content: FC<Props> = ({ children, ...props }) => {
         <StyledContent {...props}>
           <div
             id="modal"
-            css={{ padding: "90px 105px", height: 800, overflow: "auto" }}
+            css={{ padding: "90px 105px", height: 800, overflow: "auto", scrollbarWidth: 'none' }}
           >
             {children}
           </div>
