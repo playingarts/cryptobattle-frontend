@@ -10,6 +10,7 @@ interface Props extends HTMLAttributes<HTMLElement> {
   interactive?: boolean;
   noInfo?: boolean;
   isPlaceholder?: boolean;
+  containerStyles: any;
 }
 
 const Card: FC<Props> = ({
@@ -17,6 +18,7 @@ const Card: FC<Props> = ({
   size,
   isPlaceholder = false,
   interactive,
+  containerStyles,
   ...props
 }) => {
   const [hovered, setHover] = useState(false);
@@ -60,7 +62,8 @@ const Card: FC<Props> = ({
                 ".plus-icon": {
                   color: '#7B61FF'
                 }
-              }
+              },
+              ...containerStyles
             },
             hovered &&
               !interactive &&
