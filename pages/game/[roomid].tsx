@@ -139,21 +139,19 @@ const JoinGame: NextPage = () => {
     });
   }, [isReady, openNotification]);
 
-  useEffect(() => {
-    const handleTabClose = (event: any) => {
-      event.preventDefault();
+  // useEffect(() => {
+  //   const handleTabClose = (event: any) => {
+  //     event.preventDefault();
 
-      console.log("beforeunload event triggered");
+  //     return;
+  //   };
 
-      return (event.returnValue = "Are you sure you want to exit?");
-    };
+  //   window.addEventListener("beforeunload", handleTabClose);
 
-    window.addEventListener("beforeunload", handleTabClose);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleTabClose);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleTabClose);
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (isOwner === null) {
@@ -173,29 +171,29 @@ const JoinGame: NextPage = () => {
     const handleRouteChange = (url: string) => {
       console.log("handleRouteChange", url);
 
-
       if (url !== "/play" && !url.startsWith("/game/")) {
         leave();
       }
     };
 
     const handleTabClose = (event: any) => {
-            leave()
+      leave();
 
-      event.preventDefault();
-      event.stopImmediatePropagation();
-       event.returnValue = null
-       return null;
+      // event.preventDefault();
+      // event.returnValue = null;
+      return;
       // return (event.returnValue = "Are you sure you want to exit?"), leave();
     };
 
     router.events.on("routeChangeStart", handleRouteChange);
 
-    window.addEventListener("beforeunload", handleTabClose, {capture: true});
+
+    
+    window.addEventListener("beforeunload", handleTabClose);
 
     return () => {
       router.events.off("routeChangeStart", handleRouteChange);
-      window.removeEventListener("beforeunload", handleTabClose, {capture: true});
+      window.removeEventListener("beforeunload", handleTabClose);
     };
   }, [isOwner]);
 
