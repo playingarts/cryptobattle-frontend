@@ -176,7 +176,7 @@ const JoinGame: NextPage = () => {
       }
     };
 
-    const handleTabClose = (event: any) => {
+    const handleTabClose = () => {
       leave();
 
       // event.preventDefault();
