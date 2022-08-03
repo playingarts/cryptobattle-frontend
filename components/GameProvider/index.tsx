@@ -82,6 +82,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   const quit = () => {
     setResults(null);
     closeNotification();
+    // eslint-disable-next-line
+    // @ts-ignore: Unreachable code error
+    window.gameStarted = false;
     router.push("/dashboard");
   };
 
@@ -172,6 +175,11 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   }, [roomId]);
 
   useEffect(() => {
+    
+    if (!WSProvider) {
+      return
+    }
+
     WSProvider.onerror = function (event: any) {
       console.log("WebSocket error: " + event.code);
       console.log(event);
@@ -232,6 +240,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       // Timeout ended
       if (event.event === "close-room" && event.data.reason === "TIMEOUT") {
         quit();
+        
         return;
       }
 
@@ -394,7 +403,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       // if (event.data.error && event.data.error.message) {
       // }
     };
-  }, []);
+  }, [WSProvider]);
 
   // useEffect(() => {
   //   setPlayers([{ ...user, state: "ready" }]);

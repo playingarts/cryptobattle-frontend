@@ -140,26 +140,62 @@ const JoinGame: NextPage = () => {
   }, [isReady, openNotification]);
 
   useEffect(() => {
+    const handleTabClose = (event: any) => {
+      event.preventDefault();
+
+      console.log("beforeunload event triggered");
+
+      return (event.returnValue = "Are you sure you want to exit?");
+    };
+
+    window.addEventListener("beforeunload", handleTabClose);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleTabClose);
+    };
+  }, []);
+
+  useEffect(() => {
     if (isOwner === null) {
       return;
     }
+
+    const leave = () => {
+      setPlayers(null);
+      WSProvider.send(
+        JSON.stringify({
+          event: isOwner ? "close-room" : "quit-room",
+          data: {},
+        })
+      );
+    };
+
     const handleRouteChange = (url: string) => {
       console.log("handleRouteChange", url);
+
+
       if (url !== "/play" && !url.startsWith("/game/")) {
-        setPlayers(null);
-        WSProvider.send(
-          JSON.stringify({
-            event: isOwner ? "close-room" : "quit-room",
-            data: {},
-          })
-        );
+        leave();
       }
+    };
+
+    const handleTabClose = (event: any) => {
+            leave()
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+       event.returnValue = null
+       return null;
+      // return (event.returnValue = "Are you sure you want to exit?"), leave();
     };
 
     router.events.on("routeChangeStart", handleRouteChange);
 
+    window.addEventListener("beforeunload", handleTabClose, {capture: true});
+
     return () => {
       router.events.off("routeChangeStart", handleRouteChange);
+      window.removeEventListener("beforeunload", handleTabClose, {capture: true});
     };
   }, [isOwner]);
 
@@ -178,7 +214,9 @@ const JoinGame: NextPage = () => {
   }, [roomInfo, user]);
 
   useEffect(() => {
-    console.log("isBackendReady", isBackendReady);
+    // eslint-disable-next-line
+    // @ts-ignore: Unreachable code error
+    window.gameStarted = false;
     if (!isBackendReady) {
       return;
     }

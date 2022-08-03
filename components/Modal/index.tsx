@@ -53,12 +53,12 @@ const StyledContent = styled(DialogPrimitive.Content, {
 const Content: FC<Props> = ({ children, ...props }) => {
   return (
     <DialogPrimitive.Portal>
-      <StyledOverlay>
+      <StyledOverlay id="overlay">
         {" "}
         <StyledContent {...props}>
           <div
             id="modal"
-            css={{ padding: "90px 105px", height: 800, overflow: "auto", scrollbarWidth: 'none' }}
+            css={{ padding: "90px 105px", height: 'auto', overflow: "auto", scrollbarWidth: 'none' }}
           >
             {children}
           </div>

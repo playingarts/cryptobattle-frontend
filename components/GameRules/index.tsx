@@ -27,7 +27,7 @@ const GameRules: FC<Props> = ({ children, ...props }) => {
       tab: string
     ) => {
       document
-        .getElementById("modal")
+        .getElementById("overlay")
         ?.scrollTo({ top: 0, behavior: "smooth" });
       setActiveTab(tab);
     },

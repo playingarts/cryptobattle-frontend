@@ -15,7 +15,7 @@ function WSProvider({ children }: WSProviderProps): JSX.Element {
   const accessToken = localStorage.getItem("accessToken");
   
   const wsInstance = useMemo(() => {
-    if (typeof window != "undefined") {
+    if (typeof window != "undefined" && accessToken) {
       return new ReconnectingWebSocket(
         `wss://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/socket?accesstoken=${accessToken}`
       );
@@ -23,6 +23,10 @@ function WSProvider({ children }: WSProviderProps): JSX.Element {
     return null;
   }, [accessToken]);
 
+
+  if (!wsInstance) {
+    return <div>{children}</div>
+  }
 
 
 
@@ -36,7 +40,7 @@ function useWS(): WebSocket {
   const context = useContext(WSStateContext);
 
   if (context == undefined) {
-    throw new Error("useWS must be used within a WSProvider");
+    // throw new Error("useWS must be used within a WSProvider");
   }
 
   return context;

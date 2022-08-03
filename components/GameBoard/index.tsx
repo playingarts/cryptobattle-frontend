@@ -249,6 +249,12 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       });
     });
 
+    if (gameState.lastPlayedCard) {
+      // eslint-disable-next-line
+      // @ts-ignore: Unreachable code error
+      window.gameStarted = true;
+    }
+
     setLastPlayedCard(
       gameState.lastPlayedCard ? gameState.lastPlayedCard : null
     );
