@@ -10,7 +10,7 @@ interface Props extends HTMLAttributes<HTMLElement> {
   interactive?: boolean;
   noInfo?: boolean;
   isPlaceholder?: boolean;
-  containerStyles: any;
+  containerStyles?: any;
 }
 
 const Card: FC<Props> = ({
