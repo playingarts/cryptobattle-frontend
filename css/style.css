@@ -407,3 +407,8 @@ html {
 .bubbles-group div {
   margin-right: 200px
 }
+
+/* Hide scrollbar for modals */
+#modal::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}

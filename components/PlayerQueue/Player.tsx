@@ -14,7 +14,7 @@ const Player = forwardRef(
 // eslint-disable-next-line
   ({ player, loadingDelayed, currentPlayerWithPoints }, ref) => {
     const [progress, setProgress] = useState(100)
-    const [first, setFirst] = useState(false)
+    // const [first, setFirst] = useState(false)
     const { timer, totalSeconds, results } = useGame()
     useEffect(() => {
       if (!currentPlayerWithPoints) {
@@ -22,19 +22,17 @@ const Player = forwardRef(
       }
       console.log('happens timer', timer)
 
-      const seconds = totalSeconds / 1000
+      const seconds = totalSeconds / 1000;
+      console.log('seconds', seconds);
+      const secondsPassed = timer / 1000;
 
-      if (!first) {
-        setFirst(true)
-        setProgress(timer * (100 / seconds))
+      console.log((secondsPassed / seconds) * 100);
+      // setProgress((secondsPassed / seconds) * 100);
+      if (currentPlayerWithPoints.userId === player.userId && !results) {
+        setProgress((secondsPassed / seconds) * 100);
         return
       }
-
-      if (currentPlayerWithPoints.userId !== player.userId && !results) {
-        setProgress(timer * (100 / seconds))
-        return
-      }
-      setProgress(0)
+      setProgress(100)
     
 
     }, [currentPlayerWithPoints, player, timer, totalSeconds, results])
@@ -45,7 +43,6 @@ const Player = forwardRef(
       }
 
     }, [results])
-
 
     return (
           // eslint-disable-next-line
@@ -62,7 +59,7 @@ const Player = forwardRef(
               // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
               strokeLinecap: "butt",
               // Customize transition animation
-              transition: "stroke-dashoffset linear " +  totalSeconds + 'ms',
+              transition: "stroke-dashoffset linear " +  '1000' + 'ms',
               // Rotate the path
               transform: "rotate(0.25turn)",
               transformOrigin: "center center",
