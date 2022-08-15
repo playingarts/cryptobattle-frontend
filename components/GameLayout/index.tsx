@@ -34,6 +34,7 @@ const GameLayout: FC<
       <ScrollContainer
         className="scroll-container"
         ignoreElements=".draggable"
+        hideScrollbars={false}
         style={{ width: "100vw", height: "100vh", padding: 90 }}
         innerRef={container}
       >
