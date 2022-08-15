@@ -3,7 +3,6 @@ import Line from "../Line";
 import Text from "../Text";
 
 import GameRules from "../GameRules";
-import Leaderboard from "../Leaderboard";
 import { useWS } from "../WsProvider";
 import { useAuth } from "../AuthProvider";
 
@@ -254,23 +253,6 @@ export default function LogoMenu({
                       </div>
                     </GameRules>
                   </div>
-                  <Leaderboard>
-                    <div
-                      css={{
-                        color: "rgba(0, 0, 0)",
-                        cursor: "pointer",
-                        paddingBottom: 20,
-                        transition: "all 300ms",
-                        listStyle: "none",
-                        "&:hover": {
-                          opacity: "0.6",
-                        },
-                      }}
-                    >
-                      Leaderboard
-                    </div>
-                  </Leaderboard>
-
                   <li
                     onClick={purgeGames}
                     css={{
