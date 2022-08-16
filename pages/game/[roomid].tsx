@@ -24,7 +24,8 @@ const JoinGame: NextPage = () => {
   const WSProvider = useWS();
   const router = useRouter();
   const { roomid, join } = router.query;
-  const { players, setPlayers, roomInfo, isBackendReady } = useGame();
+  const { players, setPlayers, roomInfo, isBackendReady, userSocketIdle } =
+    useGame();
   const { user } = useAuth();
 
   const [isReady, setReady] = useState(false);
@@ -82,6 +83,22 @@ const JoinGame: NextPage = () => {
   const [allReady, setAllReady] = useState(false);
 
   const [startGameDisabled, setStartGameDisabled] = useState(true);
+
+  useEffect(() => {
+    if (!userSocketIdle) {
+      return;
+    }
+    if (userSocketIdle && userSocketIdle.userId !== user.userId && isOwner) {
+      WSProvider.send(
+        JSON.stringify({
+          event: "kick-player",
+          data: {
+            userId: userSocketIdle.userId
+          },
+        })
+      );
+    }
+  }, [userSocketIdle, isOwner, user]);
 
   useEffect(() => {
     if (!players) {
@@ -159,18 +176,54 @@ const JoinGame: NextPage = () => {
     }
 
     const leave = () => {
-      setPlayers(null);
-      WSProvider.send(
-        JSON.stringify({
-          event: isOwner ? "close-room" : "quit-room",
-          data: {},
-        })
-      );
+      const leave = () => {
+        setPlayers(null);
+
+        WSProvider.send(
+          JSON.stringify({
+            event: isOwner ? "close-room" : "quit-room",
+            data: {},
+          })
+        );
+      };
+
+      if (isOwner) {
+        // openNotification({
+        //   title: "Are You Sure?",
+        //   description:
+        //     "You are about to leave the lobby. The game will end for all players.",
+        //   footer: (
+        //     <div style={{ display: "flex", flexDirection: "column" }}>
+        //       <Button
+        //         onClick={closeNotification && leave}
+        //         css={() => ({
+        //           background: "#7B61FF",
+        //           color: "#fff",
+        //           margin: "10px auto",
+        //         })}
+        //       >
+        //         Yes, Disconnect
+        //       </Button>
+        //       <Button
+        //         onClick={closeNotification && leave}
+        //         css={() => ({
+        //           background: "#7B61FF",
+        //           color: "#fff",
+        //           margin: "10px auto",
+        //         })}
+        //       >
+        //         No, Stay
+        //       </Button>
+        //     </div>
+        //   ),
+        // });
+        leave();      } else {
+        leave();
+      }
     };
 
     const handleRouteChange = (url: string) => {
       console.log("handleRouteChange", url);
-
       if (url !== "/play" && !url.startsWith("/game/")) {
         leave();
       }
@@ -187,8 +240,6 @@ const JoinGame: NextPage = () => {
 
     router.events.on("routeChangeStart", handleRouteChange);
 
-
-    
     window.addEventListener("beforeunload", handleTabClose);
 
     return () => {

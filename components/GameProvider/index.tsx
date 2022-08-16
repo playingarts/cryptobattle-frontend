@@ -37,6 +37,7 @@ export type IGameProviderContext = {
   timer: any;
   totalSeconds: any;
   results: any;
+  userSocketIdle: any;
 };
 
 const getUser = async (playerId: string) => {
@@ -124,6 +125,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   const [gameState, setGameState] = useState<any>(null);
   const [isMyTurn, setIsMyTurn] = useState<any>(null);
+  const [userSocketIdle, setUserSocketIdle] = useState<any>(null);
 
   useEffect(() => {
     if (!players) {
@@ -205,6 +207,14 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         setTotalSeconds(event.data.totalSeconds);
         return;
       }
+
+      // Timeout ended
+      if (event.event === "user-socket-idle") {
+        setUserSocketIdle(event.data)
+        return;
+      }
+
+      
 
       if (event.data.error && event.data.error.message) {
         if (event.data.error.message === "Player must be in a room") {
@@ -352,6 +362,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         // eslint-disable-next-line
         // @ts-ignore: Unreachable code error
       }
+
       if (event.event === "game-info") {
         // eslint-disable-next-line
         // @ts-ignore: Unreachable code error
@@ -475,12 +486,14 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       setPlayers,
       timer,
       totalSeconds,
+      userSocketIdle,
       results,
       isBackendReady,
     }),
     [
       gameState,
       players,
+      userSocketIdle,
       playersGame,
       roomId,
       userInfo,
