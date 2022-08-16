@@ -62,6 +62,7 @@ useEffect(() => {
               left: 0,
               right: 0,
               bottom: 0,
+              pointerEvents: 'auto',
               background: notification.dark ? "rgba(255, 255, 255, .3)" :  "rgba(0, 0, 0, .9)",
               zIndex: 99900009,
               display: "flex",

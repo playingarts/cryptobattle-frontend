@@ -38,6 +38,7 @@ export type IGameProviderContext = {
   totalSeconds: any;
   results: any;
   userSocketIdle: any;
+  setUserSocketIdle: any;
 };
 
 const getUser = async (playerId: string) => {
@@ -82,6 +83,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   const quit = () => {
     setResults(null);
+    console.log('quit notifigcaiton')
     closeNotification();
     // eslint-disable-next-line
     // @ts-ignore: Unreachable code error
@@ -262,6 +264,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       // eslint-disable-next-line
       // @ts-ignore: Unreachable code error
       if (event.event === "room-updated" && window.results) {
+
         setResults(null);
         closeNotification();
         setRoomInfo(event.data);
@@ -422,8 +425,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   useEffect(() => {
     if (!results) {
-      closeNotification();
-
       return;
     }
     openNotification({
@@ -487,6 +488,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       timer,
       totalSeconds,
       userSocketIdle,
+      setUserSocketIdle,
       results,
       isBackendReady,
     }),
@@ -494,6 +496,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       gameState,
       players,
       userSocketIdle,
+      setUserSocketIdle,
       playersGame,
       roomId,
       userInfo,

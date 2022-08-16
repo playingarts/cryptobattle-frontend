@@ -24,7 +24,7 @@ const JoinGame: NextPage = () => {
   const WSProvider = useWS();
   const router = useRouter();
   const { roomid, join } = router.query;
-  const { players, setPlayers, roomInfo, isBackendReady, userSocketIdle } =
+  const { players, setPlayers, roomInfo, isBackendReady, userSocketIdle,setUserSocketIdle } =
     useGame();
   const { user } = useAuth();
 
@@ -98,7 +98,8 @@ const JoinGame: NextPage = () => {
         })
       );
     }
-  }, [userSocketIdle, isOwner, user]);
+    setUserSocketIdle(null)
+  }, [userSocketIdle, setUserSocketIdle, isOwner, user]);
 
   useEffect(() => {
     if (!players) {
@@ -129,7 +130,6 @@ const JoinGame: NextPage = () => {
   useEffect(() => {
     if (!isReady) {
       closeNotification();
-
       return;
     }
 
@@ -154,7 +154,7 @@ const JoinGame: NextPage = () => {
         </Button>
       ),
     });
-  }, [isReady, openNotification]);
+  }, [isReady, closeNotification]);
 
   // useEffect(() => {
   //   const handleTabClose = (event: any) => {
