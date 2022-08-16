@@ -154,7 +154,7 @@ const JoinGame: NextPage = () => {
         </Button>
       ),
     });
-  }, [isReady, closeNotification]);
+  }, [isReady]);
 
   // useEffect(() => {
   //   const handleTabClose = (event: any) => {

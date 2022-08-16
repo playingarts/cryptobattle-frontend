@@ -20,13 +20,10 @@ const Player = forwardRef(
       if (!currentPlayerWithPoints) {
         return
       }
-      console.log('happens timer', timer)
 
       const seconds = totalSeconds / 1000;
-      console.log('seconds', seconds);
       const secondsPassed = timer / 1000;
 
-      console.log((secondsPassed / seconds) * 100);
       // setProgress((secondsPassed / seconds) * 100);
       if (currentPlayerWithPoints.userId === player.userId && !results) {
         setProgress((secondsPassed / seconds) * 100);
