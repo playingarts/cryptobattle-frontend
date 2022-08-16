@@ -86,7 +86,7 @@ const Player = forwardRef(
               fill: "#3e98c7",
             },
           }}
-          css={{ width: 82, height: 82 }}
+          css={{ width: 70, height: 70 }}
           value={progress}
         >
           <div
@@ -167,6 +167,7 @@ const Player = forwardRef(
                 "&:hover": {
                   background: player.color,
                 },
+                transform: 'scale(0.84,0.84)'
               }}
               profilePictureUrl={
                 player.profilePictureUrl

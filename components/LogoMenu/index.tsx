@@ -74,7 +74,7 @@ const StyledContent = styled(PopoverPrimitive.Content, {
   // padding: "11px 5px",
   width: 380,
   backgroundColor: "white",
-  marginTop: -60,
+  marginTop: -72,
   minHeight: 550,
   zIndex: 4000,
   // paddingLeft: 40,
@@ -120,8 +120,7 @@ export default function LogoMenu({
   headerTitle: string;
 }) {
   const [open, setOpen] = useState(false);
-  const { loggedIn, logout} = useAuth();
-
+  const { loggedIn, logout } = useAuth();
 
   const WSProvider = useWS();
   const router = useRouter();
@@ -148,22 +147,30 @@ export default function LogoMenu({
           display: "flex",
           alignItems: "center",
           borderRadius: "10px",
-          padding: 4,
+          padding: 0,
         }}
       >
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverAnchor
-            css={{ padding: "0 20px", background: "#181818", borderRadius: 10 }}
+            css={{
+              display: "flex",
+              justifyContent: "flex-start",
+              width: "390px",
+            }}
           >
             <PopoverTrigger asChild>
               <div
                 css={{
+                  padding: "0 20px",
+                  borderRadius: 10,
+                  width: "auto",
                   display: "flex",
-                  justifyContent: "start",
+                  justifyContent: "flex-start",
                   alignItems: "center",
                   color: "white",
-                  height: "60px",
+                  height: "70px",
                   marginTop: "0",
+                  background: "#181818",
                 }}
               >
                 <div style={{ marginRight: "36px" }} className="hamburger">
@@ -208,8 +215,8 @@ export default function LogoMenu({
                     margin: 0,
                     padding: 8,
                     position: "absolute",
-                    top: -49,
-                    left: 16,
+                    top: -56,
+                    left: 12,
                     cursor: "pointer",
                     transition: "all 600ms",
                     "&:hover": {
@@ -220,13 +227,13 @@ export default function LogoMenu({
                   <CloseMenu />
                 </div>
               </PopoverClose>
-              <div css={{ padding: "0 50px 0 95px" }}>
+              <div css={{ padding: "0 52px 0 100px" }}>
                 <Text
                   component="div"
                   variant="h5"
                   css={{
                     textTransform: "uppercase",
-                    paddingTop: 0,
+                    paddingTop: 4,
                     cursor: "pointer",
                   }}
                 >

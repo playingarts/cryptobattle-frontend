@@ -100,7 +100,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
   }, [gameState, user]);
 
   return (
-    <header {...props} style={{ zIndex: 3800 }}>
+    <header {...props} style={{ zIndex: 3800, height: 70}}>
       <div
         css={(theme) => [
           {
@@ -127,6 +127,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
             marginTop: "0px",
             fontSize: "30px",
             zIndex: 3800,
+            height: 70
           }}
         >
           <LogoMenu
@@ -140,6 +141,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
                   justifyContent: "center",
                   alignItems: "center",
                   minWidth: 180,
+                  height: 70
                 }}
               >
                 <Text
@@ -180,8 +182,10 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
             textAlign: "center",
             position: "absolute",
             left: "50%",
-            top: "120%",
-            transform: "translate(-50%, -50%) scale(0.8)",
+            top: "92%",
+            transform: "translate(-50%, -50%) scale(0.72, 0.72)",
+            transformOrigin: 'top',
+            height: 70
           })}
         >
           <GameInventory isOpponentsCards={true} cards={opponentsCards} />
