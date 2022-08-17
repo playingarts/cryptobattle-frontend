@@ -83,7 +83,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   const quit = () => {
     setResults(null);
-    console.log('quit notifigcaiton')
     closeNotification();
     // eslint-disable-next-line
     // @ts-ignore: Unreachable code error
@@ -195,7 +194,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
     WSProvider.onmessage = function ({ data }) {
       const event = JSON.parse(data);
-      console.log("Game Provider WS event:", event);
+      if (event.event !== 'timer')       {console.log("Game Provider WS event:", event)}
+
       // WSProvider.send(
       //   JSON.stringify({
       //     event: "room-info",
