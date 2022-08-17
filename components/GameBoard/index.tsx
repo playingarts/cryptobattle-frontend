@@ -369,7 +369,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       },
     });
 
-      return () => {
+    return () => {
       interact(".dropzone").unset();
     };
   }, []);
@@ -462,7 +462,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                           },
                           "&::before": {
                             transition: "all 300ms",
-
                             position: "absolute",
                             content: `' '`,
                             background: "#000",
@@ -525,13 +524,31 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                               position: "relative",
                               // animationDuration: "10s",
                               opacity:
-                                lastPlayedCard?.value === card.value &&
-                                lastPlayedCard?.suit === card.suit
+                                column &&
+                                column[column.length - 1].suit &&
+                                column[column.length - 1].value &&
+                                lastPlayedCard?.value ===
+                                  column[column.length - 1].value &&
+                                lastPlayedCard?.suit ===
+                                  column[column.length - 1].suit &&
+                                (column[column.length - 1].id
+                                  ? lastPlayedCard?.id ===
+                                    column[column.length - 1].id
+                                  : true)
                                   ? 0
                                   : 1,
                               animation:
-                                lastPlayedCard?.value === card.value &&
-                                lastPlayedCard?.suit === card.suit
+                                column &&
+                                column[column.length - 1].suit &&
+                                column[column.length - 1].value &&
+                                lastPlayedCard?.value ===
+                                  column[column.length - 1].value &&
+                                lastPlayedCard?.suit ===
+                                  column[column.length - 1].suit &&
+                                (column[column.length - 1].id
+                                  ? lastPlayedCard?.id ===
+                                    column[column.length - 1].id
+                                  : true)
                                   ? "example3  0.3s linear 0.3s 1 normal forwards"
                                   : "",
                               animationDelay: "1.6s",
