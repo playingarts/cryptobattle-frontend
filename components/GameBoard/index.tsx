@@ -368,6 +368,10 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         event.target.classList.remove("drop-target");
       },
     });
+
+      return () => {
+      interact(".dropzone").unset();
+    };
   }, []);
 
   return (
