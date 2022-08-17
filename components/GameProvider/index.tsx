@@ -82,6 +82,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   };
 
   const quit = () => {
+    localStorage.setItem('chosen-nfts', '')
+
     setResults(null);
     closeNotification();
     // eslint-disable-next-line

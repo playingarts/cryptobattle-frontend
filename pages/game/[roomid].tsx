@@ -178,7 +178,8 @@ const JoinGame: NextPage = () => {
     const leave = () => {
       const leave = () => {
         setPlayers(null);
-
+                // eslint-disable-next-line
+        localStorage.setItem('chosen-nft', null)
         WSProvider.send(
           JSON.stringify({
             event: isOwner ? "close-room" : "quit-room",

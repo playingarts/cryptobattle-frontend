@@ -31,9 +31,10 @@ const NFTChoose: FC<Props> = () => {
   const WSProvider = useWS();
 
   const { user } = useAuth();
-
-  const [firstCard, setFirstCard] = useState<any>();
-  const [secondCard, setSecondCard] = useState<any>();
+  // eslint-disable-next-line
+  const [firstCard, setFirstCard] = useState<any>(localStorage.getItem('chosen-nfts') ? JSON.parse(localStorage.getItem('chosen-nfts'))[0] : null);
+      // eslint-disable-next-line
+  const [secondCard, setSecondCard] = useState<any>(localStorage.getItem('chosen-nfts') ? JSON.parse(localStorage.getItem('chosen-nfts'))[1] : null);
 
   const [activeCard, setActiveCard] = useState(0);
 
@@ -82,6 +83,9 @@ const NFTChoose: FC<Props> = () => {
         id: secondCard.id,
       });
     }
+
+    localStorage.setItem('chosen-nfts', JSON.stringify([firstCard, secondCard])
+    )
 
     WSProvider.send(
       JSON.stringify({
