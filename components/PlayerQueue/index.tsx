@@ -1,13 +1,7 @@
-import {
-  useState,
-  useEffect,
-  FC,
-  HTMLAttributes,
-  createRef,
-} from "react";
+import { useState, useEffect, FC, HTMLAttributes, createRef } from "react";
+import { useGame } from "../GameProvider";
 export type Props = HTMLAttributes<HTMLDivElement>;
 import Player from "./Player";
-
 
 // import AnimateBubbles from "../../pages/AnimateBubbles";
 // import  from "../../pages/AnimateBubbles";
@@ -24,7 +18,32 @@ const PlayerQueue: FC<PlayerQueue> = ({
   currentPlayerWithPoints,
 }) => {
   const [players, setPlayers] = useState([]);
+  const [inactivePlayers, setInactivePlayers] = useState<any>([]);
+
   const [order, setOrder] = useState([]);
+
+  const { userSocketIdle } = useGame();
+
+  useEffect(() => {
+    if (!userSocketIdle) {
+      return;
+    }
+
+    let players = [...inactivePlayers];
+
+    if (
+      players.find((player) => player.userId === userSocketIdle.userId) &&
+      !userSocketIdle.isIdle
+    ) {
+      players = players.filter(
+        (player) => player.userId !== userSocketIdle.userId
+      );
+    } 
+      players.push(userSocketIdle);
+    
+
+    setInactivePlayers(players);
+  }, [userSocketIdle, inactivePlayers, setInactivePlayers]);
 
   useEffect(() => {
     const shiftArray = (arr: any, target: any) => {
@@ -36,29 +55,18 @@ const PlayerQueue: FC<PlayerQueue> = ({
       return;
     }
 
-      setOrder(shiftArray(playersWithPoints, currentPlayerWithPoints));
-    
-
-
+    setOrder(shiftArray(playersWithPoints, currentPlayerWithPoints));
   }, [playersWithPoints, currentPlayerWithPoints]);
 
-
-
   useEffect(() => {
-
     // if (playersWithPoints.length === 0) {
     //   return;
     // }
 
     //   console.log('indexOf',  playersWithPoints.indexOf(currentPlayerWithPoints) )
 
-
-      setPlayers(order);
-    
-
-
+    setPlayers(order);
   }, [order]);
-
 
   // const shuffle = useCallback(() => {
   //   if (!players) {
@@ -74,34 +82,44 @@ const PlayerQueue: FC<PlayerQueue> = ({
 
   //
   return (
-    <div >
+    <div>
       {/* <div onClick={shuffle}>Shuffle </div> */}
       {/* <div  css={() => ({
         top: 200,
         left: 100,
         fontSize: "50px",
       })}>{timer}</div> */}
-      <div   className="bubbles-wrapper">
+      <div className="bubbles-wrapper">
         <div className="bubbles-group"></div>
         {players.length > 0 && (
-
-          <div css={{display: 'flex', justifyContent:"space-between", width: players.length * 100}}>
-          {/* // <AnimateBubbles> */}
+          <div
+            css={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: players.length * 100,
+            }}
+          >
+            {/* // <AnimateBubbles> */}
             {players.map((player: any) => {
               return (
                 <Player
-                  // eslint-disable-next-line 
+                  // eslint-disable-next-line
                   // @ts-ignore
                   currentPlayerWithPoints={currentPlayerWithPoints}
                   player={player}
+                  inactive={
+                    inactivePlayers.find(
+                      (inactivePlayer: any) =>
+                        player.userId === inactivePlayer.userId
+                    )?.isIdle
+                  }
                   loadingDelayed={loadingDelayed}
                   key={player.userId}
                   ref={createRef()}
-
                 />
               );
             })}
-            </div>
+          </div>
           // </AnimateBubbles>
         )}
       </div>

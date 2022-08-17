@@ -12,7 +12,7 @@ const Player = forwardRef(
   // eslint-disable-next-line
 // @ts-ignore
 // eslint-disable-next-line
-  ({ player, loadingDelayed, currentPlayerWithPoints }, ref) => {
+  ({ player, loadingDelayed, currentPlayerWithPoints, inactive }, ref) => {
     const [progress, setProgress] = useState(100)
     // const [first, setFirst] = useState(false)
     const { timer, totalSeconds, results } = useGame()
@@ -52,7 +52,7 @@ const Player = forwardRef(
             // Customize the path, i.e. the "completed progress"
             path: {
               // Path color
-              stroke: player.color,
+              stroke: inactive ? 'gray' : player.color,
               // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
               strokeLinecap: "butt",
               // Customize transition animation
@@ -90,6 +90,7 @@ const Player = forwardRef(
             css={{
               borderRadius: 9999,
               cursor: "default",
+              filter: inactive ? 'grayscale(100%)' : 'none',
               opacity: loadingDelayed ? "0" : "1",
               transform: loadingDelayed
                 ? "translate(1500px, 0)"
