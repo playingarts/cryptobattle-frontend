@@ -333,6 +333,10 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
           </Text>
 
           <div css={{ display: "flex", marginTop: "20px", marginBottom: 100 }}>
+          <Link target="_blank" href="https://opensea.io/collection/cryptoedition">
+
+
+
             <Button
               Icon={Opensea}
               css={(theme) => ({
@@ -343,6 +347,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
             >
               opensea collection
             </Button>
+            </Link>
           </div>
         </Fragment>
       )}
