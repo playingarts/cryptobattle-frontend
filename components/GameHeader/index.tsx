@@ -183,7 +183,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
             position: "absolute",
             left: "50%",
             top: "92%",
-            transform: "translate(-50%, -50%) scale(0.72, 0.72)",
+            transform: "translate(-50%, -50%) scale(0.68, 0.68)",
             transformOrigin: 'top',
             height: 70
           })}
