@@ -452,7 +452,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       footer: (
         <div css={{ display: "flex" }}>
-          <Button
+          {results.areAllPlayersActive && <Button
             css={(theme) => ({
               color: "#fff",
               background: "#7B61FF",
@@ -465,7 +465,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
             {playingAgain
               ? "Waiting"
               : "Play again " + "(" + timer / 1000 + ")"}
-          </Button>
+          </Button>}
           <Button onClick={playAgainQuit}>Quit</Button>
         </div>
       ),
