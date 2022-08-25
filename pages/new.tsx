@@ -10,15 +10,18 @@ import { useEffect } from "react";
 import { useGame } from "../components/GameProvider";
 import Loader from "../components/Loader";
 import { useRouter } from "next/router";
-
+import { useNotifications } from "../components/NotificationProvider";
+import Text from "../components/Text";
+import Warning from "../components/Icons/Warning";
 // import NFTInventory from "../components/NFTInventory";
 // import NFTChoose from "../components/NFTChoose";
 
 const NewGame: NextPage = () => {
   // const { user } = useAuth();
   // const { openNotification, closeNotification } = useNotifications();
+  const { openNotification } = useNotifications();
 
-  const { roomId, setRoomId} = useGame();
+  const { roomId, setRoomId, isAlreadyConnected} = useGame();
   const router = useRouter();
   useEffect(() => {
     console.log('roomid happens', roomId)
@@ -37,6 +40,32 @@ const NewGame: NextPage = () => {
 
   const headerMiddle = <div></div>
 
+  useEffect(() => {
+    if (!isAlreadyConnected) {
+      return;
+    }
+    openNotification({
+      description: (
+        <div>
+          <Text
+            variant="h1"
+            css={{ fontSize: 35, lineHeight: "45.5px", marginBottom: 0, marginTop: 60 }}
+          >
+            Already connected!
+          </Text>
+          <Text
+            variant="body3"
+            css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
+          >
+            You are already in a lobby or a game in an another browser or a tab.
+          </Text>
+        </div>
+      ),
+      dark: false,
+      icon: <Warning />,
+      iconColor: "#FF6F41",
+    });
+  }, [isAlreadyConnected]);
 
   useEffect(() => {
 

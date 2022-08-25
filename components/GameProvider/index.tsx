@@ -12,10 +12,13 @@ import Button from "../Button/";
 import { formatUsername } from "../../utils/helpers";
 import { useRouter } from "next/router";
 import Refresh from "../Icons/Refresh";
-
 import { useWS } from "../../components/WsProvider/index";
 import { useAuth } from "../../components/AuthProvider";
 import { api } from "../../api";
+
+
+
+
 
 type GameProviderProps = { children: ReactNode };
 
@@ -39,6 +42,7 @@ export type IGameProviderContext = {
   results: any;
   userSocketIdle: any;
   setUserSocketIdle: any;
+  isAlreadyConnected: boolean;
 };
 
 const getUser = async (playerId: string) => {
@@ -63,10 +67,16 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   const [timer, setTimer] = useState<any>([]);
   const [totalSeconds, setTotalSeconds] = useState<any>([]);
+  const [isAlreadyConnected, setIsAlreadyConnected] = useState<boolean>(false);
+
 
   const [userInfo, setUserInfo] = useState<any>([]);
 
   const [isBackendReady, setIsBackendReady] = useState(false);
+
+  const WSProvider = useWS();
+
+  const { user } = useAuth();
 
   const [roomInfo, setRoomInfo] = useState<any>([]);
   const [selectedCard, setSelectedCard] = useState<any>(null);
@@ -82,7 +92,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   };
 
   const quit = () => {
-    localStorage.setItem('chosen-nfts', '')
+    localStorage.setItem("chosen-nfts", "");
 
     setResults(null);
     closeNotification();
@@ -108,11 +118,27 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   }, [selectedCard]);
 
   useEffect(() => {
+            // eslint-disable-next-line
+            // @ts-ignore: Unreachable code error
+    if (isAlreadyConnected || !user || window.gameStarted) {
+      return
+    }
+    
+    if (user.inGameId) {
+      router.push(`/play`)
+      return
+    }
+    if (user.inRoomId && !router.pathname.startsWith('/join')) {
+      router.push(`/game/${user.inRoomId}`)
+    }
+    console.log(selectedCard);
+  }, [user, isAlreadyConnected]);
+
+
+  useEffect(() => {
     return () => setPlayingAgain(false);
   }, []);
 
-  const WSProvider = useWS();
-  const { user } = useAuth();
 
   const playAgain = () => {
     setPlayingAgain(true);
@@ -180,9 +206,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   }, [roomId]);
 
   useEffect(() => {
-    
     if (!WSProvider) {
-      return
+      return;
     }
 
     WSProvider.onerror = function (event: any) {
@@ -192,18 +217,20 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
     WSProvider.onclose = function (e) {
       console.log("on close: " + e.code);
+      if (e.code === 4000) {
+        setIsAlreadyConnected(true);
+      }
     };
 
     WSProvider.onmessage = function ({ data }) {
-      const event = JSON.parse(data);
-      if (event.event !== 'timer')       {console.log("Game Provider WS event:", event)}
+      
+      setIsAlreadyConnected(false);
 
-      // WSProvider.send(
-      //   JSON.stringify({
-      //     event: "room-info",
-      //     data: {},
-      //   })
-      // );
+      const event = JSON.parse(data);
+      if (event.event !== "timer") {
+        console.log("Game Provider WS event:", event);
+      }
+
 
       // Timeout ended
       if (event.event === "timer") {
@@ -214,11 +241,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       // Timeout ended
       if (event.event === "user-socket-idle") {
-        setUserSocketIdle(event.data)
+        setUserSocketIdle(event.data);
         return;
       }
-
-      
 
       if (event.data.error && event.data.error.message) {
         if (event.data.error.message === "Player must be in a room") {
@@ -254,7 +279,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       // Timeout ended
       if (event.event === "close-room" && event.data.reason === "TIMEOUT") {
         quit();
-        
+
         return;
       }
 
@@ -266,7 +291,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       // eslint-disable-next-line
       // @ts-ignore: Unreachable code error
       if (event.event === "room-updated" && window.results) {
-
         setResults(null);
         closeNotification();
         setRoomInfo(event.data);
@@ -454,20 +478,22 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       footer: (
         <div css={{ display: "flex" }}>
-          {results.areAllPlayersActive && <Button
-            css={(theme) => ({
-              color: "#fff",
-              background: "#7B61FF",
-              marginRight: theme.spacing(2),
-            })}
-            Icon={Refresh}
-            onClick={playAgain}
-            disabled={playingAgain}
-          >
-            {playingAgain
-              ? "Waiting"
-              : "Play again " + "(" + timer / 1000 + ")"}
-          </Button>}
+          {results.areAllPlayersActive && (
+            <Button
+              css={(theme) => ({
+                color: "#fff",
+                background: "#7B61FF",
+                marginRight: theme.spacing(2),
+              })}
+              Icon={Refresh}
+              onClick={playAgain}
+              disabled={playingAgain}
+            >
+              {playingAgain
+                ? "Waiting"
+                : "Play again " + "(" + timer / 1000 + ")"}
+            </Button>
+          )}
           <Button onClick={playAgainQuit}>Quit</Button>
         </div>
       ),
@@ -493,6 +519,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       setUserSocketIdle,
       results,
       isBackendReady,
+      isAlreadyConnected
     }),
     [
       gameState,
@@ -511,6 +538,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       totalSeconds,
       results,
       isBackendReady,
+      isAlreadyConnected
     ]
   );
 

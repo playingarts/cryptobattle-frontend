@@ -3,6 +3,8 @@ import Layout from "../../components/Layout";
 import { useWS } from "../../components/WsProvider/index";
 import { useRouter } from "next/router";
 import { useGame } from "../../components/GameProvider";
+import Warning from "../../components/Icons/Warning";
+
 import ComposedGlobalLayout from "../../components/_composed/GlobalLayout";
 
 import Button from "../../components/Button";
@@ -14,7 +16,7 @@ import Lobby from "../../components/Lobby";
 import Ready from "../../components/Ready";
 
 import NFTChoose from "../../components/NFTChoose";
-
+import Text from "../../components/Text";
 import { useNotifications } from "../../components/NotificationProvider";
 import { useAuth } from "../../components/AuthProvider";
 import NavProfile from "../../components/NavProfile";
@@ -24,7 +26,7 @@ const JoinGame: NextPage = () => {
   const WSProvider = useWS();
   const router = useRouter();
   const { roomid, join } = router.query;
-  const { players, setPlayers, roomInfo, isBackendReady, userSocketIdle,setUserSocketIdle } =
+  const { players, setPlayers, roomInfo, isBackendReady, userSocketIdle,setUserSocketIdle, isAlreadyConnected } =
     useGame();
   const { user } = useAuth();
 
@@ -156,19 +158,48 @@ const JoinGame: NextPage = () => {
     });
   }, [isReady]);
 
-  // useEffect(() => {
-  //   const handleTabClose = (event: any) => {
-  //     event.preventDefault();
 
-  //     return;
-  //   };
+  useEffect(() => {
+    if (!isAlreadyConnected) {
+      return;
+    }
+    openNotification({
+      description: (
+        <div>
+          <Text
+            variant="h1"
+            css={{ fontSize: 35, lineHeight: "45.5px", marginBottom: 0, marginTop: 60 }}
+          >
+            Already connected!
+          </Text>
+          <Text
+            variant="body3"
+            css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
+          >
+            You are already in a lobby or a game in an another browser or tab.
+          </Text>
+        </div>
+      ),
+      dark: false,
+      icon: <Warning />,
+      iconColor: "#FF6F41",
+    });
+  }, [isAlreadyConnected]);
 
-  //   window.addEventListener("beforeunload", handleTabClose);
 
-  //   return () => {
-  //     window.removeEventListener("beforeunload", handleTabClose);
-  //   };
-  // }, []);
+  useEffect(() => {
+    const handleTabClose = (event: any) => {
+      event.preventDefault();
+
+      return;
+    };
+
+    window.addEventListener("beforeunload", handleTabClose);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleTabClose);
+    };
+  }, []);
 
   useEffect(() => {
     if (isOwner === null) {

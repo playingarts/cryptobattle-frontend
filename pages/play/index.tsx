@@ -9,8 +9,10 @@ import { getCard } from "../../components/Cards";
 import { useGame } from "../../components/GameProvider";
 import { useWS } from "../../components/WsProvider";
 import { useAuth } from "../../components/AuthProvider";
-
+import { useNotifications } from "../../components/NotificationProvider";
 import { useState, useEffect } from "react";
+import Text from "../../components/Text";
+import Warning from "../../components/Icons/Warning";
 const Play: NextPage = () => {
   const WSProvider = useWS();
   const { user } = useAuth();
@@ -18,8 +20,9 @@ const Play: NextPage = () => {
   const [loading, setLoading] = useState(true);
 
   const [myCards, setMyCards] = useState<Array<any>>([]);
+  const { openNotification } = useNotifications();
 
-  const { gameState, isBackendReady } = useGame();
+  const { gameState, isBackendReady, isAlreadyConnected } = useGame();
   useEffect(() => {
 
     if (!isBackendReady) {
@@ -55,18 +58,32 @@ const Play: NextPage = () => {
 
   }, [gameState]);
 
-  // useEffect(() => {
-  //   const updateGame =  setInterval(() => {
-  //      WSProvider.send(
-  //        JSON.stringify({
-  //          event: "game-info",
-  //          data: {},
-  //        })
-  //      );
-  //      console.log("Interval: game-info")
-  //    }, 3000)
-  //    return () => clearInterval(updateGame)
-  //  }, [])
+  useEffect(() => {
+    if (!isAlreadyConnected) {
+      return;
+    }
+    openNotification({
+      description: (
+        <div>
+          <Text
+            variant="h1"
+            css={{ fontSize: 35, lineHeight: "45.5px", marginBottom: 0, marginTop: 60 }}
+          >
+            Already connected!
+          </Text>
+          <Text
+            variant="body3"
+            css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
+          >
+            You are already in a lobby or a game in an another browser or a tab.
+          </Text>
+        </div>
+      ),
+      dark: false,
+      icon: <Warning />,
+      iconColor: "#FF6F41",
+    });
+  }, [isAlreadyConnected]);
 
   useEffect(() => {
     if (!gameState || !user || !user.userId) {

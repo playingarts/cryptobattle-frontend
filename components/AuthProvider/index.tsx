@@ -19,11 +19,14 @@ interface User {
   userId: string;
   state: string;
   name: string;
+  inGameId: string;
+  inRoomId: string;
   username: string;
   metamask: MetamaskUser;
   profilePictureUrl: string;
   isTwitterConnected: boolean;
   isMetamaskConnected: boolean;
+  
 }
 
 export type IAuthProviderContext = {
@@ -105,20 +108,12 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
         if (data.refreshToken) {
           localStorage.setItem("refreshToken", data.refreshToken )
-                  localStorage.setItem("accessTokenExpire", data.accessTokenExpire )
-
+          localStorage.setItem("accessTokenExpire", data.accessTokenExpire )
         }
 
         const user = formatUserData(data);
         setUser(user);
 
-          if (user.inGameId) {
-            router.push(`/play`)
-            return
-          }
-          if (user.inRoomId && !router.pathname.startsWith('/join')) {
-            router.push(`/game/${user.inRoomId}`)
-          }
       });
     }
 
