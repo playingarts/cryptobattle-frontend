@@ -294,6 +294,19 @@ const JoinGame: NextPage = () => {
     }
   }, [roomInfo, user]);
 
+
+  useEffect(() => {
+
+    setTimeout(() => {
+      if (localStorage.getItem('show-rules-modal')) {
+        document.getElementById('rules-button')?.click()
+        localStorage.removeItem('show-rules-modal')
+      }   
+    }, 0);
+
+
+  }, [])
+  
   useEffect(() => {
     // eslint-disable-next-line
     // @ts-ignore: Unreachable code error
@@ -363,7 +376,7 @@ const JoinGame: NextPage = () => {
 
   const headerRight = (
     <GameRules>
-      <Button css={{ color: "#fff", background: "rgba(255, 255, 255, 0.05)" }}>
+      <Button id="rules-button" css={{ color: "#fff", background: "rgba(255, 255, 255, 0.05)" }}>
         Game Rules
       </Button>
     </GameRules>

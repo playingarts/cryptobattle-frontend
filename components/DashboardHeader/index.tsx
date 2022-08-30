@@ -57,6 +57,11 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
       .then((data: any) => {
         console.log("User Stats: ", data);
         setUserStats(data);
+
+
+        if (data.gamesPlayed === 0) {
+          localStorage.setItem('show-rules-modal', 'true')
+        }
       })
       .catch((err: any) => {
         console.log(err);
