@@ -298,6 +298,11 @@ const JoinGame: NextPage = () => {
     // eslint-disable-next-line
     // @ts-ignore: Unreachable code error
     window.gameStarted = false;
+    // eslint-disable-next-line
+    // @ts-ignore: Unreachable code error
+    localStorage.removeItem('play-again')
+
+
     if (!isBackendReady) {
       return;
     }

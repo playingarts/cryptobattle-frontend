@@ -16,10 +16,6 @@ import { useWS } from "../../components/WsProvider/index";
 import { useAuth } from "../../components/AuthProvider";
 import { api } from "../../api";
 
-
-
-
-
 type GameProviderProps = { children: ReactNode };
 
 // eslint-disable
@@ -69,7 +65,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   const [totalSeconds, setTotalSeconds] = useState<any>([]);
   const [isAlreadyConnected, setIsAlreadyConnected] = useState<boolean>(false);
 
-
   const [userInfo, setUserInfo] = useState<any>([]);
 
   const [isBackendReady, setIsBackendReady] = useState(false);
@@ -118,30 +113,36 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   }, [selectedCard]);
 
   useEffect(() => {
-            // eslint-disable-next-line
-            // @ts-ignore: Unreachable code error
+    // eslint-disable-next-line
+    // @ts-ignore: Unreachable code error
     if (isAlreadyConnected || !user || window.gameStarted) {
-      return
+      return;
     }
-    
+
     if (user.inGameId) {
-      router.push(`/play`)
-      return
+      router.push(`/play`);
+      return;
     }
-    if (user.inRoomId && !router.pathname.startsWith('/join')) {
-      router.push(`/game/${user.inRoomId}`)
+    if (user.inRoomId && !router.pathname.startsWith("/join")) {
+      router.push(`/game/${user.inRoomId}`);
     }
     console.log(selectedCard);
   }, [user, isAlreadyConnected]);
 
-
   useEffect(() => {
-    return () => setPlayingAgain(false);
+    return () => {
+      setPlayingAgain(false);
+      // eslint-disable-next-line
+      // @ts-ignore: Unreachable code error
+      localStorage.removeItem('play-again')
+    };
   }, []);
-
 
   const playAgain = () => {
     setPlayingAgain(true);
+    // eslint-disable-next-line
+    // @ts-ignore: Unreachable code error
+    localStorage.setItem('play-again', true)
     WSProvider.send(
       JSON.stringify({
         event: "next-game",
@@ -223,14 +224,12 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     };
 
     WSProvider.onmessage = function ({ data }) {
-      
       setIsAlreadyConnected(false);
 
       const event = JSON.parse(data);
       if (event.event !== "timer") {
         console.log("Game Provider WS event:", event);
       }
-
 
       // Timeout ended
       if (event.event === "timer") {
@@ -402,6 +401,13 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         // eslint-disable-next-line
         // @ts-ignore: Unreachable code error
         if (event.data.state === "ended" && !window.results) {
+          WSProvider.send(
+            JSON.stringify({
+              event: "game-results",
+              data: {},
+            })
+          );
+
           openNotification({
             title: "Game Over!",
             dark: true,
@@ -453,48 +459,155 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     if (!results) {
       return;
     }
+    const getTitle = () => {
+      if (results.winnerPlayersUserIds.length === playersGame.length) {
+        return "Tie!";
+      }
+
+      if (results.winnerPlayersUserIds.includes(user.userId)) {
+        return "You Win!";
+      }
+
+      const winners = results.winnerPlayersUserIds.map((winnerId: any) =>
+        formatUsername(
+          playersGame.find((player: any) => player.userId === winnerId).username
+        )
+      );
+
+      return winners.length > 0 
+       
+        ? winners.join(", ") + " won!"
+        : "Tie!";
+    };
+
+    const playerResults = playersGame
+    .map((player: any) => {
+      const resultsPlayer = results.playersPoints.find(
+        (playerR: any) => player.userId === playerR.userId
+      );
+
+      return {
+        points: resultsPlayer ? resultsPlayer.points : 0,
+        ...player,
+      };
+    })
+    .sort((a: any, b: any) => b.points - a.points);
+
+
+    // const playerResults = results.playersPoints
+    //   .map((player: any) => {
+    //     const playerFull = playersGame.find(
+    //       (playerGame: any) => player.userId === playerGame.userId
+    //     );
+
+    //     return {
+    //       points: player.points,
+    //       ...playerFull,
+    //     };
+    //   })
+    //   .sort((a: any, b: any) => b.points - a.points);
+
+
     openNotification({
-      title: "Game Over!",
       description: (
-        <Text
-          variant="h1"
-          css={{ fontSize: 30, lineHeight: 1, marginBottom: 60 }}
+        <div
+          css={{
+            marginTop: 40,
+          }}
         >
-          {playersGame.map((player: any) => {
-            const points = results.playersPoints.find(
-              (playersWithPoints: any) =>
-                playersWithPoints.userId === player.userId
-            );
-            return (
-              <div css={{ marginBottom: 16 }} key={player.userId}>
-                {formatUsername(player.username)} : {points ? points.points : 0}{" "}
-              </div>
-            );
-          })}
-        </Text>
+          <Text
+            variant="h1"
+            css={{
+              marginTop: 40,
+              fontSize: 35,
+              lineHeight: "45.5px",
+              letterSpacing: "-5%",
+              marginBottom: 30,
+            }}
+          >
+            {getTitle()}
+          </Text>
+          <Text
+            variant="body"
+            css={{
+              fontSize: 18,
+              lineHeight: "21.11px",
+              marginBottom: 30,
+              width: 390,
+            }}
+          >
+            {playerResults.map((player: any, index: number) => {
+              // const points = results.playersPoints.find(
+              //   (playersWithPoints: any) =>
+              //     playersWithPoints.userId === player.userId
+              // );
+              return (
+                <div
+                  css={{
+                    padding: 14,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderTop:
+                      index === 0
+                        ? "1px solid rgba(255, 255, 255, 0.1)"
+                        : "none",
+                  }}
+                  key={player.userId}
+                >
+                  <div>
+                    {index + 1 + ". "}
+                    {formatUsername(player.username)}{" "}
+                  </div>
+                  <div>
+                    {player.points ? player.points : 0}
+                    {" points"}
+                  </div>
+                </div>
+              );
+            })}
+          </Text>
+        </div>
       ),
       dark: true,
-      iconColor: "#FEEA3A",
+      isWinner: results.winnerPlayersUserIds.includes(user.userId) &&  results.winnerPlayersUserIds.length !== playersGame.length,
 
       footer: (
-        <div css={{ display: "flex" }}>
+        <div
+          css={{
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "column",
+            marginBottom: 40,
+          }}
+        >
           {results.areAllPlayersActive && (
             <Button
               css={(theme) => ({
                 color: "#fff",
                 background: "#7B61FF",
-                marginRight: theme.spacing(2),
+                marginBottom: theme.spacing(2),
               })}
               Icon={Refresh}
               onClick={playAgain}
-              disabled={playingAgain}
+              disabled={playingAgain || localStorage.getItem('play-again')}
             >
-              {playingAgain
+              {/* // eslint-disable-next-line
+    // @ts-ignore: Unreachable code error */}
+              {playingAgain || localStorage.getItem('play-again')
                 ? "Waiting"
                 : "Play again " + "(" + timer / 1000 + ")"}
             </Button>
           )}
-          <Button onClick={playAgainQuit}>Quit</Button>
+          <Button
+            css={() => ({
+              color: "#fff",
+              background: "rgba(255, 255, 255, 0.05)",
+            })}
+            onClick={playAgainQuit}
+          >
+            Dashboard
+          </Button>
         </div>
       ),
     });
@@ -519,7 +632,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       setUserSocketIdle,
       results,
       isBackendReady,
-      isAlreadyConnected
+      isAlreadyConnected,
     }),
     [
       gameState,
@@ -538,7 +651,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       totalSeconds,
       results,
       isBackendReady,
-      isAlreadyConnected
+      isAlreadyConnected,
     ]
   );
 
