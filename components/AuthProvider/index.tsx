@@ -15,18 +15,7 @@ type AuthProviderProps = { children: ReactNode };
 type MetamaskUser = { address: string; signature: string };
 import Loader from "../Loader";
 
-interface User {
-  userId: string;
-  state: string;
-  name: string;
-  inGameId: string;
-  inRoomId: string;
-  username: string;
-  metamask: MetamaskUser;
-  profilePictureUrl: string;
-  isTwitterConnected: boolean;
-  isMetamaskConnected: boolean;
-}
+
 
 export type IAuthProviderContext = {
   logout: () => void;
