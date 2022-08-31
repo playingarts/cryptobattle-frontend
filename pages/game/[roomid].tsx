@@ -261,22 +261,22 @@ const JoinGame: NextPage = () => {
       }
     };
 
-    const handleTabClose = () => {
-      leave();
+    // const handleTabClose = () => {
+    //   // leave();
 
-      // event.preventDefault();
-      // event.returnValue = null;
-      return;
-      // return (event.returnValue = "Are you sure you want to exit?"), leave();
-    };
+    //   // event.preventDefault();
+    //   // event.returnValue = null;
+    //   return;
+    //   // return (event.returnValue = "Are you sure you want to exit?"), leave();
+    // };
 
     router.events.on("routeChangeStart", handleRouteChange);
 
-    window.addEventListener("beforeunload", handleTabClose);
+    // window.addEventListener("beforeunload", handleTabClose);
 
     return () => {
       router.events.off("routeChangeStart", handleRouteChange);
-      window.removeEventListener("beforeunload", handleTabClose);
+      // window.removeEventListener("beforeunload", handleTabClose);
     };
   }, [isOwner]);
 
