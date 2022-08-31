@@ -260,22 +260,6 @@ export default function LogoMenu({
                       </div>
                     </GameRules>
                   </div>
-                  <li
-                    onClick={purgeGames}
-                    css={{
-                      color: "red",
-                      cursor: "pointer",
-                      paddingBottom: 0,
-                      transition: "all 300ms",
-                      listStyle: "none",
-                      "&:hover": {
-                        opacity: "0.6",
-                      },
-                      marginBottom: 20,
-                    }}
-                  >
-                    Purge rooms and games
-                  </li>
 
                   {loggedIn && (
                     <li
