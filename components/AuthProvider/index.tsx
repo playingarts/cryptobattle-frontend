@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
-import {api} from "../../api"
+import { api } from "../../api";
 type AuthProviderProps = { children: ReactNode };
 
 type MetamaskUser = { address: string; signature: string };
@@ -26,18 +26,17 @@ interface User {
   profilePictureUrl: string;
   isTwitterConnected: boolean;
   isMetamaskConnected: boolean;
-  
 }
 
 export type IAuthProviderContext = {
   logout: () => void;
   loggedIn: boolean;
-  user: User;
+  user: any;
   setToken: any;
 };
 
 const getUser = () => {
-  return api.get('/api/rest/me')
+  return api.get("/api/rest/me");
 };
 
 const formatUserData = (data: any) => {
@@ -68,29 +67,30 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     isTwitterConnected: false,
   });
 
-
-
   const { accesstoken } = router.query;
 
   const setToken = useCallback((token: any) => {
     console.log(token, "token");
     localStorage.setItem("accessToken", token as string);
     getUser().then((data: any) => {
-      console.log(data)
       const user = formatUserData(data);
 
       if (data.refreshToken) {
-        localStorage.setItem("refreshToken", data.refreshToken )
-                localStorage.setItem("accessTokenExpire", data.accessTokenExpire )
-
+        localStorage.setItem("refreshToken", data.refreshToken);
+        localStorage.setItem("accessTokenExpire", data.accessTokenExpire);
       }
 
       setUser(user);
       const roomid = localStorage.getItem("roomid");
-      setTimeout(() => {
-        roomid ? router.push(`/game/${roomid}?join=true`) : router.push("/dashboard");
-
-      }, 1000);
+      if (!localStorage.getItem("adding-metamask")) {
+        setTimeout(() => {
+          roomid
+            ? router.push(`/game/${roomid}?join=true`)
+            : router.push("/dashboard");
+        }, 1000);
+      } else {
+        localStorage.removeItem("adding-metamask");
+      }
 
       localStorage.removeItem("roomid");
     });
@@ -103,17 +103,16 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     setLoggedIn(isLoggedInCookie());
 
     if (isLoggedInCookie()) {
-      getUser().then((data : any) => {
-        console.log(data)
+      getUser().then((data: any) => {
+        console.log(data);
 
         if (data.refreshToken) {
-          localStorage.setItem("refreshToken", data.refreshToken )
-          localStorage.setItem("accessTokenExpire", data.accessTokenExpire )
+          localStorage.setItem("refreshToken", data.refreshToken);
+          localStorage.setItem("accessTokenExpire", data.accessTokenExpire);
         }
 
         const user = formatUserData(data);
         setUser(user);
-
       });
     }
 
@@ -128,7 +127,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
     if (router.isReady) {
       if (accesstoken) {
-        setToken(accesstoken as string)
+        setToken(accesstoken as string);
       }
     }
 
@@ -180,18 +179,18 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       .then(() => {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("signature");
-        localStorage.removeItem("refreshToken")
-        localStorage.removeItem("accessTokenExpire")
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("accessTokenExpire");
         setTimeout(() => {
           router.push("/");
         }, 0);
-      }).catch((err) => {
-        console.log(err)
       })
+      .catch((err) => {
+        console.log(err);
+      });
 
     // localStorage.removeItem("accessToken");
     // localStorage.removeItem("signature");
-
   };
 
   const memoedValue = useMemo(
