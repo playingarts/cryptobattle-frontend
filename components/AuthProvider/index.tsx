@@ -12,7 +12,7 @@ import axios from "axios";
 import { api } from "../../api";
 type AuthProviderProps = { children: ReactNode };
 
-type MetamaskUser = { address: string; signature: string };
+// type MetamaskUser = { address: string; signature: string };
 import Loader from "../Loader";
 
 
