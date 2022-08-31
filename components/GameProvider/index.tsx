@@ -134,7 +134,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       setPlayingAgain(false);
       // eslint-disable-next-line
       // @ts-ignore: Unreachable code error
-      localStorage.removeItem('play-again')
+      localStorage.removeItem("play-again");
     };
   }, []);
 
@@ -142,7 +142,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     setPlayingAgain(true);
     // eslint-disable-next-line
     // @ts-ignore: Unreachable code error
-    localStorage.setItem('play-again', true)
+    localStorage.setItem("play-again", true);
     WSProvider.send(
       JSON.stringify({
         event: "next-game",
@@ -439,8 +439,11 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
               // @ts-ignore: Unreachable code error
               window.gameStarted = true;
             }
-
-            router.push("/play");
+                      // eslint-disable-next-line
+              // @ts-ignore: Unreachable code error
+            if (!window.location.pathname.split('?')[0].endsWith("/dashboard")) {
+              router.push("/play");
+            }
           }
         }, 0);
 
@@ -456,7 +459,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   // }, [user]);
 
   useEffect(() => {
-    if (!results) {
+    if (!results || !router.pathname.endsWith("/play")) {
       return;
     }
     const getTitle = () => {
@@ -474,25 +477,21 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         )
       );
 
-      return winners.length > 0 
-       
-        ? winners.join(", ") + " won!"
-        : "Tie!";
+      return winners.length > 0 ? winners.join(", ") + " won!" : "Tie!";
     };
 
     const playerResults = playersGame
-    .map((player: any) => {
-      const resultsPlayer = results.playersPoints.find(
-        (playerR: any) => player.userId === playerR.userId
-      );
+      .map((player: any) => {
+        const resultsPlayer = results.playersPoints.find(
+          (playerR: any) => player.userId === playerR.userId
+        );
 
-      return {
-        points: resultsPlayer ? resultsPlayer.points : 0,
-        ...player,
-      };
-    })
-    .sort((a: any, b: any) => b.points - a.points);
-
+        return {
+          points: resultsPlayer ? resultsPlayer.points : 0,
+          ...player,
+        };
+      })
+      .sort((a: any, b: any) => b.points - a.points);
 
     // const playerResults = results.playersPoints
     //   .map((player: any) => {
@@ -506,7 +505,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     //     };
     //   })
     //   .sort((a: any, b: any) => b.points - a.points);
-
 
     openNotification({
       description: (
@@ -570,7 +568,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         </div>
       ),
       dark: true,
-      isWinner: results.winnerPlayersUserIds.includes(user.userId) &&  results.winnerPlayersUserIds.length !== playersGame.length,
+      isWinner:
+        results.winnerPlayersUserIds.includes(user.userId) &&
+        results.winnerPlayersUserIds.length !== playersGame.length,
 
       footer: (
         <div
@@ -590,11 +590,11 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
               })}
               Icon={Refresh}
               onClick={playAgain}
-              disabled={playingAgain || localStorage.getItem('play-again')}
+              disabled={playingAgain || localStorage.getItem("play-again")}
             >
               {/* // eslint-disable-next-line
     // @ts-ignore: Unreachable code error */}
-              {playingAgain || localStorage.getItem('play-again')
+              {playingAgain || localStorage.getItem("play-again")
                 ? "Waiting"
                 : "Play again " + "(" + timer / 1000 + ")"}
             </Button>
@@ -611,7 +611,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         </div>
       ),
     });
-  }, [results, openNotification, timer]);
+  }, [results, openNotification, timer, router]);
 
   const memoedValue = useMemo(
     () => ({
