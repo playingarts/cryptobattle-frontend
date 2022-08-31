@@ -3,7 +3,7 @@ import Line from "../Line";
 import Text from "../Text";
 
 import GameRules from "../GameRules";
-import { useWS } from "../WsProvider";
+// import { useWS } from "../WsProvider";
 import { useAuth } from "../AuthProvider";
 
 import Discord from "../Icons/Discord";
@@ -17,7 +17,7 @@ import Facebook from "../Icons/Facebook";
 import Behance from "../Icons/Behance";
 import CloseMenu from "../Icons/CloseMenu";
 import { FC, HTMLAttributes, useState } from "react";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 export type Props = HTMLAttributes<HTMLDivElement>;
 interface MenuItem extends Props {
   to: string;
@@ -122,21 +122,21 @@ export default function LogoMenu({
   const [open, setOpen] = useState(false);
   const { loggedIn, logout } = useAuth();
 
-  const WSProvider = useWS();
-  const router = useRouter();
-  const purgeGames = () => {
-    WSProvider.send(
-      JSON.stringify({
-        event: "purge-rooms-and-games",
-        data: {},
-      })
-    );
-    router.push("/dashboard");
+  // const WSProvider = useWS();
+  // const router = useRouter();
+  // const purgeGames = () => {
+  //   WSProvider.send(
+  //     JSON.stringify({
+  //       event: "purge-rooms-and-games",
+  //       data: {},
+  //     })
+  //   );
+  //   router.push("/dashboard");
 
-    setTimeout(() => {
-      window.location.reload();
-    }, 2000);
-  };
+  //   setTimeout(() => {
+  //     window.location.reload();
+  //   }, 2000);
+  // };
 
   return (
     <>
@@ -260,6 +260,22 @@ export default function LogoMenu({
                       </div>
                     </GameRules>
                   </div>
+                  <li
+                    onClick={purgeGames}
+                    css={{
+                      color: "red",
+                      cursor: "pointer",
+                      paddingBottom: 0,
+                      transition: "all 300ms",
+                      listStyle: "none",
+                      "&:hover": {
+                        opacity: "0.6",
+                      },
+                      marginBottom: 20,
+                    }}
+                  >
+                    Purge rooms and games
+                  </li>
 
                   {loggedIn && (
                     <li
