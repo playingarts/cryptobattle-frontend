@@ -260,7 +260,7 @@ export default function LogoMenu({
                       </div>
                     </GameRules>
                   </div>
-                  <li
+                  {/* <li
                     onClick={purgeGames}
                     css={{
                       color: "red",
@@ -275,7 +275,7 @@ export default function LogoMenu({
                     }}
                   >
                     Purge rooms and games
-                  </li>
+                  </li> */}
 
                   {loggedIn && (
                     <li
