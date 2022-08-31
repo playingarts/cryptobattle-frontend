@@ -8,12 +8,12 @@ import GameRulesGeneral from "./GameRulesGeneral";
 import GameRulesMoves from "./GameRulesMoves";
 import GameRulesNFTs from "./GameRulesNFTs";
 import GameRulesPoints from "./GameRulesPoints";
-import GameRulesDetails from "./GameRulesDetails";
+// import GameRulesDetails from "./GameRulesDetails";
 
 
 export type Props = HTMLAttributes<HTMLDivElement>;
 
-const tabs = ["General", "Moves", "NFTs", "Points", "Details"];
+const tabs = ["General", "Moves", "NFTs", "Points"];
 
 const GameRules: FC<Props> = ({ children, ...props }) => {
   const [activeTab, setActiveTab] = useState("General");
@@ -114,13 +114,6 @@ const GameRules: FC<Props> = ({ children, ...props }) => {
         {activeTab === "Points" && (
           <div>
             <GameRulesPoints />
-          </div>
-        )}
-
-        {/* Details */}
-        {activeTab === "Details" && (
-          <div>
-            <GameRulesDetails />
           </div>
         )}
 
