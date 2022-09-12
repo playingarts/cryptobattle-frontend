@@ -15,6 +15,7 @@ import Refresh from "../Icons/Refresh";
 import { useWS } from "../../components/WsProvider/index";
 import { useAuth } from "../../components/AuthProvider";
 import { api } from "../../api";
+import Warning from "../../components/Icons/Warning";
 
 type GameProviderProps = { children: ReactNode };
 
@@ -258,9 +259,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       if (event.event === "user-info") {
         setUserInfo(event.data);
-      // eslint-disable-next-line
-      // @ts-ignore: Unreachable code error
-        window.userId = event.data.userId
+        // eslint-disable-next-line
+        // @ts-ignore: Unreachable code error
+        window.userId = event.data.userId;
         setIsBackendReady(true);
         // if (event.data.inRoomId) {
         //   setRoomId(event.data.inRoomId);
@@ -308,7 +309,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       if (event.event === "close-room") {
         // eslint-disable-next-line
-                // @ts-ignore: Unreachable code error
+        // @ts-ignore: Unreachable code error
         event.data.ownderId !== window.userId &&
           openNotification({
             title: "Room closed by host",
@@ -332,18 +333,54 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         setPlayers(event.data.roomUsers);
       }
       if (event.event === "join-room") {
-        if (event.data?.error?.errorCode === 403 && event.data?.error?.message.startsWith('No valid server instance for the room')) {
+        if (
+          event.data?.error?.errorCode === 403 &&
+          event.data?.error?.message.startsWith(
+            "No valid server instance for the room"
+          )
+        ) {
           openNotification({
-            title: "The game has ended",
-            dark: true,
-            iconColor: "blue",
+            description: (
+              <div>
+                <Text
+                  variant="h1"
+                  css={{
+                    fontSize: 35,
+                    lineHeight: "45.5px",
+                    marginBottom: 0,
+                    marginTop: 60,
+                  }}
+                >
+                  Ended
+                </Text>
+                <Text
+                  variant="body3"
+                  css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
+                >
+                  The game you are trying to join has ended.
+                </Text>
+              </div>
+            ),
+            dark: false,
+            icon: <Warning />,
+            iconColor: "#FF6F41",
             footer: (
               <div css={{ display: "flex" }}>
-                <Button onClick={quit}>New Game</Button>
+                <Button
+                  css={() => ({
+                    background: "#7B61FF",
+                    color: "#fff",
+                    margin: "10px auto",
+                  })}
+                  onClick={quit}
+                >
+                  New Game
+                </Button>
               </div>
             ),
           });
-          router.push('/dashboard')
+
+          router.push("/dashboard");
         }
         WSProvider.send(
           JSON.stringify({
@@ -457,9 +494,11 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
               // @ts-ignore: Unreachable code error
               window.gameStarted = true;
             }
-                      // eslint-disable-next-line
-              // @ts-ignore: Unreachable code error
-            if (!window.location.pathname.split('?')[0].endsWith("/dashboard")) {
+            // eslint-disable-next-line
+            // @ts-ignore: Unreachable code error
+            if (
+              !window.location.pathname.split("?")[0].endsWith("/dashboard")
+            ) {
               router.push("/play");
             }
           }
