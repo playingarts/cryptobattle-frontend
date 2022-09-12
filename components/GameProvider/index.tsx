@@ -98,6 +98,15 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     router.push("/dashboard");
   };
 
+  const newGame = () => {
+
+    closeNotification();
+    // eslint-disable-next-line
+    // @ts-ignore: Unreachable code error
+    window.gameStarted = false;
+    router.push("/new");
+  };
+
   const playAgainQuit = () => {
     WSProvider.send(
       JSON.stringify({
@@ -373,7 +382,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
                     color: "#fff",
                     margin: "10px auto",
                   })}
-                  onClick={quit}
+                  onClick={newGame}
                 >
                   New Game
                 </Button>
