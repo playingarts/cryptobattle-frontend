@@ -320,7 +320,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       if (event.event === "close-room") {
         // eslint-disable-next-line
         // @ts-ignore: Unreachable code error
-        event.data.ownderId !== window.userId &&
+        event.data.ownderId && event.data.ownderId !== window.userId &&
           openNotification({
             title: "Room closed by host",
             dark: true,
