@@ -419,7 +419,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                       lastPlayedCard?.value ===
                         column[column.length - 1].value &&
                       lastPlayedCard?.suit === column[column.length - 1].suit &&
-                      (column[column.length - 1].id
+                      (lastPlayedCard?.id || column[column.length - 1].id
                         ? lastPlayedCard?.id === column[column.length - 1].id
                         : true) && (
                         <div
@@ -531,7 +531,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                                   column[column.length - 1].value &&
                                 lastPlayedCard?.suit ===
                                   column[column.length - 1].suit &&
-                                (column[column.length - 1].id
+                                (lastPlayedCard?.id || column[column.length - 1].id
                                   ? lastPlayedCard?.id ===
                                     column[column.length - 1].id
                                   : true)

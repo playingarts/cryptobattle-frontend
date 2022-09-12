@@ -258,6 +258,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       if (event.event === "user-info") {
         setUserInfo(event.data);
+      // eslint-disable-next-line
+      // @ts-ignore: Unreachable code error
+        window.userId = event.data.userId
         setIsBackendReady(true);
         // if (event.data.inRoomId) {
         //   setRoomId(event.data.inRoomId);
@@ -304,7 +307,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       }
 
       if (event.event === "close-room") {
-        event.ownerId !== user.userId &&
+        // eslint-disable-next-line
+                // @ts-ignore: Unreachable code error
+        event.data.ownderId !== window.userId &&
           openNotification({
             title: "Room closed by host",
             dark: true,
@@ -327,6 +332,19 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         setPlayers(event.data.roomUsers);
       }
       if (event.event === "join-room") {
+        if (event.data?.error?.errorCode === 403 && event.data?.error?.message.startsWith('No valid server instance for the room')) {
+          openNotification({
+            title: "The game has ended",
+            dark: true,
+            iconColor: "blue",
+            footer: (
+              <div css={{ display: "flex" }}>
+                <Button onClick={quit}>New Game</Button>
+              </div>
+            ),
+          });
+          router.push('/dashboard')
+        }
         WSProvider.send(
           JSON.stringify({
             event: "room-info",
