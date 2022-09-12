@@ -99,6 +99,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   };
 
   const newGame = () => {
+    setResults(null);
+    localStorage.setItem("chosen-nfts", "");
 
     closeNotification();
     // eslint-disable-next-line
@@ -116,6 +118,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         },
       })
     );
+    setResults(null);
+    localStorage.setItem("chosen-nfts", "");
+
+    closeNotification();
     router.push("/dashboard");
   };
 
