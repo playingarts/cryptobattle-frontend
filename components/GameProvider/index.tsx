@@ -107,6 +107,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         },
       })
     );
+    router.push("/dashboard");
   };
 
   useEffect(() => {
