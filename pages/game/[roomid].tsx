@@ -26,12 +26,20 @@ const JoinGame: NextPage = () => {
   const WSProvider = useWS();
   const router = useRouter();
   const { roomid, join } = router.query;
-  const { players, setPlayers, roomInfo, isBackendReady, userSocketIdle,setUserSocketIdle, isAlreadyConnected } =
-    useGame();
+  const {
+    players,
+    setPlayers,
+    roomInfo,
+    isBackendReady,
+    userSocketIdle,
+    setUserSocketIdle,
+    isAlreadyConnected,
+  } = useGame();
   const { user } = useAuth();
 
   const [isReady, setReady] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [isConfirmedLeave, setIsConfirmedLeave] = useState(false);
 
   const [isOwner, setIsOwner] = useState<any>(null);
 
@@ -95,12 +103,12 @@ const JoinGame: NextPage = () => {
         JSON.stringify({
           event: "kick-player",
           data: {
-            userId: userSocketIdle.userId
+            userId: userSocketIdle.userId,
           },
         })
       );
     }
-    setUserSocketIdle(null)
+    setUserSocketIdle(null);
   }, [userSocketIdle, setUserSocketIdle, isOwner, user]);
 
   useEffect(() => {
@@ -158,7 +166,6 @@ const JoinGame: NextPage = () => {
     });
   }, [isReady]);
 
-
   useEffect(() => {
     if (!isAlreadyConnected) {
       return;
@@ -168,7 +175,12 @@ const JoinGame: NextPage = () => {
         <div>
           <Text
             variant="h1"
-            css={{ fontSize: 35, lineHeight: "45.5px", marginBottom: 0, marginTop: 60 }}
+            css={{
+              fontSize: 35,
+              lineHeight: "45.5px",
+              marginBottom: 0,
+              marginTop: 60,
+            }}
           >
             Already connected!
           </Text>
@@ -185,7 +197,6 @@ const JoinGame: NextPage = () => {
       iconColor: "#FF6F41",
     });
   }, [isAlreadyConnected]);
-
 
   useEffect(() => {
     const handleTabClose = (event: any) => {
@@ -210,7 +221,7 @@ const JoinGame: NextPage = () => {
       const leave = () => {
         setPlayers(null);
         // eslint-disable-next-line
-        localStorage.setItem('chosen-nft', JSON.stringify(null))
+        localStorage.setItem("chosen-nft", JSON.stringify(null));
         WSProvider.send(
           JSON.stringify({
             event: isOwner ? "close-room" : "quit-room",
@@ -220,65 +231,92 @@ const JoinGame: NextPage = () => {
       };
 
       if (isOwner) {
-        // openNotification({
-        //   title: "Are You Sure?",
-        //   description:
-        //     "You are about to leave the lobby. The game will end for all players.",
-        //   footer: (
-        //     <div style={{ display: "flex", flexDirection: "column" }}>
-        //       <Button
-        //         onClick={closeNotification && leave}
-        //         css={() => ({
-        //           background: "#7B61FF",
-        //           color: "#fff",
-        //           margin: "10px auto",
-        //         })}
-        //       >
-        //         Yes, Disconnect
-        //       </Button>
-        //       <Button
-        //         onClick={closeNotification && leave}
-        //         css={() => ({
-        //           background: "#7B61FF",
-        //           color: "#fff",
-        //           margin: "10px auto",
-        //         })}
-        //       >
-        //         No, Stay
-        //       </Button>
-        //     </div>
-        //   ),
-        // });
-        leave();      } else {
+        leave();
+      } else {
         leave();
       }
     };
 
+    const leaveAdmin = () => {
+      closeNotification();
+      leave();
+      setIsConfirmedLeave(true);
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 200);
+    };
+
     const handleRouteChange = (url: string) => {
       console.log("handleRouteChange", url);
+
+      if (isOwner && !isConfirmedLeave) {
+        router.events.emit("routeChangeError");
+        openNotification({
+          dark: false,
+          icon: <Warning />,
+          iconColor: "#FF6F41",
+
+          description: (
+            <div>
+              <Text
+                variant="h1"
+                css={{
+                  fontSize: 35,
+                  lineHeight: "45.5px",
+                  marginBottom: 0,
+                  marginTop: 60,
+                }}
+              >
+               Are you sure?
+              </Text>
+              <Text
+                variant="body3"
+                css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
+              >
+                You are about to leave the lobby. The game will end for all
+                players.
+              </Text>
+            </div>
+          ),
+          footer: (
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <Button
+                onClick={leaveAdmin}
+                css={() => ({
+                  background: "#7B61FF",
+                  color: "#fff",
+                  margin: "10px auto",
+                })}
+              >
+                Yes, Disconnect
+              </Button>
+              <Button
+                onClick={closeNotification}
+                css={() => ({
+                  margin: "10px auto",
+                })}
+              >
+                No, Stay
+              </Button>
+            </div>
+          ),
+        });
+        throw `routeChange aborted. This error can be safely ignored - https://github.com/zeit/next.js/issues/2476.`;
+      }
+      if (isConfirmedLeave) {
+        setIsConfirmedLeave(false);
+      }
       if (url !== "/play" && !url.startsWith("/game/")) {
         leave();
       }
     };
 
-    // const handleTabClose = () => {
-    //   // leave();
-
-    //   // event.preventDefault();
-    //   // event.returnValue = null;
-    //   return;
-    //   // return (event.returnValue = "Are you sure you want to exit?"), leave();
-    // };
-
     router.events.on("routeChangeStart", handleRouteChange);
-
-    // window.addEventListener("beforeunload", handleTabClose);
 
     return () => {
       router.events.off("routeChangeStart", handleRouteChange);
-      // window.removeEventListener("beforeunload", handleTabClose);
     };
-  }, [isOwner]);
+  }, [isOwner, isConfirmedLeave]);
 
   useEffect(() => {
     if (!roomInfo) {
@@ -294,27 +332,22 @@ const JoinGame: NextPage = () => {
     }
   }, [roomInfo, user]);
 
-
   useEffect(() => {
-
     setTimeout(() => {
-      if (localStorage.getItem('show-rules-modal')) {
-        document.getElementById('rules-button')?.click()
-        localStorage.removeItem('show-rules-modal')
-      }   
+      if (localStorage.getItem("show-rules-modal")) {
+        document.getElementById("rules-button")?.click();
+        localStorage.removeItem("show-rules-modal");
+      }
     }, 0);
+  }, []);
 
-
-  }, [])
-  
   useEffect(() => {
     // eslint-disable-next-line
     // @ts-ignore: Unreachable code error
     window.gameStarted = false;
     // eslint-disable-next-line
     // @ts-ignore: Unreachable code error
-    localStorage.removeItem('play-again')
-
+    localStorage.removeItem("play-again");
 
     if (!isBackendReady) {
       return;
@@ -376,7 +409,10 @@ const JoinGame: NextPage = () => {
 
   const headerRight = (
     <GameRules>
-      <Button id="rules-button" css={{ color: "#fff", background: "rgba(255, 255, 255, 0.05)" }}>
+      <Button
+        id="rules-button"
+        css={{ color: "#fff", background: "rgba(255, 255, 255, 0.05)" }}
+      >
         Game Rules
       </Button>
     </GameRules>
