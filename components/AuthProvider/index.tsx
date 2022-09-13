@@ -9,7 +9,16 @@ import {
 } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import Link from "../../components/Link";
+
 import { api } from "../../api";
+import { useNotifications } from "../NotificationProvider";
+
+import Text from "../Text/";
+import Button from "../Button/";
+import Warning from "../../components/Icons/Warning";
+
+
 type AuthProviderProps = { children: ReactNode };
 
 // type MetamaskUser = { address: string; signature: string };
@@ -44,6 +53,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const [loggedIn, setLoggedIn] = useState(false);
 
   const [authorized, setAuthorized] = useState(false);
+  const { openNotification, closeNotification } = useNotifications();
 
   const [user, setUser] = useState({
     userId: "",
@@ -145,9 +155,46 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     ) {
       setAuthorized(false);
 
-      router.push({
-        pathname: "/401",
-      });
+
+      if (path.includes('/game')) {
+        openNotification({
+          description: (
+            <div>
+              <Text
+                variant="h1"
+                css={{
+                  fontSize: 35,
+                  lineHeight: "45.5px",
+                  marginBottom: 0,
+                  marginTop: 60,
+                }}
+              >
+                Ended
+              </Text>
+              <Text
+                variant="body3"
+                css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
+              >
+                The game you are trying to join has ended.
+              </Text>
+            </div>
+          ),
+          dark: false,
+          icon: <Warning />,
+          iconColor: "#FF6F41",
+          footer: (
+            <div css={{ display: "flex" }}>
+              <Button component={Link}   onClick={closeNotification} href="/" >
+                Return to Home
+              </Button>
+            </div>
+          ),
+        });
+      }else {
+        router.push({
+          pathname: "/401",
+        });
+      }
     } else {
       setAuthorized(true);
     }

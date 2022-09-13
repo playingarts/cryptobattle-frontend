@@ -213,8 +213,8 @@ const App = ({ Component, pageProps }: AppProps) => {
       </Head>
       <ThemeProvider theme={theme}>
         <MetaMaskProvider>
-          <AuthProvider>
-            <NotificationProvider>
+          <NotificationProvider>
+            <AuthProvider>
               <WSProvider url="playing-arts-game-backend-test-7pogl.ondigitalocean.app">
                 <GameProvider>
                   {/* // eslint-disable-next-line 
@@ -222,8 +222,8 @@ const App = ({ Component, pageProps }: AppProps) => {
                   <Component {...pageProps} />
                 </GameProvider>
               </WSProvider>
-            </NotificationProvider>
-          </AuthProvider>
+            </AuthProvider>
+          </NotificationProvider>
         </MetaMaskProvider>
       </ThemeProvider>
     </Fragment>
