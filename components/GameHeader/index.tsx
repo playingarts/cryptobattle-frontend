@@ -109,6 +109,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
             alignItems: "center",
             position: "relative",
             zIndex: 3800,
+            marginLeft: 10,
           },
           palette === "gradient"
             ? {
@@ -141,6 +142,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
                   justifyContent: "center",
                   alignItems: "center",
                   minWidth: 180,
+
                   height: 70
                 }}
               >
