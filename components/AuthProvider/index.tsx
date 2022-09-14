@@ -80,6 +80,9 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       }
 
       setUser(user);
+            // eslint-disable-next-line
+    // @ts-ignore
+      window.user = JSON.stringify(user)
       const roomid = localStorage.getItem("roomid");
       if (!localStorage.getItem("adding-metamask")) {
         console.log('/dashboard redirect here.')
@@ -113,6 +116,10 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
         const user = formatUserData(data);
         setUser(user);
+      // eslint-disable-next-line
+    // @ts-ignore
+        window.user = JSON.stringify(user)
+
       });
     }
 

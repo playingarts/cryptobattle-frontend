@@ -238,7 +238,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       if (e.code === 4000) {
         if (!localStorage.getItem("adding-metamask")) {
           setIsAlreadyConnected(true);
-
         } 
       }
     };

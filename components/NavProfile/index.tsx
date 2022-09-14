@@ -4,10 +4,11 @@ import { FC, HTMLAttributes } from "react";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
 
-import { useAuth } from "../AuthProvider";
 
 const NavProfile: FC<Props> = (props) => {
-  const { user } = useAuth();
+      // eslint-disable-next-line
+    // @ts-ignore
+  const user  =  window.user ? JSON.parse(window.user) : {}
 
   return (
     <div style={{ cursor: "pointer" }} {...props}>
