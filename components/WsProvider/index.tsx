@@ -13,8 +13,14 @@ const WSStateContext = createContext<any | null>(null);
 
 function WSProvider({ children }: WSProviderProps): JSX.Element {
   const accessToken = localStorage.getItem("accessToken");
+
+
   
   const wsInstance = useMemo(() => {
+    if (localStorage.getItem("adding-metamask")) {
+      localStorage.removeItem("adding-metamask")
+      return null
+    }
     if (typeof window != "undefined" && accessToken) {
       return new ReconnectingWebSocket(
         `wss://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/socket?accesstoken=${accessToken}`

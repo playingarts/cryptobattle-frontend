@@ -249,7 +249,7 @@ const JoinGame: NextPage = () => {
     const handleRouteChange = (url: string) => {
       console.log("handleRouteChange", url);
 
-      if (url !== "/play" && !url.startsWith("/game/") && isOwner && !isConfirmedLeave) {
+      if (url !== "/play" && !url.startsWith("/game/") && isOwner && !isConfirmedLeave && localStorage.getItem('accessToken')) {
         router.events.emit("routeChangeError");
         openNotification({
           dark: false,

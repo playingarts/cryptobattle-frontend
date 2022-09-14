@@ -183,9 +183,16 @@ export default function LogoMenu({
                     component="div"
                     variant="h5"
                     css={{
-                      textTransform: "uppercase",
-                      paddingTop: 8,
-                      cursor: "pointer",
+                      color: '#DDDDDD',
+                      fontSize: 25,
+                      fontWeight: 400,
+                      letterSpacing: '-0.05em',
+                      lineHeight: 1.2,
+                      fontFamily: 'Aldrich, sans-serif',
+                      textTransform: 'uppercase',
+                      position: 'absolute',
+                      marginLeft: 80,
+                      marginTop:6,
                     }}
                   >
                     {headerTitle ? headerTitle : "CRYPTOBATTLE"}

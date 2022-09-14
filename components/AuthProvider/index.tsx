@@ -82,13 +82,14 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       setUser(user);
       const roomid = localStorage.getItem("roomid");
       if (!localStorage.getItem("adding-metamask")) {
+        console.log('/dashboard redirect here.')
         setTimeout(() => {
           roomid
             ? router.push(`/game/${roomid}?join=true`)
             : router.push("/dashboard");
         }, 1000);
       } else {
-        localStorage.removeItem("adding-metamask");
+        // localStorage.removeItem("adding-metamask");
       }
 
       localStorage.removeItem("roomid");
@@ -157,6 +158,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
 
       if (path.includes('/game')) {
+        // router.push("/");
         openNotification({
           description: (
             <div>

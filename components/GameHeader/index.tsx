@@ -147,17 +147,23 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
                 <Text
                   component="h3"
                   css={{
-                    opacity: 0.9,
-                    marginRight: 10,
-                    fontSize: 20,
-                    color: "#fff",
+                    color: '#DDDDDD',
+                    fontSize: 25,
+                    fontWeight: 400,
+                    letterSpacing: '-0.05em',
+                    lineHeight: 1.2,
+                    fontFamily: 'Aldrich, sans-serif',
                     textTransform: 'uppercase',
-                    marginTop: 26
+                    // position: 'absolute',
+                    // marginLeft: 80,
+                    marginRight: 10,
+                    marginTop:30,
                   }}
                 >
                   {currentPlayer ? formatUsername(currentPlayer.username) : ""}
                 </Text>
                 <svg
+                css={{marginRight: 30}}
                   width="16"
                   height="14"
                   viewBox="0 0 16 14"

@@ -13,14 +13,19 @@ import { useEffect, useState } from "react";
 import { api } from "../../api";
 import { formatUsername } from "../../utils/helpers";
 import Loader from "../../components/Loader";
+import { useNotifications } from "../../components/NotificationProvider";
 
-const Home: NextPage = () => {
+import Warning from "../../components/Icons/Warning";
+
+const Home: any = () => {
   const { loggedIn } = useAuth();
 
   const router = useRouter();
+  const { openNotification, closeNotification } = useNotifications();
 
   const { roomid } = router.query;
   const [loading, setLoading] = useState(true);
+  const [loaded, setLoaded] = useState(false);
 
   const [roomInfo, setRoomInfo] = useState<any>(null);
   const getRoomInfo = (roomId: any) => {
@@ -37,9 +42,43 @@ const Home: NextPage = () => {
         console.log(data);
         setRoomInfo(data);
         setLoading(false);
+        setLoaded(true)
       })
       .catch((err: any) => {
         console.log(err);
+        openNotification({
+          description: (
+            <div>
+              <Text
+                variant="h1"
+                css={{
+                  fontSize: 35,
+                  lineHeight: "45.5px",
+                  marginBottom: 0,
+                  marginTop: 60,
+                }}
+              >
+                Ended
+              </Text>
+              <Text
+                variant="body3"
+                css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
+              >
+                The game you are trying to join has ended.
+              </Text>
+            </div>
+          ),
+          dark: false,
+          icon: <Warning />,
+          iconColor: "#FF6F41",
+          footer: (
+            <div css={{ display: "flex" }}>
+              <Button component={Link}   onClick={closeNotification} href="/" >
+                Return to Home
+              </Button>
+            </div>
+          ),
+        });
         setLoading(false);
       });
     localStorage.setItem("roomid", roomid as string);
@@ -71,7 +110,7 @@ const Home: NextPage = () => {
     );
   }
 
-  return (
+  return ( loaded &&
     <ComposedGlobalLayout>
       <Layout
         css={(theme) => ({

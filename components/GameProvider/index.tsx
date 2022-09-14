@@ -236,7 +236,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     WSProvider.onclose = function (e) {
       console.log("on close: " + e.code);
       if (e.code === 4000) {
-        setIsAlreadyConnected(true);
+        if (!localStorage.getItem("adding-metamask")) {
+          setIsAlreadyConnected(true);
+
+        } 
       }
     };
 

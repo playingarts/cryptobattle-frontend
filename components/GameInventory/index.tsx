@@ -124,7 +124,7 @@ const GameInventory: FC<Props> = ({
       className="game-inventory"
       style={{
         position: "fixed",
-        bottom: -8,
+        bottom: -11,
         left: 0,
         width: "100%",
         background: "transparent",
@@ -163,7 +163,7 @@ const GameInventory: FC<Props> = ({
         {cardsRegular.length > 0 && (
           <div
             css={{
-              padding: isOpponentsCards ? 5 : 15,
+              padding: isOpponentsCards ? 6 : 15,
               minWidth: "auto",
               display: "flex",
               justifyContent: "center",
