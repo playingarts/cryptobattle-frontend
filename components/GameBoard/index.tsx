@@ -263,20 +263,53 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       const latestCard = document.getElementsByClassName("game-latest-card")[0];
       playCardBeep.play();
 
-      // const container = document.getElementsByClassName("scroll-container")[0];
-
       if (!latestCard) {
-        // const latestCard = document.getElementsByClassName("game-latest-card")[0];
-
         return;
       }
-
-      latestCard.scrollIntoView({ block: "center", behavior: "smooth" });
-
-      // setTimeout(
-      //   () => latestCard.classList.add("game-latest-card__animation"),
-      //   1000
-      // );
+      function getViewPercentage(element: any) {
+        const viewport = {
+          top: window.pageYOffset,
+          bottom: window.pageYOffset + window.innerHeight
+        };
+    
+        const elementBoundingRect = element.getBoundingClientRect();
+        const elementPos = {
+          top: elementBoundingRect.y + window.pageYOffset,
+          bottom: elementBoundingRect.y + elementBoundingRect.height + window.pageYOffset
+        };
+      
+        if (viewport.top > elementPos.bottom || viewport.bottom < elementPos.top) {
+          return 0;
+        }
+      
+        // Element is fully within viewport
+        if (viewport.top < elementPos.top && viewport.bottom > elementPos.bottom) {
+          return 100;
+        }
+      
+        // Element is bigger than the viewport
+        if (elementPos.top < viewport.top && elementPos.bottom > viewport.bottom) {
+          return 100;
+        }
+      
+        const elementHeight = elementBoundingRect.height;
+        let elementHeightInView = elementHeight;
+      
+        if (elementPos.top < viewport.top) {
+          elementHeightInView = elementHeight - (window.pageYOffset - elementPos.top);
+        }
+      
+        if (elementPos.bottom > viewport.bottom) {
+          elementHeightInView = elementHeightInView - (elementPos.bottom - viewport.bottom);
+        }
+      
+        const percentageInView = (elementHeightInView / window.innerHeight) * 100;
+      
+        return Math.round(percentageInView);
+      }
+      if (getViewPercentage(latestCard) < 90) {
+        latestCard.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
     }, 0);
   }, [gameState]);
 
@@ -402,11 +435,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                       margin: column ? "20px" : "20px",
                       borderRadius: 10,
                       position: "relative",
-                      // outline:
-                      //   cardError[0] === rowIndex &&
-                      //   cardError[1] === columnIndex
-                      //     ? "#FA5252 6px solid!important"
-                      //     : "none",
                     })}
                   >
                     {!column && (
@@ -531,7 +559,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                                   column[column.length - 1].value &&
                                 lastPlayedCard?.suit ===
                                   column[column.length - 1].suit &&
-                                (lastPlayedCard?.id || column[column.length - 1].id
+                                (lastPlayedCard?.id ||
+                                column[column.length - 1].id
                                   ? lastPlayedCard?.id ===
                                     column[column.length - 1].id
                                   : true)
