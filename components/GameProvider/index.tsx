@@ -149,6 +149,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   useEffect(() => {
     return () => {
       setPlayingAgain(false);
+      
       // eslint-disable-next-line
       // @ts-ignore: Unreachable code error
       localStorage.removeItem("play-again");
@@ -298,9 +299,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       }
 
       // Timeout ended
-      if (event.event === "close-room" && event.data.reason === "TIMEOUT") {
-        quit();
-
+      if (event.event === "close-room" && (event.data.reason === "TIMEOUT" || event.data.reason === 'NEXT_GAME_VOTE_FAILED')) {
+        quit()
         return;
       }
 
@@ -410,7 +410,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       if (
         event.event === "quit-room" &&
-        event.data.reason === "KICKED_BY_ROOM_OWNER"
+        event.data.reason === "KICKED_BY_ROOM_OWNER" 
       ) {
         openNotification({
           title: "You were kicked!",
