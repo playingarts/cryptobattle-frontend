@@ -311,6 +311,9 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         latestCard.scrollIntoView({ block: "center", behavior: "smooth" });
       }
     }, 0);
+    setTimeout(() => {
+      setLastPlayedCard(null)
+    }, 2000);
   }, [gameState]);
 
   useEffect(() => {
