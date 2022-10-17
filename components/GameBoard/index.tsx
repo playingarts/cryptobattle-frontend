@@ -555,7 +555,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                               position: "relative",
                               // animationDuration: "10s",
                               opacity:
-                                column &&
+                                column && column.length - 1 === index &&
                                 column[column.length - 1].suit &&
                                 column[column.length - 1].value &&
                                 lastPlayedCard?.value ===
