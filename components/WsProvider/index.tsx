@@ -23,7 +23,9 @@ function WSProvider({ children }: WSProviderProps): JSX.Element {
     }
     if (typeof window != "undefined" && accessToken) {
       return new ReconnectingWebSocket(
-        `wss://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/socket?accesstoken=${accessToken}`
+        // eslint-disable-next-line
+        // @ts-ignore: Unreachable code error
+        `wss://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/socket?accesstoken=${accessToken}`, null, {debug: false, timeoutInterval: 12000 }
       );
     }
     return null;
