@@ -22,10 +22,13 @@ function WSProvider({ children }: WSProviderProps): JSX.Element {
       return null
     }
     if (typeof window != "undefined" && accessToken) {
+      const options = {
+        connectionTimeout: 12000
+      }
       return new ReconnectingWebSocket(
         // eslint-disable-next-line
         // @ts-ignore: Unreachable code error
-        `wss://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/socket?accesstoken=${accessToken}`, null, {debug: false, timeoutInterval: 12000 }
+        `wss://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/socket?accesstoken=${accessToken}`, [], options
       );
     }
     return null;
