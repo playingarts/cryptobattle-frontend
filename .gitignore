@@ -37,6 +37,5 @@ yarn-error.log*
 .vercel
 /dist
 tsconfig.tsbuildinfo
-/stories
 
 /dump/deals-real.json

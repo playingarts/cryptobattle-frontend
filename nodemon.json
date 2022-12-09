@@ -1,7 +1,0 @@
-{
-  "ext": "ts, json",
-  "verbose": true,
-  "watch": ["./source"],
-  "ignore": ["**/__tests__/**"],
-  "exec": "yarn schema && yarn dev"
-}
