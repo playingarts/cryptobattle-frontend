@@ -117,6 +117,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           wantNextGame: false,
         },
       })
+
+      
     );
     setResults(null);
     localStorage.setItem("chosen-nfts", "");
@@ -128,6 +130,20 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   useEffect(() => {
     console.log(selectedCard);
   }, [selectedCard]);
+
+  useEffect(() => {
+    if (!WSProvider) {
+      return;
+    }
+    setInterval(() => {
+    WSProvider.send(
+      JSON.stringify({
+        event: "ping",
+        data: {},
+      })
+    );
+    }, 20000);
+  }, [WSProvider]);
 
   useEffect(() => {
     // eslint-disable-next-line
@@ -246,7 +262,14 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     WSProvider.onmessage = function ({ data }) {
       setIsAlreadyConnected(false);
 
+
+
       const event = JSON.parse(data);
+
+      if (event.event === 'pong') {
+        return
+      }
+
       if (event.event !== "timer") {
         console.log("Game Provider WS event:", event);
       }
