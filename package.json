@@ -17,7 +17,8 @@
     "prepare": "husky install"
   },
   "engines": {
-    "node": "^16"
+    "node": "^16",
+    "yarn": "1.22.19"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
