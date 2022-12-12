@@ -211,7 +211,7 @@ export default function LogoMenu({
                   width: 20,
                   height: 20,
                   "&:focus": {
-                    outline: `none`,
+                    outline: `none`, 
                   },
                 }}
                 aria-label="Close"

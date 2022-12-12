@@ -3,10 +3,10 @@ body {
 }
 
 /* Fix rounded corners Safari */
-/* html {
+html {
   -webkit-backface-visibility: hidden;
 -webkit-transform: translate3d(0, 0, 0);
-} */
+}
 
 .game-inventory {
   opacity: 0;
@@ -406,6 +406,17 @@ html {
 
 .bubbles-group div {
   margin-right: 200px
+}
+
+
+/* Safari fix button styling */
+
+[type=button] {
+  border-radius: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
 }
 
 /* Hide scrollbar for modals */

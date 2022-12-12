@@ -8,8 +8,6 @@ import GameRulesGeneral from "./GameRulesGeneral";
 import GameRulesMoves from "./GameRulesMoves";
 import GameRulesNFTs from "./GameRulesNFTs";
 import GameRulesPoints from "./GameRulesPoints";
-// import GameRulesDetails from "./GameRulesDetails";
-
 
 export type Props = HTMLAttributes<HTMLDivElement>;
 
