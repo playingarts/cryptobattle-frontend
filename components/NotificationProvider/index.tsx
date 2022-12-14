@@ -72,7 +72,7 @@ useEffect(() => {
               right: 0,
               bottom: 0,
               pointerEvents: 'auto',
-              background: notification.dark ? notification.isWinner? "rgba(255, 255, 255, .3)" : 'none' :  "rgba(0, 0, 0, .9)",
+              background: notification.dark ? notification.isWinner? "rgba(255, 255, 255, .3)" : 'rgba(255, 255, 255, .3)' :  "rgba(0, 0, 0, .9)",
               zIndex: 99900009,
               display: "flex",
               justifyContent: "center",
