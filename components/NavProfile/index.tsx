@@ -4,7 +4,7 @@ import { FC, HTMLAttributes } from "react";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
 interface User extends Props {
-  user:  any,
+  user?:  any,
 }
 
 const NavProfile: FC<User> = (props) => {
