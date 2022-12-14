@@ -5,6 +5,7 @@ import Text from "../Text";
 import GameRules from "../GameRules";
 // import { useWS } from "../WsProvider";
 import { useAuth } from "../AuthProvider";
+import Arrowed from "../Arrowed";
 
 import Discord from "../Icons/Discord";
 import Youtube from "../Icons/Youtube";
@@ -23,19 +24,21 @@ interface MenuItem extends Props {
   to: string;
   text: string;
   fontSize?: number;
+  fontWeight?: number;
 }
 
-const MenuItem: FC<MenuItem> = ({ to, text, fontSize = 22 }) => {
+const MenuItem: FC<MenuItem> = ({ to, text, fontSize = 22, fontWeight = 500 }) => {
   return (
     <Link href={to} passHref>
       <li
         css={{
-          color: "rgba(0, 0, 0)",
+          color: "rgba(0, 0, 0, 0.5)",
           cursor: "pointer",
           paddingBottom: 20,
           transition: "all 300ms",
           listStyle: "none",
           fontSize,
+          fontWeight,
           "&:hover": {
             opacity: "0.6",
           },
@@ -183,16 +186,16 @@ export default function LogoMenu({
                     component="div"
                     variant="h5"
                     css={{
-                      color: '#DDDDDD',
+                      color: "#DDDDDD",
                       fontSize: 25,
                       fontWeight: 400,
-                      letterSpacing: '-0.05em',
+                      letterSpacing: "-0.05em",
                       lineHeight: 1.2,
-                      fontFamily: 'Aldrich, sans-serif',
-                      textTransform: 'uppercase',
-                      position: 'absolute',
+                      fontFamily: "Aldrich, sans-serif",
+                      textTransform: "uppercase",
+                      position: "absolute",
                       marginLeft: 80,
-                      marginTop:6,
+                      marginTop: 6,
                     }}
                   >
                     {headerTitle ? headerTitle : "CRYPTOBATTLE"}
@@ -211,7 +214,7 @@ export default function LogoMenu({
                   width: 20,
                   height: 20,
                   "&:focus": {
-                    outline: `none`, 
+                    outline: `none`,
                   },
                 }}
                 aria-label="Close"
@@ -246,16 +249,18 @@ export default function LogoMenu({
                 >
                   Playing Arts
                 </Text>{" "}
-                <ul css={{ fontSize: 22, padding: 0, marginTop: 40 }}>
-                  <MenuItem to="/dashboard" text="Dashboard" />
+                <ul css={{ fontSize: 22, padding: 0, marginTop: 50 }}>
+                  <MenuItem fontWeight={400} to="/dashboard" text="Dashboard" />
 
                   <div>
                     <GameRules>
                       <div
                         css={{
-                          color: "rgba(0, 0, 0)",
+                          color: "rgba(0, 0, 0, 0.5)",
                           cursor: "pointer",
                           paddingBottom: 20,
+                          fontWeight: 400,
+
                           transition: "all 300ms",
                           listStyle: "none",
                           "&:hover": {
@@ -267,6 +272,19 @@ export default function LogoMenu({
                       </div>
                     </GameRules>
                   </div>
+
+                  <Button
+                    style={{
+                      marginRight: "15px",
+                      background: "#7B61FF",
+                      color: "#fff",
+                      marginBottom: 20
+                    }}
+                    component={Link}
+                    href="/new"
+                  >
+                    New Game
+                  </Button>
                   {/* <li
                     onClick={purgeGames}
                     css={{
@@ -284,12 +302,23 @@ export default function LogoMenu({
                     Purge rooms and games
                   </li> */}
 
+                  <div css={{ paddingBottom: 10 }}>
+                    <Line spacing={2}></Line>
+                  </div>
+                  <MenuItem to="/" text="Buy NFT on Opensea" fontSize={16} />
+                  <MenuItem to="/" text="Buy NFT on LooksRare" fontSize={16} />
+                  <div css={{ paddingBottom: 10, marginTop: -10 }}>
+                    <Line spacing={2}></Line>
+                  </div>
                   {loggedIn && (
                     <li
                       onClick={logout}
                       css={{
                         cursor: "pointer",
+                        color: "rgba(0, 0, 0, 0.5)",
                         paddingBottom: 0,
+                        marginBottom: 32,
+                        fontWeight: 500,
                         transition: "all 300ms",
                         listStyle: "none",
                         "&:hover": {
@@ -297,22 +326,17 @@ export default function LogoMenu({
                         },
                       }}
                     >
-                      Logout
+                      <Arrowed>Log out</Arrowed>
                     </li>
                   )}
-
-                  <div css={{ paddingBottom: 20 }}>
-                    <Line spacing={2}></Line>
-                  </div>
-                  <MenuItem to="/" text="Buy NFT on Opensea" fontSize={16} />
-                  <MenuItem to="/" text="Buy NFT on LooksRare" fontSize={16} />
                 </ul>
               </div>
               <nav
                 css={(theme) => ({
                   display: "flex",
                   flexWrap: "wrap",
-                  marginLeft: 14,
+                  marginLeft: "auto",
+                  marginRight: "auto",
                   color: theme.colors.text_subtitle_light,
                   justifyContent: "start",
                 })}
@@ -337,10 +361,6 @@ export default function LogoMenu({
                   {
                     Icon: Youtube,
                     href: socialLinks.youtube,
-                  },
-                  {
-                    Icon: Pinterest,
-                    href: socialLinks.pinterest,
                   },
                   {
                     Icon: Discord,

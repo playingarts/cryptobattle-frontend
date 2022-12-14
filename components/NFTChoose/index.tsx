@@ -552,6 +552,7 @@ const NFTChoose: FC<Props> = () => {
                                 flexDirection: "column",
                                 alignItems: "center",
                                 width: "100%",
+                                marginTop: -20
                               }}
                             >
                               <div

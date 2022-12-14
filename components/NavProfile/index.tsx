@@ -3,12 +3,14 @@ import UserAvatar from "../UserAvatar";
 import { FC, HTMLAttributes } from "react";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
+interface User extends Props {
+  user:  any,
+}
 
-
-const NavProfile: FC<Props> = (props) => {
+const NavProfile: FC<User> = (props) => {
       // eslint-disable-next-line
     // @ts-ignore
-  const user  =  window.user ? JSON.parse(window.user) : {}
+  const user  =  window.user ? JSON.parse(window.user) : props.user
 
   return (
     <div style={{ cursor: "pointer" }} {...props}>
@@ -20,7 +22,7 @@ const NavProfile: FC<Props> = (props) => {
             opacity: 0.9,
           },
         }}
-        profilePictureUrl={user.profilePictureUrl}
+        profilePictureUrl={user && user.profilePictureUrl}
       />
     </div>
   );

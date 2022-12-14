@@ -32,7 +32,7 @@ const Home: NextPage = () => {
     </GameRules>
   );
 
-  const headerMiddle = <NavProfile />;
+  const headerMiddle = <NavProfile user={user}/>;
 
   return (
     <ComposedGlobalLayout
