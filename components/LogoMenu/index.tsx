@@ -9,7 +9,6 @@ import Arrowed from "../Arrowed";
 
 import Discord from "../Icons/Discord";
 import Youtube from "../Icons/Youtube";
-import Pinterest from "../Icons/Pinterest";
 import Button from "../Button";
 import Twitter from "../Icons/Twitter";
 import { socialLinks } from "../../source/consts";
