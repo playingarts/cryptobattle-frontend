@@ -42,38 +42,7 @@ const NFTChoose: FC<Props> = () => {
 
   const [loading, setLoading] = useState(false);
   const [topCards, setTopCards] = useState<Array<any>>([]);
-  const [NFTCards, setNFTCards] = useState<Array<CardType>>([  {
-    "suit": "clubs",
-    "value": "ace",
-    "artist": "Robbie Trevino",
-    "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/a-c-R22N86fN.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/a-c-R22N86fN.mp4",
-    "url": "https://playingarts.com/crypto/robbie-trevino"
-  },
-  {
-    "suit": "diamonds",
-    "value": "ace",
-    "artist": "Baugasm",
-    "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/a-d-Mk33LV47.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/a-d-Mk33LV47.mp4",
-    "url": "https://playingarts.com/crypto/baugasm"
-  },
-  {
-    "suit": "hearts",
-    "value": "ace",
-    "artist": "Chuck Anderson",
-    "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/a-h-x89CxW27.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/a-h-x89CxW27.mp4",
-    "url": "https://playingarts.com/crypto/chuck-anderson"
-  },
-  {
-    "suit": "spades",
-    "value": "ace",
-    "artist": "Jason Naylor",
-    "img": "https://s3.amazonaws.com/img.playingarts.com/crypto/game/a-s-26vr86EL.jpg",
-    "video": "https://s3.amazonaws.com/img.playingarts.com/crypto/cards/a-s-26vr86EL.mp4",
-    "url": "https://playingarts.com/crypto/jason-naylor"
-  },]);
+  const [NFTCards, setNFTCards] = useState<Array<CardType>>([]);
 
   const setFirstCardActive = () => {
     setActiveCard(1);
@@ -145,7 +114,7 @@ const NFTChoose: FC<Props> = () => {
           return { ...foundCard, ...card };
         });
 
-        // setNFTCards(computedData);
+        setNFTCards(computedData);
       })
       .catch((err: any) => {
         console.log(err);
