@@ -71,10 +71,9 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
   }, [player, playerInfo]);
 
   return (
-
-    <div    
-    // eslint-disable-next-line
-    // @ts-ignore
+    <div
+      // eslint-disable-next-line
+      // @ts-ignore
       ref={ref}
       style={{
         display: "flex",
@@ -224,7 +223,7 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
       </div>
       <div style={{ marginLeft: "10px" }}>
         <Text component="div" variant="label">
-          {formatUsername(playerInfo.name)}
+          {formatUsername(playerInfo.username)}
         </Text>
         {/* <div>@{formatUsername(playerInfo.username)}</div> */}
       </div>
