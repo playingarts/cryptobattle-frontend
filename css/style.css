@@ -2,12 +2,6 @@ body {
   padding: 0 !important;
 }
 
-/* Fix rounded corners Safari */
-html {
-  -webkit-backface-visibility: hidden;
--webkit-transform: translate3d(0, 0, 0);
-}
-
 .game-inventory {
   opacity: 0;
   transform: translate(0, 0);
