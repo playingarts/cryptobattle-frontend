@@ -71,9 +71,10 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
   }, [player, playerInfo]);
 
   return (
+
+    <div    
     // eslint-disable-next-line
     // @ts-ignore
-    <div
       ref={ref}
       style={{
         display: "flex",

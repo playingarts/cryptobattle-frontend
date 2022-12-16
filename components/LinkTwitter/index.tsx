@@ -1,6 +1,5 @@
 import { FC, Fragment } from "react";
 import Button from "../Button";
-import Line from "../Line";
 import Text from "../Text";
 import Link from "../Link";
 

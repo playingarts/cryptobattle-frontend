@@ -1,5 +1,4 @@
 import { FC, useEffect } from "react";
-import Layout from "../../../components/Layout";
 import Header, { Props as HeaderProps } from "../../../components/Header";
 import Footer from "../../../components/Footer";
 import { useRouter } from "next/router";

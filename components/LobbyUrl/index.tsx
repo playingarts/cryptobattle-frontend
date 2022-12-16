@@ -37,7 +37,7 @@ const LobbyUrl: FC<LobbyUrl> = ({ roomid, isOwner, startGame }) => {
   return (
     <div>
       <StatBlock
-        css={(theme) => ({
+        css={() => ({
           background: `#181818`,
           backgroundSize: "85%",
           color: "rgba(255, 255, 255, 0.5)",
@@ -76,7 +76,7 @@ const LobbyUrl: FC<LobbyUrl> = ({ roomid, isOwner, startGame }) => {
           {isOwner ? (
             <span>
               Share game link with your friends and wait for them to connect.
-              Press "START" when everyone are ready!
+              Press &quot;START&quot; when everyone are ready!
             </span>
           ) : (
             "Share this link if you want to invite more players!"

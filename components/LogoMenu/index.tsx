@@ -5,7 +5,6 @@ import Text from "../Text";
 import GameRules from "../GameRules";
 // import { useWS } from "../WsProvider";
 import { useAuth } from "../AuthProvider";
-import Arrowed from "../Arrowed";
 
 import Discord from "../Icons/Discord";
 import Youtube from "../Icons/Youtube";

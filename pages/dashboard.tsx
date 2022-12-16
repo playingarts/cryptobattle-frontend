@@ -18,7 +18,7 @@ import NavProfile from "../components/NavProfile";
 
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 import DashboardHeader from "../components/DashboardHeader";
-import PlayingArtsinfo from "../components/PlayingartsInfo";
+
 import LinkTwitter from "../components/LinkTwitter";
 
 const Home: NextPage = () => {
@@ -94,6 +94,7 @@ const Home: NextPage = () => {
                 }}
                 href="https://discord.gg/bJUDBsj977"
                 target={"_blank"}
+                rel="noreferrer"
               >
                 Join our Discord
               </a>

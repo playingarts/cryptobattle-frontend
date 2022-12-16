@@ -16,7 +16,6 @@ import Lobby from "../../components/Lobby";
 import Ready from "../../components/Ready";
 
 import NFTChoose from "../../components/NFTChoose";
-import Text from "../../components/Text";
 import { useNotifications } from "../../components/NotificationProvider";
 import { useAuth } from "../../components/AuthProvider";
 import NavProfile from "../../components/NavProfile";

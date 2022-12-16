@@ -18,7 +18,6 @@ import CardStats from "../../components/CardStats";
 import Loader from "../Loader";
 
 import Button from "../Button";
-import Link from "../Link";
 
 const getUserNftCards = () => {
   return api.get(`api/rest/user-nft-cards`);
@@ -31,10 +30,11 @@ const NFTChoose: FC<Props> = () => {
   const WSProvider = useWS();
 
   const { user } = useAuth();
-  // eslint-disable-next-line
-  // @ts-ignore: Unreachable code error
+
   const [firstCard, setFirstCard] = useState<any>(
     localStorage.getItem("chosen-nfts")
+      // eslint-disable-next-line
+  // @ts-ignore: Unreachable code error
       ? JSON.parse(localStorage.getItem("chosen-nfts"))[0]
       : null
   );
@@ -42,6 +42,8 @@ const NFTChoose: FC<Props> = () => {
   // @ts-ignore: Unreachable code error
   const [secondCard, setSecondCard] = useState<any>(
     localStorage.getItem("chosen-nfts")
+      // eslint-disable-next-line
+  // @ts-ignore: Unreachable code error
       ? JSON.parse(localStorage.getItem("chosen-nfts"))[1]
       : null
   );
@@ -324,7 +326,7 @@ const NFTChoose: FC<Props> = () => {
   return (
     <StatBlock
       title={"Choose up to 2 NFTS (optional)"}
-      css={(theme) => ({
+      css={() => ({
         background: `#181818`,
         backgroundSize: "85%",
         color: "rgba(255, 255, 255, 0.5)",

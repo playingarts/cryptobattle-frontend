@@ -5,8 +5,7 @@ import Youtube from "../Icons/Youtube";
 import Pinterest from "../Icons/Pinterest";
 import Text from "../Text";
 import Button from "../Button";
-import Line from "../Line";
-import Grid from "../Grid";
+
 import Twitter from "../Icons/Twitter";
 import { socialLinks } from "../../source/consts";
 import Instagram from "../Icons/Instagram";
@@ -16,7 +15,7 @@ import Behance from "../Icons/Behance";
 const Footer: FC<HTMLAttributes<HTMLDivElement>> = (props) => (
   <div
     {...props}
-    css={(theme) => ({
+    css={() => ({
       color: "#fff",
       backgroundColor: "transparent",
     })}

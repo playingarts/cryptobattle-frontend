@@ -2,7 +2,6 @@ import { FC, Fragment } from "react";
 import Button from "../Button";
 import Line from "../Line";
 import Link from "../Link";
-import Text from "../Text";
 import Opensea from "../../components/Icons/Opensea";
 
 const BuyNFT: FC = () => {

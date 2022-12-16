@@ -20,7 +20,7 @@ import PlayerEmpty from "../PlayerEmpty";
 const Lobby: FC<Stats> = ({ isAdmin, players }) => {
   return (
     <StatBlock
-      css={(theme) => ({
+      css={() => ({
         background: `#181818`,
         backgroundSize: "85%",
         color: "rgba(255, 255, 255, 0.5)",

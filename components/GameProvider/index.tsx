@@ -349,11 +349,11 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       }
 
       if (event.event === "close-room") {
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
+
         event.data.ownderId &&
-          event.data.ownderId !== window.userId &&
-          !window.results &&
+      // eslint-disable-next-line
+        // @ts-ignore: Unreachable code error
+          event.data.ownderId !== window.userId && !window.results &&
           openNotification({
             title: "Ooopps",
             description: <span>This game has been closed by host</span>,

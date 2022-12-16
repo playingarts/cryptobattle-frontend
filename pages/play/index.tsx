@@ -11,7 +11,6 @@ import { useWS } from "../../components/WsProvider";
 import { useAuth } from "../../components/AuthProvider";
 import { useNotifications } from "../../components/NotificationProvider";
 import { useState, useEffect } from "react";
-import Text from "../../components/Text";
 import Warning from "../../components/Icons/Warning";
 const Play: NextPage = () => {
   const WSProvider = useWS();
