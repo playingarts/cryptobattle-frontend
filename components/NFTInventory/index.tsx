@@ -276,7 +276,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                 ></Card>
                 <div
                   css={{
-                    marginBottom: 30,
+                    marginBottom: 50,
                     marginTop: 6,
                     maxWidth: 210,
                     marginLeft: 0,
@@ -302,7 +302,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                   </a>
                 </div>
               </div>
-              <div css={{ marginTop: -50, marginLeft: 20 }}>
+              <div css={{ marginTop: -70, marginLeft: 20 }}>
                 <CardStats
                   color={"light"}
                   xp={card.xp}

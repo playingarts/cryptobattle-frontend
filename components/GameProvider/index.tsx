@@ -349,11 +349,11 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       }
 
       if (event.event === "close-room") {
-
         event.data.ownderId &&
-      // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-          event.data.ownderId !== window.userId && !window.results &&
+          // eslint-disable-next-line
+          // @ts-ignore: Unreachable code error
+          event.data.ownderId !== window.userId &&
+          !window.results &&
           openNotification({
             title: "Ooopps",
             description: <span>This game has been closed by host</span>,
@@ -385,26 +385,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           )
         ) {
           openNotification({
+            title: "Ooops",
             description: (
-              <div>
-                <Text
-                  variant="h1"
-                  css={{
-                    fontSize: 35,
-                    lineHeight: "45.5px",
-                    marginBottom: 0,
-                    marginTop: 60,
-                  }}
-                >
-                  Ended
-                </Text>
-                <Text
-                  variant="body3"
-                  css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
-                >
-                  The game you are trying to join has ended.
-                </Text>
-              </div>
+              <span>The game you are trying to join has ended!</span>
             ),
             dark: false,
             icon: <Warning />,

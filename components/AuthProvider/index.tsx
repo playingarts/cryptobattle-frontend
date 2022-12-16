@@ -18,13 +18,10 @@ import Text from "../Text/";
 import Button from "../Button/";
 import Warning from "../../components/Icons/Warning";
 
-
 type AuthProviderProps = { children: ReactNode };
 
 // type MetamaskUser = { address: string; signature: string };
 import Loader from "../Loader";
-
-
 
 export type IAuthProviderContext = {
   logout: () => void;
@@ -80,12 +77,12 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       }
 
       setUser(user);
-            // eslint-disable-next-line
-    // @ts-ignore
-      window.user = JSON.stringify(user)
+      // eslint-disable-next-line
+      // @ts-ignore
+      window.user = JSON.stringify(user);
       const roomid = localStorage.getItem("roomid");
       if (!localStorage.getItem("adding-metamask")) {
-        console.log('/dashboard redirect here.')
+        console.log("/dashboard redirect here.");
         setTimeout(() => {
           roomid
             ? router.push(`/game/${roomid}?join=true`)
@@ -116,10 +113,9 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
         const user = formatUserData(data);
         setUser(user);
-      // eslint-disable-next-line
-    // @ts-ignore
-        window.user = JSON.stringify(user)
-
+        // eslint-disable-next-line
+        // @ts-ignore
+        window.user = JSON.stringify(user);
       });
     }
 
@@ -163,43 +159,23 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     ) {
       setAuthorized(false);
 
-
-      if (path.includes('/game')) {
+      if (path.includes("/game")) {
         // router.push("/");
         openNotification({
-          description: (
-            <div>
-              <Text
-                variant="h1"
-                css={{
-                  fontSize: 35,
-                  lineHeight: "45.5px",
-                  marginBottom: 0,
-                  marginTop: 60,
-                }}
-              >
-                Ended
-              </Text>
-              <Text
-                variant="body3"
-                css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
-              >
-                The game you are trying to join has ended.
-              </Text>
-            </div>
-          ),
+          title: "Ooops",
+          description: <span>The game you are trying to join has ended!</span>,
           dark: false,
           icon: <Warning />,
           iconColor: "#FF6F41",
           footer: (
             <div css={{ display: "flex" }}>
-              <Button component={Link}   onClick={closeNotification} href="/" >
-                Return to Home
+              <Button component={Link} onClick={closeNotification} href="/">
+                Back to dashboard
               </Button>
             </div>
           ),
         });
-      }else {
+      } else {
         router.push({
           pathname: "/401",
         });

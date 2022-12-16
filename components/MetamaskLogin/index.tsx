@@ -140,7 +140,7 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
           color: "#fff",
         })}
       >
-        Change address
+        Metamask
       </Button>
       // eslint-disable-next-line
       // @ts-ignore-end

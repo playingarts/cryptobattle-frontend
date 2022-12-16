@@ -41,39 +41,20 @@ const Home: any = () => {
         console.log(data);
         setRoomInfo(data);
         setLoading(false);
-        setLoaded(true)
+        setLoaded(true);
       })
       .catch((err: any) => {
         console.log(err);
         openNotification({
-          description: (
-            <div>
-              <Text
-                variant="h1"
-                css={{
-                  fontSize: 35,
-                  lineHeight: "45.5px",
-                  marginBottom: 0,
-                  marginTop: 60,
-                }}
-              >
-                Ended
-              </Text>
-              <Text
-                variant="body3"
-                css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
-              >
-                The game you are trying to join has ended.
-              </Text>
-            </div>
-          ),
+          title: "Ooops",
+          description: <span>The game you are trying to join has ended!</span>,
           dark: false,
           icon: <Warning />,
           iconColor: "#FF6F41",
           footer: (
             <div css={{ display: "flex" }}>
-              <Button component={Link}   onClick={closeNotification} href="/" >
-                Return to Home
+              <Button component={Link} onClick={closeNotification} href="/">
+                Back to dashboard
               </Button>
             </div>
           ),
@@ -109,84 +90,87 @@ const Home: any = () => {
     );
   }
 
-  return ( loaded &&
-    <ComposedGlobalLayout>
-      <Layout
-        css={(theme) => ({
-          background: theme.colors.dark_gray,
-          color: theme.colors.text_title_light,
-          overflow: "hidden",
-          paddingTop: theme.spacing(18),
-          paddingBottom: theme.spacing(6.5),
-          backgroundColor: "#0A0A0A",
-          backgroundSize: "cover",
-          position: "relative",
-        })}
-      >
-        <div css={{ position: "relative" }}>
-          <img
-            css={{ position: "absolute", left: 100, zIndex: 2 }}
-            src="/img/card.png"
-          />
-          <img
-            css={{ position: "absolute", left: 750, zIndex: 2 }}
-            src="/img/card2.png"
-          />
-          <div
-            css={{
-              background: "#fff",
-              color: "#333",
-              borderRadius: 20,
-              textAlign: "center",
-              maxWidth: 600,
-              margin: "0 auto",
-              padding: "80px 60px",
-              zIndex: 99,
-              position: "relative",
-            }}
-          >
-            <Text component="h1" css={{ margin: "1px", fontSize: "35px" }}>
-              Hey there!
-            </Text>
+  return (
+    loaded && (
+      <ComposedGlobalLayout>
+        <Layout
+          css={(theme) => ({
+            background: theme.colors.dark_gray,
+            color: theme.colors.text_title_light,
+            overflow: "hidden",
+            paddingTop: theme.spacing(18),
+            paddingBottom: theme.spacing(6.5),
+            backgroundColor: "#0A0A0A",
+            backgroundSize: "cover",
+            position: "relative",
+          })}
+        >
+          <div css={{ position: "relative" }}>
+            <img
+              css={{ position: "absolute", left: 100, zIndex: 2 }}
+              src="/img/card.png"
+            />
+            <img
+              css={{ position: "absolute", left: 750, zIndex: 2 }}
+              src="/img/card2.png"
+            />
+            <div
+              css={{
+                background: "#fff",
+                color: "#333",
+                borderRadius: 20,
+                textAlign: "center",
+                maxWidth: 600,
+                margin: "0 auto",
+                padding: "80px 60px",
+                zIndex: 99,
+                position: "relative",
+              }}
+            >
+              <Text component="h1" css={{ margin: "1px", fontSize: "35px" }}>
+                Hey there!
+              </Text>
 
-            <Text variant="body3" css={{ fontSize: 22, lineHeight: "33px" }}>
-              {formatUsername(roomInfo.inviterUsername)} invited to play a free
-              and fun card game featuring cards from Crypto Edition NFT deck!
-            </Text>
+              <Text variant="body3" css={{ fontSize: 22, lineHeight: "33px" }}>
+                {formatUsername(roomInfo.inviterUsername)} invited to play a
+                free and fun card game featuring cards from Crypto Edition NFT
+                deck!
+              </Text>
 
-            {!loggedIn && (
-              <div>
-                <Line></Line>
-                <Text
-                  variant="h6"
-                  css={{ textAlign: "center", color: "rgba(0, 0, 0, 0.3)" }}
-                >
-                  to accept, log in with:{" "}
-                </Text>
-                <div
-                  style={{ display: "flex", justifyContent: "space-around" }}
-                >
-                  <Button
-                    component={Link}
-                    href="https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter"
-                    Icon={Twitter}
-                    css={(theme) => ({
-                      background: "rgb(72, 155, 233)",
-                      marginRight: theme.spacing(1),
-                      color: "#fff",
-                    })}
+              {!loggedIn && (
+                <div>
+                  <Line></Line>
+                  <Text
+                    variant="h6"
+                    css={{ textAlign: "center", color: "rgba(0, 0, 0, 0.3)" }}
                   >
-                    Twitter
-                  </Button>
+                    to accept, log in with:{" "}
+                  </Text>
+                  <div
+                    style={{ display: "flex", justifyContent: "space-around" }}
+                  >
+                    <Button
+                      component={Link}
+                      href="https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter"
+                      Icon={Twitter}
+                      css={(theme) => ({
+                        background: "rgb(72, 155, 233)",
+                        marginRight: theme.spacing(1),
+                        color: "#fff",
+                      })}
+                    >
+                      Twitter
+                    </Button>
 
-                  <MetamaskLogin />
+                    <MetamaskLogin />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
-      </Layout>
-    </ComposedGlobalLayout>
+        </Layout>
+      </ComposedGlobalLayout>
+    )
   );
 };
 
