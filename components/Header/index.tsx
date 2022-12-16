@@ -34,7 +34,7 @@ const Header: FC<Props> = ({
             zIndex: 1,
             height: 70,
             marginTop: 0,
-            padding: 5,
+            // padding: 5,
             overflow: "hidden",
           },
 
@@ -89,7 +89,6 @@ const Header: FC<Props> = ({
               />
             </Link>
           )}
-
         </div>
 
         {headerRight && headerRight}

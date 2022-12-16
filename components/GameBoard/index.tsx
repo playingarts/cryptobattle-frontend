@@ -269,42 +269,57 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       function getViewPercentage(element: any) {
         const viewport = {
           top: window.pageYOffset,
-          bottom: window.pageYOffset + window.innerHeight
+          bottom: window.pageYOffset + window.innerHeight,
         };
-    
+
         const elementBoundingRect = element.getBoundingClientRect();
         const elementPos = {
           top: elementBoundingRect.y + window.pageYOffset,
-          bottom: elementBoundingRect.y + elementBoundingRect.height + window.pageYOffset
+          bottom:
+            elementBoundingRect.y +
+            elementBoundingRect.height +
+            window.pageYOffset,
         };
-      
-        if (viewport.top > elementPos.bottom || viewport.bottom < elementPos.top) {
+
+        if (
+          viewport.top > elementPos.bottom ||
+          viewport.bottom < elementPos.top
+        ) {
           return 0;
         }
-      
+
         // Element is fully within viewport
-        if (viewport.top < elementPos.top && viewport.bottom > elementPos.bottom) {
+        if (
+          viewport.top < elementPos.top &&
+          viewport.bottom > elementPos.bottom
+        ) {
           return 100;
         }
-      
+
         // Element is bigger than the viewport
-        if (elementPos.top < viewport.top && elementPos.bottom > viewport.bottom) {
+        if (
+          elementPos.top < viewport.top &&
+          elementPos.bottom > viewport.bottom
+        ) {
           return 100;
         }
-      
+
         const elementHeight = elementBoundingRect.height;
         let elementHeightInView = elementHeight;
-      
+
         if (elementPos.top < viewport.top) {
-          elementHeightInView = elementHeight - (window.pageYOffset - elementPos.top);
+          elementHeightInView =
+            elementHeight - (window.pageYOffset - elementPos.top);
         }
-      
+
         if (elementPos.bottom > viewport.bottom) {
-          elementHeightInView = elementHeightInView - (elementPos.bottom - viewport.bottom);
+          elementHeightInView =
+            elementHeightInView - (elementPos.bottom - viewport.bottom);
         }
-      
-        const percentageInView = (elementHeightInView / window.innerHeight) * 100;
-      
+
+        const percentageInView =
+          (elementHeightInView / window.innerHeight) * 100;
+
         return Math.round(percentageInView);
       }
       if (getViewPercentage(latestCard) < 90) {
@@ -312,7 +327,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       }
     }, 0);
     setTimeout(() => {
-      setLastPlayedCard(null)
+      setLastPlayedCard(null);
     }, 2000);
   }, [gameState]);
 
@@ -481,7 +496,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                             cardError[0] === rowIndex &&
                             cardError[1] === columnIndex
                               ? "3px solid #FA5252"
-                              : "3px dashed #333",
+                              : "3px dashed #222",
                           transition: "all 300ms",
 
                           "&:hover": {
@@ -489,7 +504,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                               cardError[0] === rowIndex &&
                               cardError[1] === columnIndex
                                 ? "3px solid #FA5252"
-                                : "3px dashed #555",
+                                : "3px dashed #222",
                           },
                           "&::before": {
                             transition: "all 300ms",
@@ -555,7 +570,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                               position: "relative",
                               // animationDuration: "10s",
                               opacity:
-                                column && column.length - 1 === index &&
+                                column &&
+                                column.length - 1 === index &&
                                 column[column.length - 1].suit &&
                                 column[column.length - 1].value &&
                                 lastPlayedCard?.value ===

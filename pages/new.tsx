@@ -21,24 +21,23 @@ const NewGame: NextPage = () => {
   // const { openNotification, closeNotification } = useNotifications();
   const { openNotification } = useNotifications();
 
-  const { roomId, setRoomId, isAlreadyConnected} = useGame();
+  const { roomId, setRoomId, isAlreadyConnected } = useGame();
   const router = useRouter();
   useEffect(() => {
-    console.log('roomid happens', roomId)
+    console.log("roomid happens", roomId);
 
     if (!roomId) {
       return;
     }
 
-
     router.push(`/game/${roomId}`);
 
-    return () => setRoomId(null)
+    return () => setRoomId(null);
   }, [roomId]);
 
   const WSProvider = useWS();
 
-  const headerMiddle = <div></div>
+  const headerMiddle = <div></div>;
 
   useEffect(() => {
     if (!isAlreadyConnected) {
@@ -49,7 +48,12 @@ const NewGame: NextPage = () => {
         <div>
           <Text
             variant="h1"
-            css={{ fontSize: 35, lineHeight: "45.5px", marginBottom: 0, marginTop: 60 }}
+            css={{
+              fontSize: 35,
+              lineHeight: "45.5px",
+              marginBottom: 0,
+              marginTop: 60,
+            }}
           >
             Already connected!
           </Text>
@@ -57,7 +61,7 @@ const NewGame: NextPage = () => {
             variant="body3"
             css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
           >
-            You are already in a lobby or a game in an another browser or a tab.
+            You are already in a lobby or a game in an another browser or tab.
           </Text>
         </div>
       ),
@@ -68,17 +72,15 @@ const NewGame: NextPage = () => {
   }, [isAlreadyConnected]);
 
   useEffect(() => {
-
-      WSProvider.send(
-        JSON.stringify({
-          event: "create-room",
-          data: {
-            type: "private",
-            maxPlayers: 10,
-          },
-        })
-      );
-    
+    WSProvider.send(
+      JSON.stringify({
+        event: "create-room",
+        data: {
+          type: "private",
+          maxPlayers: 10,
+        },
+      })
+    );
   }, []);
 
   return (

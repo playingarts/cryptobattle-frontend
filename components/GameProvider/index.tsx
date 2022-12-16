@@ -117,8 +117,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           wantNextGame: false,
         },
       })
-
-      
     );
     setResults(null);
     localStorage.setItem("chosen-nfts", "");
@@ -136,12 +134,12 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       return;
     }
     setInterval(() => {
-    WSProvider.send(
-      JSON.stringify({
-        event: "ping",
-        data: {},
-      })
-    );
+      WSProvider.send(
+        JSON.stringify({
+          event: "ping",
+          data: {},
+        })
+      );
     }, 20000);
   }, [WSProvider]);
 
@@ -165,7 +163,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   useEffect(() => {
     return () => {
       setPlayingAgain(false);
-      
+
       // eslint-disable-next-line
       // @ts-ignore: Unreachable code error
       localStorage.removeItem("play-again");
@@ -255,19 +253,17 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       if (e.code === 4000) {
         if (!localStorage.getItem("adding-metamask")) {
           setIsAlreadyConnected(true);
-        } 
+        }
       }
     };
 
     WSProvider.onmessage = function ({ data }) {
       setIsAlreadyConnected(false);
 
-
-
       const event = JSON.parse(data);
 
-      if (event.event === 'pong') {
-        return
+      if (event.event === "pong") {
+        return;
       }
 
       if (event.event !== "timer") {
@@ -322,8 +318,12 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       }
 
       // Timeout ended
-      if (event.event === "close-room" && (event.data.reason === "TIMEOUT" || event.data.reason === 'NEXT_GAME_VOTE_FAILED')) {
-        quit()
+      if (
+        event.event === "close-room" &&
+        (event.data.reason === "TIMEOUT" ||
+          event.data.reason === "NEXT_GAME_VOTE_FAILED")
+      ) {
+        quit();
         return;
       }
 
@@ -351,14 +351,18 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       if (event.event === "close-room") {
         // eslint-disable-next-line
         // @ts-ignore: Unreachable code error
-        event.data.ownderId && event.data.ownderId !== window.userId && !window.results && 
+        event.data.ownderId &&
+          event.data.ownderId !== window.userId &&
+          !window.results &&
           openNotification({
-            title: "Room closed by host",
-            dark: true,
-            iconColor: "blue",
+            title: "Ooopps",
+            description: <span>This game has been closed by host</span>,
+            dark: false,
+            icon: <Warning />,
+            iconColor: "#FF6F41",
             footer: (
-              <div css={{ display: "flex" }}>
-                <Button onClick={quit}>Quit</Button>
+              <div css={{ display: "flex", marginTop: "0px" }}>
+                <Button onClick={quit}>Go to dashboard</Button>
               </div>
             ),
           });
@@ -433,7 +437,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       if (
         event.event === "quit-room" &&
-        event.data.reason === "KICKED_BY_ROOM_OWNER" 
+        event.data.reason === "KICKED_BY_ROOM_OWNER"
       ) {
         openNotification({
           title: "You were kicked!",
@@ -462,9 +466,16 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           "Joining while hosting a game is forbidden"
         ) {
           openNotification({
-            title: "Cannot join room while hosting a game",
-            dark: true,
-            iconColor: "#FEEA3A",
+            title: "Sorry",
+            description: (
+              <span>
+                Cannot join rooms while hosting a game. Quit the game and try
+                again!
+              </span>
+            ),
+            dark: false,
+            icon: <Warning />,
+            iconColor: "#FF6F41",
             footer: (
               <div css={{ display: "flex" }}>
                 <Button onClick={quit}>Quit game</Button>

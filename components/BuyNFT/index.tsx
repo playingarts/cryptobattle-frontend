@@ -10,20 +10,34 @@ const BuyNFT: FC = () => {
     <Fragment>
       <Line spacing={5} />
 
+      {/*
       <Text
         component="p"
         css={{
           margin: 0,
-          marginTop: "30px",
+          marginTop: 30,
           marginBottom: 30,
-          color: "rgba(234, 234, 234, 0.5)",
+          marginLeft: "auto",
+          marginRight: "auto",
+          maxWidth: 1020,
+          color: "rgba(234, 234, 234, 0.3)",
         }}
       >
         Get more cards to have the most fun from the game!
       </Text>
+      */}
 
-      <div css={{ display: "flex", marginTop: "20px", marginBottom: 40 }}>
-        <Link target="_blank" href="https://opensea.io/collection/cryptoedition">
+      <div
+        css={{
+          display: "flex",
+          marginTop: 20,
+          marginBottom: 40,
+        }}
+      >
+        <Link
+          target="_blank"
+          href="https://opensea.io/collection/cryptoedition"
+        >
           <Button
             Icon={Opensea}
             css={(theme) => ({
@@ -32,7 +46,7 @@ const BuyNFT: FC = () => {
               color: "#407FDB",
             })}
           >
-            opensea collection
+            Buy more cards
           </Button>
         </Link>
       </div>

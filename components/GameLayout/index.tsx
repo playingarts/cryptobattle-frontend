@@ -29,21 +29,18 @@ const GameLayout: FC<
         closeNotification();
       };
       const leave = () => {
-
         setIsConfirmedLeave(true);
         setTimeout(() => {
           router.push("/dashboard");
         }, 0);
         closeNotification();
-
       };
 
       console.log("handleRouteChange", url);
 
-
       if (
-      // eslint-disable-next-line
-      // @ts-ignore: Unreachable code error
+        // eslint-disable-next-line
+        // @ts-ignore: Unreachable code error
         !window.results &&
         !isConfirmedLeave &&
         url !== "/play" &&
@@ -148,7 +145,7 @@ const GameLayout: FC<
             position: "fixed",
             left: theme.spacing(1),
             right: theme.spacing(1),
-            top: theme.spacing(2),
+            top: theme.spacing(1),
             zIndex: 10,
 
             "@media (min-width: 1440px)": {
@@ -168,8 +165,8 @@ const GameLayout: FC<
         <div
           css={{
             position: "fixed",
-            bottom: 40,
-            left: 40,
+            bottom: 20,
+            left: 20,
             height: 60,
             width: 60,
             borderRadius: 4000,

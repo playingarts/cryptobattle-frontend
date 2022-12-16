@@ -33,11 +33,10 @@ const GameInventory: FC<Props> = ({
   const [cardsNft, setCardsNft] = useState<any>([]);
   const [loadingDelayed, setLoadingDelayed] = useState(true);
 
-  const { gameState, selectedCard, setSelectedCard, players} = useGame();
+  const { gameState, selectedCard, setSelectedCard, players } = useGame();
   const { user } = useAuth();
 
   const WSProvider = useWS();
-
 
   const getColor = useCallback(
     (userId) => () => {
@@ -52,7 +51,6 @@ const GameInventory: FC<Props> = ({
     },
     [players]
   );
-
 
   const skip = () => {
     WSProvider.send(
@@ -113,8 +111,6 @@ const GameInventory: FC<Props> = ({
   const selectCard = useCallback(
     (card) => () => {
       setSelectedCard(card);
-
-
     },
     [setSelectedCard]
   );
@@ -128,7 +124,7 @@ const GameInventory: FC<Props> = ({
         left: 0,
         width: "100%",
         background: "transparent",
-        zIndex: 400,
+        zIndex: 999999,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -193,7 +189,6 @@ const GameInventory: FC<Props> = ({
                   <CardSmall
                     className={"draggable"}
                     onMouseDown={selectCard(card)}
-
                     key={`${index}`}
                     isSelected={
                       selectedCard ? selectedCard.uid === card.uid : false
@@ -257,7 +252,7 @@ const GameInventory: FC<Props> = ({
               alignItems: "center",
               borderTopRightRadius: isOpponentsCards ? 10 : 20,
               borderBottomRightRadius: isOpponentsCards ? 10 : 20,
-              padding: isOpponentsCards ? 5 : 15,
+              padding: isOpponentsCards ? 5 : "15px 10px 15px 15px",
               background: isOpponentsCards
                 ? gameState?.turnForPlayer === user.userId
                   ? "#282828"
@@ -383,7 +378,7 @@ const GameInventory: FC<Props> = ({
               marginLeft: 40,
               position: "absolute",
               borderRadius: 400,
-              right: -120,
+              right: -80,
               top: 32,
               background: "#181818",
               color:

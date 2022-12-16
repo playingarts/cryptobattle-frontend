@@ -12,18 +12,11 @@ const ComposedGlobalLayout: FC<
     | "noNav"
     | "palette"
     | "isCardPage"
-    | 'headerTitle'
+    | "headerTitle"
     | "headerMiddle"
     | "headerRight"
-
   >
-> = ({
-  palette,
-  children,
-  headerTitle,
-  headerMiddle,
-  headerRight
-}) => {
+> = ({ palette, children, headerTitle, headerMiddle, headerRight }) => {
   const {
     query: { scrollIntoView, scrollIntoViewBehavior, ...query },
     replace,
@@ -59,9 +52,9 @@ const ComposedGlobalLayout: FC<
   return (
     <div style={{ background: "#0a0a0a", minHeight: "100vh" }}>
       <Header
-      headerTitle={headerTitle}
-      headerMiddle={headerMiddle}
-      headerRight={headerRight}
+        headerTitle={headerTitle}
+        headerMiddle={headerMiddle}
+        headerRight={headerRight}
         css={(theme) => ({
           position: "fixed",
           left: theme.spacing(1),
@@ -81,19 +74,21 @@ const ComposedGlobalLayout: FC<
 
       {children}
 
-       <Layout css={(theme) => ({ marginTop: theme.spacing(0) })}>
-        <Footer
-          css={(theme) => ({
-            marginBottom: theme.spacing(1),
-            marginLeft: -theme.spacing(9.5),
-            marginRight: -theme.spacing(9.5),
-            paddingLeft: theme.spacing(9.5),
-            paddingRight: theme.spacing(9.5),
-            paddingTop: theme.spacing(0),
-            paddingBottom: theme.spacing(6),
-          })}
-        />
-      </Layout> 
+      <Footer
+        css={(theme) => ({
+          position: "relative",
+          marginBottom: theme.spacing(0),
+          paddingTop: theme.spacing(0),
+          paddingBottom: theme.spacing(2),
+          paddingLeft: theme.spacing(1),
+          paddingRight: theme.spacing(1),
+          maxWidth: theme.spacing(120),
+          left: "50%",
+          transform: "translate(-50%, 0)",
+          width: "100%",
+          textAlign: "center",
+        })}
+      />
     </div>
   );
 };

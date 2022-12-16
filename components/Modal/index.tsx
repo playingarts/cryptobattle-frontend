@@ -37,8 +37,9 @@ const StyledOverlay = styled(DialogPrimitive.Overlay, {
 
 const StyledContent = styled(DialogPrimitive.Content, {
   minWidth: 300,
-  marginTop: 14,
-  maxWidth: 1020,
+  marginTop: 10,
+  marginBottom: 10,
+  maxWidth: 1180,
   borderRadius: 20,
   zIndex: 9999,
   padding: "20px 5px",
@@ -58,7 +59,12 @@ const Content: FC<Props> = ({ children, ...props }) => {
         <StyledContent {...props}>
           <div
             id="modal"
-            css={{ padding: "90px 105px", height: 'auto', overflow: "auto", scrollbarWidth: 'none' }}
+            css={{
+              padding: "90px 105px",
+              height: "auto",
+              overflow: "auto",
+              scrollbarWidth: "none",
+            }}
           >
             {children}
           </div>
@@ -145,11 +151,13 @@ export const Modal: FC<Modal> = ({
             aria-label="Close"
             css={{
               margin: 0,
-              padding: 8,
+              padding: 15,
               position: "absolute",
-              top: 23,
+              top: 30,
               right: 30,
               cursor: "pointer",
+              backgroundColor: "#EAEAEA",
+              borderRadius: "50px",
               transition: "all 600ms",
               "&:hover": {
                 transform: `rotateZ(90deg)`,

@@ -26,7 +26,12 @@ interface MenuItem extends Props {
   fontWeight?: number;
 }
 
-const MenuItem: FC<MenuItem> = ({ to, text, fontSize = 22, fontWeight = 500 }) => {
+const MenuItem: FC<MenuItem> = ({
+  to,
+  text,
+  fontSize = 22,
+  fontWeight = 500,
+}) => {
   return (
     <Link href={to} passHref>
       <li
@@ -72,12 +77,14 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 //   "100%": { opacity: 1, transform: "translateX(0)" },
 // });
 const StyledContent = styled(PopoverPrimitive.Content, {
-  borderRadius: 20,
+  borderRadius: 10,
   // padding: "11px 5px",
   width: 380,
   backgroundColor: "white",
-  marginTop: -72,
-  minHeight: 550,
+  marginTop: -70,
+  marginLeft: -5,
+  paddingBottom: 40,
+  // minHeight: 550,
   zIndex: 4000,
   // paddingLeft: 40,
   boxShadow:
@@ -185,19 +192,24 @@ export default function LogoMenu({
                     component="div"
                     variant="h5"
                     css={{
-                      color: "#DDDDDD",
+                      color: "#7a7a7a",
                       fontSize: 25,
                       fontWeight: 400,
                       letterSpacing: "-0.05em",
                       lineHeight: 1.2,
                       fontFamily: "Aldrich, sans-serif",
                       textTransform: "uppercase",
-                      position: "absolute",
-                      marginLeft: 80,
-                      marginTop: 6,
+                      // position: "absolute",
+                      // marginLeft: 80,
+                      marginTop: 7,
+                      cursor: "pointer",
+                      transition: "color 500ms",
+                      "&:hover": {
+                        color: "#fff",
+                      },
                     }}
                   >
-                    {headerTitle ? headerTitle : "CRYPTOBATTLE"}
+                    {headerTitle ? headerTitle : "CRYPTO BATTLE"}
                   </Text>
                 )}
                 {logo && logo}
@@ -236,7 +248,7 @@ export default function LogoMenu({
                   <CloseMenu />
                 </div>
               </PopoverClose>
-              <div css={{ padding: "0 52px 0 100px" }}>
+              <div css={{ padding: "0 52px 0 96px" }}>
                 <Text
                   component="div"
                   variant="h5"
@@ -246,44 +258,61 @@ export default function LogoMenu({
                     cursor: "pointer",
                   }}
                 >
-                  Playing Arts
+                  CRYPTO BATTLE
                 </Text>{" "}
-                <ul css={{ fontSize: 22, padding: 0, marginTop: 50 }}>
-                  <MenuItem fontWeight={400} to="/dashboard" text="Dashboard" />
+                <ul
+                  css={{
+                    fontSize: 22,
+                    padding: 0,
+                    marginTop: 50,
+                    marginBottom: 0,
+                  }}
+                >
+                  {/* {loggedIn && <MenuItem fontWeight={400} to="/" text="Home" />} */}
+                  {loggedIn && (
+                    <MenuItem
+                      fontWeight={400}
+                      to="/dashboard"
+                      text="Dashboard"
+                    />
+                  )}
 
-                  <div>
-                    <GameRules>
-                      <div
-                        css={{
-                          color: "rgba(0, 0, 0, 0.5)",
-                          cursor: "pointer",
-                          paddingBottom: 20,
-                          fontWeight: 400,
+                  {loggedIn && (
+                    <div>
+                      <GameRules>
+                        <div
+                          css={{
+                            color: "rgba(0, 0, 0, 0.5)",
+                            cursor: "pointer",
+                            paddingBottom: 20,
+                            fontWeight: 400,
+                            transition: "all 300ms",
+                            listStyle: "none",
+                            "&:hover": {
+                              opacity: "0.6",
+                            },
+                          }}
+                        >
+                          Game Rules
+                        </div>
+                      </GameRules>
+                    </div>
+                  )}
+                  {loggedIn && (
+                    <Button
+                      style={{
+                        marginRight: "15px",
+                        background: "#7B61FF",
+                        color: "#fff",
+                        marginBottom: 10,
+                      }}
+                      component={Link}
+                      href="/new"
+                    >
+                      New Game
+                    </Button>
+                  )}
 
-                          transition: "all 300ms",
-                          listStyle: "none",
-                          "&:hover": {
-                            opacity: "0.6",
-                          },
-                        }}
-                      >
-                        Game Rules
-                      </div>
-                    </GameRules>
-                  </div>
-
-                  <Button
-                    style={{
-                      marginRight: "15px",
-                      background: "#7B61FF",
-                      color: "#fff",
-                      marginBottom: 20
-                    }}
-                    component={Link}
-                    href="/new"
-                  >
-                    New Game
-                  </Button>
                   {/* <li
                     onClick={purgeGames}
                     css={{
@@ -301,14 +330,38 @@ export default function LogoMenu({
                     Purge rooms and games
                   </li> */}
 
-                  <div css={{ paddingBottom: 10 }}>
-                    <Line spacing={2}></Line>
-                  </div>
-                  <MenuItem to="/" text="Buy NFT on Opensea" fontSize={16} />
-                  <MenuItem to="/" text="Buy NFT on LooksRare" fontSize={16} />
-                  <div css={{ paddingBottom: 10, marginTop: -10 }}>
-                    <Line spacing={2}></Line>
-                  </div>
+                  {!loggedIn && (
+                    <div
+                      css={{
+                        paddingBottom: 0,
+                        color: "#666",
+                        lineHeight: "130%",
+                      }}
+                    >
+                      Go head to head with opponents in turn-based card battle
+                    </div>
+                  )}
+
+                  {!loggedIn && <Line spacing={3}></Line>}
+
+                  {/* 
+
+                  {loggedIn && (
+                    <MenuItem
+                      to="https://opensea.io/collection/cryptoedition"
+                      text="Buy NFT on Opensea"
+                      fontSize={16}
+                    />
+                  )} */}
+
+                  {/* <MenuItem to="/" text="Buy NFT on LooksRare" fontSize={16} /> */}
+
+                  {loggedIn && (
+                    <div css={{ paddingBottom: 10, marginTop: 10 }}>
+                      <Line spacing={2}></Line>
+                    </div>
+                  )}
+
                   {loggedIn && (
                     <li
                       onClick={logout}
@@ -316,8 +369,8 @@ export default function LogoMenu({
                         cursor: "pointer",
                         color: "rgba(0, 0, 0, 0.5)",
                         paddingBottom: 0,
-                        marginBottom: 32,
-                        fontWeight: 500,
+                        marginBottom: 0,
+                        fontWeight: 400,
                         transition: "all 300ms",
                         listStyle: "none",
                         "&:hover": {
@@ -325,63 +378,65 @@ export default function LogoMenu({
                         },
                       }}
                     >
-                      <Arrowed>Log out</Arrowed>
+                      Log out
                     </li>
                   )}
                 </ul>
               </div>
-              <nav
-                css={(theme) => ({
-                  display: "flex",
-                  flexWrap: "wrap",
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                  color: theme.colors.text_subtitle_light,
-                  justifyContent: "start",
-                })}
-              >
-                {[
-                  {
-                    Icon: Twitter,
-                    href: socialLinks.twitter,
-                  },
-                  {
-                    Icon: Instagram,
-                    href: socialLinks.instagram,
-                  },
-                  {
-                    Icon: Facebook,
-                    href: socialLinks.facebook,
-                  },
-                  {
-                    Icon: Behance,
-                    href: socialLinks.behance,
-                  },
-                  {
-                    Icon: Youtube,
-                    href: socialLinks.youtube,
-                  },
-                  {
-                    Icon: Discord,
-                    href: socialLinks.discord,
-                  },
-                ].map(({ Icon, href }) => (
-                  <Button
-                    key={href}
-                    component={Link}
-                    target="_blank"
-                    href={href}
-                    css={{
-                      color: "#181818",
-                      transition: "all 400ms",
-                      "&:hover": {
-                        transform: `scale(1.1)`,
-                      },
-                    }}
-                    Icon={Icon}
-                  />
-                ))}
-              </nav>
+              {!loggedIn && (
+                <nav
+                  css={(theme) => ({
+                    display: "flex",
+                    flexWrap: "wrap",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    color: theme.colors.text_subtitle_light,
+                    justifyContent: "start",
+                  })}
+                >
+                  {[
+                    {
+                      Icon: Twitter,
+                      href: socialLinks.twitter,
+                    },
+                    {
+                      Icon: Instagram,
+                      href: socialLinks.instagram,
+                    },
+                    {
+                      Icon: Facebook,
+                      href: socialLinks.facebook,
+                    },
+                    {
+                      Icon: Behance,
+                      href: socialLinks.behance,
+                    },
+                    {
+                      Icon: Youtube,
+                      href: socialLinks.youtube,
+                    },
+                    {
+                      Icon: Discord,
+                      href: socialLinks.discord,
+                    },
+                  ].map(({ Icon, href }) => (
+                    <Button
+                      key={href}
+                      component={Link}
+                      target="_blank"
+                      href={href}
+                      css={{
+                        color: "#181818",
+                        transition: "all 400ms",
+                        "&:hover": {
+                          transform: `scale(1.1)`,
+                        },
+                      }}
+                      Icon={Icon}
+                    />
+                  ))}
+                </nav>
+              )}
             </Flex>
           </PopoverContent>
         </Popover>

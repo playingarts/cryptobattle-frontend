@@ -20,13 +20,20 @@ const Home: NextPage = () => {
 
   const headerRight = (
     <GameRules>
-      <Button css={{ color: "#fff", background: "rgba(255, 255, 255, 0.05)" }}>
+      <Button
+        css={{
+          color: "#7a7a7a",
+          background: "rgba(255, 255, 255, 0.05)",
+          transition: "color 500ms",
+          "&:hover": {
+            color: "#fff",
+          },
+        }}
+      >
         Game Rules
       </Button>
     </GameRules>
   );
-
-
 
   return (
     <ComposedGlobalLayout headerRight={headerRight}>
@@ -36,31 +43,40 @@ const Home: NextPage = () => {
           color: theme.colors.text_title_light,
           overflow: "hidden",
           paddingTop: theme.spacing(26),
-          paddingBottom: theme.spacing(6.5),
+          paddingBottom: "50px",
           backgroundColor: "#0A0A0A",
-          // backgroundImage:
-          //   "url(https://s3.amazonaws.com/img.playingarts.com/www/static/home_bg.jpg)",
-          backgroundSize: "cover",
+          backgroundImage:
+            "url(https://s3.amazonaws.com/img.playingarts.com/crypto/game/cards_bg.jpg)",
+          backgroundSize: "2200px",
+          backgroundPosition: "center 0px",
+          backgroundRepeat: "no-repeat",
         })}
       >
-        <Grid css={{marginBottom: 200}}>
-          <div css={{ gridColumn: "0 / span 5" }}>
+        <Grid css={{ marginBottom: 200 }}>
+          {/* <div css={{ gridColumn: "0 / span 5" }}>
             <div css={{ width: "400px", height: "400px" }}></div>
-          </div>
+          </div> */}
 
-          <div css={{ gridColumn: "7 / span 10" }}>
-            <Text component="h1" css={{ margin: "1px", fontSize: "50px", lineHeight: '65px' }}>
-              Go head to head with opponents in turn-based play-2-earn card
-              battle.
+          <div css={{ gridColumn: "2 / span 6" }}>
+            <Text
+              component="h1"
+              css={{ margin: "1px", fontSize: "50px", lineHeight: "65px" }}
+            >
+              Go head to head with opponents in turn-based card battle
             </Text>
-
-
 
             <Line spacing={2} />
 
             {!loggedIn ? (
               <div>
-                <Text variant="body2">ready to play? log in with: </Text>
+                <Text
+                  variant="body2"
+                  css={{
+                    color: "#7a7a7a",
+                  }}
+                >
+                  Log in with
+                </Text>
                 <div style={{ display: "flex", justifyContent: "start" }}>
                   <Button
                     component={Link}
@@ -79,8 +95,16 @@ const Home: NextPage = () => {
                 </div>
               </div>
             ) : (
-              <Button component={Link} href="/dashboard">
-                Go to dashboard
+              <Button
+                css={{
+                  marginTop: "10px",
+                  backgroundColor: "rgb(123, 97, 255)",
+                  color: "#fff",
+                }}
+                component={Link}
+                href="/dashboard"
+              >
+                Start playing
               </Button>
             )}
           </div>

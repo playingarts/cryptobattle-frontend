@@ -11,7 +11,6 @@ import { useAuth } from "../AuthProvider";
 // import Progress from '../../components/Progress';
 import Button from "../Button/";
 
-
 const getUserStats = (userId: string) => {
   return api.get("/api/rest/player-stats/" + userId);
 };
@@ -28,26 +27,26 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
     cardsStrength: 0,
   });
 
-
   const getUsername = () => {
     if (user.isTwitterConnected && !user.isMetamaskConnected) {
-      return `@${user.username}`
+      return `@${user.username}`;
     }
     if (!user.isTwitterConnected && user.isMetamaskConnected) {
-      return `${user.username}`
+      return `${user.username}`;
     }
-    return `@${user.username} ・ ${user && user.metamask && user.metamask.address}`
-  }
+    return `@${user.username} ・ ${
+      user && user.metamask && user.metamask.address
+    }`;
+  };
 
   const getGreeting = () => {
     if (user.isTwitterConnected) {
-      return `GM, ${user.name}!`
+      return `GM, ${user.name}!`;
     }
     if (!user.isTwitterConnected && user.isMetamaskConnected) {
-      return `GM!`
+      return `GM!`;
     }
-  }
-
+  };
 
   useEffect(() => {
     if (!user.userId) {
@@ -58,9 +57,8 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
         console.log("User Stats: ", data);
         setUserStats(data);
 
-
         if (data.gamesPlayed === 0) {
-          localStorage.setItem('show-rules-modal', 'true')
+          localStorage.setItem("show-rules-modal", "true");
         }
       })
       .catch((err: any) => {
@@ -78,8 +76,9 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
         backgroundSize: "85%",
         color: theme.colors.text_title_light,
         position: "relative",
-        margin: "20px 0",
-        padding: "40px 80px",
+        margin: "20px auto",
+        padding: "50px 70px",
+        maxWidth: 1040,
       })}
     >
       <div css={{ display: "flex", justifyContent: "space-between" }}>
@@ -87,8 +86,7 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
           component="h1"
           css={{
             margin: "0",
-            marginTop: "0",
-            fontSize: "50px",
+            fontSize: "55px",
             verticalAlign: "bottom",
           }}
         >
@@ -98,10 +96,10 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
           component="h1"
           css={{
             margin: "0",
-            marginTop: "0",
-            marginRight: 12,
-            fontSize: "50px",
+            fontSize: "55px",
             verticalAlign: "bottom",
+            width: "90px",
+            textAlign: "center",
           }}
         >
           {userStats.skill}
@@ -109,22 +107,42 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
       </div>
 
       <div css={{ display: "flex", justifyContent: "space-between" }}>
-        <Text css={{color: 'rgba(255, 255, 255, 0.5)'}}> {getUsername()}</Text>
-        <Text css={{color: 'rgba(255, 255, 255, 0.5)'}}>Your Skill</Text>
+        <Text
+          css={{
+            color: "rgba(255, 255, 255, 0.3)",
+            fontSize: "18px",
+            margin: "15px 0 10px",
+          }}
+        >
+          {" "}
+          {getUsername()}
+        </Text>
+        <Text
+          css={{
+            color: "rgba(255, 255, 255, 0.3)",
+            width: "90px",
+            textAlign: "center",
+            fontSize: "18px",
+            margin: "15px 0 10px",
+          }}
+        >
+          Your Skill
+        </Text>
       </div>
 
-      <Line spacing={4} />
+      <Line spacing={2} />
       <Button
-      style={{
-        marginRight: "15px",
-        background: "#7B61FF",
-        color: "#fff",
-      }}
-      component={Link}
-      href="/new"
-    >
-      New Game
-    </Button>
+        style={{
+          marginTop: "10px",
+          marginRight: "15px",
+          background: "#7B61FF",
+          color: "#fff",
+        }}
+        component={Link}
+        href="/new"
+      >
+        New Game
+      </Button>
     </StatBlock>
   );
 };

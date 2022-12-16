@@ -34,23 +34,20 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
     setTimeout(() => {
       setLoadingDelayed(false);
     }, 0);
-  }, [loading]); 
-
+  }, [loading]);
 
   useEffect(() => {
-    console.log(currentPlayer)
-  }, [currentPlayer]); 
-
+    console.log(currentPlayer);
+  }, [currentPlayer]);
 
   useEffect(() => {
     if (!gameState || !playersGame) {
       return;
     }
     if (playersGame.length === 0) {
-      return
+      return;
     }
- 
-   
+
     const currentPlayer = playersGame.find(
       (player: any) => player.userId === gameState.turnForPlayer
     );
@@ -58,7 +55,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
     // const shiftArray = (arr: any, target: any) => {
     //   return arr.concat(arr.splice(0, arr.indexOf(target)));
     // };
-     
+
     const playersWithPoints = [...playersGame].map((player: any) => {
       player.points = gameState?.playersCurrentPoints[player.userId]
         ? gameState.playersCurrentPoints[player.userId]
@@ -66,7 +63,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
 
       return { ...player };
     });
- 
+
     const currentPlayerWithPoints = playersWithPoints.find(
       (player: any) => player.userId === gameState.turnForPlayer
     );
@@ -100,7 +97,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
   }, [gameState, user]);
 
   return (
-    <header {...props} style={{ zIndex: 3800, height: 70}}>
+    <header {...props} style={{ zIndex: 3800, height: 70 }}>
       <div
         css={(theme) => [
           {
@@ -128,7 +125,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
             marginTop: "0px",
             fontSize: "30px",
             zIndex: 3800,
-            height: 70
+            height: 70,
           }}
         >
           <LogoMenu
@@ -142,30 +139,29 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
                   justifyContent: "center",
                   alignItems: "center",
                   minWidth: 180,
-
-                  height: 70
+                  height: 70,
                 }}
               >
                 <Text
                   component="h3"
                   css={{
-                    color: '#DDDDDD',
+                    color: "#DDDDDD",
                     fontSize: 25,
                     fontWeight: 400,
-                    letterSpacing: '-0.05em',
+                    letterSpacing: "-0.05em",
                     lineHeight: 1.2,
-                    fontFamily: 'Aldrich, sans-serif',
-                    textTransform: 'uppercase',
+                    fontFamily: "Aldrich, sans-serif",
+                    textTransform: "uppercase",
                     // position: 'absolute',
                     // marginLeft: 80,
                     marginRight: 10,
-                    marginTop:30,
+                    marginTop: 30,
                   }}
                 >
                   {currentPlayer ? formatUsername(currentPlayer.username) : ""}
                 </Text>
                 <svg
-                css={{marginRight: 30}}
+                  css={{ marginRight: 30 }}
                   width="16"
                   height="14"
                   viewBox="0 0 16 14"
@@ -192,8 +188,8 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
             left: "50%",
             top: "92%",
             transform: "translate(-50%, -50%) scale(0.68, 0.68)",
-            transformOrigin: 'top',
-            height: 70
+            transformOrigin: "top",
+            height: 70,
           })}
         >
           <GameInventory isOpponentsCards={true} cards={opponentsCards} />

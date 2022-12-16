@@ -17,88 +17,86 @@ const Footer: FC<HTMLAttributes<HTMLDivElement>> = (props) => (
   <div
     {...props}
     css={(theme) => ({
-      background: theme.colors.page_bg_dark,
       color: "#fff",
-      borderRadius: theme.spacing(1),
+      backgroundColor: "transparent",
     })}
-  ><Line spacing={2}></Line>
-    <Grid>
-      <div
-        css={(theme) => ({
-          gridColumn: "span 6",
-          opacity: 0.5,
-          color: theme.colors.text_subtitle_light,
-        })}
-      >
-        <Text variant="h6" component="h2" css={{ margin: 0 }}>
-          playing arts project
-        </Text>
-        {/* <Text variant="body0">
+  >
+    {/* <Line spacing={2}></Line> */}
+    <div
+      css={(theme) => ({
+        opacity: 0.3,
+        color: theme.colors.text_subtitle_light,
+      })}
+    >
+      <Text variant="h6" component="h2" css={{ margin: "0 0 10px 0" }}>
+        © playing arts project
+      </Text>
+      {/* <Text variant="body0">
           All rights reserved. Any artwork displayed on this website may not be
           reproduced or used in any manner whatsoever without the express
           written permission of Digital Abstracts or their respective owners.
         </Text> */}
-        <Text
+      {/*<Text
           variant="body0"
           css={{
             marginBottom: 0,
+            display: "none",
           }}
         >
-          © 2012—2021 Digital Abstracts SL Privacy statement Patent Pending
+          © 2012—2022 Digital Abstracts SL
         </Text>
-      </div>
-      {/* <Line vertical={true} spacing={0} /> */}
-      <nav
-        css={(theme) => ({
-          display: "flex",
-          flexWrap: "wrap",
-          gridColumn: "span 6",
-          color: theme.colors.text_subtitle_light,
-          opacity: 0.5,
-          justifyContent: "end",
-        })}
-      >
-        {[
-          {
-            Icon: Twitter,
-            href: socialLinks.twitter,
-          },
-          {
-            Icon: Instagram,
-            href: socialLinks.instagram,
-          },
-          {
-            Icon: Facebook,
-            href: socialLinks.facebook,
-          },
-          {
-            Icon: Behance,
-            href: socialLinks.behance,
-          },
-          {
-            Icon: Youtube,
-            href: socialLinks.youtube,
-          },
-          {
-            Icon: Pinterest,
-            href: socialLinks.pinterest,
-          },
-          {
-            Icon: Discord,
-            href: socialLinks.discord,
-          },
-        ].map(({ Icon, href }) => (
-          <Button
-            key={href}
-            component={Link}
-            target="_blank"
-            href={href}
-            Icon={Icon}
-          />
-        ))}
-
-      </nav>
-    </Grid>
+        */}
+    </div>
+    {/* <Line vertical={true} spacing={0} /> */}
+    <nav
+      css={(theme) => ({
+        display: "none",
+        flexWrap: "wrap",
+        gridColumn: "span 6",
+        color: theme.colors.text_subtitle_light,
+        opacity: 0.5,
+        justifyContent: "end",
+      })}
+    >
+      {[
+        {
+          Icon: Twitter,
+          href: socialLinks.twitter,
+        },
+        {
+          Icon: Instagram,
+          href: socialLinks.instagram,
+        },
+        {
+          Icon: Facebook,
+          href: socialLinks.facebook,
+        },
+        {
+          Icon: Behance,
+          href: socialLinks.behance,
+        },
+        {
+          Icon: Youtube,
+          href: socialLinks.youtube,
+        },
+        {
+          Icon: Pinterest,
+          href: socialLinks.pinterest,
+        },
+        {
+          Icon: Discord,
+          href: socialLinks.discord,
+        },
+      ].map(({ Icon, href }) => (
+        <Button
+          key={href}
+          component={Link}
+          target="_blank"
+          href={href}
+          Icon={Icon}
+        />
+      ))}
+    </nav>
   </div>
 );
 

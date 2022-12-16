@@ -32,11 +32,19 @@ const NFTChoose: FC<Props> = () => {
 
   const { user } = useAuth();
   // eslint-disable-next-line
-      // @ts-ignore: Unreachable code error
-  const [firstCard, setFirstCard] = useState<any>(localStorage.getItem('chosen-nfts') ? JSON.parse(localStorage.getItem('chosen-nfts'))[0] : null);
+  // @ts-ignore: Unreachable code error
+  const [firstCard, setFirstCard] = useState<any>(
+    localStorage.getItem("chosen-nfts")
+      ? JSON.parse(localStorage.getItem("chosen-nfts"))[0]
+      : null
+  );
   // eslint-disable-next-line
-      // @ts-ignore: Unreachable code error
-  const [secondCard, setSecondCard] = useState<any>(localStorage.getItem('chosen-nfts') ? JSON.parse(localStorage.getItem('chosen-nfts'))[1] : null);
+  // @ts-ignore: Unreachable code error
+  const [secondCard, setSecondCard] = useState<any>(
+    localStorage.getItem("chosen-nfts")
+      ? JSON.parse(localStorage.getItem("chosen-nfts"))[1]
+      : null
+  );
 
   const [activeCard, setActiveCard] = useState(0);
 
@@ -86,8 +94,10 @@ const NFTChoose: FC<Props> = () => {
       });
     }
 
-    localStorage.setItem('chosen-nfts', JSON.stringify([firstCard, secondCard])
-    )
+    localStorage.setItem(
+      "chosen-nfts",
+      JSON.stringify([firstCard, secondCard])
+    );
 
     WSProvider.send(
       JSON.stringify({
@@ -167,42 +177,22 @@ const NFTChoose: FC<Props> = () => {
       >
         <div
           onClick={setFirstCardActive}
-          css={{ display: "flex", marginRight: 20 }}
+          css={{ display: "flex", marginRight: 10, width: "50%" }}
         >
           {!firstCard ? (
             <div css={{ display: "flex" }}>
               <CardEmpty isNftChoose={NFTCards.length !== 0} />
               <svg
-                css={{ marginTop: 70 }}
-                width="140"
-                height="86"
-                viewBox="0 0 140 86"
+                css={{ marginTop: 70, marginLeft: 20 }}
+                width="130"
+                height="130"
+                viewBox="0 0 130 130"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <rect
-                  width="140"
-                  height="10"
-                  rx="5"
-                  fill="white"
-                  fillOpacity="0.05"
-                />
-                <rect
-                  y="38"
-                  width="140"
-                  height="10"
-                  rx="5"
-                  fill="white"
-                  fillOpacity="0.05"
-                />
-                <rect
-                  y="76"
-                  width="140"
-                  height="10"
-                  rx="5"
-                  fill="white"
-                  fillOpacity="0.05"
-                />
+                <rect width="130" height="10" rx="5" fill="#242424" />
+                <rect y="43" width="130" height="10" rx="5" fill="#242424" />
+                <rect y="84" width="130" height="10" rx="5" fill="#242424" />
               </svg>
             </div>
           ) : (
@@ -224,7 +214,7 @@ const NFTChoose: FC<Props> = () => {
                 animated={false}
                 card={{ img: firstCard.imageUrl }}
               ></Card>
-              <div css={{ marginTop: 40 }}>
+              <div css={{ marginTop: 40, marginLeft: 20 }}>
                 <CardStats
                   css={{ minWidth: 130 }}
                   color="light"
@@ -234,9 +224,14 @@ const NFTChoose: FC<Props> = () => {
                 />
                 <div
                   css={{
-                    marginTop: 30,
-                    fontSize: 16,
-                    fontWeight: "bold",
+                    marginTop: 10,
+                    display: "inline-flex",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    lineHeight: "30px",
+                    padding: "2px 15px",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    borderRadius: "20px",
                     transition: "color 300ms",
                     cursor: "pointer",
                     "&:hover": {
@@ -260,36 +255,16 @@ const NFTChoose: FC<Props> = () => {
             <div css={{ minWidth: 360, display: "flex" }}>
               <CardEmpty isNftChoose={NFTCards.length !== 0} />
               <svg
-                css={{ marginTop: 70 }}
-                width="140"
-                height="86"
-                viewBox="0 0 140 86"
+                css={{ marginTop: 70, marginLeft: 20 }}
+                width="130"
+                height="130"
+                viewBox="0 0 130 130"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <rect
-                  width="140"
-                  height="10"
-                  rx="5"
-                  fill="white"
-                  fillOpacity="0.05"
-                />
-                <rect
-                  y="38"
-                  width="140"
-                  height="10"
-                  rx="5"
-                  fill="white"
-                  fillOpacity="0.05"
-                />
-                <rect
-                  y="76"
-                  width="140"
-                  height="10"
-                  rx="5"
-                  fill="white"
-                  fillOpacity="0.05"
-                />
+                <rect width="130" height="10" rx="5" fill="#242424" />
+                <rect y="43" width="130" height="10" rx="5" fill="#242424" />
+                <rect y="84" width="130" height="10" rx="5" fill="#242424" />
               </svg>
             </div>
           ) : (
@@ -306,7 +281,7 @@ const NFTChoose: FC<Props> = () => {
                 animated={false}
                 card={{ img: secondCard.imageUrl }}
               ></Card>
-              <div css={{ marginTop: 40 }}>
+              <div css={{ marginTop: 40, marginLeft: 20 }}>
                 <CardStats
                   css={{ minWidth: 130 }}
                   color="light"
@@ -316,9 +291,14 @@ const NFTChoose: FC<Props> = () => {
                 />
                 <div
                   css={{
-                    marginTop: 30,
-                    fontSize: 16,
-                    fontWeight: "bold",
+                    marginTop: 10,
+                    display: "inline-flex",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    lineHeight: "30px",
+                    padding: "2px 15px",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    borderRadius: "20px",
                     transition: "color 300ms",
                     cursor: "pointer",
                     "&:hover": {
@@ -347,9 +327,10 @@ const NFTChoose: FC<Props> = () => {
       css={(theme) => ({
         background: `#181818`,
         backgroundSize: "85%",
-        color: theme.colors.text_title_light,
+        color: "rgba(255, 255, 255, 0.5)",
         position: "relative",
         margin: "20px 0",
+        padding: "40px 40px 10px 40px",
       })}
     >
       {!user.isMetamaskConnected && (
@@ -368,12 +349,7 @@ const NFTChoose: FC<Props> = () => {
 
       {user.isMetamaskConnected && (
         <div>
-          <Modal
-            trigger={trigger()}
-            description="Share your game link, wait for players to connect and click “Start”!
-        Choose the NFTs you want to level up (optional)."
-            title="Choose your NFTs"
-          >
+          <Modal trigger={trigger()} title="Choose cards">
             {loading && (
               <Loader
                 css={{
@@ -385,7 +361,9 @@ const NFTChoose: FC<Props> = () => {
             )}
 
             {topCards && topCards.length > 0 && (
-              <Text variant="h6">Most Played</Text>
+              <Text variant="h6" css={{ opacity: 0.5, marginTop: "40px" }}>
+                Most Played Cards
+              </Text>
             )}
 
             <div
@@ -408,7 +386,8 @@ const NFTChoose: FC<Props> = () => {
                       width: "50%",
                       display: "flex",
                       alignItems: "center",
-                      maxWidth: 400,
+                      maxWidth: 480,
+                      // background: "#ccc",
 
                       pointerEvents:
                         firstCard?.id === card.id || secondCard?.id === card.id
@@ -444,24 +423,25 @@ const NFTChoose: FC<Props> = () => {
                               color: "rgba(0, 0, 0, 0.5)",
                             }}
                           >
-                            <Link
+                            {/* <Link
                               css={{
                                 pointerEvents: "auto",
                                 textDecoration: "none",
-                                color: "rgba(255, 255, 255, 0.9)",
+                                color: "#000",
+                                opacity: 0.5,
                                 transition: "all 500ms",
                                 "&:hover": {
-                                  color: "rgba(255, 255, 255, 0.8)",
+                                  opacity: 1,
                                 },
                               }}
                               href={card.url}
                               target="_blank"
                             >
                               {card.artist}
-                            </Link>
+                            </Link> */}
                           </div>
                         </div>
-                        <div css={{ marginLeft: 20 }}>
+                        <div css={{ marginTop: 40, marginLeft: 20 }}>
                           <CardStats
                             css={{ marginBottom: 20 }}
                             color={"dark"}
@@ -472,10 +452,25 @@ const NFTChoose: FC<Props> = () => {
 
                           {firstCard?.id === card.id ||
                           secondCard?.id === card.id ? (
-                            <Button disabled={true}>Selected</Button>
+                            <Button
+                              css={{
+                                fontSize: "13px",
+                                lineHeight: "30px",
+                                padding: "2px 15px",
+                              }}
+                              disabled={true}
+                            >
+                              Selected
+                            </Button>
                           ) : (
                             <Button
-                              css={{ color: "#fff", background: "#7B61FF" }}
+                              css={{
+                                color: "#fff",
+                                background: "#7B61FF",
+                                fontSize: "13px",
+                                lineHeight: "30px",
+                                padding: "2px 15px",
+                              }}
                             >
                               Select
                             </Button>
@@ -489,9 +484,13 @@ const NFTChoose: FC<Props> = () => {
 
             {cardInventory.length !== 0 && (
               <div>
-                <Line css={{ margin: "50px 0 10px 0" }}></Line>
+                {topCards && topCards.length > 0 && (
+                  <Line css={{ margin: "0 0 20px 0" }}></Line>
+                )}
 
-                <Text variant="h6">Never Played</Text>
+                <Text variant="h6" css={{ opacity: 0.5, marginTop: "40px" }}>
+                  Your Inventory
+                </Text>
                 <div
                   css={{
                     display: "flex",
@@ -509,7 +508,7 @@ const NFTChoose: FC<Props> = () => {
                             secondCard?.id === card.id
                               ? "none"
                               : "unset",
-                          marginBottom: 40,
+                          marginBottom: 50,
                         }}
                         onClick={
                           firstCard?.id === card.id ||
@@ -526,7 +525,7 @@ const NFTChoose: FC<Props> = () => {
                               flexDirection: "column",
                               alignItems: "flex-start",
                               maxWidth: 190,
-                              marginRight: 12,
+                              marginRight: 50,
                             }}
                           >
                             <Card
@@ -552,17 +551,30 @@ const NFTChoose: FC<Props> = () => {
                                 flexDirection: "column",
                                 alignItems: "center",
                                 width: "100%",
-                                marginTop: -10
+                                marginTop: -10,
                               }}
                             >
-             
-
                               {firstCard?.id === card.id ||
-                              secondCard?.id === card.id ? (  
-                                <Button disabled={true}>Selected</Button>
+                              secondCard?.id === card.id ? (
+                                <Button
+                                  css={{
+                                    fontSize: "13px",
+                                    lineHeight: "30px",
+                                    padding: "2px 15px",
+                                  }}
+                                  disabled={true}
+                                >
+                                  Selected
+                                </Button>
                               ) : (
                                 <Button
-                                  css={{ color: "#fff", background: "#7B61FF" }}
+                                  css={{
+                                    color: "#fff",
+                                    fontSize: "13px",
+                                    lineHeight: "30px",
+                                    padding: "2px 15px",
+                                    background: "#7B61FF",
+                                  }}
                                 >
                                   Select
                                 </Button>
@@ -576,8 +588,8 @@ const NFTChoose: FC<Props> = () => {
               </div>
             )}
           </Modal>
+          {/*
           <Line />
-
           <Text
             css={{
               textAlign: "center",
@@ -589,6 +601,7 @@ const NFTChoose: FC<Props> = () => {
           >
             You will be able to use these cards during the game.
           </Text>
+          */}
         </div>
       )}
     </StatBlock>

@@ -32,13 +32,14 @@ const GameRules: FC<Props> = ({ children, ...props }) => {
     []
   );
 
-  const onClose = () => setActiveTab('General')
+  const onClose = () => setActiveTab("General");
 
   return (
     <div
       {...props}
       css={(theme) => ({
-        minWidth: "200px",
+        // minWidth: "200px",
+        marginRight: 20,
         color: theme.colors.text_title_light,
       })}
     >
@@ -50,7 +51,7 @@ const GameRules: FC<Props> = ({ children, ...props }) => {
         })}
         onClose={onClose}
       >
-        <div css={{ display: "flex", marginBottom: 50, marginTop: 20}}>
+        <div css={{ display: "flex", marginBottom: 50, marginTop: 20 }}>
           {tabs.map((tab) => (
             <button
               onClick={(e) => switchTab(e, tab)}
@@ -60,8 +61,7 @@ const GameRules: FC<Props> = ({ children, ...props }) => {
                 marginRight: 20,
                 cursor: "pointer",
                 marginTop: 10,
-                background:
-                  activeTab === tab ? "#181818" : "rgba(0, 0, 0, 0.1)",
+                background: activeTab === tab ? "#181818" : "#EAEAEA",
                 color: activeTab === tab ? "#fff" : "#000",
                 borderRadius: 50,
                 height: 34,
@@ -116,7 +116,7 @@ const GameRules: FC<Props> = ({ children, ...props }) => {
         )}
 
         <div>
-          <Line css={{marginBottom: 40}}/>
+          <Line css={{ marginBottom: 40 }} />
           <div
             css={{
               display: "flex",
@@ -124,7 +124,6 @@ const GameRules: FC<Props> = ({ children, ...props }) => {
                 ? "space-between"
                 : "flex-end",
               alignItems: "center",
-  
             }}
           >
             {tabs[tabs.indexOf(activeTab) - 1] && (

@@ -14,7 +14,7 @@ const CloseMenu: FC<HTMLAttributes<SVGElement>> = (props) => (
       y1="1.85474"
       x2="21.3585"
       y2="21.6537"
-      stroke="#C6C6C6"
+      stroke="#7F7F7F"
       strokeWidth="2"
       strokeLinecap="round"
     />
@@ -23,7 +23,7 @@ const CloseMenu: FC<HTMLAttributes<SVGElement>> = (props) => (
       y1="2.34659"
       x2="1.55977"
       y2="22.1456"
-      stroke="#C6C6C6"
+      stroke="#7F7F7F"
       strokeWidth="2"
       strokeLinecap="round"
     />

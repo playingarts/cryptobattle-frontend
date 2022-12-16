@@ -57,8 +57,12 @@ const JoinGame: NextPage = () => {
     if (!allReady) {
       openNotification({
         title: "Are You Sure?",
-        description:
-          "Some of the players are still not ready and will not play this round!",
+        description: (
+          <span>
+            Some of the players are still not ready and will not play this
+            round!
+          </span>
+        ),
         footer: (
           <div style={{ display: "flex", flexDirection: "column" }}>
             <Button
@@ -147,22 +151,23 @@ const JoinGame: NextPage = () => {
       title: "You are ready!",
       description: (
         <span>
-          Please wait for others to connect. <br></br>The game will start soon.
+          Now please wait for others to connect.<br></br>The game will start
+          shortly.
         </span>
       ),
       icon: <NavProfile color={"red"}></NavProfile>,
-      footer: (
-        <Button
-          onClick={toggleReady}
-          css={() => ({
-            background: "#7B61FF",
-            color: "#fff",
-            margin: "20px auto",
-          })}
-        >
-          {"I'M NOT READY"}
-        </Button>
-      ),
+      // footer: (
+      //   <Button
+      //     onClick={toggleReady}
+      //     css={() => ({
+      //       background: "#eee",
+      //       color: "#999",
+      //       margin: "20px auto",
+      //     })}
+      //   >
+      //     {"Back to lobby"}
+      //   </Button>
+      // ),
     });
   }, [isReady]);
 
@@ -171,26 +176,11 @@ const JoinGame: NextPage = () => {
       return;
     }
     openNotification({
+      title: "Already connected!",
       description: (
-        <div>
-          <Text
-            variant="h1"
-            css={{
-              fontSize: 35,
-              lineHeight: "45.5px",
-              marginBottom: 0,
-              marginTop: 60,
-            }}
-          >
-            Already connected!
-          </Text>
-          <Text
-            variant="body3"
-            css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
-          >
-            You are already in a lobby or a game in an another browser or tab.
-          </Text>
-        </div>
+        <span>
+          You are already in a lobby or a game in an another browser or tab.
+        </span>
       ),
       dark: false,
       icon: <Warning />,
@@ -249,41 +239,31 @@ const JoinGame: NextPage = () => {
     const handleRouteChange = (url: string) => {
       console.log("handleRouteChange", url);
 
-      if (url !== "/play" && !url.startsWith("/game/") && isOwner && !isConfirmedLeave && localStorage.getItem('accessToken')) {
+      if (
+        url !== "/play" &&
+        !url.startsWith("/game/") &&
+        isOwner &&
+        !isConfirmedLeave &&
+        localStorage.getItem("accessToken")
+      ) {
         router.events.emit("routeChangeError");
         openNotification({
+          title: "Are you sure?",
+          description: (
+            <span>
+              You are about to leave the lobby. The game will end for all
+              players.
+            </span>
+          ),
           dark: false,
           icon: <Warning />,
           iconColor: "#FF6F41",
-
-          description: (
-            <div>
-              <Text
-                variant="h1"
-                css={{
-                  fontSize: 35,
-                  lineHeight: "45.5px",
-                  marginBottom: 0,
-                  marginTop: 60,
-                }}
-              >
-               Are you sure?
-              </Text>
-              <Text
-                variant="body3"
-                css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
-              >
-                You are about to leave the lobby. The game will end for all
-                players.
-              </Text>
-            </div>
-          ),
           footer: (
             <div style={{ display: "flex", flexDirection: "column" }}>
               <Button
                 onClick={leaveAdmin}
                 css={() => ({
-                  background: "#7B61FF",
+                  background: "#FF6F41",
                   color: "#fff",
                   margin: "10px auto",
                 })}
@@ -385,7 +365,7 @@ const JoinGame: NextPage = () => {
       css={() => ({
         background: "#7B61FF",
         color: "#fff",
-        margin: "20px auto",
+        margin: "20px auto 0",
       })}
       onClick={startGame}
     >
@@ -411,7 +391,14 @@ const JoinGame: NextPage = () => {
     <GameRules>
       <Button
         id="rules-button"
-        css={{ color: "#fff", background: "rgba(255, 255, 255, 0.05)" }}
+        css={{
+          color: "#7a7a7a",
+          background: "rgba(255, 255, 255, 0.05)",
+          transition: "color 500ms",
+          "&:hover": {
+            color: "#fff",
+          },
+        }}
       >
         Game Rules
       </Button>
@@ -437,7 +424,7 @@ const JoinGame: NextPage = () => {
           paddingBottom: theme.spacing(6.5),
           backgroundColor: "#0A0A0A",
           backgroundSize: "cover",
-          maxWidth: "810px",
+          maxWidth: "940px",
           margin: "0 auto",
         })}
       >

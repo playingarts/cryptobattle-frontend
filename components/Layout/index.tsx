@@ -10,18 +10,17 @@ export interface Props extends HTMLAttributes<HTMLElement> {
 }
 
 const Layout: ForwardRefRenderFunction<HTMLElement, Props> = (
-  {  children, ...props },
+  { children, ...props },
   ref
 ) => {
   // useEffect(() => {
 
   //   setTimeout(() => {
   //     window.scrollTo(0, document.body.scrollHeight/2 );
-  
+
   //   }, 500);
 
   // }, []);
-
 
   return (
     <section
@@ -35,7 +34,7 @@ const Layout: ForwardRefRenderFunction<HTMLElement, Props> = (
     >
       <div
         css={(theme) => ({
-          maxWidth: theme.spacing(123),
+          maxWidth: theme.spacing(142),
           margin: "0 auto",
         })}
       >

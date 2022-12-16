@@ -3,10 +3,9 @@ import StatBlock from "../StatBlock";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
 interface Stats extends Props {
-    isAdmin:  boolean,
-    players: Array<PlayerType>
-  }
-
+  isAdmin: boolean;
+  players: Array<PlayerType>;
+}
 
 interface PlayerType {
   userId: string;
@@ -18,14 +17,13 @@ import Player from "../Player";
 
 import PlayerEmpty from "../PlayerEmpty";
 
-const Lobby: FC<Stats> = ({ isAdmin, players}) => {
- 
+const Lobby: FC<Stats> = ({ isAdmin, players }) => {
   return (
     <StatBlock
       css={(theme) => ({
         background: `#181818`,
         backgroundSize: "85%",
-        color: theme.colors.text_title_light,
+        color: "rgba(255, 255, 255, 0.5)",
         position: "relative",
         margin: "20px 0",
       })}
@@ -34,19 +32,24 @@ const Lobby: FC<Stats> = ({ isAdmin, players}) => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "3fr 1fr",
+          gridTemplateColumns: "1fr 1fr",
           gap: "20px",
         }}
       >
-        {players && players.map((player: PlayerType) => (
-          <Player color={player.color} isAdmin={isAdmin} player={player} key={player.userId} />
-        ))}
-
-        {players && Array(4 - players.length)
-          .fill(0)
-          .map((_, i) => (
-            <PlayerEmpty key={i} />
+        {players &&
+          players.map((player: PlayerType) => (
+            <Player
+              color={player.color}
+              isAdmin={isAdmin}
+              player={player}
+              key={player.userId}
+            />
           ))}
+
+        {players &&
+          Array(2 - players.length)
+            .fill(0)
+            .map((_, i) => <PlayerEmpty key={i} />)}
       </div>
     </StatBlock>
   );

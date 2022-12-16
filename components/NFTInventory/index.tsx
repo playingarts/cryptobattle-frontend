@@ -108,7 +108,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
           }}
         >
           <Text variant="body2" css={{ opacity: 0.6 }}>
-            Connect your wallet to use NFT cards in the game.
+            Connect your wallet to use Crypto EditionNFT cards in the game.
           </Text>
           <MetamaskLogin
             css={{
@@ -131,7 +131,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                 <CardEmpty
                   isPlaceholder={true}
                   css={{
-                    marginRight: "20px",
+                    marginRight: "30px",
                     pointerEvents: "none",
                     background: `#181818`,
                   }}
@@ -160,7 +160,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
         color: theme.colors.text_title_light,
         position: "relative",
         margin: "0px 0",
-        padding: "10px 78px",
+        padding: "10px 50px",
       })}
     >
       {/* <div
@@ -218,11 +218,19 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
           ></MetamaskLogin>
         )}
       </div> */}
-      {/* <Line spacing={2}></Line> */}
+
+      <Line spacing={2} css={{ margin: "30px auto 0" }}></Line>
 
       {topCards.length > 0 && (
-        <Text variant="h6" css={{ opacity: 0.6, marginBottom: 40 }}>
-          Your most played cards{" "}
+        <Text
+          variant="h6"
+          css={{
+            color: "rgba(255, 255, 255, 0.3)",
+            marginTop: 30,
+            marginBottom: 30,
+          }}
+        >
+          Most played cards{" "}
           {loading && (
             <Loader
               {...props}
@@ -245,7 +253,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
           topCards.map((card, index) => (
             <div
               style={{
-                width: "50%",
+                width: 440,
                 display: "flex",
                 alignItems: "center",
                 pointerEvents: "none",
@@ -256,7 +264,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                 <Card
                   css={{
                     marginRight: "0px",
-                    width: 300,
+                    width: 230,
                     boxShadow: "none",
                     marginBottom: 20,
                     transform: "scale(1, 1)",
@@ -268,10 +276,9 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                 ></Card>
                 <div
                   css={{
-                    marginBottom: 12,
+                    marginBottom: 30,
                     marginTop: 6,
                     maxWidth: 210,
-
                     marginLeft: 0,
                     textAlign: "center",
                     color: "rgba(255, 255, 255, 0.5)",
@@ -282,7 +289,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                       pointerEvents: "auto",
                       textDecoration: "none",
                       transition: "all 300ms",
-                      color: "rgba(255, 255, 255, 0.6)",
+                      color: "rgba(255, 255, 255, 0.3)",
                       "&:hover": {
                         color: "rgba(255, 255, 255, 0.9)",
                       },
@@ -295,7 +302,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                   </a>
                 </div>
               </div>
-              <div css={{ marginLeft: -30, marginTop: -50 }}>
+              <div css={{ marginTop: -50, marginLeft: 20 }}>
                 <CardStats
                   color={"light"}
                   xp={card.xp}
@@ -320,33 +327,38 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
           <Text
             component="p"
             css={{
-              margin: 0,
-              marginTop: "30px",
-              marginBottom: 30,
-              fontSize: 22,
-              maxWidth: 800,
-              color: "rgba(234, 234, 234, 0.5)",
+              fontSize: 20,
+              maxWidth: "920px",
+              margin: "30px auto",
+              padding: "30px 50px 0",
+              color: "rgba(255, 255, 255, 0.3)",
             }}
           >
-            Looks like there are no Crypto Edition NFT cards in your wallet. Get
-            some to have the most fun from the game!
+            Looks like there are no Crypto Edition NFT cards in your wallet.
           </Text>
 
-          <div css={{ display: "flex", marginTop: "20px", marginBottom: 100 }}>
-          <Link target="_blank" href="https://opensea.io/collection/cryptoedition">
-
-
-
-            <Button
-              Icon={Opensea}
-              css={(theme) => ({
-                background: "rgba(255, 255, 255, 0.05)",
-                marginRight: theme.spacing(1),
-                color: "#407FDB",
-              })}
+          <div
+            css={{
+              display: "flex",
+              margin: "30px auto",
+              padding: "0px 50px",
+              maxWidth: "920px",
+            }}
+          >
+            <Link
+              target="_blank"
+              href="https://opensea.io/collection/cryptoedition"
             >
-              opensea collection
-            </Button>
+              <Button
+                Icon={Opensea}
+                css={(theme) => ({
+                  background: "rgba(255, 255, 255, 0.05)",
+                  marginRight: theme.spacing(1),
+                  color: "#407FDB",
+                })}
+              >
+                Buy NFT
+              </Button>
             </Link>
           </div>
         </Fragment>
@@ -354,9 +366,16 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
 
       {cardInventory.length > 0 && (
         <div style={{}}>
-          {topCards.length > 0 &&  <Line spacing={2}></Line>}
-          <Text variant="h6" css={{ opacity: 0.6, marginBottom: 40 }}>
-            Inventory
+          {topCards.length > 0 && <Line spacing={2}></Line>}
+          <Text
+            variant="h6"
+            css={{
+              color: "rgba(255, 255, 255, 0.3)",
+              marginTop: 30,
+              marginBottom: 30,
+            }}
+          >
+            Your Inventory
           </Text>
 
           <div
@@ -368,7 +387,10 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
             {cardInventory.map((card, index) => (
               <div key={index}>
                 <Card
-                  css={{ marginRight: "50px", pointerEvents: "none" }}
+                  css={{
+                    marginRight: "50px",
+                    pointerEvents: "none",
+                  }}
                   animated={true}
                   card={{ img: card.imageUrl }}
                 ></Card>
@@ -376,7 +398,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                   css={{
                     marginBottom: 50,
                     marginTop: 20,
-                    maxWidth: 210,
+                    width: 210,
                     textAlign: "center",
                     color: "rgba(255, 255, 255, 0.5)",
                   }}
@@ -385,7 +407,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                     css={{
                       pointerEvents: "auto",
                       textDecoration: "none",
-                      color: "rgba(255, 255, 255, 0.9)",
+                      color: "rgba(255, 255, 255, 0.3)",
                       transition: "all 500ms",
                       "&:hover": {
                         color: "rgba(255, 255, 255, 0.8)",

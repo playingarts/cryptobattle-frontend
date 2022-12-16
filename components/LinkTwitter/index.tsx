@@ -9,18 +9,20 @@ import Twitter from "../../components/Icons/Twitter";
 const LinkTwitter: FC = () => {
   return (
     <Fragment>
-      <div css={{ padding: "20px 34px" }}>
+      <div
+        css={{ padding: "20px 50px 0", maxWidth: "920px", margin: "0 auto" }}
+      >
         <Text
           component="p"
           css={{
             margin: 0,
-            marginTop: "20px",
+            marginTop: "30px",
             marginBottom: 30,
-            color: "rgba(234, 234, 234, 0.5)",
+            color: "rgba(255, 255, 255, 0.3)",
             fontSize: 20,
           }}
         >
-          Link your twitter so other players could follow you.
+          Link your twitter so other players could know who you are (optional).
         </Text>
 
         <div css={{ display: "flex", marginTop: "20px", marginBottom: 40 }}>
@@ -39,7 +41,6 @@ const LinkTwitter: FC = () => {
             Link Twitter
           </Button>
         </div>
-        <Line css={{ marginBottom: 80 }}></Line>
       </div>
     </Fragment>
   );

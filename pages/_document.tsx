@@ -14,7 +14,7 @@ export const Links = () => (
         h5: theme.typography.h5,
         h6: theme.typography.h6,
         body: {
-          background: "#181818",
+          background: "#0A0A0A",
           fontFamily: "Work Sans, sans-serif",
         },
         svg: {
@@ -45,12 +45,12 @@ export const Links = () => (
 );
 
 const Document = () => (
-  <Html style={{height: '100%'}} lang="en">
+  <Html style={{ height: "100%" }} lang="en">
     <Head>
       <Links />
     </Head>
 
-    <body style={{height: '100%'}}>
+    <body style={{ height: "100%" }}>
       <Main />
       <NextScript />
     </body>

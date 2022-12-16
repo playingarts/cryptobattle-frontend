@@ -40,7 +40,7 @@ const LobbyUrl: FC<LobbyUrl> = ({ roomid, isOwner, startGame }) => {
         css={(theme) => ({
           background: `#181818`,
           backgroundSize: "85%",
-          color: theme.colors.text_title_light,
+          color: "rgba(255, 255, 255, 0.5)",
           position: "relative",
           margin: "20px 0",
         })}
@@ -75,8 +75,8 @@ const LobbyUrl: FC<LobbyUrl> = ({ roomid, isOwner, startGame }) => {
         >
           {isOwner ? (
             <span>
-              Share with your friends and wait for them to connect. Press START
-              when everyone are ready!
+              Share game link with your friends and wait for them to connect.
+              Press "START" when everyone are ready!
             </span>
           ) : (
             "Share this link if you want to invite more players!"
@@ -109,7 +109,7 @@ const LobbyUrl: FC<LobbyUrl> = ({ roomid, isOwner, startGame }) => {
             transition: "all 400ms",
             "&::before": {
               opacity: 0,
-              content: isCopied ? `"Copied"` : `"Copy link"`,
+              content: isCopied ? `"Copied"` : `"Copy"`,
               display: "flex",
               background: "#fff",
               justifyContent: "center",
@@ -124,10 +124,8 @@ const LobbyUrl: FC<LobbyUrl> = ({ roomid, isOwner, startGame }) => {
               top: -62,
               left: "50%",
               transform: "translate(-50%, 0)",
-              padding: "12px 0",
-              paddingTop: 18,
-              paddingLeft: 0,
-              minWidth: 90,
+              padding: "12px 15px 9px",
+              // minWidth: 110,
               height: 30,
               pointerEvents: "none",
               textTransform: "uppercase",

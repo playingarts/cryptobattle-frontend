@@ -1,5 +1,5 @@
 import { FC, HTMLAttributes, useRef } from "react";
-import { useState} from "react";
+import { useState } from "react";
 import { theme } from "../../pages/_app";
 
 interface Props extends HTMLAttributes<HTMLElement> {
@@ -10,11 +10,7 @@ interface Props extends HTMLAttributes<HTMLElement> {
   isNftChoose?: boolean;
 }
 
-const CardEmpty: FC<Props> = ({
-  size,
-  isNftChoose = true,
-  ...props
-}) => {
+const CardEmpty: FC<Props> = ({ size, isNftChoose = true, ...props }) => {
   const [hovered, setHover] = useState(false);
   const width = size === "big" ? 37 : 21;
   const height = size === "big" ? 52 : 29.4;
@@ -36,9 +32,9 @@ const CardEmpty: FC<Props> = ({
         fontWeight: 500,
         fontsize: 18,
         cursor: "pointer",
-        lineheight: hovered ? 21 : 21
+        lineheight: hovered ? 21 : 21,
       })}
-    onMouseEnter={() => setHover(true)}
+      onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
       <div ref={wrapper}>
@@ -49,11 +45,9 @@ const CardEmpty: FC<Props> = ({
               position: "relative",
               height: theme.spacing(height),
               borderRadius: theme.spacing(1.5),
-              background: 'rgba(255, 255, 255, 0.05)',
-              transition: 'all 400ms',
-    
+              background: "rgba(255, 255, 255, 0.05)",
+              transition: "all 400ms",
             },
-
           ]}
         >
           <div
@@ -68,14 +62,14 @@ const CardEmpty: FC<Props> = ({
               alignItems: "center",
             }}
           >
-            { isNftChoose &&  (
+            {isNftChoose && (
               <div
-              className='plus-icon'
+                className="plus-icon"
                 css={{
                   width: "70px",
                   height: "70px",
                   display: "flex",
-                  background: '#181818',
+                  background: "#181818",
                   justifyContent: "center",
                   alignItems: "center",
                   borderRadius: "100px",
@@ -90,7 +84,6 @@ const CardEmpty: FC<Props> = ({
                   },
                 }}
               >
-        
                 <svg
                   width="31"
                   height="31"
@@ -116,7 +109,7 @@ const CardEmpty: FC<Props> = ({
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
-                </svg>   
+                </svg>
               </div>
             )}
           </div>

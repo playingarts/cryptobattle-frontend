@@ -24,9 +24,8 @@ const Play: NextPage = () => {
 
   const { gameState, isBackendReady, isAlreadyConnected } = useGame();
   useEffect(() => {
-
     if (!isBackendReady) {
-      return
+      return;
     }
 
     setTimeout(() => {
@@ -42,20 +41,15 @@ const Play: NextPage = () => {
           data: {},
         })
       );
-
     }, 0);
-
-
   }, [isBackendReady]);
 
-
   useEffect(() => {
-    if (!gameState ) {
+    if (!gameState) {
       return;
     }
-    
-    setMinWidth(7*250)
 
+    setMinWidth(7 * 250);
   }, [gameState]);
 
   useEffect(() => {
@@ -63,21 +57,11 @@ const Play: NextPage = () => {
       return;
     }
     openNotification({
+      title: "Already connected!",
       description: (
-        <div>
-          <Text
-            variant="h1"
-            css={{ fontSize: 35, lineHeight: "45.5px", marginBottom: 0, marginTop: 60 }}
-          >
-            Already connected!
-          </Text>
-          <Text
-            variant="body3"
-            css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
-          >
-            You are already in a lobby or a game in an another browser or a tab.
-          </Text>
-        </div>
+        <span>
+          You are already in a lobby or a game in an another browser or tab.
+        </span>
       ),
       dark: false,
       icon: <Warning />,
@@ -87,12 +71,11 @@ const Play: NextPage = () => {
 
   useEffect(() => {
     if (!gameState || !user || !user.userId) {
-
       return;
     }
 
     setTimeout(() => {
-      setLoading(false)
+      setLoading(false);
     }, 1000);
 
     console.log("Game users with cards: ", gameState.gameUsersWithCards);
@@ -100,7 +83,6 @@ const Play: NextPage = () => {
     const cards = gameState.gameUsersWithCards.filter(
       (userCards: any) => userCards.userId === user.userId
     )[0].cards;
-
 
     if (!cards) {
       return;
@@ -111,7 +93,6 @@ const Play: NextPage = () => {
     });
 
     setMyCards(cardsFormatted);
-
   }, [gameState, user]);
 
   if (loading) {
@@ -140,11 +121,8 @@ const Play: NextPage = () => {
     );
   }
 
-
-
   return (
-    <GameLayout loading={loading}
-    >
+    <GameLayout loading={loading}>
       <Layout
         css={(theme) => ({
           background: theme.colors.dark_gray,
@@ -153,7 +131,7 @@ const Play: NextPage = () => {
           backgroundSize: "cover",
           minHeight: "100vh",
           padding: "20px 50px",
-          minWidth
+          minWidth,
         })}
       >
         <GameBoard
@@ -164,10 +142,7 @@ const Play: NextPage = () => {
           }
         ></GameBoard>
       </Layout>
-      <GameInventory
-        loading={loading}
-        cards={myCards}
-      ></GameInventory>
+      <GameInventory loading={loading} cards={myCards}></GameInventory>
     </GameLayout>
   );
 };

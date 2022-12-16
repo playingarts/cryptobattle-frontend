@@ -5,7 +5,7 @@ body {
 /* Fix rounded corners Safari */
 html {
   -webkit-backface-visibility: hidden;
--webkit-transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
 }
 
 .game-inventory {
@@ -46,7 +46,7 @@ html {
   z-index: 999999999;
   transform: translate(-150px, -150px) rotate(-10deg);
   opacity: 0;
-  z-index:9999;
+  z-index: 9999;
   pointer-events: none;
   animation-name: example;
   animation-delay: 1s;
@@ -56,14 +56,13 @@ html {
 
 .game-latest-card__score {
   opacity: 0;
-  z-index:9999;
+  z-index: 9999;
   pointer-events: none;
   animation-name: example2;
   animation-delay: 1s;
 
   animation-duration: 800ms;
   transform-origin: center center;
-
 }
 
 /* .game-latest-card__animation {
@@ -74,56 +73,46 @@ html {
   animation-duration: 3s;
   transform-origin: center center;
 } */
-.rotate-spinner  {
-  
+.rotate-spinner {
   animation: rotate 8s linear 0s infinite backwards;
-
-  }
+}
 
 @-webkit-keyframes rotate {
   from {
     -webkit-transform: rotate(0deg);
   }
-  to { 
+  to {
     -webkit-transform: rotate(360deg);
   }
 }
-
-
 
 @keyframes example {
   0% {
     opacity: 0;
     transform: translate(-150px, -150px) rotate(-10deg) scale(2, 2);
-
   }
   30% {
     opacity: 0.4;
     /* opacity: 0; */
     transform: translate(-100px, -100px) rotate(-5deg) scale(2, 2);
-
   }
   68%,
   72% {
     opacity: 1;
-    transform: translate(0, 0)  rotate(0) scale(1, 1);
-
+    transform: translate(0, 0) rotate(0) scale(1, 1);
   }
   100% {
     opacity: 0;
-    transform: translate(0, 0)  rotate(0) scale(1, 1);
-
+    transform: translate(0, 0) rotate(0) scale(1, 1);
   }
 }
 
 @keyframes example2 {
   0% {
     opacity: 1;
-
   }
   30% {
     opacity: 1;
-
   }
   68%,
   72% {
@@ -140,23 +129,19 @@ html {
   }
 }
 
-
 @keyframes example3 {
   0% {
-    opacity: 0,
-
+    opacity: 0;
   }
   30% {
-    opacity: 0,
-
+    opacity: 0;
   }
   68%,
   72% {
-    opacity: 0,
-
+    opacity: 0;
   }
   100% {
-    opacity: 1
+    opacity: 1;
   }
 }
 
@@ -167,8 +152,6 @@ html {
   grid-row: 1;
   grid-column: 1;
 }
-
-
 
 /* .player-queue > .game-player {
   transition: all 5s linear;
@@ -285,7 +268,7 @@ html {
   touch-action: none;
   user-select: none;
   pointer-events: none;
-  transition: none!important;
+  transition: none !important;
 }
 
 #outer-dropzone {
@@ -312,12 +295,11 @@ html {
   border-color: #aaa;
 }
 
-
 .drop-target {
   background-color: rgb(23, 23, 23);
   border-color: #fff !important;
-  filter: brightness(130%);}
-
+  filter: brightness(130%);
+}
 
 .drag-drop {
   /* display: inline-block;
@@ -339,8 +321,6 @@ html {
   color: #000;
   background-color: #4e4;
 }
-
-
 
 html {
   font-family: sans-serif;
@@ -405,18 +385,16 @@ html {
 }
 
 .bubbles-group div {
-  margin-right: 200px
+  margin-right: 200px;
 }
-
 
 /* Safari fix button styling */
 
-[type=button] {
+[type="button"] {
   border-radius: 0;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-
 }
 
 /* Hide scrollbar for modals */
