@@ -276,7 +276,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                 ></Card>
                 <div
                   css={{
-                    marginBottom: 30,
+                    marginBottom: 60,
                     marginTop: 6,
                     maxWidth: 210,
                     marginLeft: 0,
@@ -302,7 +302,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                   </a>
                 </div>
               </div>
-              <div css={{ marginTop: -50, marginLeft: 20 }}>
+              <div css={{ marginTop: -70, marginLeft: 20 }}>
                 <CardStats
                   color={"light"}
                   xp={card.xp}
@@ -330,7 +330,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
               fontSize: 20,
               maxWidth: "920px",
               margin: "30px auto",
-              padding: "30px 50px 0",
+              padding: "30px 10px 0",
               color: "rgba(255, 255, 255, 0.3)",
             }}
           >
@@ -341,7 +341,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
             css={{
               display: "flex",
               margin: "30px auto",
-              padding: "0px 50px",
+              padding: "0px 10px",
               maxWidth: "920px",
             }}
           >

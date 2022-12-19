@@ -155,18 +155,18 @@ const JoinGame: NextPage = () => {
         </span>
       ),
       icon: <NavProfile color={"red"}></NavProfile>,
-      // footer: (
-      //   <Button
-      //     onClick={toggleReady}
-      //     css={() => ({
-      //       background: "#eee",
-      //       color: "#999",
-      //       margin: "20px auto",
-      //     })}
-      //   >
-      //     {"Back to lobby"}
-      //   </Button>
-      // ),
+      footer: (
+        <Button
+          onClick={toggleReady}
+          css={() => ({
+            background: "#eee",
+            color: "#999",
+            margin: "20px auto",
+          })}
+        >
+          {"Not ready"}
+        </Button>
+      ),
     });
   }, [isReady]);
 

@@ -9,7 +9,7 @@ const LinkTwitter: FC = () => {
   return (
     <Fragment>
       <div
-        css={{ padding: "20px 50px 0", maxWidth: "920px", margin: "0 auto" }}
+        css={{ padding: "20px 10px 0", maxWidth: "920px", margin: "0 auto" }}
       >
         <Text
           component="p"
