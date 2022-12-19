@@ -46,8 +46,8 @@ const Lobby: FC<Stats> = ({ isAdmin, players }) => {
             />
           ))}
 
-        {players &&
-          Array(2 - players.length)
+        {players  && players.length < 4 && 
+          Array(4 - players.length)
             .fill(0)
             .map((_, i) => <PlayerEmpty key={i} />)}
       </div>
