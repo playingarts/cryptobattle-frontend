@@ -40,11 +40,12 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
     store.set("signature", { expiry, signature, account });
   }, [account, signature, expiry, signedAccount]);
 
-  const sendSignature = async () => {
+  const sendSignature = async (metamaskSignKeyLocal = metamaskSignKey, regTokenLocal = regToken) => {
+
     ethereum
       .request({
         method: "personal_sign",
-        params: [metamaskSignKey, account],
+        params: [metamaskSignKeyLocal, account],
       })
       .then((signature: string) => {
         if (loggedIn) {
@@ -58,7 +59,7 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
         axios
           .get(url, {
             headers: {
-              regToken: regToken,
+              regToken: regTokenLocal,
               "content-type": "application/json",
             },
           })
@@ -82,7 +83,6 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
     const address: string = (await ethereum.request({ method: 'eth_requestAccounts' }))[0];
     connect();
 
-    // const url = loggedIn ? 'https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=' + address : 'https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=' + address + '&accesstoken='+ localStorage.getItem("accessToken")
 
     axios
       .get(
@@ -98,7 +98,8 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
       .then((result: any) => {
         setMetamaskSignKey(result.data.metamaskSignKey);
         setRegToken(result.data.regtoken);
-        sendSignature();
+          sendSignature(result.data.metamaskSignKey, result.data.regtoken);
+     
       })
       .catch((err) => {
         console.log(err);
