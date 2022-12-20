@@ -6,7 +6,7 @@ import { HTMLAttributes, FC } from "react";
 import { useAuth } from "../AuthProvider";
 import Metamask from "../Icons/Metamask";
 import axios from "axios";
-
+import { useRouter } from "next/router";
 export type Props = HTMLAttributes<HTMLDivElement>;
 interface MetamaskLogin extends Props {
   roomId?:  any,
@@ -27,7 +27,7 @@ const MetamaskLogin: FC<MetamaskLogin> = ({ roomId,...props }) => {
   const [regToken, setRegToken] = useState(null);
 
   const { loggedIn, user, setToken } = useAuth();
-
+const router = useRouter();
   useEffect(() => {
     if (!account) {
       return;
@@ -42,22 +42,25 @@ const MetamaskLogin: FC<MetamaskLogin> = ({ roomId,...props }) => {
     store.set("signature", { expiry, signature, account });
   }, [account, signature, expiry, signedAccount]);
 
-  const sendSignature = async (metamaskSignKeyLocal = metamaskSignKey, regTokenLocal = regToken) => {
-
+  const sendSignature = async (metamaskSignKeyLocal = metamaskSignKey, regTokenLocal = regToken, accountLocal = account) => {
+    // console.log('sendSignature', metamaskSignKeyLocal, regTokenLocal, account)
     ethereum
       .request({
         method: "personal_sign",
-        params: [metamaskSignKeyLocal, account],
+        params: [metamaskSignKeyLocal, accountLocal],
       })
       .then((signature: string) => {
+        // console.log('eth request success', signature)
         if (loggedIn) {
           localStorage.setItem("adding-metamask", "true");
         }
         const url = !loggedIn
-          ? `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask/callback?walletAddress=${account}&signature=${signature}`
-          : `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask/callback?walletAddress=${account}&signature=${signature}` +
+          ? `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask/callback?walletAddress=${accountLocal}&signature=${signature}`
+          : `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask/callback?walletAddress=${accountLocal}&signature=${signature}` +
             "&accesstoken=" +
             localStorage.getItem("accessToken");
+
+            // console.log('url', url)
         axios
           .get(url, {
             headers: {
@@ -68,14 +71,9 @@ const MetamaskLogin: FC<MetamaskLogin> = ({ roomId,...props }) => {
           .then((result: any) => {
             setToken(result.data.accesstoken);
             setTimeout(() => {
-              console.log(roomId)
-              if (roomId) {
-                console.log(`${window.location.origin}/game/${roomId}`)
-
-              }else {
-                window.location.reload();
-
-              }
+           roomId ?   router.push(`/game/${roomId}?join=true`)
+            : router.push("/dashboard");
+   
             }, 1000);
             console.log(result.data.accesstoken);
           })
@@ -90,6 +88,7 @@ const MetamaskLogin: FC<MetamaskLogin> = ({ roomId,...props }) => {
     setSignature((prev) => ({ ...prev, signing: true }));
     console.log('requestSignature')
     const address: string = (await ethereum.request({ method: 'eth_requestAccounts' }))[0];
+    console.log(address)
     connect();
 
 
@@ -107,7 +106,7 @@ const MetamaskLogin: FC<MetamaskLogin> = ({ roomId,...props }) => {
       .then((result: any) => {
         setMetamaskSignKey(result.data.metamaskSignKey);
         setRegToken(result.data.regtoken);
-          sendSignature(result.data.metamaskSignKey, result.data.regtoken);
+          sendSignature(result.data.metamaskSignKey, result.data.regtoken, address);
      
       })
       .catch((err) => {
