@@ -8,8 +8,10 @@ import Metamask from "../Icons/Metamask";
 import axios from "axios";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
-
-const MetamaskLogin: FC<Props> = ({ ...props }) => {
+interface MetamaskLogin extends Props {
+  roomId?:  any,
+}
+const MetamaskLogin: FC<MetamaskLogin> = ({ roomId,...props }) => {
   const { ethereum, account, connect } = useMetaMask();
   const [{ account: signedAccount, expiry, signature, signing }, setSignature] =
     useState(
@@ -66,7 +68,14 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
           .then((result: any) => {
             setToken(result.data.accesstoken);
             setTimeout(() => {
-              window.location.reload();
+              console.log(roomId)
+              if (roomId) {
+                console.log(`${window.location.origin}/game/${roomId}`)
+
+              }else {
+                window.location.reload();
+
+              }
             }, 1000);
             console.log(result.data.accesstoken);
           })

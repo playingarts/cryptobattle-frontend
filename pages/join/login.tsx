@@ -162,7 +162,7 @@ const Home: any = () => {
                       Twitter
                     </Button>
 
-                    <MetamaskLogin />
+                    <MetamaskLogin roomId={roomid}/>
                   </div>
                 </div>
               )}
