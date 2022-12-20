@@ -78,8 +78,8 @@ const MetamaskLogin: FC<Props> = ({ ...props }) => {
 
   const requestSignature = async () => {
     setSignature((prev) => ({ ...prev, signing: true }));
-
-    const address: string = (await ethereum.enable())[0];
+    console.log('requestSignature')
+    const address: string = (await ethereum.request({ method: 'eth_requestAccounts' }))[0];
     connect();
 
     // const url = loggedIn ? 'https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=' + address : 'https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=' + address + '&accesstoken='+ localStorage.getItem("accessToken")
