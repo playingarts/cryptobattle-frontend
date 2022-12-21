@@ -9,7 +9,7 @@ import { api } from "../../api";
 import Loader from "../Loader";
 import MetamaskLogin from "../../components/MetamaskLogin/";
 import Card from "../../components/CardNew";
-import CardEmpty from "../../components/CardEmpty";
+// import CardEmpty from "../../components/CardEmpty";
 import { getCard } from "../../components/Cards";
 import CardStats from "../CardStats";
 import BuyNFT from "../BuyNFT";
@@ -96,7 +96,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
 
   if (Object.keys(user.metamask).length === 0) {
     return (
-      <div css={{ marginRight: 100, marginLeft: 100, marginTop: 50 }}>
+      <div css={{ padding: "20px 10px 0", maxWidth: "920px", margin: "0 auto" }}>
         {" "}
         {/* <Text component="h3" css={{ margin: 0 }}>
           NFT Inventory
@@ -122,7 +122,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
             }}
           ></MetamaskLogin>
         </div>
-        <div
+        {/* <div
           css={{
             display: "flex",
             justifyContent: "space-between",
@@ -154,7 +154,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                 ></div>
               </div>
             ))}
-        </div>
+        </div> */}
       </div>
     );
   }
