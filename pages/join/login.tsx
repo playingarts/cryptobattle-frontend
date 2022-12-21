@@ -54,7 +54,7 @@ const Home: any = () => {
           footer: (
             <div css={{ display: "flex" }}>
               <Button component={Link} onClick={closeNotification} href="/">
-                Back to dashboard
+                Go to Homepage
               </Button>
             </div>
           ),
@@ -95,59 +95,64 @@ const Home: any = () => {
       <ComposedGlobalLayout>
         <Layout
           css={(theme) => ({
-            background: theme.colors.dark_gray,
+            backgroundColor: "#0A0A0A",
+            backgroundImage:
+              "url(https://s3.amazonaws.com/img.playingarts.com/crypto/game/cards_bg.jpg)",
+            backgroundSize: "2200px",
+            backgroundPosition: "center 0px",
+            backgroundRepeat: "no-repeat",
             color: theme.colors.text_title_light,
             overflow: "hidden",
             paddingTop: theme.spacing(18),
-            paddingBottom: theme.spacing(6.5),
-            backgroundColor: "#0A0A0A",
-            backgroundSize: "cover",
+            paddingBottom: theme.spacing(15),
             position: "relative",
           })}
         >
           <div css={{ position: "relative" }}>
-            <img
+            {/* <img
               css={{ position: "absolute", left: 100, zIndex: 2 }}
               src="/img/card.png"
             />
             <img
               css={{ position: "absolute", left: 750, zIndex: 2 }}
               src="/img/card2.png"
-            />
+            /> */}
             <div
               css={{
                 background: "#fff",
                 color: "#333",
                 borderRadius: 20,
-                textAlign: "center",
+                textAlign: "left",
                 maxWidth: 600,
-                margin: "0 auto",
+                margin: "0 100px",
                 padding: "80px 60px",
                 zIndex: 99,
                 position: "relative",
               }}
             >
-              <Text component="h1" css={{ margin: "1px", fontSize: "35px" }}>
+              <Text component="h1" css={{ margin: "1px", fontSize: "45px" }}>
                 Hey there!
               </Text>
 
               <Text variant="body3" css={{ fontSize: 22, lineHeight: "33px" }}>
-                {formatUsername(roomInfo.inviterUsername)} invited to play a
-                free and fun card game featuring cards from Crypto Edition NFT
-                deck!
+                {formatUsername(roomInfo.inviterUsername)} is inviting you to battle in a new card game by 
+                 <Link
+                  target="_blank"
+                  href="https://playingarts.com/crypto"
+                > Playing Arts</Link>!
               </Text>
 
               {!loggedIn && (
                 <div>
-                  <Line></Line>
+                  <Line spacing={2}></Line>
                   <Text
-                    variant="h6"
-                    css={{ textAlign: "center", color: "rgba(0, 0, 0, 0.3)" }}
+                    // variant="h6"
+                    css={{ textAlign: "left", fontSize: "22px", color: "rgba(0, 0, 0, 0.4)" }}
                   >
-                    to accept, log in with:{" "}
+                    To proceed, log in with{" "}
                   </Text>
                   <div
-                    style={{ display: "flex", justifyContent: "space-around" }}
+                    style={{ display: "flex", justifyContent: "left" }}
                   >
                     <Button
                       component={Link}

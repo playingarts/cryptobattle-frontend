@@ -299,7 +299,7 @@ const GameRulesPoints: FC<Props> = ({ ...props }) => {
         </div>
       </div>
 
-      <Text
+      {/* <Text
         variant="h2"
         css={{ fontSize: "30px", color: "#000", marginTop: 30 }}
       >
@@ -364,7 +364,7 @@ const GameRulesPoints: FC<Props> = ({ ...props }) => {
         }}
       >
         Text coming soon.
-      </Text>
+      </Text> */}
     </div>
   );
 };

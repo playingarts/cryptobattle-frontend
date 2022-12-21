@@ -96,32 +96,28 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
 
   if (Object.keys(user.metamask).length === 0) {
     return (
-      <div css={{ padding: "20px 10px 0", maxWidth: "920px", margin: "0 auto" }}>
+      <div css={{ padding: "20px 10px 0", maxWidth: "920px", margin: "0 auto 50px" }}>
         {" "}
         {/* <Text component="h3" css={{ margin: 0 }}>
           NFT Inventory
         </Text> */}
-        <div
-          css={{ padding: "20px 10px 0", maxWidth: "920px", margin: "0 auto" }}
+        <Text
+          css={{
+            margin: 0,
+            marginTop: "30px",
+            marginBottom: 30,
+            color: "rgba(255, 255, 255, 0.3)",
+            fontSize: 20,
+          }}
         >
-          <Text
-            css={{
-              margin: 0,
-              marginTop: "30px",
-              marginBottom: 30,
-              color: "rgba(255, 255, 255, 0.3)",
-              fontSize: 20,
-            }}
-          >
-            Connect your wallet to use Crypto Edition NFT cards in the game.
-          </Text>
-          <MetamaskLogin
-            css={{
-              background: "rgba(255, 255, 255, 0.05)",
-              color: "#F89D35",
-            }}
-          ></MetamaskLogin>
-        </div>
+          Connect your wallet to use Crypto Edition NFT cards in the game.
+        </Text>
+        <MetamaskLogin
+          css={{
+            background: "rgba(255, 255, 255, 0.05)",
+            color: "#F89D35",
+          }}
+        ></MetamaskLogin>
         {/* <div
           css={{
             display: "flex",

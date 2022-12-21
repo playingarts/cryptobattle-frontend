@@ -338,7 +338,7 @@ const NFTChoose: FC<Props> = () => {
       {!user.isMetamaskConnected && (
         <div>
           <Text variant="body" css={{ opacity: 0.6, margin: "0 0 30px 0" }}>
-            Connect your wallet to use Crypto Edition NFT cards in the game (optional).
+            Connect your wallet to use Crypto Edition NFT cards in the game.
           </Text>
           <MetamaskLogin
             css={{
@@ -603,7 +603,7 @@ const NFTChoose: FC<Props> = () => {
           >
             You will be able to use these cards during the game.
           </Text>
-          */}
+          */} 
         </div>
       )}
     </StatBlock>
