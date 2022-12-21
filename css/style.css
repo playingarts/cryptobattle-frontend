@@ -184,17 +184,24 @@ body {
   transition: 0.3s all;
 }
 .line-2 {
-  width: 18px;
+  width: 15px;
 }
 .line-3 {
-  width: 26px;
+  width: 24px;
+}
+.hamburger:hover .line {
+  width: 28px;
+  opacity: 100%;
+  transition: 0.3s all;
 }
 .hamburger:hover .line:nth-child(2) {
-  width: 30px;
+  width: 28px;
+  opacity: 100%;
   transition: 0.3s all;
 }
 .hamburger:hover .line:nth-child(3) {
-  width: 30px;
+  width: 28px;
+  opacity: 100%;
   transition: 0.3s all;
 }
 

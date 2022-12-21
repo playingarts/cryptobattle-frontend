@@ -12,11 +12,12 @@ const Home: NextPage = () => {
       <Layout
         css={(theme) => ({
           background: theme.colors.dark_gray,
-          color: theme.colors.text_title_light,
+          color: "rgba(255, 255, 255, 0.3)",
           overflow: "hidden",
           paddingTop: theme.spacing(26),
-          paddingBottom: theme.spacing(6.5),
+          paddingBottom: theme.spacing(20),
           backgroundColor: "#0A0A0A",
+          textAlign: "center",
 
           backgroundSize: "cover",
         })}

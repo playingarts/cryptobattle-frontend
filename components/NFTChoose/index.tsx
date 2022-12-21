@@ -332,13 +332,13 @@ const NFTChoose: FC<Props> = () => {
         color: "rgba(255, 255, 255, 0.5)",
         position: "relative",
         margin: "20px 0",
-        padding: "40px 40px 10px 40px",
+        padding: "40px",
       })}
     >
       {!user.isMetamaskConnected && (
         <div>
           <Text variant="body" css={{ opacity: 0.6 }}>
-            Connect wallet to use and level up NFT cards you are holding.
+            Connect your wallet to use Crypto Edition NFT cards in the game (optional).
           </Text>
           <MetamaskLogin
             css={{

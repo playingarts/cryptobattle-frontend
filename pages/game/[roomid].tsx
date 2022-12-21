@@ -150,8 +150,7 @@ const JoinGame: NextPage = () => {
       title: "You are ready!",
       description: (
         <span>
-          Now please wait for others to connect.<br></br>The game will start
-          shortly.
+          Now please wait for the host to start the game.
         </span>
       ),
       icon: <NavProfile color={"red"}></NavProfile>,

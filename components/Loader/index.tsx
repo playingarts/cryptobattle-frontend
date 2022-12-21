@@ -19,7 +19,7 @@ const Loader: FC<HTMLAttributes<HTMLSpanElement>> = (props) => (
           },
         },
         animation: "2s linear infinite animation",
-        opacity: 0.5,
+        opacity: 0.3,
       }}
     />
   </span>
