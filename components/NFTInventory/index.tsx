@@ -105,7 +105,6 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
           css={{ padding: "20px 10px 0", maxWidth: "920px", margin: "0 auto" }}
         >
           <Text
-            component="p"
             css={{
               margin: 0,
               marginTop: "30px",
@@ -114,7 +113,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
               fontSize: 20,
             }}
           >
-            Connect your wallet to use Crypto Edition NFT cards in the game (optional).
+            Connect your wallet to use Crypto Edition NFT cards in the game.
           </Text>
           <MetamaskLogin
             css={{
