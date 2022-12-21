@@ -122,7 +122,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
             }}
           ></MetamaskLogin>
         </div>
-        {/* <div
+        <div
           css={{
             display: "flex",
             justifyContent: "space-between",
@@ -154,7 +154,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                 ></div>
               </div>
             ))}
-        </div> */}
+        </div>
       </div>
     );
   }
