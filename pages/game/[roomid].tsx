@@ -249,8 +249,7 @@ const JoinGame: NextPage = () => {
           title: "Are you sure?",
           description: (
             <span>
-              You are about to leave the lobby. The game will end for all
-              players.
+              You are about to leave the lobby. The game will end for all connected players.
             </span>
           ),
           dark: false,

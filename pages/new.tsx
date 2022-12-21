@@ -44,26 +44,11 @@ const NewGame: NextPage = () => {
       return;
     }
     openNotification({
+      title: "Already connected!",
       description: (
-        <div>
-          <Text
-            variant="h1"
-            css={{
-              fontSize: 35,
-              lineHeight: "45.5px",
-              marginBottom: 0,
-              marginTop: 60,
-            }}
-          >
-            Already connected!
-          </Text>
-          <Text
-            variant="body3"
-            css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
-          >
-            You are already in a lobby or a game in an another browser or tab.
-          </Text>
-        </div>
+        <span>
+          You are already in a lobby or a game in an another browser or tab.
+        </span>
       ),
       dark: false,
       icon: <Warning />,
