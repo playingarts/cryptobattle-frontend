@@ -96,7 +96,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
 
   if (Object.keys(user.metamask).length === 0) {
     return (
-      <div css={{ padding: "20px 10px 0", maxWidth: "920px", margin: "0 auto" }}>
+      <div css={{ marginRight: 100, marginLeft: 100, marginTop: 50 }}>
         {" "}
         {/* <Text component="h3" css={{ margin: 0 }}>
           NFT Inventory
@@ -124,7 +124,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
         </div>
         <div
           css={{
-            display: "none",
+            display: "flex",
             justifyContent: "space-between",
             marginBottom: 150,
           }}
