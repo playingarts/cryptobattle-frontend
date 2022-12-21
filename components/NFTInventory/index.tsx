@@ -124,12 +124,12 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
         </div>
         <div
           css={{
-            display: "flex",
-            justifyContent: "start",
-            margin: "100px 0",
+            display: "none",
+            justifyContent: "space-between",
+            marginBottom: 150,
           }}
         >
-          {Array(0)
+          {Array(4)
             .fill(0)
             .map((card, index) => (
               <div key={index}>
@@ -148,7 +148,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
                     marginTop: 20,
                     borderRadius: 40,
                     height: 15,
-                    marginRight: "50px",
+                    marginRight: "auto",
                     marginLeft: "auto",
                   }}
                 ></div>
