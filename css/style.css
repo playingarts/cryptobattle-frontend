@@ -177,31 +177,30 @@ body {
 .line {
   display: block;
   width: 28px;
-  height: 2px;
-  background-color: white;
-  opacity: 40%;
-  margin: 7px 0;
+  height: 3px;
+  background-color: rgba(234, 234, 234, 0.5);
+  /* opacity: 40%; */
+  margin: 6px 0 6px 1px;
+  border-radius: 3px;
   transition: 0.3s all;
 }
 .line-2 {
   width: 15px;
 }
 .line-3 {
-  width: 24px;
+  width: 28px;
 }
 .hamburger:hover .line {
   width: 28px;
-  opacity: 100%;
+  /* opacity: 100%; */
   transition: 0.3s all;
 }
 .hamburger:hover .line:nth-child(2) {
   width: 28px;
-  opacity: 100%;
   transition: 0.3s all;
 }
 .hamburger:hover .line:nth-child(3) {
   width: 28px;
-  opacity: 100%;
   transition: 0.3s all;
 }
 

@@ -209,7 +209,7 @@ const App = ({ Component, pageProps }: AppProps) => {
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
-        <title>Crypto Battle </title>
+        <title>Card Battle - Playing Arts</title>
       </Head>
       <ThemeProvider theme={theme}>
         <MetaMaskProvider>

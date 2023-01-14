@@ -151,7 +151,7 @@ export const Modal: FC<Modal> = ({
             aria-label="Close"
             css={{
               margin: 0,
-              padding: 15,
+              // padding: 15,
               position: "absolute",
               top: 30,
               right: 30,

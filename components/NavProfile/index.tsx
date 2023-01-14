@@ -17,7 +17,11 @@ const NavProfile: FC<User> = (props) => {
       <UserAvatar
         css={{
           transition: "opacity 400ms",
-          transform: "scale(0.9,0.9)",
+          // transform: "scale(0.7,0.7)",
+          width: "50px !important",
+          height: "50px !important",
+          marginRight: "20px",
+
           "&:hover": {
             opacity: 0.9,
           },

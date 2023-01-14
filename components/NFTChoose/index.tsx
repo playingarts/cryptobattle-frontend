@@ -233,7 +233,7 @@ const NFTChoose: FC<Props> = () => {
                     lineHeight: "30px",
                     padding: "2px 15px",
                     background: "rgba(255, 255, 255, 0.05)",
-                    borderRadius: "20px",
+                    borderRadius: "10px",
                     transition: "color 300ms",
                     cursor: "pointer",
                     "&:hover": {
@@ -300,7 +300,7 @@ const NFTChoose: FC<Props> = () => {
                     lineHeight: "30px",
                     padding: "2px 15px",
                     background: "rgba(255, 255, 255, 0.05)",
-                    borderRadius: "20px",
+                    borderRadius: "10px",
                     transition: "color 300ms",
                     cursor: "pointer",
                     "&:hover": {

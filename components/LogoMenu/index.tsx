@@ -181,7 +181,7 @@ export default function LogoMenu({
                   background: "#181818",
                 }}
               >
-                <div style={{ marginRight: "36px" }} className="hamburger">
+                <div style={{ marginRight: "35px", marginTop: "1px", }} className="hamburger">
                   <span className="line line-1"></span>
                   <span className="line line-2"></span>
                   <span className="line line-3"></span>
@@ -200,7 +200,7 @@ export default function LogoMenu({
                       textTransform: "uppercase",
                       // position: "absolute",
                       // marginLeft: 80,
-                      marginTop: 7,
+                      marginTop: 8,
                       cursor: "pointer",
                       transition: "color 500ms",
                       "&:hover": {
@@ -221,8 +221,9 @@ export default function LogoMenu({
                 css={{
                   background: "none",
                   border: "none",
-                  width: 20,
-                  height: 20,
+                  width: 0,
+                  height: 10,
+                  margin: "5px 5px 5px 4px",
                   "&:focus": {
                     outline: `none`,
                   },
@@ -233,12 +234,10 @@ export default function LogoMenu({
                   aria-label="Close"
                   css={{
                     margin: 0,
-                    padding: 8,
-                    position: "absolute",
-                    top: -56,
-                    left: 12,
+                    padding: 0,
                     cursor: "pointer",
-                    transition: "all 600ms",
+                    transition: "all 300ms",
+                    position: "absolute",
                     "&:hover": {
                       transform: `rotateZ(90deg)`,
                     },
@@ -247,7 +246,7 @@ export default function LogoMenu({
                   <CloseMenu />
                 </div>
               </PopoverClose>
-              <div css={{ padding: "0 52px 0 96px" }}>
+              <div css={{ padding: "0 52px 0 95px" }}>
                 <Text
                   component="div"
                   variant="h5"
@@ -257,7 +256,7 @@ export default function LogoMenu({
                     cursor: "pointer",
                   }}
                 >
-                  CRYPTO BATTLE
+                  Card Battle
                 </Text>{" "}
                 <ul
                   css={{
@@ -296,6 +295,14 @@ export default function LogoMenu({
                         </div>
                       </GameRules>
                     </div>
+                  )}
+
+                  {loggedIn && (
+                    <MenuItem
+                      fontWeight={400}
+                      to="https://playingarts.com/"
+                      text="Website"
+                    />
                   )}
                   {loggedIn && (
                     <Button

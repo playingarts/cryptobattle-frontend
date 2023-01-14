@@ -53,7 +53,7 @@ const Button: ForwardRefRenderFunction<HTMLButtonElement, Props> = (
           position: "relative",
           background: "none",
           display: "inline-flex",
-          borderRadius: theme.spacing(size === "small" ? 4 : 5),
+          borderRadius: theme.spacing(size === "small" ? 1 : 1),
           padding: 0,
           alignItems: "center",
           border: "none",
@@ -82,8 +82,8 @@ const Button: ForwardRefRenderFunction<HTMLButtonElement, Props> = (
               fontWeight: 600,
               lineHeight: "50px",
               textTransform: "uppercase",
-              paddingLeft: theme.spacing(2.5),
-              paddingRight: theme.spacing(2.5),
+              paddingLeft: theme.spacing(2),
+              paddingRight: theme.spacing(2),
             }
           : {
               ...(color !== "black"

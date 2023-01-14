@@ -69,7 +69,7 @@ const Home: NextPage = () => {
           >
             <DashboardHeader />
 
-            {/* <div
+            <div
               css={{
                 backgroundColor: "#181818",
                 color: "rgba(255, 255, 255, 0.3)",
@@ -99,7 +99,7 @@ const Home: NextPage = () => {
                 Join our Discord
               </a>
               and let us know what you think about this game!
-            </div> */}
+            </div>
 
             {user && !user.isTwitterConnected && <LinkTwitter />}
             {/* <div

@@ -39,7 +39,7 @@ const GameRules: FC<Props> = ({ children, ...props }) => {
       {...props}
       css={(theme) => ({
         // minWidth: "200px",
-        marginRight: 20,
+        marginRight: 10,
         color: theme.colors.text_title_light,
       })}
     >
@@ -63,7 +63,7 @@ const GameRules: FC<Props> = ({ children, ...props }) => {
                 marginTop: 10,
                 background: activeTab === tab ? "#181818" : "#EAEAEA",
                 color: activeTab === tab ? "#fff" : "#000",
-                borderRadius: 50,
+                borderRadius: 10,
                 height: 34,
                 border: 0,
                 boxShadow: "none",
