@@ -69,10 +69,23 @@ const Header: FC<Props> = ({
             // transform: "translate(-50%, -50%)",
           })}
         >
-          {headerMiddle ? (
+          {/* {headerMiddle ? (
             headerMiddle
           ) : (
-            <Link href="/">
+            <br />
+          )} */}
+
+          <div
+            css={(theme) => ({
+              transition: theme.transitions.normal("top"),
+              textAlign: "center",
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+            })}
+          >
+            <Link href="/dashboard">
               <LogoIcon
                 css={(theme) => [
                   palette !== "gradient" && {
@@ -82,13 +95,13 @@ const Header: FC<Props> = ({
                     transition: "opacity 500ms",
 
                     "&:hover": {
-                      opacity: "0.6",
+                      opacity: "0.8",
                     },
                   },
                 ]}
               />
             </Link>
-          )}
+          </div>
         </div>
 
         {headerRight && headerRight}

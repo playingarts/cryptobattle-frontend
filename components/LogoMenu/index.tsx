@@ -208,7 +208,7 @@ export default function LogoMenu({
                       },
                     }}
                   >
-                    {headerTitle ? headerTitle : "CRYPTO BATTLE"}
+                    {headerTitle ? headerTitle : "CARD BATTLE"}
                   </Text>
                 )}
                 {logo && logo}
@@ -301,7 +301,7 @@ export default function LogoMenu({
                     <MenuItem
                       fontWeight={400}
                       to="https://playingarts.com/"
-                      text="Website"
+                      text="Go to website"
                     />
                   )}
                   {loggedIn && (
