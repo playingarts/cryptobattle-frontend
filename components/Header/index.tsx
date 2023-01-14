@@ -69,11 +69,11 @@ const Header: FC<Props> = ({
             // transform: "translate(-50%, -50%)",
           })}
         >
-          {/* {headerMiddle ? (
-            headerMiddle
+          {headerMiddle ? (
+            ""
           ) : (
-            <br />
-          )} */}
+            ""
+          )}
 
           <div
             css={(theme) => ({
