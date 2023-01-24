@@ -250,11 +250,19 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
     WSProvider.onclose = function (e) {
       console.log("on close: " + e.code);
+      // Don't reconnect if there's already a connection opened in the backend.
       if (e.code === 4000) {
         if (!localStorage.getItem("adding-metamask")) {
           setIsAlreadyConnected(true);
         }
+        WSProvider.close()
       }
+
+      // Don't reconnect if there's a new connection opened in the backend.
+      if (e.code === 4001) {
+        WSProvider.close()
+      }
+
     };
 
     WSProvider.onmessage = function ({ data }) {
