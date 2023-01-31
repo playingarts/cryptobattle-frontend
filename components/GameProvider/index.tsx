@@ -98,6 +98,12 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     router.push("/dashboard");
   };
 
+  const reload = () => {
+    // eslint-disable-next-line
+    // @ts-ignore: Unreachable code error
+    location.reload();
+  }
+
   const newGame = () => {
     setResults(null);
     localStorage.setItem("chosen-nfts", "");
@@ -260,6 +266,27 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       // Don't reconnect if there's a new connection opened in the backend.
       if (e.code === 4001) {
+
+        openNotification({
+          title: "Already connected!",
+          description: (
+            <span>
+              You are already in a lobby or a game in an another browser or tab.
+            </span>
+          ),
+          dark: false,
+          footer: (
+            <div css={{ display: "flex", marginTop: "0px" }}>
+              <Button onClick={reload}>Play Here</Button>
+            </div>
+          ),
+          icon: <Warning />,
+          iconColor: "#FF6F41",
+        });
+
+        // eslint-disable-next-line
+        // @ts-ignore
+        window.isConnectionClosed = true;
         WSProvider.close()
       }
 

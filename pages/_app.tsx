@@ -200,6 +200,23 @@ const App = ({ Component, pageProps }: AppProps) => {
     if (typeof window !== "undefined") {
       smoothscroll.polyfill();
     }
+
+    // Refresh game if the window is focused and the connection is closed
+    window.onblur = function () {
+
+      window.onfocus = function () {
+    
+        // eslint-disable-next-line
+        // @ts-ignore
+        if (window.isConnectionClosed) {
+          location.reload();
+        // eslint-disable-next-line
+        // @ts-ignore
+          window.isConnectionClosed = false;
+
+        }
+      };
+    };
   }, []);
 
   return (
