@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const client = axios.create({
-  baseURL: `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/`,
+  baseURL: `https://cryptobattle-backend-production.up.railway.app/`,
 });
 
 const request = function (options) {

@@ -80,7 +80,7 @@ const Home: NextPage = () => {
                 <div style={{ display: "flex", justifyContent: "start" }}>
                   <Button
                     component={Link}
-                    href="https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter"
+                    href="https://cryptobattle-backend-production.up.railway.app/auth/twitter"
                     Icon={Twitter}
                     css={(theme) => ({
                       background: "rgb(72, 155, 233)",

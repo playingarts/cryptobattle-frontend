@@ -28,7 +28,7 @@ function WSProvider({ children }: WSProviderProps): JSX.Element {
       return new ReconnectingWebSocket(
         // eslint-disable-next-line
         // @ts-ignore: Unreachable code error
-        `wss://playing-arts-game-backend-test-7pogl.ondigitalocean.app/api/socket?accesstoken=${accessToken}`, [], options
+        `wss://cryptobattle-backend-production.up.railway.app/api/socket?accesstoken=${accessToken}`, [], options
       );
     }
     return null;

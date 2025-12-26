@@ -212,7 +212,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const logout = () => {
     axios
       .get(
-        "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/logout?accesstoken=" +
+        "https://cryptobattle-backend-production.up.railway.app/auth/logout?accesstoken=" +
           localStorage.getItem("accessToken"),
         {
           headers: {

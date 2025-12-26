@@ -55,8 +55,8 @@ const router = useRouter();
           localStorage.setItem("adding-metamask", "true");
         }
         const url = !loggedIn
-          ? `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask/callback?walletAddress=${accountLocal}&signature=${signature}`
-          : `https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask/callback?walletAddress=${accountLocal}&signature=${signature}` +
+          ? `https://cryptobattle-backend-production.up.railway.app/auth/metamask/callback?walletAddress=${accountLocal}&signature=${signature}`
+          : `https://cryptobattle-backend-production.up.railway.app/auth/metamask/callback?walletAddress=${accountLocal}&signature=${signature}` +
             "&accesstoken=" +
             localStorage.getItem("accessToken");
 
@@ -94,7 +94,7 @@ const router = useRouter();
 
     axios
       .get(
-        "https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/metamask?walletAddress=" +
+        "https://cryptobattle-backend-production.up.railway.app/auth/metamask?walletAddress=" +
           address,
         {
           headers: {

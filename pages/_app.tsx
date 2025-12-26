@@ -232,7 +232,7 @@ const App = ({ Component, pageProps }: AppProps) => {
         <MetaMaskProvider>
           <NotificationProvider>
             <AuthProvider>
-              <WSProvider url="playing-arts-game-backend-test-7pogl.ondigitalocean.app">
+              <WSProvider url="cryptobattle-backend-production.up.railway.app">
                 <GameProvider>
                   {/* // eslint-disable-next-line 
     // @ts-ignore: Unreachable code error */}

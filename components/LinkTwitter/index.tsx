@@ -27,7 +27,7 @@ const LinkTwitter: FC = () => {
         <div css={{ display: "flex", marginTop: "20px", marginBottom: 40 }}>
           <Button
             component={Link}
-            href={`https://playing-arts-game-backend-test-7pogl.ondigitalocean.app/auth/twitter?accesstoken=${localStorage.getItem(
+            href={`https://cryptobattle-backend-production.up.railway.app/auth/twitter?accesstoken=${localStorage.getItem(
               "accessToken"
             )}`}
             Icon={Twitter}
