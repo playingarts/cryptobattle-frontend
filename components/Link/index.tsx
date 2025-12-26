@@ -3,12 +3,10 @@ import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import { useRouter } from "next/router";
 import { ClassNames, Theme, CSSObject } from "@emotion/react";
 import { CSSInterpolation } from "@emotion/serialize";
-
-// Omit conflicting properties from HTMLAttributes that exist in NextLinkProps
-type ConflictingProps = "onClick" | "onMouseEnter" | "onTouchStart";
-
+    // eslint-disable-next-line 
+    // @ts-ignore: Unreachable code error
 export interface Props extends NextLinkProps,
-    Omit<HTMLAttributes<HTMLAnchorElement | HTMLButtonElement>, ConflictingProps> {
+    HTMLAttributes<HTMLAnchorElement | HTMLButtonElement> {
   component?: "a" | "button";
   activeCss?: ((_: Theme) => CSSInterpolation) | CSSObject;
   target?: HTMLAnchorElement["target"];

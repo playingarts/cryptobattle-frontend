@@ -13,22 +13,25 @@ import Link from "../../components/Link";
 
 import { api } from "../../api";
 import { useNotifications } from "../NotificationProvider";
-import { logError } from "../../utils/errorHandler";
 
 import Text from "../Text/";
 import Button from "../Button/";
 import Warning from "../../components/Icons/Warning";
-import Loader from "../Loader";
-import { User } from "../../types/game";
+
 
 type AuthProviderProps = { children: ReactNode };
 
-export interface IAuthProviderContext {
+// type MetamaskUser = { address: string; signature: string };
+import Loader from "../Loader";
+
+
+
+export type IAuthProviderContext = {
   logout: () => void;
   loggedIn: boolean;
-  user: User;
-  setToken: (token: string) => void;
-}
+  user: any;
+  setToken: any;
+};
 
 const getUser = () => {
   return api.get("/api/rest/me");
@@ -52,21 +55,20 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const [authorized, setAuthorized] = useState(false);
   const { openNotification, closeNotification } = useNotifications();
 
-  const [user, setUser] = useState<User>({
+  const [user, setUser] = useState({
     userId: "",
+    state: "",
     name: "",
     username: "",
     metamask: { address: "", signature: "" },
     profilePictureUrl: "",
     isMetamaskConnected: false,
     isTwitterConnected: false,
-    playerLevel: 0,
-    authProvider: "twitter",
   });
 
   const { accesstoken } = router.query;
 
-  const setToken = useCallback((token: string) => {
+  const setToken = useCallback((token: any) => {
     console.log(token, "token");
     localStorage.setItem("accessToken", token as string);
     getUser().then((data: any) => {
@@ -78,6 +80,9 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       }
 
       setUser(user);
+            // eslint-disable-next-line
+    // @ts-ignore
+      window.user = JSON.stringify(user)
       const roomid = localStorage.getItem("roomid");
       if (!localStorage.getItem("adding-metamask")) {
         console.log('/dashboard redirect here.')
@@ -111,6 +116,10 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
         const user = formatUserData(data);
         setUser(user);
+      // eslint-disable-next-line
+    // @ts-ignore
+        window.user = JSON.stringify(user)
+
       });
     }
 
@@ -203,7 +212,8 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const logout = () => {
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/logout?accesstoken=${localStorage.getItem("accessToken")}`,
+        "https://cryptobattle-backend-production.up.railway.app/auth/logout?accesstoken=" +
+          localStorage.getItem("accessToken"),
         {
           headers: {
             accesstoken: localStorage.getItem("accessToken"),
@@ -220,9 +230,12 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
           router.push("/");
         }, 0);
       })
-      .catch((err: unknown) => {
-        logError("AuthProvider.logout", err);
+      .catch((err) => {
+        console.log(err);
       });
+
+    // localStorage.removeItem("accessToken");
+    // localStorage.removeItem("signature");
   };
 
   const memoedValue = useMemo(

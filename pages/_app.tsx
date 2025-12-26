@@ -1,12 +1,16 @@
 import { Fragment, useEffect } from "react";
-import { Theme } from "@emotion/react";
+import { ThemeProvider, Theme } from "@emotion/react";
 import Head from "next/head";
 import { AppProps } from "next/app";
 import "modern-normalize/modern-normalize.css";
 import { CSSInterpolation } from "@emotion/serialize";
 import smoothscroll from "smoothscroll-polyfill";
-import { AppProviders } from "../components/AppProviders";
-import { connectionState } from "../utils/connectionState";
+import { MetaMaskProvider } from "metamask-react";
+import { AuthProvider } from "../components/AuthProvider/";
+import { GameProvider } from "../components/GameProvider/";
+import { NotificationProvider } from "../components/NotificationProvider/";
+
+import { WSProvider } from "../components/WsProvider/index";
 import "../css/style.css";
 declare module "@emotion/react" {
   export interface Theme {
@@ -199,10 +203,17 @@ const App = ({ Component, pageProps }: AppProps) => {
 
     // Refresh game if the window is focused and the connection is closed
     window.onblur = function () {
+
       window.onfocus = function () {
-        if (connectionState.isConnectionClosed) {
-          window.location.reload();
-          connectionState.isConnectionClosed = false;
+    
+        // eslint-disable-next-line
+        // @ts-ignore
+        if (window.isConnectionClosed) {
+          location.reload();
+        // eslint-disable-next-line
+        // @ts-ignore
+          window.isConnectionClosed = false;
+
         }
       };
     };
@@ -217,9 +228,21 @@ const App = ({ Component, pageProps }: AppProps) => {
         />
         <title>Card Battle - Playing Arts</title>
       </Head>
-      <AppProviders theme={theme}>
-        <Component {...pageProps} />
-      </AppProviders>
+      <ThemeProvider theme={theme}>
+        <MetaMaskProvider>
+          <NotificationProvider>
+            <AuthProvider>
+              <WSProvider url="cryptobattle-backend-production.up.railway.app">
+                <GameProvider>
+                  {/* // eslint-disable-next-line 
+    // @ts-ignore: Unreachable code error */}
+                  <Component {...pageProps} />
+                </GameProvider>
+              </WSProvider>
+            </AuthProvider>
+          </NotificationProvider>
+        </MetaMaskProvider>
+      </ThemeProvider>
     </Fragment>
   );
 };

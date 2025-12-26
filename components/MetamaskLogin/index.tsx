@@ -7,7 +7,6 @@ import { useAuth } from "../AuthProvider";
 import Metamask from "../Icons/Metamask";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { logError } from "../../utils/errorHandler";
 export type Props = HTMLAttributes<HTMLDivElement>;
 interface MetamaskLogin extends Props {
   roomId?:  any,
@@ -56,8 +55,8 @@ const router = useRouter();
           localStorage.setItem("adding-metamask", "true");
         }
         const url = !loggedIn
-          ? `${process.env.NEXT_PUBLIC_API_URL}/auth/metamask/callback?walletAddress=${accountLocal}&signature=${signature}`
-          : `${process.env.NEXT_PUBLIC_API_URL}/auth/metamask/callback?walletAddress=${accountLocal}&signature=${signature}` +
+          ? `https://cryptobattle-backend-production.up.railway.app/auth/metamask/callback?walletAddress=${accountLocal}&signature=${signature}`
+          : `https://cryptobattle-backend-production.up.railway.app/auth/metamask/callback?walletAddress=${accountLocal}&signature=${signature}` +
             "&accesstoken=" +
             localStorage.getItem("accessToken");
 
@@ -78,14 +77,11 @@ const router = useRouter();
             }, 1000);
             console.log(result.data.accesstoken);
           })
-          .catch((err: unknown) => {
-            logError("MetamaskLogin.sendSignature", err);
+          .catch((err) => {
+            console.log(err);
           });
       })
-      .catch((err: unknown) => {
-        logError("MetamaskLogin.personalSign", err);
-        setSignature((prev) => ({ ...prev, signing: false }));
-      });
+      .catch(() => setSignature((prev) => ({ ...prev, signing: false })));
   };
 
   const requestSignature = async () => {
@@ -98,7 +94,8 @@ const router = useRouter();
 
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/metamask?walletAddress=${address}`,
+        "https://cryptobattle-backend-production.up.railway.app/auth/metamask?walletAddress=" +
+          address,
         {
           headers: {
             // accesstoken: localStorage.getItem("accessToken"),
@@ -112,8 +109,8 @@ const router = useRouter();
           sendSignature(result.data.metamaskSignKey, result.data.regtoken, address);
      
       })
-      .catch((err: unknown) => {
-        logError("MetamaskLogin.requestSignature", err);
+      .catch((err) => {
+        console.log(err);
       });
   };
 

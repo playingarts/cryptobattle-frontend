@@ -9,7 +9,6 @@ import {
 import { api } from "../../api";
 import { useWS } from "../../components/WsProvider/index";
 import { formatUsername } from "../../utils/helpers";
-import { logError } from "../../utils/errorHandler";
 export type Props = HTMLAttributes<HTMLDivElement>;
 import { useAuth } from "../AuthProvider";
 
@@ -65,8 +64,8 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
         .then((data: any) => {
           setPlayerInfo(data);
         })
-        .catch((err: unknown) => {
-          logError("Player.getUser", err);
+        .catch((err: any) => {
+          console.log(err);
         });
     }
   }, [player, playerInfo]);

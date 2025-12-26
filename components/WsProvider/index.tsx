@@ -7,7 +7,7 @@ import {
 } from "react";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
-type WSProviderProps = { children: ReactNode };
+type WSProviderProps = { children: ReactNode; url: string };
 
 const WSStateContext = createContext<any | null>(null);
 
@@ -26,7 +26,9 @@ function WSProvider({ children }: WSProviderProps): JSX.Element {
         connectionTimeout: 12000
       }
       return new ReconnectingWebSocket(
-        `${process.env.NEXT_PUBLIC_WS_URL}/api/socket?accesstoken=${accessToken}`, [], options
+        // eslint-disable-next-line
+        // @ts-ignore: Unreachable code error
+        `wss://cryptobattle-backend-production.up.railway.app/api/socket?accesstoken=${accessToken}`, [], options
       );
     }
     return null;

@@ -32,7 +32,7 @@ const NewGame: NextPage = () => {
 
     router.push(`/game/${roomId}`);
 
-    return () => setRoomId("");
+    return () => setRoomId(null);
   }, [roomId]);
 
   const WSProvider = useWS();

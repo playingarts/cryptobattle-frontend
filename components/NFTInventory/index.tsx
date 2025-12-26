@@ -6,7 +6,6 @@ import Link from "../Link";
 import Text from "../Text";
 import { useAuth } from "../AuthProvider";
 import { api } from "../../api";
-import { logError } from "../../utils/errorHandler";
 import Loader from "../Loader";
 import MetamaskLogin from "../../components/MetamaskLogin/";
 import Card from "../../components/CardNew";
@@ -68,8 +67,8 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
         setLoading(false);
         setNFTCards(computedData);
       })
-      .catch((err: unknown) => {
-        logError("NFTInventory.getUserNftCards", err);
+      .catch((err: any) => {
+        console.log(err);
         setLoading(false);
       });
   }, [user]);
@@ -95,7 +94,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
     setTopCards(topCards);
   }, [NFTCards]);
 
-  if (!user.metamask || Object.keys(user.metamask).length === 0) {
+  if (Object.keys(user.metamask).length === 0) {
     return (
       <div css={{ padding: "20px 10px 0", maxWidth: "920px", margin: "0 auto 50px" }}>
         {" "}

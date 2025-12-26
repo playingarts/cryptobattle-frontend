@@ -13,7 +13,6 @@ import { api } from "../../api";
 import { formatUsername } from "../../utils/helpers";
 import Loader from "../../components/Loader";
 import { useNotifications } from "../../components/NotificationProvider";
-import { logError } from "../../utils/errorHandler";
 
 import Warning from "../../components/Icons/Warning";
 
@@ -44,8 +43,8 @@ const Home: any = () => {
         setLoading(false);
         setLoaded(true);
       })
-      .catch((err: unknown) => {
-        logError("JoinLogin.getRoomInfo", err);
+      .catch((err: any) => {
+        console.log(err);
         openNotification({
           title: "Ooops",
           description: <span>The game you are trying to join has ended!</span>,
@@ -157,7 +156,7 @@ const Home: any = () => {
                   >
                     <Button
                       component={Link}
-                      href={`${process.env.NEXT_PUBLIC_API_URL}/auth/twitter`}
+                      href="https://cryptobattle-backend-production.up.railway.app/auth/twitter"
                       Icon={Twitter}
                       css={(theme) => ({
                         background: "rgb(72, 155, 233)",

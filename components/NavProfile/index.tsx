@@ -1,27 +1,29 @@
 import UserAvatar from "../UserAvatar";
-import { useAuth } from "../AuthProvider";
 
 import { FC, HTMLAttributes } from "react";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
-interface NavProfileProps extends Props {
-  user?: { profilePictureUrl?: string };
+interface User extends Props {
+  user?:  any,
 }
 
-const NavProfile: FC<NavProfileProps> = (props) => {
-  const { user: authUser } = useAuth();
-  const user = props.user || authUser;
+const NavProfile: FC<User> = (props) => {
+      // eslint-disable-next-line
+    // @ts-ignore
+  const user  =  window.user ? JSON.parse(window.user) : props.user
 
   return (
     <div style={{ cursor: "pointer" }} {...props}>
       <UserAvatar
         css={{
           transition: "opacity 400ms",
+          // transform: "scale(0.7,0.7)",
+
           "&:hover": {
             opacity: 0.9,
           },
         }}
-        profilePictureUrl={user?.profilePictureUrl || ""}
+        profilePictureUrl={user && user.profilePictureUrl}
       />
     </div>
   );

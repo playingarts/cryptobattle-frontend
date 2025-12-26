@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const client = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: `https://cryptobattle-backend-production.up.railway.app/`,
 });
 
 const request = function (options) {

@@ -4,7 +4,6 @@ import { Modal, DialogClose } from "../Modal";
 import Text from "../Text";
 import { useAuth } from "../AuthProvider";
 import { api } from "../../api";
-import { logError } from "../../utils/errorHandler";
 import Line from "../Line";
 import { getCard } from "../../components/Cards";
 
@@ -32,21 +31,22 @@ const NFTChoose: FC<Props> = () => {
 
   const { user } = useAuth();
 
-  const getInitialCards = () => {
-    const stored = localStorage.getItem("chosen-nfts");
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch {
-        return [null, null];
-      }
-    }
-    return [null, null];
-  };
-
-  const initialCards = getInitialCards();
-  const [firstCard, setFirstCard] = useState<any>(initialCards[0]);
-  const [secondCard, setSecondCard] = useState<any>(initialCards[1]);
+  const [firstCard, setFirstCard] = useState<any>(
+    localStorage.getItem("chosen-nfts")
+      // eslint-disable-next-line
+  // @ts-ignore: Unreachable code error
+      ? JSON.parse(localStorage.getItem("chosen-nfts"))[0]
+      : null
+  );
+  // eslint-disable-next-line
+  // @ts-ignore: Unreachable code error
+  const [secondCard, setSecondCard] = useState<any>(
+    localStorage.getItem("chosen-nfts")
+      // eslint-disable-next-line
+  // @ts-ignore: Unreachable code error
+      ? JSON.parse(localStorage.getItem("chosen-nfts"))[1]
+      : null
+  );
 
   const [activeCard, setActiveCard] = useState(0);
 
@@ -128,8 +128,8 @@ const NFTChoose: FC<Props> = () => {
 
         setNFTCards(computedData);
       })
-      .catch((err: unknown) => {
-        logError("NFTChoose.getUserNftCards", err);
+      .catch((err: any) => {
+        console.log(err);
         setLoading(false);
       });
   }, [user]);
