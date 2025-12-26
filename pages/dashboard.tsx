@@ -125,7 +125,7 @@ const Home: NextPage = () => {
               {!user.isTwitterConnected && (
                 <Button
                   component={Link}
-                  href={`https://cryptobattle-backend-production.up.railway.app/auth/twitter?accesstoken=${localStorage.getItem(
+                  href={`${process.env.NEXT_PUBLIC_API_URL}/auth/twitter?accesstoken=${localStorage.getItem(
                     "accessToken"
                   )}`}
                   Icon={Twitter}

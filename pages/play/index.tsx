@@ -79,9 +79,14 @@ const Play: NextPage = () => {
 
     console.log("Game users with cards: ", gameState.gameUsersWithCards);
 
-    const cards = gameState.gameUsersWithCards.filter(
+    if (!gameState.gameUsersWithCards) {
+      return;
+    }
+
+    const userWithCards = gameState.gameUsersWithCards.filter(
       (userCards: any) => userCards.userId === user.userId
-    )[0].cards;
+    )[0];
+    const cards = userWithCards?.cards;
 
     if (!cards) {
       return;

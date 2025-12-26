@@ -7,8 +7,7 @@ import { useNotifications } from "../../components/NotificationProvider";
 import Text from "../../components/Text";
 import Warning from "../../components/Icons/Warning";
 import Button from "../../components/Button";
-
-// import { useGame } from "../../components/GameProvider";
+import { useGame } from "../../components/GameProvider";
 
 const GameLayout: FC<
   Pick<
@@ -16,9 +15,10 @@ const GameLayout: FC<
     "altNav" | "showAltNav" | "noNav" | "palette" | "isCardPage" | "loading"
   >
 > = ({ palette, loading, children }) => {
-  const container = useRef(null);
+  const container = useRef<HTMLElement | null>(null);
   const router = useRouter();
   const { openNotification, closeNotification } = useNotifications();
+  const { refs } = useGame();
 
   const [isConfirmedLeave, setIsConfirmedLeave] = useState(false);
 
@@ -39,9 +39,7 @@ const GameLayout: FC<
       console.log("handleRouteChange", url);
 
       if (
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-        !window.results &&
+        !refs.hasResults.current &&
         !isConfirmedLeave &&
         url !== "/play" &&
         !localStorage.getItem("play-again")
@@ -114,14 +112,8 @@ const GameLayout: FC<
 
   useEffect(() => {
     if (container.current) {
-      // eslint-disable-next-line
-      // @ts-ignore: Unreachable code error
-      container.current?.scrollTo(
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
+      container.current.scrollTo(
         (container.current.scrollWidth - container.current.clientWidth) / 2,
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
         container.current.scrollHeight / 2 - container.current.clientHeight / 2
       );
     }
@@ -129,9 +121,6 @@ const GameLayout: FC<
 
   return (
     <div style={{ background: "#0a0a0a", minHeight: "100vh" }}>
-      {/* // eslint-disable-next-line 
-    // @ts-ignore: Unreachable code error */}
-
       <ScrollContainer
         className="scroll-container"
         ignoreElements=".draggable"

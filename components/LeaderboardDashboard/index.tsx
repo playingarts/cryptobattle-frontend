@@ -1,8 +1,8 @@
 import { FC, HTMLAttributes, useEffect } from "react";
-// import { useAuth } from "../AuthProvider";
 export type Props = HTMLAttributes<HTMLDivElement>;
 import StatBlock from "../../components/StatBlock";
 import { api } from "../../api";
+import { logError } from "../../utils/errorHandler";
 
 import Line from "../Line";
 import Text from "../Text";
@@ -30,8 +30,8 @@ const LeaderboardDashboard: FC<Props> = ({ ...props }) => {
       .then((data: any) => {
         console.log(data);
       })
-      .catch((err: any) => {
-        console.log(err);
+      .catch((err: unknown) => {
+        logError("LeaderboardDashboard.getLeaderboard", err);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

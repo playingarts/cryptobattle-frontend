@@ -1,13 +1,13 @@
 import { FC, HTMLAttributes, useEffect, useState } from "react";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
-// import FaqItem from "../FaqItem";
 import Line from "../Line";
 import Text from "../Text";
 import StatBlock from "../../components/StatBlock";
 
 import { api } from "../../api";
 import { useAuth } from "../AuthProvider";
+import { logError } from "../../utils/errorHandler";
 // import Progress from '../../components/Progress';
 import GameRules from "../GameRules/";
 
@@ -43,8 +43,8 @@ const Stats: FC<Props> = ({ ...props }) => {
         console.log("User Stats: ", data);
         setUserStats(data);
       })
-      .catch((err : any) => {
-        console.log(err);
+      .catch((err: unknown) => {
+        logError("Stats.getUserStats", err);
       });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

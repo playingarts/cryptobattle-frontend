@@ -80,7 +80,7 @@ const Home: NextPage = () => {
                 <div style={{ display: "flex", justifyContent: "start" }}>
                   <Button
                     component={Link}
-                    href="https://cryptobattle-backend-production.up.railway.app/auth/twitter"
+                    href={`${process.env.NEXT_PUBLIC_API_URL}/auth/twitter`}
                     Icon={Twitter}
                     css={(theme) => ({
                       background: "rgb(72, 155, 233)",

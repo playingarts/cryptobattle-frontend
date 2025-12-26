@@ -33,6 +33,7 @@ const JoinGame: NextPage = () => {
     userSocketIdle,
     setUserSocketIdle,
     isAlreadyConnected,
+    refs,
   } = useGame();
   const { user } = useAuth();
 
@@ -207,9 +208,8 @@ const JoinGame: NextPage = () => {
 
     const leave = () => {
       const leave = () => {
-        setPlayers(null);
-        // eslint-disable-next-line
-        localStorage.setItem("chosen-nft", JSON.stringify(null));
+        setPlayers([]);
+        localStorage.removeItem("chosen-nft");
         WSProvider.send(
           JSON.stringify({
             event: isOwner ? "close-room" : "quit-room",
@@ -319,11 +319,7 @@ const JoinGame: NextPage = () => {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    window.gameStarted = false;
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
+    refs.gameStarted.current = false;
     localStorage.removeItem("play-again");
 
     if (!isBackendReady) {
@@ -436,8 +432,6 @@ const JoinGame: NextPage = () => {
 
           {!isOwner && <Ready readyButton={readyButton} />}
 
-          {/* // eslint-disable-next-line 
-          // @ts-ignore: Unreachable code error */}
           <Lobby isAdmin={isOwner} players={players} />
 
           <NFTChoose />

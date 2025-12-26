@@ -25,13 +25,22 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
 
     return rows;
   };
-  const { gameState, isMyTurn, players, selectedCard } = useGame();
+  const { gameState, isMyTurn, players, selectedCard, refs } = useGame();
 
   const [board, setBoard] = useState(generateBoard(7, 5));
   const [cardError, setCardError] = useState<any>([]);
   const [lastPlayedCard, setLastPlayedCard] = useState<any>(null);
 
   const playCardBeep = new Audio("../../sounds/play-card.mp3");
+
+  // Sync refs for event handlers (replaces window.* pattern)
+  useEffect(() => {
+    refs.selectedCard.current = selectedCard;
+  }, [selectedCard, refs]);
+
+  useEffect(() => {
+    refs.gameState.current = gameState;
+  }, [gameState, refs]);
 
   const getColor = useCallback(
     (userId) => () => {
@@ -56,18 +65,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     },
     []
   );
-
-  useEffect(() => {
-    // eslint-disable-next-line
-    // @ts-ignore
-    window.selectedCard = selectedCard;
-  }, [selectedCard]);
-
-  useEffect(() => {
-    // eslint-disable-next-line
-    // @ts-ignore
-    window.state = gameState;
-  }, [gameState]);
 
   const addCard = useCallback(
     (rowIndex, columnIndex, card = selectedCard, state = gameState) =>
@@ -217,16 +214,13 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       return;
     }
 
+    const allowedPlacements = gameState.allowedUserCardsPlacement?.additionalProperties || [];
     console.log(
-      Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties)
-        .length === 0,
+      Object.keys(allowedPlacements).length === 0,
       "length"
     );
 
-    if (
-      Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties)
-        .length === 0
-    ) {
+    if (Object.keys(allowedPlacements).length === 0) {
       setTimeout(() => {
         WSProvider.send(
           JSON.stringify({
@@ -242,17 +236,18 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     Object.keys(tableCards).forEach((key) => {
       const cards = gameState.gameTableCards?.additionalProperties;
       const indexes = key.split("-");
+      const cardsAtPosition = cards?.[key];
 
-      cards[key].forEach((card: any) => {
-        const cardF = getCard(card.suit, card.value, card);
-        addCardToBoard(Number(indexes[1]), Number(indexes[0]), cardF);
-      });
+      if (cardsAtPosition) {
+        cardsAtPosition.forEach((card: any) => {
+          const cardF = getCard(card.suit, card.value, card);
+          addCardToBoard(Number(indexes[1]), Number(indexes[0]), cardF);
+        });
+      }
     });
 
     if (gameState.lastPlayedCard) {
-      // eslint-disable-next-line
-      // @ts-ignore: Unreachable code error
-      window.gameStarted = true;
+      refs.gameStarted.current = true;
     }
 
     setLastPlayedCard(
@@ -403,12 +398,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         addCard(
           Number(target[0]),
           Number(target[1]),
-          // eslint-disable-next-line
-          // @ts-ignore
-          window.selectedCard,
-          // eslint-disable-next-line
-          // @ts-ignore
-          window.state
+          refs.selectedCard.current,
+          refs.gameState.current
         )();
         event.stopImmediatePropagation();
       },

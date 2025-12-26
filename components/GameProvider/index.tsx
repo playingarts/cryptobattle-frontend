@@ -5,6 +5,10 @@ import {
   ReactNode,
   useState,
   useEffect,
+  useRef,
+  Dispatch,
+  SetStateAction,
+  MutableRefObject,
 } from "react";
 import { useNotifications } from "../NotificationProvider";
 import Text from "../Text/";
@@ -16,31 +20,53 @@ import { useWS } from "../../components/WsProvider/index";
 import { useAuth } from "../../components/AuthProvider";
 import { api } from "../../api";
 import Warning from "../../components/Icons/Warning";
+import { logError } from "../../utils/errorHandler";
+import {
+  GameUpdatedData,
+  RoomUser,
+  GamePlayer,
+  RoomInfo,
+  GameResults,
+  User,
+  PlayerCard,
+  UserSocketIdleData,
+} from "../../types/game";
+import { connectionState } from "../../utils/connectionState";
 
 type GameProviderProps = { children: ReactNode };
 
-// eslint-disable
+// Refs for synchronous access in event handlers (replaces window.* pattern)
+export interface GameRefs {
+  gameStarted: MutableRefObject<boolean>;
+  hasResults: MutableRefObject<boolean>;
+  currentUserId: MutableRefObject<string>;
+  currentRoomId: MutableRefObject<string>;
+  isConnectionClosed: MutableRefObject<boolean>;
+  selectedCard: MutableRefObject<PlayerCard | null>;
+  gameState: MutableRefObject<GameUpdatedData | null>;
+}
 
-export type IGameProviderContext = {
-  gameState: any;
-  players: any;
-  playersGame: any;
+export interface IGameProviderContext {
+  gameState: GameUpdatedData | null;
+  players: RoomUser[];
+  playersGame: GamePlayer[];
   isBackendReady: boolean;
-  roomId: any;
-  userInfo: any;
-  roomInfo: any;
-  selectedCard: any;
-  setSelectedCard: any;
-  isMyTurn: any;
-  setRoomId: any;
-  setPlayers: any;
-  timer: any;
-  totalSeconds: any;
-  results: any;
-  userSocketIdle: any;
-  setUserSocketIdle: any;
+  roomId: string;
+  userInfo: User | null;
+  roomInfo: RoomInfo | null;
+  selectedCard: PlayerCard | null;
+  setSelectedCard: Dispatch<SetStateAction<PlayerCard | null>>;
+  isMyTurn: boolean;
+  setRoomId: Dispatch<SetStateAction<string>>;
+  setPlayers: Dispatch<SetStateAction<RoomUser[]>>;
+  timer: number;
+  totalSeconds: number;
+  results: GameResults | null;
+  userSocketIdle: UserSocketIdleData | null;
+  setUserSocketIdle: Dispatch<SetStateAction<UserSocketIdleData | null>>;
   isAlreadyConnected: boolean;
-};
+  refs: GameRefs;
+}
 
 const getUser = async (playerId: string) => {
   if (!playerId) {
@@ -54,19 +80,19 @@ const GameProviderContext = createContext<IGameProviderContext | null>(null);
 function GameProvider({ children }: GameProviderProps): JSX.Element {
   const { openNotification, closeNotification } = useNotifications();
 
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<GameResults | null>(null);
 
-  const [players, setPlayers] = useState<any>([]);
-  const [playersInfo, setPlayersInfo] = useState<any>([]);
-  const [playersGame, setPlayersGame] = useState<any>([]);
+  const [players, setPlayers] = useState<RoomUser[]>([]);
+  const [playersInfo, setPlayersInfo] = useState<User[]>([]);
+  const [playersGame, setPlayersGame] = useState<GamePlayer[]>([]);
 
-  const [playingAgain, setPlayingAgain] = useState<any>(false);
+  const [playingAgain, setPlayingAgain] = useState<boolean>(false);
 
-  const [timer, setTimer] = useState<any>([]);
-  const [totalSeconds, setTotalSeconds] = useState<any>([]);
+  const [timer, setTimer] = useState<number>(0);
+  const [totalSeconds, setTotalSeconds] = useState<number>(0);
   const [isAlreadyConnected, setIsAlreadyConnected] = useState<boolean>(false);
 
-  const [userInfo, setUserInfo] = useState<any>([]);
+  const [userInfo, setUserInfo] = useState<User | null>(null);
 
   const [isBackendReady, setIsBackendReady] = useState(false);
 
@@ -74,17 +100,40 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   const { user } = useAuth();
 
-  const [roomInfo, setRoomInfo] = useState<any>([]);
-  const [selectedCard, setSelectedCard] = useState<any>(null);
+  const [roomInfo, setRoomInfo] = useState<RoomInfo | null>(null);
+  const [selectedCard, setSelectedCard] = useState<PlayerCard | null>(null);
 
-  const [roomId, setRoomId] = useState<any>("");
+  const [roomId, setRoomId] = useState<string>("");
 
   const router = useRouter();
 
-  const startGameBeep = new Audio("../../sounds/start-game.mp3");
+  // Refs for synchronous access in event handlers (replaces window.* pattern)
+  const gameStartedRef = useRef<boolean>(false);
+  const hasResultsRef = useRef<boolean>(false);
+  const currentUserIdRef = useRef<string>("");
+  const currentRoomIdRef = useRef<string>("");
+  const isConnectionClosedRef = useRef<boolean>(false);
+  const selectedCardRef = useRef<PlayerCard | null>(null);
+  const gameStateRef = useRef<GameUpdatedData | null>(null);
+
+  const refs: GameRefs = {
+    gameStarted: gameStartedRef,
+    hasResults: hasResultsRef,
+    currentUserId: currentUserIdRef,
+    currentRoomId: currentRoomIdRef,
+    isConnectionClosed: isConnectionClosedRef,
+    selectedCard: selectedCardRef,
+    gameState: gameStateRef,
+  };
+
+  const startGameBeepRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    startGameBeepRef.current = new Audio("../../sounds/start-game.mp3");
+  }, []);
 
   const playStartGameSound = () => {
-    startGameBeep.play();
+    startGameBeepRef.current?.play();
   };
 
   const quit = () => {
@@ -92,16 +141,12 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
     setResults(null);
     closeNotification();
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    window.gameStarted = false;
+    gameStartedRef.current = false;
     router.push("/dashboard");
   };
 
   const reload = () => {
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    location.reload();
+    window.location.reload();
   }
 
   const newGame = () => {
@@ -109,9 +154,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     localStorage.setItem("chosen-nfts", "");
 
     closeNotification();
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    window.gameStarted = false;
+    gameStartedRef.current = false;
     router.push("/new");
   };
 
@@ -139,7 +182,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     if (!WSProvider) {
       return;
     }
-    setInterval(() => {
+    const pingInterval = setInterval(() => {
       WSProvider.send(
         JSON.stringify({
           event: "ping",
@@ -147,12 +190,12 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         })
       );
     }, 20000);
+
+    return () => clearInterval(pingInterval);
   }, [WSProvider]);
 
   useEffect(() => {
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    if (isAlreadyConnected || !user || window.gameStarted) {
+    if (isAlreadyConnected || !user || gameStartedRef.current) {
       return;
     }
 
@@ -163,24 +206,18 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     if (user.inRoomId && !router.pathname.startsWith("/join")) {
       router.push(`/game/${user.inRoomId}`);
     }
-    console.log(selectedCard);
   }, [user, isAlreadyConnected]);
 
   useEffect(() => {
     return () => {
       setPlayingAgain(false);
-
-      // eslint-disable-next-line
-      // @ts-ignore: Unreachable code error
       localStorage.removeItem("play-again");
     };
   }, []);
 
   const playAgain = () => {
     setPlayingAgain(true);
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    localStorage.setItem("play-again", true);
+    localStorage.setItem("play-again", "true");
     WSProvider.send(
       JSON.stringify({
         event: "next-game",
@@ -191,9 +228,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     );
   };
 
-  const [gameState, setGameState] = useState<any>(null);
-  const [isMyTurn, setIsMyTurn] = useState<any>(null);
-  const [userSocketIdle, setUserSocketIdle] = useState<any>(null);
+  const [gameState, setGameState] = useState<GameUpdatedData | null>(null);
+  const [isMyTurn, setIsMyTurn] = useState<boolean>(false);
+  const [userSocketIdle, setUserSocketIdle] = useState<UserSocketIdleData | null>(null);
 
   useEffect(() => {
     if (!players) {
@@ -222,8 +259,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
             console.log();
             setPlayersInfo([...playersInfo, data]);
           })
-          .catch((err) => {
-            console.log(err);
+          .catch((err: unknown) => {
+            logError("GameProvider.getUser", err);
           });
       }
     });
@@ -239,9 +276,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   }, [gameState]);
 
   useEffect(() => {
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    window.roomId = roomId;
+    currentRoomIdRef.current = roomId;
   }, [roomId]);
 
   useEffect(() => {
@@ -284,9 +319,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           iconColor: "#FF6F41",
         });
 
-        // eslint-disable-next-line
-        // @ts-ignore
-        window.isConnectionClosed = true;
+        connectionState.isConnectionClosed = true;
         WSProvider.close()
       }
 
@@ -332,13 +365,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       if (event.event === "user-info") {
         setUserInfo(event.data);
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-        window.userId = event.data.userId;
+        currentUserIdRef.current = event.data.userId;
         setIsBackendReady(true);
-        // if (event.data.inRoomId) {
-        //   setRoomId(event.data.inRoomId);
-        // }
       }
 
       if (event.event === "create-room") {
@@ -367,28 +395,22 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         console.log("next-game", event);
       }
 
-      // eslint-disable-next-line
-      // @ts-ignore: Unreachable code error
-      if (event.event === "room-updated" && window.results) {
+      if (event.event === "room-updated" && hasResultsRef.current) {
         setResults(null);
         closeNotification();
         setRoomInfo(event.data);
         setPlayers(event.data.roomUsers);
-        setPlayingAgain(null);
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-        window.results = null;
+        setPlayingAgain(false);
+        hasResultsRef.current = false;
 
         router.push(`/game/${event.data.roomId}`);
         return;
       }
 
       if (event.event === "close-room") {
-
-        event.data.ownderId &&
-      // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-          event.data.ownderId !== window.userId && !window.results &&
+        if (event.data.ownerId &&
+            event.data.ownerId !== currentUserIdRef.current &&
+            !hasResultsRef.current) {
           openNotification({
             title: "Ooopps",
             description: <span>This game has been closed by host</span>,
@@ -401,6 +423,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
               </div>
             ),
           });
+        }
       }
 
       if (event.event === "room-updated" || event.event === "room-info") {
@@ -525,24 +548,15 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       if (event.event === "game-results") {
         console.log("game-results", event.data);
         setResults(event.data);
-
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-        window.results = true;
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
+        hasResultsRef.current = true;
       }
 
       if (event.event === "game-info") {
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-        if (event.data.state === "ended" && window.results) {
+        if (event.data.state === "ended" && hasResultsRef.current) {
           return;
         }
         setGameState({ ...gameState, ...event.data });
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-        if (event.data.state === "ended" && !window.results) {
+        if (event.data.state === "ended" && !hasResultsRef.current) {
           WSProvider.send(
             JSON.stringify({
               event: "game-results",
@@ -562,30 +576,21 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           });
         }
 
-        console.log(event.data.state);
-
         console.log('game-info": ', event.data);
       }
 
       if (event.event === "game-updated") {
         setGameState({ ...event.data });
+        gameStateRef.current = event.data;
 
         setTimeout(() => {
           if (event.data.state === "started") {
             closeNotification();
-            // eslint-disable-next-line
-            // @ts-ignore: Unreachable code error
-            if (!window.gameStarted && !window.results) {
+            if (!gameStartedRef.current && !hasResultsRef.current) {
               playStartGameSound();
-              // eslint-disable-next-line
-              // @ts-ignore: Unreachable code error
-              window.gameStarted = true;
+              gameStartedRef.current = true;
             }
-            // eslint-disable-next-line
-            // @ts-ignore: Unreachable code error
-            if (
-              !window.location.pathname.split("?")[0].endsWith("/dashboard")
-            ) {
+            if (!router.pathname.endsWith("/dashboard")) {
               router.push("/play");
             }
           }
@@ -617,7 +622,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       const winners = results.winnerPlayersUserIds.map((winnerId: any) =>
         formatUsername(
-          playersGame.find((player: any) => player.userId === winnerId).username
+          playersGame.find((player: any) => player.userId === winnerId)?.username || ""
         )
       );
 
@@ -734,13 +739,11 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
               })}
               Icon={Refresh}
               onClick={playAgain}
-              disabled={playingAgain || localStorage.getItem("play-again")}
+              disabled={playingAgain || !!localStorage.getItem("play-again")}
             >
-              {/* // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error */}
               {playingAgain || localStorage.getItem("play-again")
                 ? "Waiting"
-                : "Play again " + "(" + timer / 1000 + ")"}
+                : `Play again (${timer / 1000})`}
             </Button>
           )}
           <Button
@@ -756,6 +759,11 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       ),
     });
   }, [results, openNotification, timer, router]);
+
+  // Sync selectedCard state with ref for event handlers
+  useEffect(() => {
+    selectedCardRef.current = selectedCard;
+  }, [selectedCard]);
 
   const memoedValue = useMemo(
     () => ({
@@ -777,6 +785,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       results,
       isBackendReady,
       isAlreadyConnected,
+      refs,
     }),
     [
       gameState,
@@ -796,6 +805,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       results,
       isBackendReady,
       isAlreadyConnected,
+      refs,
     ]
   );
 

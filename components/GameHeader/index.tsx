@@ -57,10 +57,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
     // };
 
     const playersWithPoints = [...playersGame].map((player: any) => {
-      player.points = gameState?.playersCurrentPoints[player.userId]
-        ? gameState.playersCurrentPoints[player.userId]
-        : 0;
-
+      player.points = gameState?.playersCurrentPoints?.[player.userId] ?? 0;
       return { ...player };
     });
 
@@ -81,10 +78,11 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
     }
 
     // Show opponents cards if 2 players
-    if (gameState.allGamePlayers.length === 2) {
-      const cardsOpponents = gameState.gameUsersWithCards.filter(
+    if (gameState.allGamePlayers.length === 2 && gameState.gameUsersWithCards) {
+      const opponentData = gameState.gameUsersWithCards.filter(
         (userCards: any) => userCards.userId !== user.userId
-      )[0].cards;
+      )[0];
+      const cardsOpponents = opponentData?.cards || [];
 
       const cardsOpponentsFormatted = cardsOpponents.map((card: any) => {
         if (!card.suit) {
