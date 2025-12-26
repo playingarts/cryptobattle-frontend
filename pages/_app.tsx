@@ -1,15 +1,11 @@
 import { Fragment, useEffect } from "react";
-import { ThemeProvider, Theme } from "@emotion/react";
+import { Theme } from "@emotion/react";
 import Head from "next/head";
 import { AppProps } from "next/app";
 import "modern-normalize/modern-normalize.css";
 import { CSSInterpolation } from "@emotion/serialize";
 import smoothscroll from "smoothscroll-polyfill";
-import { MetaMaskProvider } from "metamask-react";
-import { AuthProvider } from "../components/AuthProvider/";
-import { GameProvider } from "../components/GameProvider/";
-import { NotificationProvider } from "../components/NotificationProvider/";
-import { WSProvider } from "../components/WsProvider/index";
+import { AppProviders } from "../components/AppProviders";
 import { connectionState } from "../utils/connectionState";
 import "../css/style.css";
 declare module "@emotion/react" {
@@ -221,19 +217,9 @@ const App = ({ Component, pageProps }: AppProps) => {
         />
         <title>Card Battle - Playing Arts</title>
       </Head>
-      <ThemeProvider theme={theme}>
-        <MetaMaskProvider>
-          <NotificationProvider>
-            <AuthProvider>
-              <WSProvider>
-                <GameProvider>
-                  <Component {...pageProps} />
-                </GameProvider>
-              </WSProvider>
-            </AuthProvider>
-          </NotificationProvider>
-        </MetaMaskProvider>
-      </ThemeProvider>
+      <AppProviders theme={theme}>
+        <Component {...pageProps} />
+      </AppProviders>
     </Fragment>
   );
 };
