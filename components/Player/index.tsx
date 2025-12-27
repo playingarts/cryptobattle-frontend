@@ -1,6 +1,5 @@
 import {
   HTMLAttributes,
-  FC,
   useEffect,
   useState,
   useCallback,
@@ -10,20 +9,19 @@ import { api } from "../../api";
 import { useWS } from "../../components/WsProvider/index";
 import { formatUsername } from "../../utils/helpers";
 import { logError } from "../../utils/errorHandler";
-export type Props = HTMLAttributes<HTMLDivElement>;
 import { useAuth } from "../AuthProvider";
-
 import Text from "../Text";
 import UserAvatar from "../../components/UserAvatar";
-interface Player extends Props {
+
+export type Props = HTMLAttributes<HTMLDivElement>;
+
+interface PlayerProps extends Props {
   player: { userId: string; state: string };
   color: string;
   isAdmin: boolean;
 }
-// eslint-disable-next-line
-// @ts-ignore
-// eslint-disable-next-line
-const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
+
+const Player = forwardRef<HTMLDivElement, PlayerProps>(({ color, player, isAdmin }, ref) => {
   const [playerInfo, setPlayerInfo] = useState({
     name: "",
     profilePictureUrl: "",
@@ -71,8 +69,6 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
 
   return (
     <div
-      // eslint-disable-next-line
-      // @ts-ignore
       ref={ref}
       style={{
         display: "flex",
@@ -229,5 +225,7 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
     </div>
   );
 });
+
+Player.displayName = 'Player';
 
 export default Player;

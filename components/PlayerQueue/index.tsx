@@ -103,8 +103,6 @@ const PlayerQueue: FC<PlayerQueue> = ({
             {players.map((player: any) => {
               return (
                 <Player
-                  // eslint-disable-next-line
-                  // @ts-ignore
                   currentPlayerWithPoints={currentPlayerWithPoints}
                   player={player}
                   inactive={

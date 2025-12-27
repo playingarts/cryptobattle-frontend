@@ -209,7 +209,6 @@ const JoinGame: NextPage = () => {
     const leave = () => {
       const leave = () => {
         setPlayers(null);
-        // eslint-disable-next-line
         localStorage.setItem("chosen-nft", JSON.stringify(null));
         WSProvider.send(
           JSON.stringify({
@@ -433,8 +432,6 @@ const JoinGame: NextPage = () => {
 
           {!isOwner && <Ready readyButton={readyButton} />}
 
-          {/* // eslint-disable-next-line 
-          // @ts-ignore: Unreachable code error */}
           <Lobby isAdmin={isOwner} players={players} />
 
           <NFTChoose />

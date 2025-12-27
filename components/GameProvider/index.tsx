@@ -32,8 +32,6 @@ import {
 
 type GameProviderProps = { children: ReactNode };
 
-// eslint-disable
-
 export type IGameProviderContext = {
   gameState: any;
   players: any;
@@ -110,10 +108,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   };
 
   const reload = () => {
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    location.reload();
-  }
+    window.location.reload();
+  };
 
   const newGame = () => {
     setResults(null);
@@ -180,18 +176,13 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   useEffect(() => {
     return () => {
       setPlayingAgain(false);
-
-      // eslint-disable-next-line
-      // @ts-ignore: Unreachable code error
       localStorage.removeItem("play-again");
     };
   }, []);
 
   const playAgain = () => {
     setPlayingAgain(true);
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    localStorage.setItem("play-again", true);
+    localStorage.setItem("play-again", "true");
     WSProvider.send(
       JSON.stringify({
         event: "next-game",
@@ -486,10 +477,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
               })}
               Icon={Refresh}
               onClick={playAgain}
-              disabled={playingAgain || localStorage.getItem("play-again")}
+              disabled={!!(playingAgain || localStorage.getItem("play-again"))}
             >
-              {/* // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error */}
               {playingAgain || localStorage.getItem("play-again")
                 ? "Waiting"
                 : "Play again " + "(" + timer / 1000 + ")"}

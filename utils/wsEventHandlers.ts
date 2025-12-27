@@ -8,6 +8,10 @@
 import { NextRouter } from 'next/router';
 import { ReactNode } from 'react';
 import {
+  CloseEvent as RWSCloseEvent,
+  ErrorEvent as RWSErrorEvent,
+} from 'reconnecting-websocket/dist/events';
+import {
   isGameStarted,
   setGameStarted,
   hasResults,
@@ -606,8 +610,8 @@ export function createWSMessageHandler(deps: HandlerDependencies): (event: Messa
 /**
  * Create the WebSocket close handler
  */
-export function createWSCloseHandler(deps: HandlerDependencies): (event: CloseEvent) => void {
-  return function handleClose(e: CloseEvent) {
+export function createWSCloseHandler(deps: HandlerDependencies): (event: RWSCloseEvent) => void {
+  return function handleClose(e: RWSCloseEvent) {
     console.log('on close: ' + e.code);
     handleWSClose(
       e.code,
@@ -623,8 +627,8 @@ export function createWSCloseHandler(deps: HandlerDependencies): (event: CloseEv
 /**
  * Create the WebSocket error handler
  */
-export function createWSErrorHandler(): (event: Event) => void {
-  return function handleError(event: Event) {
+export function createWSErrorHandler(): (event: RWSErrorEvent) => void {
+  return function handleError(event: RWSErrorEvent) {
     console.log('WebSocket error: ', event);
   };
 }

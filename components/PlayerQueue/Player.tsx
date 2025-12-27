@@ -5,13 +5,24 @@ import "react-circular-progressbar/dist/styles.css";
 
 import { formatUsername } from "../../utils/helpers";
 import { useGame } from "../GameProvider";
-// eslint-disable-next-line
-// @ts-ignore
-// eslint-disable-next-line
-const Player = forwardRef(
-  // eslint-disable-next-line
-// @ts-ignore
-// eslint-disable-next-line
+
+interface PlayerType {
+  userId: string;
+  color: string;
+  points: number;
+  username: string;
+  profilePictureUrl?: string;
+  profileImageUrl?: string;
+}
+
+interface PlayerProps {
+  player: PlayerType;
+  loadingDelayed?: boolean;
+  currentPlayerWithPoints?: PlayerType | null;
+  inactive?: boolean;
+}
+
+const Player = forwardRef<HTMLDivElement, PlayerProps>(
   ({ player, loadingDelayed, currentPlayerWithPoints, inactive }, ref) => {
     const [progress, setProgress] = useState(100)
     // const [first, setFirst] = useState(false)
@@ -42,8 +53,6 @@ const Player = forwardRef(
     }, [results])
 
     return (
-          // eslint-disable-next-line
-    // @ts-ignore
       <div css={{marginRight: 10}} ref={ref}>
         <CircularProgressbarWithChildren
           styles={{
@@ -168,9 +177,7 @@ const Player = forwardRef(
                 transform: 'scale(0.84,0.84)'
               }}
               profilePictureUrl={
-                player.profilePictureUrl
-                  ? player.profilePictureUrl
-                  : player.profileImageUrl
+                player.profilePictureUrl || player.profileImageUrl || ''
               }
             />
           </div>
@@ -179,5 +186,7 @@ const Player = forwardRef(
     );
   }
 );
+
+Player.displayName = 'Player';
 
 export default Player;

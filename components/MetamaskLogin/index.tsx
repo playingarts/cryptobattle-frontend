@@ -1,18 +1,19 @@
 import { useMetaMask } from "metamask-react";
 import { useEffect, useState } from "react";
-import Button from "../Button";
+import Button, { Props as ButtonProps } from "../Button";
 import store from "store";
-import { HTMLAttributes, FC } from "react";
+import { FC } from "react";
 import { useAuth } from "../AuthProvider";
 import { logError } from "../../utils/errorHandler";
 import Metamask from "../Icons/Metamask";
 import axios from "axios";
 import { useRouter } from "next/router";
-export type Props = HTMLAttributes<HTMLDivElement>;
-interface MetamaskLogin extends Props {
-  roomId?:  any,
+
+interface MetamaskLoginProps extends Omit<ButtonProps, 'Icon' | 'loading' | 'onClick'> {
+  roomId?: string | string[];
 }
-const MetamaskLogin: FC<MetamaskLogin> = ({ roomId,...props }) => {
+
+const MetamaskLogin: FC<MetamaskLoginProps> = ({ roomId, ...props }) => {
   const { ethereum, account, connect } = useMetaMask();
   const [{ account: signedAccount, expiry, signature, signing }, setSignature] =
     useState(
@@ -72,9 +73,9 @@ const router = useRouter();
           .then((result: any) => {
             setToken(result.data.accesstoken);
             setTimeout(() => {
-           roomId ?   router.push(`/game/${roomId}?join=true`)
-            : router.push("/dashboard");
-   
+              const roomIdValue = Array.isArray(roomId) ? roomId[0] : roomId;
+              roomIdValue ? router.push(`/game/${roomIdValue}?join=true`)
+                : router.push("/dashboard");
             }, 1000);
             console.log(result.data.accesstoken);
           })
@@ -117,8 +118,6 @@ const router = useRouter();
 
   if (!ethereum) {
     return (
-      // eslint-disable-next-line
-      // @ts-ignore-start
       <Button
         {...props}
         Icon={Metamask}
@@ -131,15 +130,11 @@ const router = useRouter();
       >
         Install Metamask
       </Button>
-      // eslint-disable-next-line
-      // @ts-ignore-end
     );
   }
 
   if (user && user.isMetamaskConnected) {
     return (
-      // eslint-disable-next-line
-      // @ts-ignore-start
       <Button
         {...props}
         Icon={Metamask}
@@ -152,22 +147,17 @@ const router = useRouter();
       >
         Change address
       </Button>
-      // eslint-disable-next-line
-      // @ts-ignore-end
     );
   }
 
   if (account !== signedAccount) {
     return (
-      // eslint-disable-next-line
-      // @ts-ignore-start
       <Button
         {...props}
         css={() => ({
           background: "rgb(248, 157, 53)",
           color: "#fff",
         })}
-        // component={''}
         color="black"
         Icon={Metamask}
         loading={signing}
@@ -175,8 +165,6 @@ const router = useRouter();
       >
         {signing ? "signing" : loggedIn ? "connect metamask" : "metamask"}
       </Button>
-      // eslint-disable-next-line
-      // @ts-ignore-end
     );
   }
 
