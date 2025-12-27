@@ -72,6 +72,70 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     setGlobalState(gameState);
   }, [gameState]);
 
+  const addCardToBoard = useCallback(
+    (rowIndex: number, columnIndex: number, card: any = selectedCard) => {
+      const row = Number(rowIndex);
+      const column = Number(columnIndex);
+
+      setBoard((prevBoard: any) => {
+        const localBoard = [...prevBoard];
+
+        const placeToPutCard = localBoard[row][column];
+
+        if (
+          placeToPutCard &&
+          placeToPutCard !== "empty" &&
+          Array.isArray(placeToPutCard)
+        ) {
+          if (
+            !placeToPutCard.find(
+              (existingCard) =>
+                existingCard.value === card.value &&
+                existingCard.suit === card.suit
+            )
+          ) {
+            localBoard[row][column] = [...localBoard[row][column], card];
+          }
+        } else {
+          localBoard[row][column] = [card];
+        }
+
+        if (
+          localBoard[row][column + 1] !== undefined &&
+          localBoard[row][column + 1] === null
+        ) {
+          localBoard[row][column + 1] = "empty";
+        }
+
+        if (
+          localBoard[row][column - 1] !== undefined &&
+          localBoard[row][column - 1] === null
+        ) {
+          localBoard[row][column - 1] = "empty";
+        }
+
+        if (
+          localBoard[row - 1] !== undefined &&
+          localBoard[row - 1][column] === null
+        ) {
+          localBoard[row - 1][column] = "empty";
+        }
+
+        if (
+          localBoard[row + 1] !== undefined &&
+          localBoard[row + 1][column] === null
+        ) {
+          localBoard[row + 1][column] = "empty";
+        }
+
+        return [...localBoard];
+      });
+
+      removeCard ? removeCard(card) : null;
+    },
+    [selectedCard, removeCard]
+  );
+
   const addCard = useCallback(
     (rowIndex, columnIndex, card = selectedCard, state = gameState) =>
       () => {
@@ -130,6 +194,19 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         }
 
         console.log("Playing card: ", card);
+
+        // Optimistic UI - immediately add card to board and show animation
+        addCardToBoard(rowIndex, columnIndex, card);
+        setLastPlayedCard({
+          ...card,
+          scoringLevel: 0, // Will be updated when server responds
+        });
+
+        // Clear animation after delay
+        setTimeout(() => {
+          setLastPlayedCard(null);
+        }, 2000);
+
         WSProvider.send(
           JSON.stringify({
             event: "play-card",
@@ -144,70 +221,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
           })
         );
       },
-    [WSProvider, selectedCard, setCardError]
+    [WSProvider, selectedCard, setCardError, addCardToBoard]
   );
-
-  const addCardToBoard = (
-    rowIndex: number,
-    columnIndex: number,
-    card: any = selectedCard
-  ) => {
-    const row = Number(rowIndex);
-    const column = Number(columnIndex);
-
-    const localBoard = [...board];
-
-    const placeToPutCard = localBoard[row][column];
-
-    if (
-      placeToPutCard &&
-      placeToPutCard !== "empty" &&
-      Array.isArray(placeToPutCard)
-    ) {
-      if (
-        !placeToPutCard.find(
-          (existingCard) =>
-            existingCard.value === card.value && existingCard.suit === card.suit
-        )
-      ) {
-        localBoard[row][column].push(card);
-      }
-    } else {
-      localBoard[row][column] = [card];
-    }
-
-    if (
-      localBoard[row][column + 1] !== undefined &&
-      localBoard[row][column + 1] === null
-    ) {
-      localBoard[row][column + 1] = "empty";
-    }
-
-    if (
-      localBoard[row][column - 1] !== undefined &&
-      localBoard[row][column - 1] === null
-    ) {
-      localBoard[row][column - 1] = "empty";
-    }
-
-    if (
-      localBoard[row - 1] !== undefined &&
-      localBoard[row - 1][column] === null
-    ) {
-      localBoard[row - 1][column] = "empty";
-    }
-
-    if (
-      localBoard[row + 1] !== undefined &&
-      localBoard[row + 1][column] === null
-    ) {
-      localBoard[row + 1][column] = "empty";
-    }
-
-    setBoard([...localBoard]);
-
-    removeCard ? removeCard(card) : null;
-  };
 
   useEffect(() => {
     console.log("gameState:", gameState);
