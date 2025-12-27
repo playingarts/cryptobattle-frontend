@@ -166,11 +166,16 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       return;
     }
 
-    if (user.inGameId) {
+    // Skip redirect if already on game-related pages or dashboard
+    const currentPath = router.pathname;
+    const skipRedirectPaths = ['/new', '/game/', '/play', '/dashboard'];
+    const shouldSkipRedirect = skipRedirectPaths.some(path => currentPath.startsWith(path));
+
+    if (user.inGameId && !shouldSkipRedirect) {
       router.push(`/play`);
       return;
     }
-    if (user.inRoomId && !router.pathname.startsWith("/join")) {
+    if (user.inRoomId && !currentPath.startsWith("/join") && !shouldSkipRedirect) {
       router.push(`/game/${user.inRoomId}`);
     }
     console.log(selectedCard);
