@@ -216,11 +216,6 @@ const JoinGame: NextPage = () => {
             data: {},
           })
         );
-        // Close WebSocket after sending the event to prevent auto-reconnection
-        // Small delay to ensure the server receives the message first
-        setTimeout(() => {
-          WSProvider.close();
-        }, 100);
       };
 
       if (isOwner) {
@@ -234,8 +229,9 @@ const JoinGame: NextPage = () => {
       closeNotification();
       leave();
       setIsConfirmedLeave(true);
+      // Use window.location for full page reload to reset WebSocket and user state
       setTimeout(() => {
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       }, 200);
     };
 

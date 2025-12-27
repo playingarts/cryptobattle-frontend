@@ -94,9 +94,8 @@ describe('wsEventHandlers', () => {
   describe('handleCloseRoomTimeout', () => {
     it('should call quit and return true for TIMEOUT', () => {
       const uiActions = { quit: jest.fn() };
-      const wsProvider = { send: jest.fn(), close: jest.fn() };
 
-      const result = handleCloseRoomTimeout({ reason: 'TIMEOUT' }, uiActions, wsProvider);
+      const result = handleCloseRoomTimeout({ reason: 'TIMEOUT' }, uiActions);
 
       expect(uiActions.quit).toHaveBeenCalled();
       expect(result).toBe(true);
@@ -104,9 +103,8 @@ describe('wsEventHandlers', () => {
 
     it('should call quit and return true for NEXT_GAME_VOTE_FAILED', () => {
       const uiActions = { quit: jest.fn() };
-      const wsProvider = { send: jest.fn(), close: jest.fn() };
 
-      const result = handleCloseRoomTimeout({ reason: 'NEXT_GAME_VOTE_FAILED' }, uiActions, wsProvider);
+      const result = handleCloseRoomTimeout({ reason: 'NEXT_GAME_VOTE_FAILED' }, uiActions);
 
       expect(uiActions.quit).toHaveBeenCalled();
       expect(result).toBe(true);
@@ -114,9 +112,8 @@ describe('wsEventHandlers', () => {
 
     it('should return false for other reasons', () => {
       const uiActions = { quit: jest.fn() };
-      const wsProvider = { send: jest.fn(), close: jest.fn() };
 
-      const result = handleCloseRoomTimeout({ reason: 'OTHER' }, uiActions, wsProvider);
+      const result = handleCloseRoomTimeout({ reason: 'OTHER' }, uiActions);
 
       expect(uiActions.quit).not.toHaveBeenCalled();
       expect(result).toBe(false);
@@ -132,14 +129,12 @@ describe('wsEventHandlers', () => {
         openNotification: jest.fn(),
         closeNotification: jest.fn(),
       };
-      const wsProvider = { send: jest.fn(), close: jest.fn() };
       const renderWarningIcon = jest.fn().mockReturnValue('warning-icon');
       const renderQuitButton = jest.fn().mockReturnValue('quit-button');
 
       handleCloseRoomByOwner(
         { ownderId: 'user123' },
         notifications,
-        wsProvider,
         renderWarningIcon,
         renderQuitButton
       );
@@ -160,12 +155,10 @@ describe('wsEventHandlers', () => {
         openNotification: jest.fn(),
         closeNotification: jest.fn(),
       };
-      const wsProvider = { send: jest.fn(), close: jest.fn() };
 
       handleCloseRoomByOwner(
         { ownderId: 'user123' },
         notifications,
-        wsProvider,
         jest.fn(),
         jest.fn()
       );
@@ -181,12 +174,10 @@ describe('wsEventHandlers', () => {
         openNotification: jest.fn(),
         closeNotification: jest.fn(),
       };
-      const wsProvider = { send: jest.fn(), close: jest.fn() };
 
       handleCloseRoomByOwner(
         { ownderId: 'user123' },
         notifications,
-        wsProvider,
         jest.fn(),
         jest.fn()
       );
