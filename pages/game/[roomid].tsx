@@ -207,7 +207,7 @@ const JoinGame: NextPage = () => {
     }
 
     const leave = () => {
-      const leave = () => {
+      const sendLeaveEvent = () => {
         setPlayers(null);
         localStorage.setItem("chosen-nft", JSON.stringify(null));
         WSProvider.send(
@@ -216,12 +216,17 @@ const JoinGame: NextPage = () => {
             data: {},
           })
         );
+        // Close WebSocket after sending the event to prevent auto-reconnection
+        // Small delay to ensure the server receives the message first
+        setTimeout(() => {
+          WSProvider.close();
+        }, 100);
       };
 
       if (isOwner) {
-        leave();
+        sendLeaveEvent();
       } else {
-        leave();
+        sendLeaveEvent();
       }
     };
 

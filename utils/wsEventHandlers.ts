@@ -186,10 +186,15 @@ export function handleCreateRoom(
  */
 export function handleCloseRoomTimeout(
   data: CloseRoomEventData,
-  uiActions: Pick<UIActions, 'quit'>
+  uiActions: Pick<UIActions, 'quit'>,
+  wsProvider: WSProviderType
 ): boolean {
   if (data.reason === 'TIMEOUT' || data.reason === 'NEXT_GAME_VOTE_FAILED') {
     uiActions.quit();
+    // Close WebSocket to prevent auto-reconnection
+    setTimeout(() => {
+      wsProvider.close();
+    }, 100);
     return true;
   }
   return false;
@@ -201,6 +206,7 @@ export function handleCloseRoomTimeout(
 export function handleCloseRoomByOwner(
   data: CloseRoomEventData,
   notifications: NotificationActions,
+  wsProvider: WSProviderType,
   renderWarningIcon: () => ReactNode,
   renderQuitButton: () => ReactNode
 ): void {
@@ -213,6 +219,10 @@ export function handleCloseRoomByOwner(
       iconColor: '#FF6F41',
       footer: renderQuitButton(),
     });
+    // Close WebSocket to prevent auto-reconnection
+    setTimeout(() => {
+      wsProvider.close();
+    }, 100);
   }
 }
 
@@ -502,7 +512,7 @@ export function createWSMessageHandler(deps: HandlerDependencies): (event: Messa
 
     // Close room event (timeout)
     if (event.event === 'close-room') {
-      if (handleCloseRoomTimeout(event.data as CloseRoomEventData, deps.uiActions)) {
+      if (handleCloseRoomTimeout(event.data as CloseRoomEventData, deps.uiActions, deps.wsProvider)) {
         return;
       }
     }
@@ -529,6 +539,7 @@ export function createWSMessageHandler(deps: HandlerDependencies): (event: Messa
       handleCloseRoomByOwner(
         event.data as CloseRoomEventData,
         deps.notifications,
+        deps.wsProvider,
         deps.renderWarningIcon,
         deps.renderQuitButton
       );
