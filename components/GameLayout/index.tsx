@@ -4,12 +4,13 @@ import ScrollContainer from "react-indiana-drag-scroll";
 import GameRules from "../../components/GameRules/";
 import { useRouter } from "next/router";
 import { useNotifications } from "../../components/NotificationProvider";
+import { useWS } from "../../components/WsProvider";
+import { useGame } from "../../components/GameProvider";
+import { useAuth } from "../../components/AuthProvider";
 import Text from "../../components/Text";
 import Warning from "../../components/Icons/Warning";
 import Button from "../../components/Button";
-import { hasResults } from "../../utils/gameState";
-
-// import { useGame } from "../../components/GameProvider";
+import { hasResults, setGameStarted } from "../../utils/gameState";
 
 const GameLayout: FC<
   Pick<
@@ -20,8 +21,33 @@ const GameLayout: FC<
   const container = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { openNotification, closeNotification } = useNotifications();
+  const WSProvider = useWS(false);
+  const { roomInfo, setPlayers } = useGame();
+  const { user } = useAuth();
 
   const [isConfirmedLeave, setIsConfirmedLeave] = useState(false);
+
+  // Determine if current user is the room owner
+  const isOwner = roomInfo?.ownderId === user?.userId;
+
+  // Ref to store beforeunload handler so we can remove it when intentionally leaving
+  const beforeUnloadHandlerRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null);
+
+  // Setup beforeunload handler to warn users about leaving
+  useEffect(() => {
+    const handleTabClose = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      return;
+    };
+
+    beforeUnloadHandlerRef.current = handleTabClose;
+    window.addEventListener("beforeunload", handleTabClose);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleTabClose);
+      beforeUnloadHandlerRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     const handleRouteChange = (url: string) => {
@@ -30,11 +56,37 @@ const GameLayout: FC<
         closeNotification();
       };
       const leave = () => {
+        // Clear local state first
+        setPlayers(null);
+        localStorage.setItem("chosen-nft", JSON.stringify(null));
+        setGameStarted(false);
+
+        // Send appropriate event based on ownership
+        // Owner sends close-room (ends game for all), non-owner sends quit-room
+        if (WSProvider) {
+          const eventName = isOwner ? "close-room" : "quit-room";
+          console.log(`Sending ${eventName} event, isOwner: ${isOwner}`);
+          WSProvider.send(
+            JSON.stringify({
+              event: eventName,
+              data: {},
+            })
+          );
+        }
+
         setIsConfirmedLeave(true);
-        setTimeout(() => {
-          router.push("/dashboard");
-        }, 0);
         closeNotification();
+
+        // Remove beforeunload handler to prevent browser "Leave site?" dialog
+        if (beforeUnloadHandlerRef.current) {
+          window.removeEventListener("beforeunload", beforeUnloadHandlerRef.current);
+        }
+
+        // Use window.location for full page reload to reset WebSocket and user state
+        // Increased timeout to ensure WebSocket message is sent before page unloads
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 500);
       };
 
       console.log("handleRouteChange", url);
@@ -109,7 +161,7 @@ const GameLayout: FC<
     return () => {
       router.events.off("routeChangeStart", handleRouteChange);
     };
-  }, [isConfirmedLeave]);
+  }, [isConfirmedLeave, WSProvider, isOwner, setPlayers]);
 
   useEffect(() => {
     if (container.current) {
