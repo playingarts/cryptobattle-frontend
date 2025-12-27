@@ -81,7 +81,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   const [isBackendReady, setIsBackendReady] = useState(false);
 
-  const WSProvider = useWS();
+  // Use useWS(false) to not throw when there's no connection
+  const WSProvider = useWS(false);
 
   const { user } = useAuth();
 
@@ -121,14 +122,16 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   };
 
   const playAgainQuit = () => {
-    WSProvider.send(
-      JSON.stringify({
-        event: "next-game",
-        data: {
-          wantNextGame: false,
-        },
-      })
-    );
+    if (WSProvider) {
+      WSProvider.send(
+        JSON.stringify({
+          event: "next-game",
+          data: {
+            wantNextGame: false,
+          },
+        })
+      );
+    }
     setResults(null);
     localStorage.setItem("chosen-nfts", "");
 
@@ -183,14 +186,16 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   const playAgain = () => {
     setPlayingAgain(true);
     localStorage.setItem("play-again", "true");
-    WSProvider.send(
-      JSON.stringify({
-        event: "next-game",
-        data: {
-          wantNextGame: true,
-        },
-      })
-    );
+    if (WSProvider) {
+      WSProvider.send(
+        JSON.stringify({
+          event: "next-game",
+          data: {
+            wantNextGame: true,
+          },
+        })
+      );
+    }
   };
 
   const [gameState, setGameState] = useState<any>(null);

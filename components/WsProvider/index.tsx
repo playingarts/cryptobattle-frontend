@@ -28,23 +28,27 @@ function WSProvider({ children, url }: WSProviderProps): JSX.Element {
     return new ReconnectingWebSocket(wsUrl, [], options);
   }, [accessToken, url]);
 
-
-  if (!wsInstance) {
-    return <div>{children}</div>
-  }
-
-
-
+  // Always provide the context, even when wsInstance is null
+  // This allows components to handle the null case gracefully
   return (
     <WSStateContext.Provider value={wsInstance}>
       {children}
     </WSStateContext.Provider>
   );
 }
-function useWS(): ReconnectingWebSocket {
+
+/**
+ * Hook to get the WebSocket connection
+ * @param required - If true (default), throws an error when no connection exists
+ * @returns The WebSocket connection or null (if required is false)
+ */
+function useWS(): ReconnectingWebSocket;
+function useWS(required: true): ReconnectingWebSocket;
+function useWS(required: false): ReconnectingWebSocket | null;
+function useWS(required = true): ReconnectingWebSocket | null {
   const context = useContext(WSStateContext);
 
-  if (context === null) {
+  if (context === null && required) {
     throw new Error("useWS must be used within a WSProvider with a valid connection");
   }
 
