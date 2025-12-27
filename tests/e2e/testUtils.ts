@@ -1,19 +1,16 @@
 /**
  * Test utilities for E2E smoke tests
  *
- * REQUIRED ENVIRONMENT VARIABLES:
- * - TEST_TOKEN_1: Access token for first test account
- * - TEST_TOKEN_2: Access token for second test account
+ * Uses the /api/rest/test-token endpoint to create test accounts.
+ * This endpoint only works in development/staging environments.
  *
- * To get test tokens:
- * 1. Log in to the app via Twitter or MetaMask
- * 2. Open browser DevTools → Application → Local Storage
- * 3. Copy the 'accessToken' value
- * 4. Set as environment variable before running tests
- *
- * Example:
- * TEST_TOKEN_1=xxx TEST_TOKEN_2=yyy yarn test:smoke
+ * For production testing, set TEST_TOKEN_1 and TEST_TOKEN_2 env vars.
  */
+
+import axios from 'axios';
+
+const API_BASE_URL = process.env.TEST_API_URL || 'https://cryptobattle-backend-production.up.railway.app';
+const TEST_TOKEN_SECRET = process.env.TEST_TOKEN_SECRET;
 
 interface TestAccount {
   accessToken: string;
@@ -21,7 +18,14 @@ interface TestAccount {
 }
 
 /**
- * Get test accounts from environment variables
+ * Check if manual tokens are provided via environment variables
+ */
+function hasManualTokens(): boolean {
+  return !!(process.env.TEST_TOKEN_1 && process.env.TEST_TOKEN_2);
+}
+
+/**
+ * Get test accounts from environment variables (for production testing)
  */
 export function getTestAccounts(): TestAccount[] {
   const token1 = process.env.TEST_TOKEN_1;
@@ -45,16 +49,57 @@ export function getTestAccounts(): TestAccount[] {
 }
 
 /**
- * Create multiple test accounts (uses pre-configured tokens)
+ * Create a test account using the test-token API endpoint
+ * Only works in development/staging environments
  */
-export async function createGuestAccounts(count: number): Promise<TestAccount[]> {
-  const accounts = getTestAccounts();
+async function createTestAccount(username: string): Promise<TestAccount> {
+  const params: Record<string, string> = { username };
 
-  if (count > accounts.length) {
-    throw new Error(`Only ${accounts.length} test accounts available, requested ${count}`);
+  // Add secret if available (required for production)
+  if (TEST_TOKEN_SECRET) {
+    params.secret = TEST_TOKEN_SECRET;
   }
 
-  return accounts.slice(0, count);
+  const response = await axios.get(`${API_BASE_URL}/api/rest/test-token`, {
+    params,
+  });
+
+  return {
+    accessToken: response.data.accessToken,
+    name: response.data.username,
+  };
+}
+
+/**
+ * Create multiple test accounts
+ * Uses API endpoint in dev/staging, or env vars for production
+ */
+export async function createGuestAccounts(count: number): Promise<TestAccount[]> {
+  // If manual tokens are provided, use them
+  if (hasManualTokens()) {
+    const accounts = getTestAccounts();
+    if (count > accounts.length) {
+      throw new Error(`Only ${accounts.length} test accounts available, requested ${count}`);
+    }
+    return accounts.slice(0, count);
+  }
+
+  // Otherwise, try to create accounts via API
+  try {
+    const promises = Array.from({ length: count }, (_, i) =>
+      createTestAccount(`SmokeBot${i + 1}`)
+    );
+    return await Promise.all(promises);
+  } catch (error: unknown) {
+    const axiosError = error as { response?: { status: number } };
+    if (axiosError.response?.status === 403) {
+      throw new Error(
+        'Test token endpoint not available (production mode).\n' +
+        'Set TEST_TOKEN_1 and TEST_TOKEN_2 environment variables manually.'
+      );
+    }
+    throw error;
+  }
 }
 
 /**

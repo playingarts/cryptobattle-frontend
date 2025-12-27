@@ -11,20 +11,12 @@
  */
 
 import { GameBot } from './GameBot';
-import { createGuestAccounts, sleep, getTestAccounts } from './testUtils';
+import { createGuestAccounts, sleep } from './testUtils';
 
 // Increase timeout for e2e tests
 jest.setTimeout(120000);
 
-// Check if tokens are available
-const hasTokens = (): boolean => {
-  return !!(process.env.TEST_TOKEN_1 && process.env.TEST_TOKEN_2);
-};
-
-// Skip all tests if tokens not available
-const describeIfTokens = hasTokens() ? describe : describe.skip;
-
-describeIfTokens('CryptoBattle Smoke Tests', () => {
+describe('CryptoBattle Smoke Tests', () => {
   let bot1: GameBot;
   let bot2: GameBot;
 
@@ -275,31 +267,16 @@ describeIfTokens('CryptoBattle Smoke Tests', () => {
 
 describe('Smoke Test Summary', () => {
   it('prints test summary', () => {
-    if (!hasTokens()) {
-      console.log('\n========================================');
-      console.log('     SMOKE TESTS SKIPPED');
-      console.log('========================================');
-      console.log('Missing test tokens. To run smoke tests:');
-      console.log('');
-      console.log('1. Log in to the app with two different accounts');
-      console.log('2. Open DevTools → Application → Local Storage');
-      console.log('3. Copy the "accessToken" value for each account');
-      console.log('4. Run tests with tokens:');
-      console.log('');
-      console.log('   TEST_TOKEN_1=xxx TEST_TOKEN_2=yyy yarn test:smoke');
-      console.log('========================================\n');
-    } else {
-      console.log('\n========================================');
-      console.log('       SMOKE TESTS COMPLETED');
-      console.log('========================================');
-      console.log('All core game functionality verified:');
-      console.log('  - WebSocket connection');
-      console.log('  - Room creation and joining');
-      console.log('  - Player ready state');
-      console.log('  - Game start');
-      console.log('  - Auto-play to completion');
-      console.log('  - Results generation');
-      console.log('========================================\n');
-    }
+    console.log('\n========================================');
+    console.log('       SMOKE TESTS COMPLETED');
+    console.log('========================================');
+    console.log('All core game functionality verified:');
+    console.log('  - WebSocket connection');
+    console.log('  - Room creation and joining');
+    console.log('  - Player ready state');
+    console.log('  - Game start');
+    console.log('  - Auto-play to completion');
+    console.log('  - Results generation');
+    console.log('========================================\n');
   });
 });
