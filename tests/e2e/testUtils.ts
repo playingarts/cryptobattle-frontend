@@ -152,3 +152,24 @@ export async function waitUntil(
 
   throw new Error('waitUntil timeout');
 }
+
+/**
+ * Create a guest session using the /auth/guest endpoint
+ * This creates a real guest user in the database
+ */
+export async function createGuestSession(): Promise<TestAccount> {
+  const response = await axios.get(`${API_BASE_URL}/auth/guest`);
+
+  return {
+    accessToken: response.data.accesstoken,
+    name: `Guest_${Date.now()}`,
+  };
+}
+
+/**
+ * Create multiple guest sessions via /auth/guest endpoint
+ */
+export async function createGuestSessions(count: number): Promise<TestAccount[]> {
+  const promises = Array.from({ length: count }, () => createGuestSession());
+  return await Promise.all(promises);
+}

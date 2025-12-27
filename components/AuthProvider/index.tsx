@@ -64,6 +64,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     metamask: { address: "", signature: "" },
     profilePictureUrl: "",
     isMetamaskConnected: false,
+    isGuest: false,
   });
 
   const { accesstoken } = router.query;

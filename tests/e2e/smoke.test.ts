@@ -11,7 +11,7 @@
  */
 
 import { GameBot } from './GameBot';
-import { createGuestAccounts, sleep } from './testUtils';
+import { createGuestAccounts, createGuestSession, createGuestSessions, sleep } from './testUtils';
 
 // Increase timeout for e2e tests
 jest.setTimeout(120000);
@@ -290,6 +290,176 @@ describe('CryptoBattle Smoke Tests', () => {
       expect(true).toBe(true);
     });
   });
+
+  describe('Guest Authentication', () => {
+    it('should create guest session via /auth/guest endpoint', async () => {
+      const guestAccount = await createGuestSession();
+
+      expect(guestAccount.accessToken).toBeTruthy();
+      expect(typeof guestAccount.accessToken).toBe('string');
+      console.log('Guest session created successfully');
+    });
+
+    it('should connect to WebSocket with guest token', async () => {
+      const guestAccount = await createGuestSession();
+
+      bot1 = new GameBot({
+        name: 'GuestBot',
+        accessToken: guestAccount.accessToken,
+        logEvents: true,
+      });
+
+      await bot1.connect();
+      await bot1.waitForConnection();
+
+      expect(bot1.isConnected).toBe(true);
+      expect(bot1.userId).toBeTruthy();
+      console.log(`Guest connected with userId: ${bot1.userId}`);
+    });
+  });
+
+  describe('Guest Gameplay', () => {
+    it('should allow guest to create and host a room', async () => {
+      const guestAccount = await createGuestSession();
+
+      bot1 = new GameBot({
+        name: 'GuestHost',
+        accessToken: guestAccount.accessToken,
+        logEvents: true,
+      });
+
+      await bot1.connect();
+      await bot1.waitForConnection();
+
+      bot1.createRoom();
+      const roomId = await bot1.waitForRoomCreated();
+
+      expect(roomId).toBeTruthy();
+      console.log(`Guest created room: ${roomId}`);
+    });
+
+    it('should complete a full game between two guests', async () => {
+      const guestAccounts = await createGuestSessions(2);
+
+      // Guest 1 creates room with auto-play enabled
+      bot1 = new GameBot({
+        name: 'GuestPlayer1',
+        accessToken: guestAccounts[0].accessToken,
+        logEvents: true,
+        autoPlay: true,
+      });
+
+      await bot1.connect();
+      await bot1.waitForConnection();
+
+      bot1.createRoom();
+      const roomId = await bot1.waitForRoomCreated();
+      console.log(`Guest game room created: ${roomId}`);
+
+      // Guest 2 joins with auto-play enabled
+      bot2 = new GameBot({
+        name: 'GuestPlayer2',
+        accessToken: guestAccounts[1].accessToken,
+        logEvents: true,
+        autoPlay: true,
+      });
+
+      await bot2.connect();
+      await bot2.waitForConnection();
+
+      bot2.joinRoom(roomId);
+      await bot2.waitForRoomJoined();
+      console.log('Both guests in room');
+
+      // Both players ready up
+      await sleep(500);
+      bot1.setReady(true);
+      await sleep(500);
+      bot2.setReady(true);
+      console.log('Both guests ready');
+
+      // Host starts the game
+      await sleep(500);
+      bot1.startGame();
+
+      // Wait for game to start
+      await Promise.all([bot1.waitForGameStart(), bot2.waitForGameStart()]);
+      console.log('Guest game started');
+
+      // Wait for game to end (bots will auto-play)
+      const results = await Promise.race([
+        bot1.waitForGameEnd(),
+        bot2.waitForGameEnd(),
+      ]);
+
+      console.log('Guest game ended with results:', results);
+
+      expect(results).toBeTruthy();
+      expect(results.winnerPlayersUserIds).toBeDefined();
+      expect(results.playersPoints).toBeDefined();
+    });
+
+    it('should allow mixed game between guest and test account', async () => {
+      // Create one guest via /auth/guest and one via test-token
+      const guestAccount = await createGuestSession();
+      const [testAccount] = await createGuestAccounts(1);
+
+      // Guest creates room
+      bot1 = new GameBot({
+        name: 'GuestPlayer',
+        accessToken: guestAccount.accessToken,
+        logEvents: true,
+        autoPlay: true,
+      });
+
+      await bot1.connect();
+      await bot1.waitForConnection();
+
+      bot1.createRoom();
+      const roomId = await bot1.waitForRoomCreated();
+      console.log(`Mixed game room created: ${roomId}`);
+
+      // Test account joins
+      bot2 = new GameBot({
+        name: 'TestPlayer',
+        accessToken: testAccount.accessToken,
+        logEvents: true,
+        autoPlay: true,
+      });
+
+      await bot2.connect();
+      await bot2.waitForConnection();
+
+      bot2.joinRoom(roomId);
+      await bot2.waitForRoomJoined();
+      console.log('Guest and test player in room');
+
+      // Both players ready up
+      await sleep(500);
+      bot1.setReady(true);
+      await sleep(500);
+      bot2.setReady(true);
+
+      // Host starts the game
+      await sleep(500);
+      bot1.startGame();
+
+      // Wait for game to start
+      await Promise.all([bot1.waitForGameStart(), bot2.waitForGameStart()]);
+      console.log('Mixed game started');
+
+      // Wait for game to end
+      const results = await Promise.race([
+        bot1.waitForGameEnd(),
+        bot2.waitForGameEnd(),
+      ]);
+
+      console.log('Mixed game ended with results:', results);
+
+      expect(results).toBeTruthy();
+      expect(results.winnerPlayersUserIds).toBeDefined();
+    });
+  });
 });
 
 describe('Smoke Test Summary', () => {
@@ -304,6 +474,9 @@ describe('Smoke Test Summary', () => {
     console.log('  - Game start');
     console.log('  - Auto-play to completion');
     console.log('  - Results generation');
+    console.log('  - Guest authentication (/auth/guest)');
+    console.log('  - Guest gameplay (full game)');
+    console.log('  - Mixed games (guest + auth user)');
     console.log('========================================\n');
   });
 });
