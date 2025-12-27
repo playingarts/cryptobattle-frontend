@@ -127,6 +127,7 @@ interface GameEventData {
 
 interface QuitRoomEventData {
   reason?: string;
+  userId?: string;
 }
 
 interface WSEvent {
@@ -313,18 +314,29 @@ export function handleJoinRoom(
 }
 
 /**
- * Handle quit room event (kicked by owner)
+ * Handle quit room event (kicked by owner or player left)
  */
 export function handleQuitRoom(
   data: QuitRoomEventData,
   notifications: NotificationActions,
-  renderQuitButton: () => ReactNode
+  renderQuitButton: () => ReactNode,
+  renderWarningIcon: () => ReactNode
 ): void {
   if (data.reason === 'KICKED_BY_ROOM_OWNER') {
     notifications.openNotification({
       title: 'You were kicked!',
       dark: true,
       iconColor: 'blue',
+      footer: renderQuitButton(),
+    });
+  } else if (data.reason === 'PLAYER_LEFT') {
+    // Another player left the game mid-play
+    notifications.openNotification({
+      title: 'Opponent left',
+      description: 'Your opponent has left the game.',
+      dark: false,
+      icon: renderWarningIcon(),
+      iconColor: '#FF6F41',
       footer: renderQuitButton(),
     });
   }
@@ -579,12 +591,13 @@ export function createWSMessageHandler(deps: HandlerDependencies): (event: Messa
       );
     }
 
-    // Quit room (kicked)
+    // Quit room (kicked or player left)
     if (event.event === 'quit-room') {
       handleQuitRoom(
         event.data as QuitRoomEventData,
         deps.notifications,
-        deps.renderQuitButton
+        deps.renderQuitButton,
+        deps.renderWarningIcon
       );
     }
 

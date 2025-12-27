@@ -91,13 +91,15 @@ const GameLayout: FC<
           window.removeEventListener("beforeunload", beforeUnloadHandlerRef.current);
         }
 
-        // Use window.location for full page reload to reset WebSocket and user state
-        // Longer timeout to ensure WebSocket message is sent AND processed by backend
-        console.log('[DEBUG GameLayout leave] Scheduling redirect in 1500ms');
+        // Give time for WebSocket message to be sent and processed
+        console.log('[DEBUG GameLayout leave] Scheduling redirect in 500ms');
         setTimeout(() => {
           console.log('[DEBUG GameLayout leave] Redirecting to /dashboard now');
-          window.location.href = "/dashboard";
-        }, 1500);
+          // Use router.push for smoother navigation, with window.location as fallback
+          router.push("/dashboard").catch(() => {
+            window.location.href = "/dashboard";
+          });
+        }, 500);
       };
 
       console.log("handleRouteChange", url);
