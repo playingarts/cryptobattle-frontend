@@ -271,9 +271,26 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       setGameStarted(true);
     }
 
-    setLastPlayedCard(
-      gameState.lastPlayedCard ? gameState.lastPlayedCard : null
-    );
+    // Only set lastPlayedCard from server if we don't already have one
+    // (to preserve optimistic UI updates that already triggered animation)
+    setLastPlayedCard((currentLastPlayedCard: any) => {
+      // If we already have a lastPlayedCard with the same suit/value, keep it
+      // (this preserves the animation that already started from optimistic update)
+      if (
+        currentLastPlayedCard &&
+        gameState.lastPlayedCard &&
+        currentLastPlayedCard.suit === gameState.lastPlayedCard.suit &&
+        currentLastPlayedCard.value === gameState.lastPlayedCard.value
+      ) {
+        // Update scoringLevel from server but keep the animation running
+        return {
+          ...currentLastPlayedCard,
+          scoringLevel: gameState.lastPlayedCard.scoringLevel,
+        };
+      }
+      // Otherwise, use server's lastPlayedCard (e.g., opponent's move)
+      return gameState.lastPlayedCard ? gameState.lastPlayedCard : null;
+    });
 
     setTimeout(() => {
       const latestCard = document.getElementsByClassName("game-latest-card")[0];
