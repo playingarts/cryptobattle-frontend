@@ -37,6 +37,9 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   const [board, setBoard] = useState(generateBoard(7, 5));
   const [cardError, setCardError] = useState<any>([]);
   const [lastPlayedCard, setLastPlayedCard] = useState<any>(null);
+  const [animationKey, setAnimationKey] = useState<number>(0);
+  // Track which card we already started animation for (to avoid double animation)
+  const [animatedCardId, setAnimatedCardId] = useState<string | null>(null);
 
   const playCardBeep = new Audio("../../sounds/play-card.mp3");
 
@@ -202,6 +205,10 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
           userId: state.turnForPlayer,
         };
         addCardToBoard(rowIndex, columnIndex, cardWithUserId);
+        // Set a new animation key to ensure React keeps the same animation element
+        const cardId = `${card.suit}-${card.value}`;
+        setAnimationKey(Date.now());
+        setAnimatedCardId(cardId); // Mark this card as already animated
         setLastPlayedCard({
           ...cardWithUserId,
           scoringLevel: 0, // Will be updated when server responds
@@ -210,6 +217,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         // Clear animation after delay
         setTimeout(() => {
           setLastPlayedCard(null);
+          setAnimatedCardId(null);
         }, 2000);
 
         WSProvider.send(
@@ -276,95 +284,96 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       setGameStarted(true);
     }
 
-    // Only set lastPlayedCard from server if we don't already have one
-    // (to preserve optimistic UI updates that already triggered animation)
-    setLastPlayedCard((currentLastPlayedCard: any) => {
-      // If we already have a lastPlayedCard with the same suit/value, keep it exactly as-is
-      // Returning the same reference prevents React re-render and CSS animation restart
-      if (
-        currentLastPlayedCard &&
-        gameState.lastPlayedCard &&
-        currentLastPlayedCard.suit === gameState.lastPlayedCard.suit &&
-        currentLastPlayedCard.value === gameState.lastPlayedCard.value
-      ) {
-        // Return exact same reference to prevent re-render and animation restart
-        return currentLastPlayedCard;
+    // Check if this is a card we already animated (from optimistic UI)
+    const serverCardId = gameState.lastPlayedCard
+      ? `${gameState.lastPlayedCard.suit}-${gameState.lastPlayedCard.value}`
+      : null;
+    const alreadyAnimated = serverCardId && serverCardId === animatedCardId;
+
+    // Only set lastPlayedCard from server if we haven't already animated this card
+    if (!alreadyAnimated) {
+      if (gameState.lastPlayedCard) {
+        // This is a new card (e.g., opponent's move) - animate it
+        setAnimationKey(Date.now());
+        setAnimatedCardId(serverCardId);
+        setLastPlayedCard(gameState.lastPlayedCard);
+
+        setTimeout(() => {
+          const latestCard = document.getElementsByClassName("game-latest-card")[0];
+          playCardBeep.play();
+
+          if (!latestCard) {
+            return;
+          }
+          function getViewPercentage(element: any) {
+            const viewport = {
+              top: window.pageYOffset,
+              bottom: window.pageYOffset + window.innerHeight,
+            };
+
+            const elementBoundingRect = element.getBoundingClientRect();
+            const elementPos = {
+              top: elementBoundingRect.y + window.pageYOffset,
+              bottom:
+                elementBoundingRect.y +
+                elementBoundingRect.height +
+                window.pageYOffset,
+            };
+
+            if (
+              viewport.top > elementPos.bottom ||
+              viewport.bottom < elementPos.top
+            ) {
+              return 0;
+            }
+
+            // Element is fully within viewport
+            if (
+              viewport.top < elementPos.top &&
+              viewport.bottom > elementPos.bottom
+            ) {
+              return 100;
+            }
+
+            // Element is bigger than the viewport
+            if (
+              elementPos.top < viewport.top &&
+              elementPos.bottom > viewport.bottom
+            ) {
+              return 100;
+            }
+
+            const elementHeight = elementBoundingRect.height;
+            let elementHeightInView = elementHeight;
+
+            if (elementPos.top < viewport.top) {
+              elementHeightInView =
+                elementHeight - (window.pageYOffset - elementPos.top);
+            }
+
+            if (elementPos.bottom > viewport.bottom) {
+              elementHeightInView =
+                elementHeightInView - (elementPos.bottom - viewport.bottom);
+            }
+
+            const percentageInView =
+              (elementHeightInView / window.innerHeight) * 100;
+
+            return Math.round(percentageInView);
+          }
+          if (getViewPercentage(latestCard) < 90) {
+            latestCard.scrollIntoView({ block: "center", behavior: "smooth" });
+          }
+        }, 0);
+
+        setTimeout(() => {
+          setLastPlayedCard(null);
+          setAnimatedCardId(null);
+        }, 2000);
       }
-      // Otherwise, use server's lastPlayedCard (e.g., opponent's move)
-      return gameState.lastPlayedCard ? gameState.lastPlayedCard : null;
-    });
-
-    setTimeout(() => {
-      const latestCard = document.getElementsByClassName("game-latest-card")[0];
-      playCardBeep.play();
-
-      if (!latestCard) {
-        return;
-      }
-      function getViewPercentage(element: any) {
-        const viewport = {
-          top: window.pageYOffset,
-          bottom: window.pageYOffset + window.innerHeight,
-        };
-
-        const elementBoundingRect = element.getBoundingClientRect();
-        const elementPos = {
-          top: elementBoundingRect.y + window.pageYOffset,
-          bottom:
-            elementBoundingRect.y +
-            elementBoundingRect.height +
-            window.pageYOffset,
-        };
-
-        if (
-          viewport.top > elementPos.bottom ||
-          viewport.bottom < elementPos.top
-        ) {
-          return 0;
-        }
-
-        // Element is fully within viewport
-        if (
-          viewport.top < elementPos.top &&
-          viewport.bottom > elementPos.bottom
-        ) {
-          return 100;
-        }
-
-        // Element is bigger than the viewport
-        if (
-          elementPos.top < viewport.top &&
-          elementPos.bottom > viewport.bottom
-        ) {
-          return 100;
-        }
-
-        const elementHeight = elementBoundingRect.height;
-        let elementHeightInView = elementHeight;
-
-        if (elementPos.top < viewport.top) {
-          elementHeightInView =
-            elementHeight - (window.pageYOffset - elementPos.top);
-        }
-
-        if (elementPos.bottom > viewport.bottom) {
-          elementHeightInView =
-            elementHeightInView - (elementPos.bottom - viewport.bottom);
-        }
-
-        const percentageInView =
-          (elementHeightInView / window.innerHeight) * 100;
-
-        return Math.round(percentageInView);
-      }
-      if (getViewPercentage(latestCard) < 90) {
-        latestCard.scrollIntoView({ block: "center", behavior: "smooth" });
-      }
-    }, 0);
-    setTimeout(() => {
-      setLastPlayedCard(null);
-    }, 2000);
-  }, [gameState]);
+    }
+    // If already animated, just skip - don't touch lastPlayedCard or start new timers
+  }, [gameState, animatedCardId]);
 
   useEffect(() => {
     console.log("interact happens");
@@ -498,6 +507,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                         ? lastPlayedCard?.id === column[column.length - 1].id
                         : true) && (
                         <div
+                          key={animationKey}
                           className="game-latest-card"
                           css={{
                             background: getColor(
