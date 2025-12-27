@@ -13,7 +13,10 @@ module.exports = {
         tsconfig: '<rootDir>/tsconfig.test.json',
       },
     ],
-    '^.+\\.jsx?$': 'babel-jest',
+    '^.+\\.jsx?$': [
+      'babel-jest',
+      { configFile: '<rootDir>/tests/e2e/babel.config.js' },
+    ],
   },
   // Allow axios ESM module to be transformed
   transformIgnorePatterns: [

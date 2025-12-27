@@ -38,9 +38,6 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
   const [hovered, setHover] = useState(false);
 
   const getUser = (playerId: string) => {
-    if (!playerId) {
-      return;
-    }
     return api.get(`/api/rest/user-info/${playerId}`);
   };
 
@@ -60,8 +57,9 @@ const Player: FC<Player> = forwardRef(({ color, player, isAdmin }, ref) => {
 
   useEffect(() => {
     console.log("player", playerInfo);
-    if (!playerInfo.username && player.userId) {
-      getUser(player.userId)
+    const userId = player?.userId;
+    if (!playerInfo.username && userId) {
+      getUser(userId)
         .then((data: any) => {
           setPlayerInfo(data);
         })
