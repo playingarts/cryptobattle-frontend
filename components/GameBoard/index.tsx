@@ -41,6 +41,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   // Use ref to track processed cards - doesn't cause re-renders or useEffect loops
   const processedCardRef = useRef<string | null>(null);
   const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Store animation start time to create stable React key - prevents animation restart on re-render
+  const animationKeyRef = useRef<string | null>(null);
 
   const playCardBeep = new Audio("../../sounds/play-card.mp3");
 
@@ -86,6 +88,9 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     }
 
     processedCardRef.current = cardId;
+    // Create a stable animation key with timestamp - this prevents React from remounting
+    // the animation element when gameState changes, which would restart the CSS animation
+    animationKeyRef.current = `${cardId}-${Date.now()}`;
     setLastPlayedCard(card);
 
     if (playSound) {
@@ -113,6 +118,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     animationTimerRef.current = setTimeout(() => {
       setLastPlayedCard(null);
       processedCardRef.current = null;
+      animationKeyRef.current = null;
     }, 2000);
   }, []);
 
@@ -459,6 +465,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                         ? lastPlayedCard?.id === column[column.length - 1].id
                         : true) && (
                         <div
+                          key={animationKeyRef.current}
                           className="game-latest-card"
                           css={{
                             background: getColor(
