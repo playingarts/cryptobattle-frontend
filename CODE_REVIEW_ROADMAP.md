@@ -58,10 +58,12 @@ Based on senior engineer review of the CryptoBattle frontend codebase.
 - Added NEXT_PUBLIC_WS_URL environment variable support
 - Removed @ts-ignore comment from Component spread
 
-### [ ] Remove unnecessary eslint-disable/@ts-ignore comments
-- 111 occurrences across 16 files
-- Fix underlying type issues instead of suppressing
-- Some removed in commit d848c19
+### [x] Remove unnecessary eslint-disable/@ts-ignore comments
+- Fixed forwardRef typing in Player components
+- Fixed MetamaskLogin interface to extend ButtonProps
+- Removed ~22 unnecessary comments across 10 files
+- 6 intentional comments remain (react-hooks/exhaustive-deps, gameState any types)
+- Commits: d848c19, c457048
 
 ### [x] Add .env.example
 - Document required environment variables
@@ -79,16 +81,16 @@ Based on senior engineer review of the CryptoBattle frontend codebase.
 | Logger utility | Done | - |
 | Error logging in components | Done | 289a3ce, 2ac71c0 |
 | .env.example | Done | - |
-| Some @ts-ignore removal | Done | d848c19 |
 | Eliminate window.* global state | Done | 81ca764 |
 | Extract WebSocket event handlers | Done | c496dd3 |
-| Consolidate React context providers | Done | - |
+| Consolidate React context providers | Done | 22e43cd |
+| Remove @ts-ignore/eslint-disable | Done | c457048 |
 
 ---
 
-## Next Steps (Priority Order)
+## ✅ Roadmap Complete
 
-1. Remove remaining @ts-ignore/eslint-disable (P2/P3)
+All P0/P1/P2/P3 items from the senior engineer code review have been addressed.
 
 ---
 
