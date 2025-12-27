@@ -33,9 +33,11 @@ Based on senior engineer review of the CryptoBattle frontend codebase.
   - pages/game/[roomid].tsx
   - pages/_app.tsx
 
-### [ ] Extract WebSocket event handlers
-- Create modular `utils/wsEventHandlers.ts`
-- Move event handling logic out of GameProvider
+### [x] Extract WebSocket event handlers
+- Created modular `utils/wsEventHandlers.ts` with 15+ handler functions
+- Created `utils/__tests__/wsEventHandlers.test.ts` with 25 tests
+- Refactored GameProvider to use extracted handlers
+- Reduced GameProvider inline handler code by ~250 lines
 
 ---
 
@@ -76,15 +78,15 @@ Based on senior engineer review of the CryptoBattle frontend codebase.
 | Error logging in components | Done | 289a3ce, 2ac71c0 |
 | .env.example | Done | - |
 | Some @ts-ignore removal | Done | d848c19 |
+| Eliminate window.* global state | Done | 81ca764 |
+| Extract WebSocket event handlers | Done | - |
 
 ---
 
 ## Next Steps (Priority Order)
 
-1. Eliminate window.* global state (P0/P1)
-2. Extract WebSocket event handlers (P0/P1)
-3. Consolidate providers into AppProviders (P2/P3)
-4. Remove remaining @ts-ignore/eslint-disable (P2/P3)
+1. Consolidate providers into AppProviders (P2/P3)
+2. Remove remaining @ts-ignore/eslint-disable (P2/P3)
 
 ---
 

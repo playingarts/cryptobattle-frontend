@@ -5,6 +5,7 @@ import {
   ReactNode,
   useState,
   useEffect,
+  useCallback,
 } from "react";
 import { useNotifications } from "../NotificationProvider";
 import Text from "../Text/";
@@ -21,12 +22,13 @@ import {
   isGameStarted,
   setGameStarted,
   setRoomId as setGlobalRoomId,
-  setUserId as setGlobalUserId,
-  getUserId as getGlobalUserId,
-  hasResults,
-  setResults as setGlobalResults,
-  setConnectionClosed,
 } from "../../utils/gameState";
+import {
+  createWSMessageHandler,
+  createWSCloseHandler,
+  createWSErrorHandler,
+  HandlerDependencies,
+} from "../../utils/wsEventHandlers";
 
 type GameProviderProps = { children: ReactNode };
 
@@ -251,333 +253,101 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     setGlobalRoomId(roomId);
   }, [roomId]);
 
+  // Render functions for handler dependencies
+  const renderWarningIcon = useCallback(() => <Warning />, []);
+  const renderQuitButton = useCallback(() => (
+    <div css={{ display: "flex", marginTop: "0px" }}>
+      <Button onClick={quit}>Go to dashboard</Button>
+    </div>
+  ), [quit]);
+  const renderReloadButton = useCallback(() => (
+    <div css={{ display: "flex", marginTop: "0px" }}>
+      <Button onClick={reload}>Play Here</Button>
+    </div>
+  ), [reload]);
+  const renderNewGameButton = useCallback(() => (
+    <div css={{ display: "flex" }}>
+      <Button
+        css={() => ({
+          background: "#7B61FF",
+          color: "#fff",
+          margin: "10px auto",
+        })}
+        onClick={newGame}
+      >
+        New Game
+      </Button>
+    </div>
+  ), [newGame]);
+  const renderDashboardButton = useCallback(() => (
+    <div css={{ display: "flex" }}>
+      <Button onClick={quit}>Quit</Button>
+    </div>
+  ), [quit]);
+  const renderGameEndedNotification = useCallback(() => (
+    <div>
+      <Text
+        variant="h1"
+        css={{
+          fontSize: 35,
+          lineHeight: "45.5px",
+          marginBottom: 0,
+          marginTop: 60,
+        }}
+      >
+        Ended
+      </Text>
+      <Text
+        variant="body3"
+        css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
+      >
+        The game you are trying to join has ended.
+      </Text>
+    </div>
+  ), []);
+
+  // WebSocket event handlers setup
   useEffect(() => {
     if (!WSProvider) {
       return;
     }
 
-    WSProvider.onerror = function (event: any) {
-      console.log("WebSocket error: " + event.code);
-      console.log(event);
+    const handlerDeps: HandlerDependencies = {
+      notifications: { openNotification, closeNotification },
+      stateSetters: {
+        setTimer,
+        setTotalSeconds,
+        setUserSocketIdle,
+        setUserInfo,
+        setIsBackendReady,
+        setRoomId,
+        setResults,
+        setRoomInfo,
+        setPlayers,
+        setPlayingAgain,
+        setIsAlreadyConnected,
+        setGameState,
+      },
+      router,
+      wsProvider: WSProvider,
+      uiActions: {
+        quit,
+        reload,
+        newGame,
+        playStartGameSound,
+      },
+      getGameState: () => gameState,
+      renderWarningIcon,
+      renderQuitButton,
+      renderNewGameButton,
+      renderReloadButton,
+      renderDashboardButton,
+      renderGameEndedNotification,
     };
 
-    WSProvider.onclose = function (e) {
-      console.log("on close: " + e.code);
-      // Don't reconnect if there's already a connection opened in the backend.
-      if (e.code === 4000) {
-        if (!localStorage.getItem("adding-metamask")) {
-          setIsAlreadyConnected(true);
-        }
-        WSProvider.close()
-      }
-
-      // Don't reconnect if there's a new connection opened in the backend.
-      if (e.code === 4001) {
-
-        openNotification({
-          title: "Already connected!",
-          description: (
-            <span>
-              You are already in a lobby or a game in an another browser or tab.
-            </span>
-          ),
-          dark: false,
-          footer: (
-            <div css={{ display: "flex", marginTop: "0px" }}>
-              <Button onClick={reload}>Play Here</Button>
-            </div>
-          ),
-          icon: <Warning />,
-          iconColor: "#FF6F41",
-        });
-
-        setConnectionClosed(true);
-        WSProvider.close()
-      }
-
-    };
-
-    WSProvider.onmessage = function ({ data }) {
-      setIsAlreadyConnected(false);
-
-      const event = JSON.parse(data);
-
-      if (event.event === "pong") {
-        return;
-      }
-
-      if (event.event !== "timer") {
-        console.log("Game Provider WS event:", event);
-      }
-
-      // Timeout ended
-      if (event.event === "timer") {
-        setTimer(event.data.secondsLeft);
-        setTotalSeconds(event.data.totalSeconds);
-        return;
-      }
-
-      // Timeout ended
-      if (event.event === "user-socket-idle") {
-        setUserSocketIdle(event.data);
-        return;
-      }
-
-      if (event.data.error && event.data.error.message) {
-        if (event.data.error.message === "Player must be in a room") {
-          // setRoomId(null);
-          router.push("/dashboard");
-          return;
-        }
-      }
-
-      if (event.event === "choose-nft-cards") {
-        console.log("choose-nft-cards sub: ", event);
-      }
-
-      if (event.event === "user-info") {
-        setUserInfo(event.data);
-        setGlobalUserId(event.data.userId);
-        setIsBackendReady(true);
-        // if (event.data.inRoomId) {
-        //   setRoomId(event.data.inRoomId);
-        // }
-      }
-
-      if (event.event === "create-room") {
-        console.log("create-room happens");
-        setRoomId(event.data.roomId);
-        WSProvider.send(
-          JSON.stringify({
-            event: "room-info",
-            data: {},
-          })
-        );
-      }
-
-      // Timeout ended
-      if (
-        event.event === "close-room" &&
-        (event.data.reason === "TIMEOUT" ||
-          event.data.reason === "NEXT_GAME_VOTE_FAILED")
-      ) {
-        quit();
-        return;
-      }
-
-      // Play againjoin/62c999531f743708ecebd3ab
-      if (event.event === "next-game") {
-        console.log("next-game", event);
-      }
-
-      if (event.event === "room-updated" && hasResults()) {
-        setResults(null);
-        closeNotification();
-        setRoomInfo(event.data);
-        setPlayers(event.data.roomUsers);
-        setPlayingAgain(null);
-        setGlobalResults(false);
-
-        router.push(`/game/${event.data.roomId}`);
-        return;
-      }
-
-      if (event.event === "close-room") {
-
-        event.data.ownderId &&
-          event.data.ownderId !== getGlobalUserId() && !hasResults() &&
-          openNotification({
-            title: "Ooopps",
-            description: <span>This game has been closed by host</span>,
-            dark: false,
-            icon: <Warning />,
-            iconColor: "#FF6F41",
-            footer: (
-              <div css={{ display: "flex", marginTop: "0px" }}>
-                <Button onClick={quit}>Go to dashboard</Button>
-              </div>
-            ),
-          });
-      }
-
-      if (event.event === "room-updated" || event.event === "room-info") {
-        setRoomInfo(event.data);
-
-        if (!event.data.roomUsers) {
-          return;
-        }
-        console.log("Room updated: ", event.data);
-        setPlayers(event.data.roomUsers);
-      }
-      if (event.event === "join-room") {
-        if (
-          event.data?.error?.errorCode === 403 &&
-          event.data?.error?.message.startsWith(
-            "No valid server instance for the room"
-          )
-        ) {
-          openNotification({
-            description: (
-              <div>
-                <Text
-                  variant="h1"
-                  css={{
-                    fontSize: 35,
-                    lineHeight: "45.5px",
-                    marginBottom: 0,
-                    marginTop: 60,
-                  }}
-                >
-                  Ended
-                </Text>
-                <Text
-                  variant="body3"
-                  css={{ fontSize: 22, lineHeight: "33px", marginBottom: 0 }}
-                >
-                  The game you are trying to join has ended.
-                </Text>
-              </div>
-            ),
-            dark: false,
-            icon: <Warning />,
-            iconColor: "#FF6F41",
-            footer: (
-              <div css={{ display: "flex" }}>
-                <Button
-                  css={() => ({
-                    background: "#7B61FF",
-                    color: "#fff",
-                    margin: "10px auto",
-                  })}
-                  onClick={newGame}
-                >
-                  New Game
-                </Button>
-              </div>
-            ),
-          });
-
-          router.push("/dashboard");
-        }
-        WSProvider.send(
-          JSON.stringify({
-            event: "room-info",
-            data: {},
-          })
-        );
-      }
-
-      if (
-        event.event === "quit-room" &&
-        event.data.reason === "KICKED_BY_ROOM_OWNER"
-      ) {
-        openNotification({
-          title: "You were kicked!",
-          dark: true,
-          iconColor: "blue",
-          footer: (
-            <div css={{ display: "flex" }}>
-              <Button onClick={quit}>Quit</Button>
-            </div>
-          ),
-        });
-      }
-
-      if (event.data.error && event.data.error.message) {
-        if (
-          event.data.error.message === "No valid server instance for the room"
-        ) {
-          // setRoomId(null);
-          return;
-        }
-      }
-
-      if (event.data.error && event.data.error.message) {
-        if (
-          event.data.error.message ===
-          "Joining while hosting a game is forbidden"
-        ) {
-          openNotification({
-            title: "Sorry",
-            description: (
-              <span>
-                Cannot join rooms while hosting a game. Quit the game and try
-                again!
-              </span>
-            ),
-            dark: false,
-            icon: <Warning />,
-            iconColor: "#FF6F41",
-            footer: (
-              <div css={{ display: "flex" }}>
-                <Button onClick={quit}>Quit game</Button>
-              </div>
-            ),
-          });
-
-          return;
-        }
-      }
-
-      if (event.event === "game-results") {
-        console.log("game-results", event.data);
-        setResults(event.data);
-        setGlobalResults(true);
-      }
-
-      if (event.event === "game-info") {
-        if (event.data.state === "ended" && hasResults()) {
-          return;
-        }
-        setGameState({ ...gameState, ...event.data });
-        if (event.data.state === "ended" && !hasResults()) {
-          WSProvider.send(
-            JSON.stringify({
-              event: "game-results",
-              data: {},
-            })
-          );
-
-          openNotification({
-            title: "Game Over!",
-            dark: true,
-            iconColor: "blue",
-            footer: (
-              <div css={{ display: "flex" }}>
-                <Button onClick={quit}>Quit</Button>
-              </div>
-            ),
-          });
-        }
-
-        console.log(event.data.state);
-
-        console.log('game-info": ', event.data);
-      }
-
-      if (event.event === "game-updated") {
-        setGameState({ ...event.data });
-
-        setTimeout(() => {
-          if (event.data.state === "started") {
-            closeNotification();
-            if (!isGameStarted() && !hasResults()) {
-              playStartGameSound();
-              setGameStarted(true);
-            }
-            if (
-              !window.location.pathname.split("?")[0].endsWith("/dashboard")
-            ) {
-              router.push("/play");
-            }
-          }
-        }, 0);
-
-        console.log('game-updated": ', event.data);
-      }
-      // if (event.data.error && event.data.error.message) {
-      // }
-    };
+    WSProvider.onerror = createWSErrorHandler();
+    WSProvider.onclose = createWSCloseHandler(handlerDeps);
+    WSProvider.onmessage = createWSMessageHandler(handlerDeps);
   }, [WSProvider]);
 
   // useEffect(() => {
