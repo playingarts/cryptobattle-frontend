@@ -152,7 +152,29 @@ const Home: NextPage = () => {
               })}
             ></LeaderboardDashboard>
           </Grid> */}
-          <NFTInventory></NFTInventory>
+          {!user.isGuest ? (
+            <NFTInventory></NFTInventory>
+          ) : (
+            <div
+              css={{
+                backgroundColor: "#181818",
+                color: "rgba(255, 255, 255, 0.5)",
+                maxWidth: 1040,
+                margin: "30px auto 0",
+                padding: "40px 70px",
+                fontSize: "16px",
+                borderRadius: "10px",
+                textAlign: "center",
+              }}
+            >
+              <p css={{ margin: 0, marginBottom: 10 }}>
+                You are playing as a guest. Stats and NFT cards are not available.
+              </p>
+              <p css={{ margin: 0, color: "rgba(255, 255, 255, 0.3)" }}>
+                Connect with Metamask to track your progress and use NFT cards.
+              </p>
+            </div>
+          )}
           {/* <PlayingArtsinfo></PlayingArtsinfo> */}
         </div>
       </Layout>

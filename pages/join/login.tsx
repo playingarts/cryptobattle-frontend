@@ -6,6 +6,7 @@ import Button from "../../components/Button";
 import ComposedGlobalLayout from "../../components/_composed/GlobalLayout";
 import { useAuth } from "../../components/AuthProvider";
 import MetamaskLogin from "../../components/MetamaskLogin/";
+import GuestLogin from "../../components/GuestLogin/";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { api } from "../../api";
@@ -151,9 +152,18 @@ const Home: any = () => {
                     To proceed, log in with{" "}
                   </Text>
                   <div
-                    style={{ display: "flex", justifyContent: "left" }}
+                    style={{ display: "flex", justifyContent: "left", alignItems: "center" }}
                   >
                     <MetamaskLogin roomId={roomid}/>
+                    <Text
+                      css={{
+                        color: "rgba(0, 0, 0, 0.4)",
+                        margin: "0 10px",
+                      }}
+                    >
+                      or
+                    </Text>
+                    <GuestLogin roomId={roomid}/>
                   </div>
                 </div>
               )}

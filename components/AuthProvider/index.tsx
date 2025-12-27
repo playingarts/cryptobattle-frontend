@@ -42,6 +42,7 @@ const getUser = () => {
 const formatUserData = (data: any) => {
   data.isMetamaskConnected =
     data.authProvider === "metamask" || data.authProvider === "unified";
+  data.isGuest = data.authProvider === "guest";
   return data;
 };
 

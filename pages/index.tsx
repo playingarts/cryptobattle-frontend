@@ -9,6 +9,7 @@ import Line from "../components/Line";
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 import { useAuth } from "../components/AuthProvider";
 import MetamaskLogin from "../components/MetamaskLogin/";
+import GuestLogin from "../components/GuestLogin/";
 import GameRules from "../components/GameRules";
 
 const Home: NextPage = () => {
@@ -73,8 +74,18 @@ const Home: NextPage = () => {
                 >
                   Log in with
                 </Text>
-                <div style={{ display: "flex", justifyContent: "start" }}>
+                <div style={{ display: "flex", justifyContent: "start", alignItems: "center" }}>
                   <MetamaskLogin />
+                  <Text
+                    variant="body2"
+                    css={{
+                      color: "#7a7a7a",
+                      margin: "0 10px",
+                    }}
+                  >
+                    or
+                  </Text>
+                  <GuestLogin />
                 </div>
               </div>
             ) : (
