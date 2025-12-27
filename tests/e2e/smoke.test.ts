@@ -146,6 +146,10 @@ describe('CryptoBattle Smoke Tests', () => {
       await sleep(500);
       bot2.setReady(true);
 
+      // Host starts the game
+      await sleep(500);
+      bot1.startGame();
+
       // Wait for game to start
       await Promise.all([bot1.waitForGameStart(), bot2.waitForGameStart()]);
 
@@ -194,6 +198,10 @@ describe('CryptoBattle Smoke Tests', () => {
       bot2.setReady(true);
       console.log('Both players ready');
 
+      // Host starts the game
+      await sleep(500);
+      bot1.startGame();
+
       // Wait for game to start
       await Promise.all([bot1.waitForGameStart(), bot2.waitForGameStart()]);
       console.log('Game started');
@@ -228,7 +236,26 @@ describe('CryptoBattle Smoke Tests', () => {
         logEvents: true,
       });
 
-      await expect(bot1.connect()).rejects.toThrow();
+      // Server accepts connection first, then closes with 3400 after token validation
+      await bot1.connect();
+
+      // Wait for server to close the connection
+      await new Promise<void>((resolve) => {
+        const checkDisconnect = setInterval(() => {
+          if (!bot1.isConnected) {
+            clearInterval(checkDisconnect);
+            resolve();
+          }
+        }, 100);
+        // Timeout after 5 seconds
+        setTimeout(() => {
+          clearInterval(checkDisconnect);
+          resolve();
+        }, 5000);
+      });
+
+      // Connection should be closed by server
+      expect(bot1.isConnected).toBe(false);
     });
 
     it('should handle joining non-existent room', async () => {

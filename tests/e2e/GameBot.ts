@@ -223,7 +223,7 @@ export class GameBot {
 
   // Game actions
   createRoom(): void {
-    this.send('create-room', {});
+    this.send('create-room', { type: 'private', maxPlayers: 2 });
   }
 
   joinRoom(roomId: string): void {
@@ -233,6 +233,10 @@ export class GameBot {
   setReady(ready: boolean = true): void {
     this.send('player-ready', { ready });
     this.isReady = ready;
+  }
+
+  startGame(): void {
+    this.send('start-game', {});
   }
 
   playCard(x: number, y: number, suit: string, value: string, nftId: string = ''): void {
@@ -289,7 +293,8 @@ export class GameBot {
 
   // Wait helpers for testing
   async waitForConnection(): Promise<void> {
-    if (this.isConnected) return;
+    // Wait for user-info which provides the userId
+    if (this.userId) return;
     await this.waitForEvent('user-info', 10000);
   }
 
