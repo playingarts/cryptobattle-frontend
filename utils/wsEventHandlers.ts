@@ -97,7 +97,11 @@ interface UserInfoEventData {
 }
 
 interface CreateRoomEventData {
-  roomId: string;
+  roomId?: string;
+  error?: {
+    errorCode?: number;
+    message?: string;
+  };
 }
 
 interface CloseRoomEventData {
@@ -158,6 +162,12 @@ export function handleUserInfo(
   data: UserInfoEventData,
   setters: Pick<StateSetters, 'setUserInfo' | 'setIsBackendReady'>
 ): void {
+  console.log('[DEBUG user-info] Received:', {
+    userId: data.userId,
+    inRoomId: data.inRoomId,
+    inGameId: data.inGameId,
+    currentPath: typeof window !== 'undefined' ? window.location.pathname : 'SSR',
+  });
   setters.setUserInfo(data);
   setGlobalUserId(data.userId);
   setters.setIsBackendReady(true);
@@ -169,16 +179,33 @@ export function handleUserInfo(
 export function handleCreateRoom(
   data: CreateRoomEventData,
   setters: Pick<StateSetters, 'setRoomId'>,
-  wsProvider: WSProviderType
+  wsProvider: WSProviderType,
+  router: NextRouter
 ): void {
-  console.log('create-room happens');
-  setters.setRoomId(data.roomId);
-  wsProvider.send(
-    JSON.stringify({
-      event: 'room-info',
-      data: {},
-    })
-  );
+  console.log('[DEBUG create-room] Response received:', data);
+
+  // Handle error case - user might still be in another room
+  if (data.error) {
+    console.log('[DEBUG create-room] ERROR:', data.error.message);
+    // If user is already in a room/game, redirect to dashboard
+    // The backend should have cleared their state
+    router.push('/dashboard');
+    return;
+  }
+
+  if (data.roomId) {
+    console.log('[DEBUG create-room] Setting roomId to:', data.roomId);
+    setters.setRoomId(data.roomId);
+    wsProvider.send(
+      JSON.stringify({
+        event: 'room-info',
+        data: {},
+      })
+    );
+  } else {
+    console.log('[DEBUG create-room] WARNING: No roomId in response, redirecting to dashboard');
+    router.push('/dashboard');
+  }
 }
 
 /**
@@ -497,7 +524,7 @@ export function createWSMessageHandler(deps: HandlerDependencies): (event: Messa
 
     // Create room event
     if (event.event === 'create-room') {
-      handleCreateRoom(event.data as CreateRoomEventData, deps.stateSetters, deps.wsProvider);
+      handleCreateRoom(event.data as CreateRoomEventData, deps.stateSetters, deps.wsProvider, deps.router);
     }
 
     // Close room event (timeout)

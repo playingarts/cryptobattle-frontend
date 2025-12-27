@@ -56,6 +56,13 @@ const GameLayout: FC<
         closeNotification();
       };
       const leave = () => {
+        console.log('[DEBUG GameLayout leave] Starting leave process', {
+          isOwner,
+          roomId: roomInfo?.roomId,
+          userId: user?.userId,
+          ownerId: roomInfo?.ownderId,
+        });
+
         // Clear local state first
         setPlayers(null);
         localStorage.setItem("chosen-nft", JSON.stringify(null));
@@ -65,13 +72,15 @@ const GameLayout: FC<
         // Owner sends close-room (ends game for all), non-owner sends quit-room
         if (WSProvider) {
           const eventName = isOwner ? "close-room" : "quit-room";
-          console.log(`Sending ${eventName} event, isOwner: ${isOwner}`);
+          console.log(`[DEBUG GameLayout leave] Sending ${eventName} event, isOwner: ${isOwner}`);
           WSProvider.send(
             JSON.stringify({
               event: eventName,
               data: {},
             })
           );
+        } else {
+          console.log('[DEBUG GameLayout leave] WARNING: WSProvider is null, cannot send leave event');
         }
 
         setIsConfirmedLeave(true);
@@ -84,7 +93,9 @@ const GameLayout: FC<
 
         // Use window.location for full page reload to reset WebSocket and user state
         // Longer timeout to ensure WebSocket message is sent AND processed by backend
+        console.log('[DEBUG GameLayout leave] Scheduling redirect in 1500ms');
         setTimeout(() => {
+          console.log('[DEBUG GameLayout leave] Redirecting to /dashboard now');
           window.location.href = "/dashboard";
         }, 1500);
       };

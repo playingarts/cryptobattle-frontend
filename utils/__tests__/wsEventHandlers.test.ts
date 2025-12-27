@@ -77,17 +77,44 @@ describe('wsEventHandlers', () => {
   });
 
   describe('handleCreateRoom', () => {
-    it('should set room id and request room info', () => {
+    it('should set room id and request room info on success', () => {
       const setters = { setRoomId: jest.fn() };
       const wsProvider = { send: jest.fn(), close: jest.fn() };
+      const router = { push: jest.fn() } as any;
       const data = { roomId: 'room123' };
 
-      handleCreateRoom(data, setters, wsProvider);
+      handleCreateRoom(data, setters, wsProvider, router);
 
       expect(setters.setRoomId).toHaveBeenCalledWith('room123');
       expect(wsProvider.send).toHaveBeenCalledWith(
         JSON.stringify({ event: 'room-info', data: {} })
       );
+      expect(router.push).not.toHaveBeenCalled();
+    });
+
+    it('should redirect to dashboard on error', () => {
+      const setters = { setRoomId: jest.fn() };
+      const wsProvider = { send: jest.fn(), close: jest.fn() };
+      const router = { push: jest.fn() } as any;
+      const data = { error: { message: 'User already in room' } };
+
+      handleCreateRoom(data, setters, wsProvider, router);
+
+      expect(setters.setRoomId).not.toHaveBeenCalled();
+      expect(wsProvider.send).not.toHaveBeenCalled();
+      expect(router.push).toHaveBeenCalledWith('/dashboard');
+    });
+
+    it('should redirect to dashboard when no roomId in response', () => {
+      const setters = { setRoomId: jest.fn() };
+      const wsProvider = { send: jest.fn(), close: jest.fn() };
+      const router = { push: jest.fn() } as any;
+      const data = {};
+
+      handleCreateRoom(data, setters, wsProvider, router);
+
+      expect(setters.setRoomId).not.toHaveBeenCalled();
+      expect(router.push).toHaveBeenCalledWith('/dashboard');
     });
   });
 

@@ -24,12 +24,14 @@ const NewGame: NextPage = () => {
   const { roomId, setRoomId, isAlreadyConnected } = useGame();
   const router = useRouter();
   useEffect(() => {
-    console.log("roomid happens", roomId);
+    console.log("[DEBUG /new page] roomId changed:", roomId);
 
     if (!roomId) {
+      console.log("[DEBUG /new page] No roomId yet, waiting for create-room response");
       return;
     }
 
+    console.log("[DEBUG /new page] Got roomId, redirecting to /game/", roomId);
     router.push(`/game/${roomId}`);
 
     return () => setRoomId(null);
@@ -57,6 +59,7 @@ const NewGame: NextPage = () => {
   }, [isAlreadyConnected]);
 
   useEffect(() => {
+    console.log("[DEBUG /new page] Sending create-room event");
     WSProvider.send(
       JSON.stringify({
         event: "create-room",

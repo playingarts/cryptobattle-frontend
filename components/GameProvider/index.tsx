@@ -162,20 +162,43 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   }, [WSProvider]);
 
   useEffect(() => {
+    // Use both pathname and asPath for more reliable path detection
+    const currentPath = router.pathname;
+    const actualPath = router.asPath;
+
+    console.log('[DEBUG GameProvider redirect check]', {
+      isAlreadyConnected,
+      user: user ? { userId: user.userId, inGameId: user.inGameId, inRoomId: user.inRoomId } : null,
+      isGameStarted: isGameStarted(),
+      pathname: currentPath,
+      asPath: actualPath,
+    });
+
     if (isAlreadyConnected || !user || isGameStarted()) {
+      console.log('[DEBUG GameProvider] Skipping redirect - early return conditions met');
       return;
     }
 
     // Skip redirect if already on game-related pages or dashboard
-    const currentPath = router.pathname;
+    // Check both pathname and asPath for reliability
     const skipRedirectPaths = ['/new', '/game/', '/play', '/dashboard'];
-    const shouldSkipRedirect = skipRedirectPaths.some(path => currentPath.startsWith(path));
+    const shouldSkipRedirect = skipRedirectPaths.some(path =>
+      currentPath.startsWith(path) || actualPath.startsWith(path)
+    );
+
+    console.log('[DEBUG GameProvider redirect decision]', {
+      shouldSkipRedirect,
+      willRedirectToPlay: user.inGameId && !shouldSkipRedirect,
+      willRedirectToRoom: user.inRoomId && !currentPath.startsWith("/join") && !actualPath.startsWith("/join") && !shouldSkipRedirect,
+    });
 
     if (user.inGameId && !shouldSkipRedirect) {
+      console.log('[DEBUG GameProvider] Redirecting to /play due to inGameId:', user.inGameId);
       router.push(`/play`);
       return;
     }
-    if (user.inRoomId && !currentPath.startsWith("/join") && !shouldSkipRedirect) {
+    if (user.inRoomId && !currentPath.startsWith("/join") && !actualPath.startsWith("/join") && !shouldSkipRedirect) {
+      console.log('[DEBUG GameProvider] Redirecting to /game/ due to inRoomId:', user.inRoomId);
       router.push(`/game/${user.inRoomId}`);
     }
     console.log(selectedCard);
