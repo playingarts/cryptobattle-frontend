@@ -218,13 +218,13 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     }
 
     console.log(
-      Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties)
+      Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties || {})
         .length === 0,
       "length"
     );
 
     if (
-      Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties)
+      Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties || {})
         .length === 0
     ) {
       setTimeout(() => {
