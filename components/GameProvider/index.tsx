@@ -140,7 +140,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     if (!WSProvider) {
       return;
     }
-    setInterval(() => {
+    const intervalId = setInterval(() => {
       WSProvider.send(
         JSON.stringify({
           event: "ping",
@@ -148,6 +148,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         })
       );
     }, 20000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
   }, [WSProvider]);
 
   useEffect(() => {

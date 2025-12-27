@@ -1,8 +1,10 @@
 import axios from "axios";
 import { logError } from "./utils/errorHandler";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://cryptobattle-backend-production.up.railway.app/';
+
 const client = axios.create({
-  baseURL: `https://cryptobattle-backend-production.up.railway.app/`,
+  baseURL: API_BASE_URL,
 });
 
 const request = function (options) {
