@@ -2,6 +2,8 @@
  * Jest configuration for E2E smoke tests
  * These tests run against the production or staging backend
  */
+const path = require('path');
+
 module.exports = {
   displayName: 'e2e',
   testEnvironment: 'node',
@@ -15,7 +17,7 @@ module.exports = {
     ],
     '^.+\\.jsx?$': [
       'babel-jest',
-      { configFile: '<rootDir>/tests/e2e/babel.config.js' },
+      { configFile: path.resolve(__dirname, 'tests/e2e/babel.config.js') },
     ],
   },
   // Allow axios ESM module to be transformed
