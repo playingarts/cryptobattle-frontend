@@ -7,6 +7,7 @@ import { useNotifications } from "../../components/NotificationProvider";
 import Text from "../../components/Text";
 import Warning from "../../components/Icons/Warning";
 import Button from "../../components/Button";
+import { hasResults } from "../../utils/gameState";
 
 // import { useGame } from "../../components/GameProvider";
 
@@ -39,9 +40,7 @@ const GameLayout: FC<
       console.log("handleRouteChange", url);
 
       if (
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-        !window.results &&
+        !hasResults() &&
         !isConfirmedLeave &&
         url !== "/play" &&
         !localStorage.getItem("play-again")

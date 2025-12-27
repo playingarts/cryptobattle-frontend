@@ -17,6 +17,16 @@ import { useWS } from "../../components/WsProvider/index";
 import { useAuth } from "../../components/AuthProvider";
 import { api } from "../../api";
 import Warning from "../../components/Icons/Warning";
+import {
+  isGameStarted,
+  setGameStarted,
+  setRoomId as setGlobalRoomId,
+  setUserId as setGlobalUserId,
+  getUserId as getGlobalUserId,
+  hasResults,
+  setResults as setGlobalResults,
+  setConnectionClosed,
+} from "../../utils/gameState";
 
 type GameProviderProps = { children: ReactNode };
 
@@ -93,9 +103,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
     setResults(null);
     closeNotification();
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    window.gameStarted = false;
+    setGameStarted(false);
     router.push("/dashboard");
   };
 
@@ -110,9 +118,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     localStorage.setItem("chosen-nfts", "");
 
     closeNotification();
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    window.gameStarted = false;
+    setGameStarted(false);
     router.push("/new");
   };
 
@@ -155,9 +161,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   }, [WSProvider]);
 
   useEffect(() => {
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    if (isAlreadyConnected || !user || window.gameStarted) {
+    if (isAlreadyConnected || !user || isGameStarted()) {
       return;
     }
 
@@ -244,9 +248,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   }, [gameState]);
 
   useEffect(() => {
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    window.roomId = roomId;
+    setGlobalRoomId(roomId);
   }, [roomId]);
 
   useEffect(() => {
@@ -289,9 +291,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           iconColor: "#FF6F41",
         });
 
-        // eslint-disable-next-line
-        // @ts-ignore
-        window.isConnectionClosed = true;
+        setConnectionClosed(true);
         WSProvider.close()
       }
 
@@ -337,9 +337,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       if (event.event === "user-info") {
         setUserInfo(event.data);
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-        window.userId = event.data.userId;
+        setGlobalUserId(event.data.userId);
         setIsBackendReady(true);
         // if (event.data.inRoomId) {
         //   setRoomId(event.data.inRoomId);
@@ -372,17 +370,13 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         console.log("next-game", event);
       }
 
-      // eslint-disable-next-line
-      // @ts-ignore: Unreachable code error
-      if (event.event === "room-updated" && window.results) {
+      if (event.event === "room-updated" && hasResults()) {
         setResults(null);
         closeNotification();
         setRoomInfo(event.data);
         setPlayers(event.data.roomUsers);
         setPlayingAgain(null);
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-        window.results = null;
+        setGlobalResults(false);
 
         router.push(`/game/${event.data.roomId}`);
         return;
@@ -391,9 +385,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       if (event.event === "close-room") {
 
         event.data.ownderId &&
-      // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-          event.data.ownderId !== window.userId && !window.results &&
+          event.data.ownderId !== getGlobalUserId() && !hasResults() &&
           openNotification({
             title: "Ooopps",
             description: <span>This game has been closed by host</span>,
@@ -530,24 +522,15 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       if (event.event === "game-results") {
         console.log("game-results", event.data);
         setResults(event.data);
-
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-        window.results = true;
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
+        setGlobalResults(true);
       }
 
       if (event.event === "game-info") {
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-        if (event.data.state === "ended" && window.results) {
+        if (event.data.state === "ended" && hasResults()) {
           return;
         }
         setGameState({ ...gameState, ...event.data });
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
-        if (event.data.state === "ended" && !window.results) {
+        if (event.data.state === "ended" && !hasResults()) {
           WSProvider.send(
             JSON.stringify({
               event: "game-results",
@@ -578,16 +561,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         setTimeout(() => {
           if (event.data.state === "started") {
             closeNotification();
-            // eslint-disable-next-line
-            // @ts-ignore: Unreachable code error
-            if (!window.gameStarted && !window.results) {
+            if (!isGameStarted() && !hasResults()) {
               playStartGameSound();
-              // eslint-disable-next-line
-              // @ts-ignore: Unreachable code error
-              window.gameStarted = true;
+              setGameStarted(true);
             }
-            // eslint-disable-next-line
-            // @ts-ignore: Unreachable code error
             if (
               !window.location.pathname.split("?")[0].endsWith("/dashboard")
             ) {

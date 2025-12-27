@@ -14,6 +14,7 @@ import Link from "../../components/Link";
 import { api } from "../../api";
 import { logError } from "../../utils/errorHandler";
 import { useNotifications } from "../NotificationProvider";
+import { setUser as setGlobalUser } from "../../utils/gameState";
 
 import Text from "../Text/";
 import Button from "../Button/";
@@ -81,9 +82,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       }
 
       setUser(user);
-            // eslint-disable-next-line
-    // @ts-ignore
-      window.user = JSON.stringify(user)
+      setGlobalUser(JSON.stringify(user))
       const roomid = localStorage.getItem("roomid");
       if (!localStorage.getItem("adding-metamask")) {
         console.log('/dashboard redirect here.')
@@ -117,9 +116,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
         const user = formatUserData(data);
         setUser(user);
-      // eslint-disable-next-line
-    // @ts-ignore
-        window.user = JSON.stringify(user)
+        setGlobalUser(JSON.stringify(user))
 
       });
     }

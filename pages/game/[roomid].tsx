@@ -18,6 +18,7 @@ import Ready from "../../components/Ready";
 import NFTChoose from "../../components/NFTChoose";
 import { useNotifications } from "../../components/NotificationProvider";
 import { useAuth } from "../../components/AuthProvider";
+import { setGameStarted } from "../../utils/gameState";
 import NavProfile from "../../components/NavProfile";
 import LobbyUrl from "../../components/LobbyUrl";
 
@@ -319,11 +320,7 @@ const JoinGame: NextPage = () => {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
-    window.gameStarted = false;
-    // eslint-disable-next-line
-    // @ts-ignore: Unreachable code error
+    setGameStarted(false);
     localStorage.removeItem("play-again");
 
     if (!isBackendReady) {

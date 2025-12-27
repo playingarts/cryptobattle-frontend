@@ -1,6 +1,7 @@
 import UserAvatar from "../UserAvatar";
 
 import { FC, HTMLAttributes } from "react";
+import { getUser as getGlobalUser } from "../../utils/gameState";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
 interface User extends Props {
@@ -8,9 +9,8 @@ interface User extends Props {
 }
 
 const NavProfile: FC<User> = (props) => {
-      // eslint-disable-next-line
-    // @ts-ignore
-  const user  =  window.user ? JSON.parse(window.user) : props.user
+  const globalUser = getGlobalUser();
+  const user = globalUser ? JSON.parse(globalUser) : props.user
 
   return (
     <div style={{ cursor: "pointer" }} {...props}>

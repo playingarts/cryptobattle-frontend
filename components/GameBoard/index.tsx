@@ -6,6 +6,13 @@ import CardEmpty from "../../components/CardEmpty";
 import { useGame } from "../GameProvider";
 import { useWS } from "../WsProvider";
 import interact from "interactjs";
+import {
+  setSelectedCard as setGlobalSelectedCard,
+  getSelectedCard as getGlobalSelectedCard,
+  setState as setGlobalState,
+  getState as getGlobalState,
+  setGameStarted,
+} from "../../utils/gameState";
 
 interface Props extends HTMLAttributes<HTMLElement> {
   removeCard?: (cardId: string) => void;
@@ -58,15 +65,11 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   );
 
   useEffect(() => {
-    // eslint-disable-next-line
-    // @ts-ignore
-    window.selectedCard = selectedCard;
+    setGlobalSelectedCard(selectedCard);
   }, [selectedCard]);
 
   useEffect(() => {
-    // eslint-disable-next-line
-    // @ts-ignore
-    window.state = gameState;
+    setGlobalState(gameState);
   }, [gameState]);
 
   const addCard = useCallback(
@@ -250,9 +253,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     });
 
     if (gameState.lastPlayedCard) {
-      // eslint-disable-next-line
-      // @ts-ignore: Unreachable code error
-      window.gameStarted = true;
+      setGameStarted(true);
     }
 
     setLastPlayedCard(
@@ -398,17 +399,11 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         console.log(event, "ondrop event");
 
         const target = event.currentTarget.id.split("-");
-        // eslint-disable-next-line
-        // @ts-ignore
         addCard(
           Number(target[0]),
           Number(target[1]),
-          // eslint-disable-next-line
-          // @ts-ignore
-          window.selectedCard,
-          // eslint-disable-next-line
-          // @ts-ignore
-          window.state
+          getGlobalSelectedCard(),
+          getGlobalState()
         )();
         event.stopImmediatePropagation();
       },

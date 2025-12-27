@@ -12,6 +12,7 @@ import { NotificationProvider } from "../components/NotificationProvider/";
 
 import { WSProvider } from "../components/WsProvider/index";
 import "../css/style.css";
+import { isConnectionClosed, setConnectionClosed } from "../utils/gameState";
 declare module "@emotion/react" {
   export interface Theme {
     transitions: {
@@ -205,15 +206,9 @@ const App = ({ Component, pageProps }: AppProps) => {
     window.onblur = function () {
 
       window.onfocus = function () {
-    
-        // eslint-disable-next-line
-        // @ts-ignore
-        if (window.isConnectionClosed) {
+        if (isConnectionClosed()) {
           location.reload();
-        // eslint-disable-next-line
-        // @ts-ignore
-          window.isConnectionClosed = false;
-
+          setConnectionClosed(false);
         }
       };
     };
