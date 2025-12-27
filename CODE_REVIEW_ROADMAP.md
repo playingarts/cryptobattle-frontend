@@ -52,9 +52,11 @@ Based on senior engineer review of the CryptoBattle frontend codebase.
 ### [x] Create logging infrastructure
 - Created `utils/logger.ts` with levels and contexts
 
-### [ ] Consolidate React context providers
-- Create `components/AppProviders/index.tsx`
-- Simplify `pages/_app.tsx` nesting
+### [x] Consolidate React context providers
+- Created `components/AppProviders/index.tsx`
+- Simplified `pages/_app.tsx` from 6 levels of nesting to single AppProviders
+- Added NEXT_PUBLIC_WS_URL environment variable support
+- Removed @ts-ignore comment from Component spread
 
 ### [ ] Remove unnecessary eslint-disable/@ts-ignore comments
 - 111 occurrences across 16 files
@@ -79,14 +81,14 @@ Based on senior engineer review of the CryptoBattle frontend codebase.
 | .env.example | Done | - |
 | Some @ts-ignore removal | Done | d848c19 |
 | Eliminate window.* global state | Done | 81ca764 |
-| Extract WebSocket event handlers | Done | - |
+| Extract WebSocket event handlers | Done | c496dd3 |
+| Consolidate React context providers | Done | - |
 
 ---
 
 ## Next Steps (Priority Order)
 
-1. Consolidate providers into AppProviders (P2/P3)
-2. Remove remaining @ts-ignore/eslint-disable (P2/P3)
+1. Remove remaining @ts-ignore/eslint-disable (P2/P3)
 
 ---
 
