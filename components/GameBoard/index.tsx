@@ -196,9 +196,14 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         console.log("Playing card: ", card);
 
         // Optimistic UI - immediately add card to board and show animation
-        addCardToBoard(rowIndex, columnIndex, card);
-        setLastPlayedCard({
+        // Use turnForPlayer from gameState as the current user's ID for proper color
+        const cardWithUserId = {
           ...card,
+          userId: state.turnForPlayer,
+        };
+        addCardToBoard(rowIndex, columnIndex, cardWithUserId);
+        setLastPlayedCard({
+          ...cardWithUserId,
           scoringLevel: 0, // Will be updated when server responds
         });
 
