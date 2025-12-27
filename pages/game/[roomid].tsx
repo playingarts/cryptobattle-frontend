@@ -319,15 +319,6 @@ const JoinGame: NextPage = () => {
   }, [roomInfo, user]);
 
   useEffect(() => {
-    setTimeout(() => {
-      if (localStorage.getItem("show-rules-modal")) {
-        document.getElementById("rules-button")?.click();
-        localStorage.removeItem("show-rules-modal");
-      }
-    }, 0);
-  }, []);
-
-  useEffect(() => {
     setGameStarted(false);
     localStorage.removeItem("play-again");
 
