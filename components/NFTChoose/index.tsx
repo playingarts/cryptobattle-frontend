@@ -4,6 +4,7 @@ import { Modal, DialogClose } from "../Modal";
 import Text from "../Text";
 import { useAuth } from "../AuthProvider";
 import { api } from "../../api";
+import { logError } from "../../utils/errorHandler";
 import Line from "../Line";
 import { getCard } from "../../components/Cards";
 
@@ -129,7 +130,7 @@ const NFTChoose: FC<Props> = () => {
         setNFTCards(computedData);
       })
       .catch((err: any) => {
-        console.log(err);
+        logError(err, 'NFTChoose');
         setLoading(false);
       });
   }, [user]);

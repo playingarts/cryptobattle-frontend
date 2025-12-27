@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { api } from "../../api";
 import { formatUsername } from "../../utils/helpers";
+import { logError } from "../../utils/errorHandler";
 import Loader from "../../components/Loader";
 import { useNotifications } from "../../components/NotificationProvider";
 
@@ -44,7 +45,7 @@ const Home: any = () => {
         setLoaded(true);
       })
       .catch((err: any) => {
-        console.log(err);
+        logError(err, 'JoinLogin');
         openNotification({
           title: "Ooops",
           description: <span>The game you are trying to join has ended!</span>,

@@ -10,6 +10,7 @@ import { useNotifications } from "../NotificationProvider";
 import Text from "../Text/";
 import Button from "../Button/";
 import { formatUsername } from "../../utils/helpers";
+import { logError } from "../../utils/errorHandler";
 import { useRouter } from "next/router";
 import Refresh from "../Icons/Refresh";
 import { useWS } from "../../components/WsProvider/index";
@@ -223,7 +224,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
             setPlayersInfo([...playersInfo, data]);
           })
           .catch((err) => {
-            console.log(err);
+            logError(err, 'GameProvider');
           });
       }
     });

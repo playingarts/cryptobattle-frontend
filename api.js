@@ -1,4 +1,5 @@
 import axios from "axios";
+import { logError } from "./utils/errorHandler";
 
 const client = axios.create({
   baseURL: `https://cryptobattle-backend-production.up.railway.app/`,
@@ -23,7 +24,7 @@ const request = function (options) {
           localStorage.setItem("accessTokenExpire", data.accessTokenExpire);
         })
         .catch((err) => {
-          console.log(err);
+          logError(err, 'API:RefreshToken');
         });
     }
     return response.data;

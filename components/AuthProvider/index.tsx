@@ -12,6 +12,7 @@ import axios from "axios";
 import Link from "../../components/Link";
 
 import { api } from "../../api";
+import { logError } from "../../utils/errorHandler";
 import { useNotifications } from "../NotificationProvider";
 
 import Text from "../Text/";
@@ -231,7 +232,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
         }, 0);
       })
       .catch((err) => {
-        console.log(err);
+        logError(err, 'AuthProvider');
       });
 
     // localStorage.removeItem("accessToken");

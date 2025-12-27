@@ -6,6 +6,7 @@ import Link from "../Link";
 import Text from "../Text";
 import { useAuth } from "../AuthProvider";
 import { api } from "../../api";
+import { logError } from "../../utils/errorHandler";
 import Loader from "../Loader";
 import MetamaskLogin from "../../components/MetamaskLogin/";
 import Card from "../../components/CardNew";
@@ -68,7 +69,7 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
         setNFTCards(computedData);
       })
       .catch((err: any) => {
-        console.log(err);
+        logError(err, 'NFTInventory');
         setLoading(false);
       });
   }, [user]);

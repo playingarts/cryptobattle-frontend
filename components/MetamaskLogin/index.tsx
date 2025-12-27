@@ -4,6 +4,7 @@ import Button from "../Button";
 import store from "store";
 import { HTMLAttributes, FC } from "react";
 import { useAuth } from "../AuthProvider";
+import { logError } from "../../utils/errorHandler";
 import Metamask from "../Icons/Metamask";
 import axios from "axios";
 import { useRouter } from "next/router";
@@ -78,7 +79,7 @@ const router = useRouter();
             console.log(result.data.accesstoken);
           })
           .catch((err) => {
-            console.log(err);
+            logError(err, 'MetamaskLogin');
           });
       })
       .catch(() => setSignature((prev) => ({ ...prev, signing: false })));
@@ -110,7 +111,7 @@ const router = useRouter();
      
       })
       .catch((err) => {
-        console.log(err);
+        logError(err, 'MetamaskLogin');
       });
   };
 
