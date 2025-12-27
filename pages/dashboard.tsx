@@ -59,38 +59,6 @@ const Home: NextPage = () => {
           >
             <DashboardHeader />
 
-            <div
-              css={{
-                backgroundColor: "#181818",
-                color: "rgba(255, 255, 255, 0.3)",
-                maxWidth: 1040,
-                margin: "30px auto 0",
-                padding: "0 70px",
-                lineHeight: "70px",
-                fontSize: "16px",
-                borderRadius: "10px",
-              }}
-            >
-              We need your feedback!
-              <a
-                css={{
-                  color: "rgba(255, 255, 255, 0.5)",
-                  textDecoration: "none",
-                  margin: "0 7px",
-                  transition: "all 300ms",
-                  "&:hover": {
-                    color: "rgba(255, 255, 255, 0.9)",
-                  },
-                }}
-                href="https://discord.gg/bJUDBsj977"
-                target={"_blank"}
-                rel="noreferrer"
-              >
-                Join our Discord
-              </a>
-              and let us know what you think about this game!
-            </div>
-
             {/* <div
               css={{
                 display: "flex",
