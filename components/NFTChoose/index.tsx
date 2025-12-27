@@ -32,21 +32,15 @@ const NFTChoose: FC<Props> = () => {
 
   const { user } = useAuth();
 
+  // Get saved NFT choices from localStorage
+  const savedNfts = typeof window !== 'undefined' ? localStorage.getItem("chosen-nfts") : null;
+  const parsedNfts = savedNfts ? JSON.parse(savedNfts) : null;
+
   const [firstCard, setFirstCard] = useState<any>(
-    localStorage.getItem("chosen-nfts")
-      // eslint-disable-next-line
-  // @ts-ignore: Unreachable code error
-      ? JSON.parse(localStorage.getItem("chosen-nfts"))[0]
-      : null
+    parsedNfts ? parsedNfts[0] : null
   );
-  // eslint-disable-next-line
-  // @ts-ignore: Unreachable code error
   const [secondCard, setSecondCard] = useState<any>(
-    localStorage.getItem("chosen-nfts")
-      // eslint-disable-next-line
-  // @ts-ignore: Unreachable code error
-      ? JSON.parse(localStorage.getItem("chosen-nfts"))[1]
-      : null
+    parsedNfts ? parsedNfts[1] : null
   );
 
   const [activeCard, setActiveCard] = useState(0);

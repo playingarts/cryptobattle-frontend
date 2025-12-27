@@ -16,7 +16,7 @@ const GameLayout: FC<
     "altNav" | "showAltNav" | "noNav" | "palette" | "isCardPage" | "loading"
   >
 > = ({ palette, loading, children }) => {
-  const container = useRef(null);
+  const container = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { openNotification, closeNotification } = useNotifications();
 
@@ -114,14 +114,8 @@ const GameLayout: FC<
 
   useEffect(() => {
     if (container.current) {
-      // eslint-disable-next-line
-      // @ts-ignore: Unreachable code error
-      container.current?.scrollTo(
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
+      container.current.scrollTo(
         (container.current.scrollWidth - container.current.clientWidth) / 2,
-        // eslint-disable-next-line
-        // @ts-ignore: Unreachable code error
         container.current.scrollHeight / 2 - container.current.clientHeight / 2
       );
     }
