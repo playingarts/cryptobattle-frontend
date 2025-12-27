@@ -10,7 +10,7 @@ import ComposedGlobalLayout from "../../components/_composed/GlobalLayout";
 import Button from "../../components/Button";
 import GameRules from "../../components/GameRules/";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import Lobby from "../../components/Lobby";
 import Ready from "../../components/Ready";
@@ -42,6 +42,9 @@ const JoinGame: NextPage = () => {
   const [isConfirmedLeave, setIsConfirmedLeave] = useState(false);
 
   const [isOwner, setIsOwner] = useState<any>(null);
+
+  // Ref to store beforeunload handler so we can remove it when intentionally leaving
+  const beforeUnloadHandlerRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null);
 
   const { openNotification, closeNotification } = useNotifications();
 
@@ -188,16 +191,17 @@ const JoinGame: NextPage = () => {
   }, [isAlreadyConnected]);
 
   useEffect(() => {
-    const handleTabClose = (event: any) => {
+    const handleTabClose = (event: BeforeUnloadEvent) => {
       event.preventDefault();
-
       return;
     };
 
+    beforeUnloadHandlerRef.current = handleTabClose;
     window.addEventListener("beforeunload", handleTabClose);
 
     return () => {
       window.removeEventListener("beforeunload", handleTabClose);
+      beforeUnloadHandlerRef.current = null;
     };
   }, []);
 
@@ -229,6 +233,10 @@ const JoinGame: NextPage = () => {
       closeNotification();
       leave();
       setIsConfirmedLeave(true);
+      // Remove beforeunload handler to prevent browser "Leave site?" dialog
+      if (beforeUnloadHandlerRef.current) {
+        window.removeEventListener("beforeunload", beforeUnloadHandlerRef.current);
+      }
       // Use window.location for full page reload to reset WebSocket and user state
       setTimeout(() => {
         window.location.href = "/dashboard";
