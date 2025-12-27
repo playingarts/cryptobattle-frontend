@@ -37,11 +37,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   const [board, setBoard] = useState(generateBoard(7, 5));
   const [cardError, setCardError] = useState<any>([]);
   const [lastPlayedCard, setLastPlayedCard] = useState<any>(null);
-  const [pendingCard, setPendingCard] = useState<{
-    card: any;
-    rowIndex: number;
-    columnIndex: number;
-  } | null>(null);
 
   const playCardBeep = new Audio("../../sounds/play-card.mp3");
 
@@ -135,22 +130,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         }
 
         console.log("Playing card: ", card);
-
-        // Optimistic UI update - show animation immediately before server response
-        setPendingCard({
-          card: {
-            ...card,
-            scoringLevel: 0, // Will be updated when server responds
-          },
-          rowIndex,
-          columnIndex,
-        });
-
-        // Clear pending card animation after delay
-        setTimeout(() => {
-          setPendingCard(null);
-        }, 2000);
-
         WSProvider.send(
           JSON.stringify({
             event: "play-card",
@@ -275,11 +254,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
 
     if (gameState.lastPlayedCard) {
       setGameStarted(true);
-    }
-
-    // Clear pending card when server responds with the actual card placement
-    if (gameState.lastPlayedCard) {
-      setPendingCard(null);
     }
 
     setLastPlayedCard(
@@ -504,25 +478,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                           <div className="game-latest-card__score">
                             {" "}
                             +{lastPlayedCard.scoringLevel}
-                          </div>
-                        </div>
-                      )}
-
-                    {/* Optimistic animation for pending card (shows immediately on drop) */}
-                    {pendingCard &&
-                      pendingCard.rowIndex === rowIndex &&
-                      pendingCard.columnIndex === columnIndex && (
-                        <div
-                          className="game-latest-card"
-                          css={{
-                            background: "#4CAF50",
-                            outlineColor: "#4CAF50",
-                            zIndex: 9999,
-                          }}
-                        >
-                          <div className="game-latest-card__score">
-                            {" "}
-                            +{pendingCard.card.scoringLevel}
                           </div>
                         </div>
                       )}
