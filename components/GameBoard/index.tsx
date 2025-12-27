@@ -18,6 +18,7 @@ interface Props extends HTMLAttributes<HTMLElement> {
   removeCard?: (cardId: string) => void;
 }
 
+
 const GameBoard: FC<Props> = ({ children, removeCard }) => {
   const WSProvider = useWS();
 
@@ -36,14 +37,18 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
 
   const [board, setBoard] = useState(generateBoard(7, 5));
   const [cardError, setCardError] = useState<any>([]);
-  const [lastPlayedCard, setLastPlayedCard] = useState<any>(null);
 
   // Track which card we're currently animating - stored as "suit-value" string
   // This ref is the SINGLE SOURCE OF TRUTH for animation state
   const animatingCardIdRef = useRef<string | null>(null);
-  const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
   // Track the last card we processed from gameState to detect new cards from opponents
   const lastProcessedServerCardRef = useRef<string | null>(null);
+  // Reference to the animation overlay element for JS animations
+  const animationOverlayRef = useRef<HTMLDivElement | null>(null);
+  // Reference to the score overlay element for JS animations
+  const scoreOverlayRef = useRef<HTMLDivElement | null>(null);
+  // Track if animation is currently running
+  const animationRunningRef = useRef(false);
 
   const playCardBeep = new Audio("../../sounds/play-card.mp3");
 
@@ -79,46 +84,121 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     setGlobalState(gameState);
   }, [gameState]);
 
-  // Start animation for a card - this is the ONLY function that should set lastPlayedCard
-  const startAnimation = useCallback((card: any, playSound = true) => {
+  // Get player color for a userId
+  const getPlayerColor = useCallback(
+    (userId: string) => {
+      if (userId === "system") {
+        return "#2D3038";
+      }
+      const foundPlayer = players.find(
+        (player: any) => player.userId === userId
+      );
+      return foundPlayer ? foundPlayer.color : "gray";
+    },
+    [players]
+  );
+
+  // Start animation for a card using Web Animations API
+  // This approach is immune to React re-renders and CSS animation restarts
+  const startAnimation = useCallback((card: any, row: number, column: number, playSound = true) => {
     const cardId = `${card.suit}-${card.value}`;
 
     // If we're already animating this exact card, do nothing
-    if (animatingCardIdRef.current === cardId) {
+    if (animatingCardIdRef.current === cardId || animationRunningRef.current) {
       return;
     }
 
-    // Clear any existing animation timer
-    if (animationTimerRef.current) {
-      clearTimeout(animationTimerRef.current);
+    // Mark animation as running
+    animatingCardIdRef.current = cardId;
+    animationRunningRef.current = true;
+
+    // Get the card element position for positioning the overlay
+    const cardElement = document.querySelector(`[data-row="${row}"][data-column="${column}"]`);
+    if (!cardElement || !animationOverlayRef.current || !scoreOverlayRef.current) {
+      animatingCardIdRef.current = null;
+      animationRunningRef.current = false;
+      return;
     }
 
-    // Set the animation state
-    animatingCardIdRef.current = cardId;
-    setLastPlayedCard(card);
+    const rect = cardElement.getBoundingClientRect();
+    const color = getPlayerColor(card.userId);
+
+    // Setup the overlay element
+    const overlay = animationOverlayRef.current;
+    const scoreOverlay = scoreOverlayRef.current;
+
+    // Position and style the overlay
+    overlay.style.position = "fixed";
+    overlay.style.top = `${rect.top}px`;
+    overlay.style.left = `${rect.left}px`;
+    overlay.style.width = `${rect.width}px`;
+    overlay.style.height = `${rect.height}px`;
+    overlay.style.background = color;
+    overlay.style.outline = `6px solid ${color}`;
+    overlay.style.borderRadius = "10px";
+    overlay.style.display = "flex";
+    overlay.style.justifyContent = "center";
+    overlay.style.alignItems = "center";
+    overlay.style.fontFamily = "Aldrich";
+    overlay.style.fontSize = "100px";
+    overlay.style.color = "#fff";
+    overlay.style.zIndex = "9999";
+    overlay.style.pointerEvents = "none";
+
+    // Set score text
+    scoreOverlay.textContent = `+${card.scoringLevel || 0}`;
 
     if (playSound) {
       playCardBeep.play();
     }
 
+    // Define the card fly-in animation keyframes (matching CSS @keyframes example)
+    const cardKeyframes = [
+      { opacity: 0, transform: "translate(-150px, -150px) rotate(-10deg) scale(2, 2)" },
+      { opacity: 0.4, transform: "translate(-100px, -100px) rotate(-5deg) scale(2, 2)", offset: 0.3 },
+      { opacity: 1, transform: "translate(0, 0) rotate(0) scale(1, 1)", offset: 0.68 },
+      { opacity: 1, transform: "translate(0, 0) rotate(0) scale(1, 1)", offset: 0.72 },
+      { opacity: 0, transform: "translate(0, 0) rotate(0) scale(1, 1)" },
+    ];
+
+    // Define the score animation keyframes (matching CSS @keyframes example2)
+    const scoreKeyframes = [
+      { opacity: 1, transform: "scale(1, 1)" },
+      { opacity: 1, transform: "scale(1, 1)", offset: 0.3 },
+      { opacity: 1, transform: "scale(1, 1)", offset: 0.68 },
+      { opacity: 1, transform: "scale(1, 1)", offset: 0.72 },
+      { opacity: 0.5, transform: "scale(2, 2)", offset: 0.8 },
+      { opacity: 0, transform: "scale(3, 3)" },
+    ];
+
+    // Run the animation using Web Animations API
+    const cardAnimation = overlay.animate(cardKeyframes, {
+      duration: 800,
+      easing: "linear",
+      fill: "forwards",
+    });
+
+    scoreOverlay.animate(scoreKeyframes, {
+      duration: 800,
+      easing: "linear",
+      fill: "forwards",
+    });
+
     // Scroll to card if needed
     setTimeout(() => {
-      const latestCard = document.getElementsByClassName("game-latest-card")[0];
-      if (latestCard) {
-        const rect = latestCard.getBoundingClientRect();
-        const inView = rect.top >= 0 && rect.bottom <= window.innerHeight;
-        if (!inView) {
-          latestCard.scrollIntoView({ block: "center", behavior: "smooth" });
-        }
+      const inView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+      if (!inView) {
+        cardElement.scrollIntoView({ block: "center", behavior: "smooth" });
       }
     }, 0);
 
-    // End animation after 2 seconds
-    animationTimerRef.current = setTimeout(() => {
-      setLastPlayedCard(null);
+    // Cleanup after animation completes
+    cardAnimation.onfinish = () => {
+      overlay.style.display = "none";
       animatingCardIdRef.current = null;
-    }, 2000);
-  }, []);
+      animationRunningRef.current = false;
+    };
+  }, [getPlayerColor]);
 
   const addCardToBoard = useCallback(
     (rowIndex: number, columnIndex: number, card: any = selectedCard) => {
@@ -253,7 +333,10 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         addCardToBoard(rowIndex, columnIndex, cardWithUserId);
 
         // Start animation immediately for instant feedback (optimistic UI)
-        startAnimation(cardWithUserId, true);
+        // Use setTimeout to ensure the card is in the DOM before animating
+        setTimeout(() => {
+          startAnimation(cardWithUserId, rowIndex, columnIndex, true);
+        }, 0);
 
         WSProvider.send(
           JSON.stringify({
@@ -324,8 +407,13 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       // 2. AND we're not already animating this card (from optimistic UI)
       if (serverCardId !== lastProcessedServerCardRef.current &&
           serverCardId !== animatingCardIdRef.current) {
-        // This is an opponent's card - animate it
-        startAnimation(gameState.lastPlayedCard, true);
+        // Get position from the lastPlayedCard - x is column, y is row
+        const row = gameState.lastPlayedCard.y;
+        const column = gameState.lastPlayedCard.x;
+        // This is an opponent's card - animate it after a short delay to ensure DOM is ready
+        setTimeout(() => {
+          startAnimation(gameState.lastPlayedCard, row, column, true);
+        }, 50);
       }
       // Always update the last processed server card
       lastProcessedServerCardRef.current = serverCardId;
@@ -420,14 +508,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     };
   }, []);
 
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-      if (animationTimerRef.current) {
-        clearTimeout(animationTimerRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div
@@ -462,35 +542,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                     {!column && (
                       <div style={{ width: "210px", height: "300px" }}></div>
                     )}
-
-                    {column &&
-                      column[column.length - 1].suit &&
-                      column[column.length - 1].value &&
-                      lastPlayedCard?.value ===
-                        column[column.length - 1].value &&
-                      lastPlayedCard?.suit === column[column.length - 1].suit &&
-                      (lastPlayedCard?.id || column[column.length - 1].id
-                        ? lastPlayedCard?.id === column[column.length - 1].id
-                        : true) && (
-                        <div
-                          key={animatingCardIdRef.current}
-                          className="game-latest-card"
-                          css={{
-                            background: getColor(
-                              column[column.length - 1].userId
-                            )(),
-                            outlineColor: getColor(
-                              column[column.length - 1].userId
-                            )(),
-                            zIndex: 9999,
-                          }}
-                        >
-                          <div className="game-latest-card__score">
-                            {" "}
-                            +{lastPlayedCard.scoringLevel}
-                          </div>
-                        </div>
-                      )}
 
                     {column === "empty" && (
                       <CardEmpty
@@ -573,40 +624,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                                   : `6px solid ${getColor(card.userId)()}`,
                               borderRadius: 16,
                               position: "relative",
-                              // animationDuration: "10s",
-                              opacity:
-                                column &&
-                                column.length - 1 === index &&
-                                column[column.length - 1].suit &&
-                                column[column.length - 1].value &&
-                                lastPlayedCard?.value ===
-                                  column[column.length - 1].value &&
-                                lastPlayedCard?.suit ===
-                                  column[column.length - 1].suit &&
-                                (lastPlayedCard?.id ||
-                                column[column.length - 1].id
-                                  ? lastPlayedCard?.id ===
-                                    column[column.length - 1].id
-                                  : true)
-                                  ? 0
-                                  : 1,
-                              animation:
-                                column &&
-                                column[column.length - 1].suit &&
-                                column[column.length - 1].value &&
-                                lastPlayedCard?.value ===
-                                  column[column.length - 1].value &&
-                                lastPlayedCard?.suit ===
-                                  column[column.length - 1].suit &&
-                                (column[column.length - 1].id
-                                  ? lastPlayedCard?.id ===
-                                    column[column.length - 1].id
-                                  : true)
-                                  ? "example3  0.3s linear 0.3s 1 normal forwards"
-                                  : "",
-                              animationDelay: "1.6s",
                               transition: "all 300ms",
-                              // animationName: 'example3',
                               transform: getSkew(index)(),
                               "&::before": {
                                 transition: "all 300ms",
@@ -674,6 +692,13 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         })}
       </div>
       {children}
+      {/* Animation overlay - controlled by JS Web Animations API, not CSS */}
+      <div
+        ref={animationOverlayRef}
+        style={{ display: "none" }}
+      >
+        <div ref={scoreOverlayRef}></div>
+      </div>
     </div>
   );
 };
