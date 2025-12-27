@@ -38,11 +38,12 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   const [cardError, setCardError] = useState<any>([]);
   const [lastPlayedCard, setLastPlayedCard] = useState<any>(null);
 
-  // Use ref to track processed cards - doesn't cause re-renders or useEffect loops
-  const processedCardRef = useRef<string | null>(null);
+  // Track which card we're currently animating - stored as "suit-value" string
+  // This ref is the SINGLE SOURCE OF TRUTH for animation state
+  const animatingCardIdRef = useRef<string | null>(null);
   const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
-  // Store animation start time to create stable React key - prevents animation restart on re-render
-  const animationKeyRef = useRef<string | null>(null);
+  // Track the last card we processed from gameState to detect new cards from opponents
+  const lastProcessedServerCardRef = useRef<string | null>(null);
 
   const playCardBeep = new Audio("../../sounds/play-card.mp3");
 
@@ -78,28 +79,26 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     setGlobalState(gameState);
   }, [gameState]);
 
-  // Helper to trigger animation for a card
-  const triggerCardAnimation = useCallback((card: any, playSound = true) => {
+  // Start animation for a card - this is the ONLY function that should set lastPlayedCard
+  const startAnimation = useCallback((card: any, playSound = true) => {
     const cardId = `${card.suit}-${card.value}`;
 
-    // Skip if we already processed this exact card
-    if (processedCardRef.current === cardId) {
+    // If we're already animating this exact card, do nothing
+    if (animatingCardIdRef.current === cardId) {
       return;
     }
 
-    processedCardRef.current = cardId;
-    // Create a stable animation key with timestamp - this prevents React from remounting
-    // the animation element when gameState changes, which would restart the CSS animation
-    animationKeyRef.current = `${cardId}-${Date.now()}`;
+    // Clear any existing animation timer
+    if (animationTimerRef.current) {
+      clearTimeout(animationTimerRef.current);
+    }
+
+    // Set the animation state
+    animatingCardIdRef.current = cardId;
     setLastPlayedCard(card);
 
     if (playSound) {
       playCardBeep.play();
-    }
-
-    // Clear any existing timer
-    if (animationTimerRef.current) {
-      clearTimeout(animationTimerRef.current);
     }
 
     // Scroll to card if needed
@@ -114,11 +113,10 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       }
     }, 0);
 
-    // Clear animation after 2 seconds
+    // End animation after 2 seconds
     animationTimerRef.current = setTimeout(() => {
       setLastPlayedCard(null);
-      processedCardRef.current = null;
-      animationKeyRef.current = null;
+      animatingCardIdRef.current = null;
     }, 2000);
   }, []);
 
@@ -254,8 +252,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         };
         addCardToBoard(rowIndex, columnIndex, cardWithUserId);
 
-        // Trigger animation immediately for instant feedback
-        triggerCardAnimation(cardWithUserId, true);
+        // Start animation immediately for instant feedback (optimistic UI)
+        startAnimation(cardWithUserId, true);
 
         WSProvider.send(
           JSON.stringify({
@@ -271,7 +269,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
           })
         );
       },
-    [WSProvider, selectedCard, setCardError, addCardToBoard, triggerCardAnimation]
+    [WSProvider, selectedCard, setCardError, addCardToBoard, startAnimation]
   );
 
   useEffect(() => {
@@ -319,10 +317,20 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
 
     if (gameState.lastPlayedCard) {
       setGameStarted(true);
-      // Trigger animation - triggerCardAnimation will check if already processed
-      triggerCardAnimation(gameState.lastPlayedCard, true);
+      const serverCardId = `${gameState.lastPlayedCard.suit}-${gameState.lastPlayedCard.value}`;
+
+      // Only trigger animation if:
+      // 1. This is a NEW card from server (different from last processed server card)
+      // 2. AND we're not already animating this card (from optimistic UI)
+      if (serverCardId !== lastProcessedServerCardRef.current &&
+          serverCardId !== animatingCardIdRef.current) {
+        // This is an opponent's card - animate it
+        startAnimation(gameState.lastPlayedCard, true);
+      }
+      // Always update the last processed server card
+      lastProcessedServerCardRef.current = serverCardId;
     }
-  }, [gameState]);
+  }, [gameState, startAnimation]);
 
   useEffect(() => {
     console.log("interact happens");
@@ -465,7 +473,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                         ? lastPlayedCard?.id === column[column.length - 1].id
                         : true) && (
                         <div
-                          key={animationKeyRef.current}
+                          key={animatingCardIdRef.current}
                           className="game-latest-card"
                           css={{
                             background: getColor(
