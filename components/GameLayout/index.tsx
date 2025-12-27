@@ -83,10 +83,10 @@ const GameLayout: FC<
         }
 
         // Use window.location for full page reload to reset WebSocket and user state
-        // Increased timeout to ensure WebSocket message is sent before page unloads
+        // Longer timeout to ensure WebSocket message is sent AND processed by backend
         setTimeout(() => {
           window.location.href = "/dashboard";
-        }, 500);
+        }, 1500);
       };
 
       console.log("handleRouteChange", url);
