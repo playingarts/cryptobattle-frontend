@@ -4,13 +4,9 @@ import Grid from "../components/Grid";
 import Text from "../components/Text";
 import Link from "../components/Link";
 import Button from "../components/Button";
-// import PromoSection from "../components/PromoSection";
-
-import Twitter from "../components/Icons/Twitter";
 
 import Line from "../components/Line";
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
-// import Arrowed from "../components/Arrowed";
 import { useAuth } from "../components/AuthProvider";
 import MetamaskLogin from "../components/MetamaskLogin/";
 import GameRules from "../components/GameRules";
@@ -78,19 +74,6 @@ const Home: NextPage = () => {
                   Log in with
                 </Text>
                 <div style={{ display: "flex", justifyContent: "start" }}>
-                  <Button
-                    component={Link}
-                    href="https://cryptobattle-backend-production.up.railway.app/auth/twitter"
-                    Icon={Twitter}
-                    css={(theme) => ({
-                      background: "rgb(72, 155, 233)",
-                      marginRight: theme.spacing(1),
-                      color: "#fff",
-                    })}
-                  >
-                    Twitter
-                  </Button>
-
                   <MetamaskLogin />
                 </div>
               </div>

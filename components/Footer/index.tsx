@@ -6,7 +6,6 @@ import Pinterest from "../Icons/Pinterest";
 import Text from "../Text";
 import Button from "../Button";
 
-import Twitter from "../Icons/Twitter";
 import { socialLinks } from "../../source/consts";
 import Instagram from "../Icons/Instagram";
 import Facebook from "../Icons/Facebook";
@@ -58,10 +57,6 @@ const Footer: FC<HTMLAttributes<HTMLDivElement>> = (props) => (
       })}
     >
       {[
-        {
-          Icon: Twitter,
-          href: socialLinks.twitter,
-        },
         {
           Icon: Instagram,
           href: socialLinks.instagram,

@@ -29,24 +29,17 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
   });
 
   const getUsername = () => {
-    if (user.isTwitterConnected && !user.isMetamaskConnected) {
-      return `@${user.username}`;
-    }
-    if (!user.isTwitterConnected && user.isMetamaskConnected) {
+    if (user.isMetamaskConnected && user.metamask?.address) {
       return `${user.username}`;
     }
-    return `@${user.username} ・ ${
-      user && user.metamask && user.metamask.address
-    }`;
+    return user.username || '';
   };
 
   const getGreeting = () => {
-    if (user.isTwitterConnected) {
+    if (user.name) {
       return `GM, ${user.name}!`;
     }
-    if (!user.isTwitterConnected && user.isMetamaskConnected) {
-      return `GM!`;
-    }
+    return `GM!`;
   };
 
   useEffect(() => {

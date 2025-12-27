@@ -1,25 +1,15 @@
 import { NextPage } from "next";
 import Layout from "../components/Layout";
-// import Text from "../components/Text";
 import Button from "../components/Button";
-// import Link from "../components/Link";
 import GameRules from "../components/GameRules/";
 
-// import Stats from "../components/Stats";
-// import LeaderboardDashboard from "../components/LeaderboardDashboard";
 import NFTInventory from "../components/NFTInventory";
-// import PromoSection from "../components/PromoSection";
-// import Grid from "../components/Grid/";
-// import Twitter from "../components/Icons/Twitter";
-// import { formatUsername } from "../utils/helpers";
 
 import { useAuth } from "../components/AuthProvider";
 import NavProfile from "../components/NavProfile";
 
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 import DashboardHeader from "../components/DashboardHeader";
-
-import LinkTwitter from "../components/LinkTwitter";
 
 const Home: NextPage = () => {
   const { user } = useAuth();
@@ -101,7 +91,6 @@ const Home: NextPage = () => {
               and let us know what you think about this game!
             </div>
 
-            {user && !user.isTwitterConnected && <LinkTwitter />}
             {/* <div
               css={{
                 display: "flex",

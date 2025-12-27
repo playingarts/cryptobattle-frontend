@@ -40,8 +40,6 @@ const getUser = () => {
 };
 
 const formatUserData = (data: any) => {
-  data.isTwitterConnected =
-    data.authProvider === "twitter" || data.authProvider === "unified";
   data.isMetamaskConnected =
     data.authProvider === "metamask" || data.authProvider === "unified";
   return data;
@@ -65,7 +63,6 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     metamask: { address: "", signature: "" },
     profilePictureUrl: "",
     isMetamaskConnected: false,
-    isTwitterConnected: false,
   });
 
   const { accesstoken } = router.query;

@@ -3,7 +3,6 @@ import Text from "../../components/Text";
 import Line from "../../components/Line";
 import Link from "../../components/Link";
 import Button from "../../components/Button";
-import Twitter from "../../components/Icons/Twitter";
 import ComposedGlobalLayout from "../../components/_composed/GlobalLayout";
 import { useAuth } from "../../components/AuthProvider";
 import MetamaskLogin from "../../components/MetamaskLogin/";
@@ -147,7 +146,6 @@ const Home: any = () => {
                 <div>
                   <Line spacing={2}></Line>
                   <Text
-                    // variant="h6"
                     css={{ textAlign: "left", fontSize: "22px", color: "rgba(0, 0, 0, 0.4)" }}
                   >
                     To proceed, log in with{" "}
@@ -155,19 +153,6 @@ const Home: any = () => {
                   <div
                     style={{ display: "flex", justifyContent: "left" }}
                   >
-                    <Button
-                      component={Link}
-                      href="https://cryptobattle-backend-production.up.railway.app/auth/twitter"
-                      Icon={Twitter}
-                      css={(theme) => ({
-                        background: "rgb(72, 155, 233)",
-                        marginRight: theme.spacing(1),
-                        color: "#fff",
-                      })}
-                    >
-                      Twitter
-                    </Button>
-
                     <MetamaskLogin roomId={roomid}/>
                   </div>
                 </div>

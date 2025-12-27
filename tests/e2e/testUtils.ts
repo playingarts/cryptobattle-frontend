@@ -35,7 +35,7 @@ export function getTestAccounts(): TestAccount[] {
     throw new Error(
       'Missing test tokens. Set TEST_TOKEN_1 and TEST_TOKEN_2 environment variables.\n' +
       'To get tokens:\n' +
-      '1. Log in to the app via Twitter or MetaMask\n' +
+      '1. Log in to the app via MetaMask\n' +
       '2. Open browser DevTools → Application → Local Storage\n' +
       '3. Copy the "accessToken" value\n' +
       '4. Run: TEST_TOKEN_1=xxx TEST_TOKEN_2=yyy yarn test:smoke'

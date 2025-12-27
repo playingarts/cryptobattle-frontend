@@ -9,7 +9,6 @@ import { useAuth } from "../AuthProvider";
 import Discord from "../Icons/Discord";
 import Youtube from "../Icons/Youtube";
 import Button from "../Button";
-import Twitter from "../Icons/Twitter";
 import { socialLinks } from "../../source/consts";
 import Instagram from "../Icons/Instagram";
 import Facebook from "../Icons/Facebook";
@@ -401,10 +400,6 @@ export default function LogoMenu({
                   })}
                 >
                   {[
-                    {
-                      Icon: Twitter,
-                      href: socialLinks.twitter,
-                    },
                     {
                       Icon: Instagram,
                       href: socialLinks.instagram,
