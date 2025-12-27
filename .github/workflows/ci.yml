@@ -53,12 +53,11 @@ jobs:
 
       - name: Run smoke tests
         env:
-          TEST_TOKEN_1: ${{ secrets.TEST_TOKEN_1 }}
-          TEST_TOKEN_2: ${{ secrets.TEST_TOKEN_2 }}
+          TEST_TOKEN_SECRET: ${{ secrets.TEST_TOKEN_SECRET }}
         run: |
-          if [ -n "$TEST_TOKEN_1" ] && [ -n "$TEST_TOKEN_2" ]; then
+          if [ -n "$TEST_TOKEN_SECRET" ]; then
             yarn test:smoke
           else
-            echo "Smoke tests skipped - no test tokens configured"
-            echo "To enable smoke tests, add TEST_TOKEN_1 and TEST_TOKEN_2 secrets"
+            echo "Smoke tests skipped - TEST_TOKEN_SECRET not configured"
+            echo "To enable smoke tests, add TEST_TOKEN_SECRET secret"
           fi
