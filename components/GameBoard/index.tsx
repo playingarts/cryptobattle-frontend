@@ -329,7 +329,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     }, 0);
     setTimeout(() => {
       setLastPlayedCard(null);
-    }, 500);
+    }, 2000);
   }, [gameState]);
 
   useEffect(() => {
@@ -594,7 +594,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                                   : true)
                                   ? "example3  0.3s linear 0.3s 1 normal forwards"
                                   : "",
-                              animationDelay: "0.1s",
+                              animationDelay: "1.6s",
                               transition: "all 300ms",
                               // animationName: 'example3',
                               transform: getSkew(index)(),
