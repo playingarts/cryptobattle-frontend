@@ -100,11 +100,17 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
 
   // Start animation for a card using Web Animations API
   // This approach is immune to React re-renders and CSS animation restarts
-  const startAnimation = useCallback((card: any, row: number, column: number, playSound = true) => {
+  const startAnimation = useCallback((card: any, row: number, column: number, playSound = true, retryCount = 0) => {
     const cardId = `${card.suit}-${card.value}`;
 
     // If we're already animating this exact card, do nothing
     if (animatingCardIdRef.current === cardId || animationRunningRef.current) {
+      return;
+    }
+
+    // Validate row and column
+    if (row === undefined || row === null || column === undefined || column === null) {
+      console.log('[Animation] Missing row/column:', { row, column, card });
       return;
     }
 
@@ -115,6 +121,17 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     // Get the card element position for positioning the overlay
     const cardElement = document.querySelector(`[data-row="${row}"][data-column="${column}"]`);
     if (!cardElement || !animationOverlayRef.current || !scoreOverlayRef.current) {
+      // Retry up to 5 times with increasing delay for opponent cards (DOM might not be ready)
+      if (retryCount < 5) {
+        console.log(`[Animation] Card element not found, retrying... (${retryCount + 1}/5)`);
+        animatingCardIdRef.current = null;
+        animationRunningRef.current = false;
+        setTimeout(() => {
+          startAnimation(card, row, column, playSound, retryCount + 1);
+        }, 100 * (retryCount + 1));
+        return;
+      }
+      console.log('[Animation] Card element not found after retries:', { row, column });
       animatingCardIdRef.current = null;
       animationRunningRef.current = false;
       return;
@@ -402,6 +419,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       setGameStarted(true);
       const serverCardId = `${gameState.lastPlayedCard.suit}-${gameState.lastPlayedCard.value}`;
 
+      console.log('[Animation] lastPlayedCard from server:', gameState.lastPlayedCard);
+
       // Only trigger animation if:
       // 1. This is a NEW card from server (different from last processed server card)
       // 2. AND we're not already animating this card (from optimistic UI)
@@ -410,10 +429,11 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         // Get position from the lastPlayedCard - x is column, y is row
         const row = gameState.lastPlayedCard.y;
         const column = gameState.lastPlayedCard.x;
+        console.log('[Animation] Triggering animation for opponent card:', { row, column, serverCardId });
         // This is an opponent's card - animate it after a short delay to ensure DOM is ready
         setTimeout(() => {
           startAnimation(gameState.lastPlayedCard, row, column, true);
-        }, 50);
+        }, 100);
       }
       // Always update the last processed server card
       lastProcessedServerCardRef.current = serverCardId;
