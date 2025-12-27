@@ -43,8 +43,8 @@ body {
   z-index: 9999;
   pointer-events: none;
   animation-name: example;
-  animation-delay: 0s;
-  animation-duration: 400ms;
+  animation-delay: 1s;
+  animation-duration: 800ms;
   transform-origin: center center;
 }
 
@@ -53,8 +53,8 @@ body {
   z-index: 9999;
   pointer-events: none;
   animation-name: example2;
-  animation-delay: 0s;
-  animation-duration: 400ms;
+  animation-delay: 1s;
+  animation-duration: 800ms;
   transform-origin: center center;
 }
 
