@@ -8,6 +8,7 @@ import StatBlock from "../../components/StatBlock";
 
 import { api } from "../../api";
 import { useAuth } from "../AuthProvider";
+import { logError } from "../../utils/errorHandler";
 // import Progress from '../../components/Progress';
 import GameRules from "../GameRules/";
 
@@ -44,7 +45,7 @@ const Stats: FC<Props> = ({ ...props }) => {
         setUserStats(data);
       })
       .catch((err : any) => {
-        console.log(err);
+        logError(err, 'Stats');
       });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -3,6 +3,7 @@ import { FC, HTMLAttributes, useEffect } from "react";
 export type Props = HTMLAttributes<HTMLDivElement>;
 import StatBlock from "../../components/StatBlock";
 import { api } from "../../api";
+import { logError } from "../../utils/errorHandler";
 
 import Line from "../Line";
 import Text from "../Text";
@@ -31,7 +32,7 @@ const LeaderboardDashboard: FC<Props> = ({ ...props }) => {
         console.log(data);
       })
       .catch((err: any) => {
-        console.log(err);
+        logError(err, 'LeaderboardDashboard');
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

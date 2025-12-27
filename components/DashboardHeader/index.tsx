@@ -8,6 +8,7 @@ import StatBlock from "../../components/StatBlock";
 
 import { api } from "../../api";
 import { useAuth } from "../AuthProvider";
+import { logError } from "../../utils/errorHandler";
 // import Progress from '../../components/Progress';
 import Button from "../Button/";
 
@@ -62,7 +63,7 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
         }
       })
       .catch((err: any) => {
-        console.log(err);
+        logError(err, 'DashboardHeader');
       });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
