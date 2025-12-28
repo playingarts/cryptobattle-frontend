@@ -178,7 +178,9 @@ function normalizeAllowedPlacements(
 function normalizePoints(
   serverPoints?: Record<string, number> | { additionalProperties?: Record<string, number> }
 ): Record<string, number> {
+  console.log('[DEBUG normalizePoints] input:', serverPoints);
   if (!serverPoints) {
+    console.log('[DEBUG normalizePoints] no serverPoints, returning {}');
     return {};
   }
 
@@ -186,7 +188,9 @@ function normalizePoints(
   // 1. Direct format: { "userId1": 10, "userId2": 20 }
   // 2. Wrapped format: { additionalProperties: { "userId1": 10, "userId2": 20 } }
   if ('additionalProperties' in serverPoints && serverPoints.additionalProperties) {
-    return { ...serverPoints.additionalProperties };
+    const result = { ...serverPoints.additionalProperties };
+    console.log('[DEBUG normalizePoints] wrapped format, result:', result);
+    return result;
   }
 
   // Direct format - return as-is (filter out non-numeric values for safety)
@@ -196,6 +200,7 @@ function normalizePoints(
       result[key] = value;
     }
   }
+  console.log('[DEBUG normalizePoints] direct format, result:', result);
   return result;
 }
 
