@@ -34,6 +34,9 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
 
     const { results, state } = useGame()
 
+    // Detect if player is a bot
+    const isBot = player.username?.toLowerCase().includes('bot')
+
     // Track when current player changes (new turn starts)
     const prevCurrentPlayerRef = useRef<string | null>(null)
 
@@ -254,6 +257,7 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
               profilePictureUrl={
                 player.profilePictureUrl || player.profileImageUrl || ''
               }
+              avatarBgColor={isBot ? '#4c4c4c' : undefined}
             />
           </div>
         </CircularProgressbarWithChildren>
