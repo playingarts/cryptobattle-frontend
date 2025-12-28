@@ -53,10 +53,9 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     dispatch,
   });
 
-  // Track last played card for animation
-  const [lastPlayedCard, setLastPlayedCard] = useState<NormalizedCard | null>(null);
-  const animatingCardIdRef = useRef<string | null>(null);
-  const lastProcessedServerCardRef = useRef<string | null>(null);
+  // Use currentAnimation from useAnimationQueue for animation state
+  // This replaces the old lastPlayedCard state system
+  const lastPlayedCard = currentAnimation?.card || null;
 
   // Refs to hold current values for interact.js callbacks (outside React lifecycle)
   const selectedCardRef = useRef(selectedCard);
@@ -70,8 +69,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   useEffect(() => {
     gameStateRef.current = gameState;
   }, [gameState]);
-
-  const playCardBeep = new Audio("../../sounds/play-card.mp3");
 
   // Get player color by userId
   const getColor = useCallback(
@@ -108,29 +105,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       hasLastPlayedCard: !!gameState.lastPlayedCard,
     });
   }, [gameState?.gameId, gameState?.state, gameState?.turnForPlayer, gameState?.lastPlayedCard]);
-
-  // Start animation for a card
-  const startAnimation = useCallback((card: NormalizedCard, position: { x: number; y: number }, playSound = true) => {
-    const cardId = `${card.suit?.toLowerCase()}-${card.value}`;
-
-    // If already animating this card, skip
-    if (animatingCardIdRef.current === cardId) {
-      return;
-    }
-
-    animatingCardIdRef.current = cardId;
-    setLastPlayedCard(card);
-
-    if (playSound) {
-      playCardBeep.play();
-    }
-
-    // Auto-clear after animation duration
-    setTimeout(() => {
-      setLastPlayedCard(null);
-      animatingCardIdRef.current = null;
-    }, 2000);
-  }, []);
 
   // Handle card placement
   const addCard = useCallback(
@@ -197,7 +171,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         position,
       });
 
-      // Dispatch to reducer (updates board + triggers animation)
+      // Dispatch to reducer (updates board + triggers animation via useAnimationQueue)
       dispatch(localMoveInitiated({
         moveKey,
         card: normalizedCard,
@@ -207,9 +181,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         isLocal: true,
         confirmed: false,
       }));
-
-      // Start animation
-      startAnimation(normalizedCard, position, true);
 
       // Remove card from hand
       removeCard?.(card as unknown as string);
@@ -229,10 +200,10 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         })
       );
     },
-    [WSProvider, selectedCard, startAnimation, gameState, dispatch, removeCard]
+    [WSProvider, selectedCard, gameState, dispatch, removeCard]
   );
 
-  // Handle auto-pass and opponent animations
+  // Handle auto-pass when no valid placements available
   useEffect(() => {
     if (!gameState?.gameId) {
       return;
@@ -249,37 +220,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         );
       }, 2000);
     }
-
-    // Handle opponent animations
-    const serverLastPlayedCard = gameState.lastPlayedCard;
-    if (serverLastPlayedCard) {
-      const serverCardId = `${serverLastPlayedCard.suit?.toLowerCase()}-${serverLastPlayedCard.value}`;
-
-      console.log('[DEBUG Animation] serverCardId:', serverCardId);
-      console.log('[DEBUG Animation] lastProcessedServerCardRef:', lastProcessedServerCardRef.current);
-      console.log('[DEBUG Animation] animatingCardIdRef:', animatingCardIdRef.current);
-      console.log('[DEBUG Animation] isMyTurn:', isMyTurn);
-
-      // Only animate if this is a new card from server and we're not already animating it
-      if (
-        serverCardId !== lastProcessedServerCardRef.current &&
-        serverCardId !== animatingCardIdRef.current
-      ) {
-        console.log('[DEBUG Animation] Starting animation for:', serverCardId);
-        const transformedCard = getCard(
-          serverLastPlayedCard.suit,
-          serverLastPlayedCard.value,
-          serverLastPlayedCard
-        );
-        // Find position from lastPlayedPosition
-        const position = gameState.lastPlayedPosition || { x: 0, y: 0 };
-        startAnimation(transformedCard, position, true);
-      } else {
-        console.log('[DEBUG Animation] Skipping animation - already processed or animating');
-      }
-      lastProcessedServerCardRef.current = serverCardId;
-    }
-  }, [gameState?.gameId, gameState?.lastPlayedCard, gameState?.lastPlayedPosition, gameState?.allowedPlacements, isMyTurn, startAnimation, WSProvider]);
+  }, [gameState?.gameId, gameState?.allowedPlacements, isMyTurn, WSProvider]);
 
   // Set up drag and drop
   useEffect(() => {
@@ -426,7 +367,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                     ? lastPlayedCard?.id === topCard.id
                     : true) && (
                     <div
-                      key={animatingCardIdRef.current}
+                      key={currentAnimation?.moveKey || 'animation'}
                       className="game-latest-card"
                       css={{
                         background: getColor(topCard.userId || '')(),
