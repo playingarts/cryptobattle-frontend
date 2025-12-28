@@ -28,21 +28,27 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
     // const [first, setFirst] = useState(false)
     const { timer, totalSeconds, results } = useGame()
     useEffect(() => {
-      if (!currentPlayerWithPoints) {
-        return
+      // Reset to full if no current player or game ended
+      if (!currentPlayerWithPoints || results) {
+        setProgress(100);
+        return;
       }
 
-      const seconds = totalSeconds / 1000;
-      const secondsPassed = timer / 1000;
-
-      // setProgress((secondsPassed / seconds) * 100);
-      if (currentPlayerWithPoints.userId === player.userId && !results) {
-        setProgress((secondsPassed / seconds) * 100);
-        return
+      // Only show timer progress for the current player (whose turn it is)
+      if (currentPlayerWithPoints.userId !== player.userId) {
+        setProgress(100);
+        return;
       }
-      setProgress(100)
-    
 
+      // Guard against division by zero
+      if (totalSeconds <= 0) {
+        setProgress(100);
+        return;
+      }
+
+      // Calculate progress as percentage of time remaining
+      const progressPercent = (timer / totalSeconds) * 100;
+      setProgress(Math.max(0, Math.min(100, progressPercent)));
     }, [currentPlayerWithPoints, player, timer, totalSeconds, results])
     
     useEffect(() => {
