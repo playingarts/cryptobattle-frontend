@@ -107,15 +107,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       turnForPlayer: gameState.turnForPlayer,
       hasLastPlayedCard: !!gameState.lastPlayedCard,
     });
-
-    // Debug: Log board state and allowed placements
-    console.log('[DEBUG Board] allowedPlacements:', gameState.allowedPlacements);
-    console.log('[DEBUG Board] gameTableCards keys:', Object.keys(gameState.gameTableCards));
-    console.log('[DEBUG Board] board dimensions:', board.length, 'x', board[0]?.length);
-    console.log('[DEBUG Board] cells with cards:', board.flat().filter(c => c.cards.length > 0).map(c => `${c.x}-${c.y}`));
-    console.log('[DEBUG Board] drop target cells:', board.flat().filter(c => c.isDropTarget).map(c => `${c.x}-${c.y}`));
-    console.log('[DEBUG Board] empty cells:', board.flat().filter(c => c.isEmpty).map(c => `${c.x}-${c.y}`));
-  }, [gameState?.gameId, gameState?.state, gameState?.turnForPlayer, gameState?.lastPlayedCard, gameState?.allowedPlacements, gameState?.gameTableCards, board]);
+  }, [gameState?.gameId, gameState?.state, gameState?.turnForPlayer, gameState?.lastPlayedCard]);
 
   // Start animation for a card
   const startAnimation = useCallback((card: NormalizedCard, position: { x: number; y: number }, playSound = true) => {
@@ -385,9 +377,19 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                   position: "relative",
                 })}
               >
-                {/* Empty cell (no cards, not a drop target) */}
+                {/* Empty cell (no cards, not a drop target) - show as faded placeholder */}
                 {isEmpty && !isDropTarget && (
-                  <div style={{ width: "210px", height: "300px" }}></div>
+                  <CardEmpty
+                    key={`placeholder-${columnIndex}-${cellRowIndex}`}
+                    isPlaceholder={true}
+                    containerStyles={{
+                      opacity: 0.3,
+                      border: "none",
+                    }}
+                    css={{
+                      pointerEvents: "none",
+                    }}
+                  />
                 )}
 
                 {/* Animation overlay for last played card */}
