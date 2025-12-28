@@ -114,13 +114,14 @@ export function useAnimationQueue({
       }
     }, 0);
 
-    // End animation after duration
+    // End animation after duration - but keep currentAnimation so overlay stays visible
     animationTimeoutRef.current = setTimeout(() => {
       logAnimation('ANIM_COMPLETE', {
         moveKey: pendingAnimation.moveKey,
       });
       dispatch({ type: 'ANIMATION_COMPLETED', payload: { moveKey: pendingAnimation.moveKey } });
-      setCurrentAnimation(null);
+      // Don't clear currentAnimation - let the overlay stay visible
+      // It will be replaced when the next animation starts
       setIsAnimating(false);
     }, ANIMATION_DURATION_MS);
 
@@ -142,7 +143,8 @@ export function useAnimationQueue({
   }, []);
 
   return {
-    currentAnimation: isAnimating ? currentAnimation : null,
+    // Always return currentAnimation - overlay stays visible after animation completes
+    currentAnimation,
     isAnimating,
   };
 }
