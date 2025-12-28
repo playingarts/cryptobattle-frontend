@@ -11,7 +11,7 @@ import Instagram from "../Icons/Instagram";
 import Facebook from "../Icons/Facebook";
 import Behance from "../Icons/Behance";
 
-// Get commit info from Vercel environment variables
+// Build version info from Vercel environment variables
 const commitSha = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || 'dev';
 const commitShort = commitSha.slice(0, 7);
 const commitRef = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF || 'local';
