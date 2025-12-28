@@ -8,7 +8,7 @@
  * - Auto-clears animation after duration
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PendingAnimation } from '../types/game';
 import { GameAction } from '../store/gameActions';
 import { logAnimation } from '../utils/debug';
@@ -36,7 +36,6 @@ export function useAnimationQueue({
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentAnimation, setCurrentAnimation] = useState<PendingAnimation | null>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Use refs to track state inside useEffect without re-running on every state change
   const isAnimatingRef = useRef(isAnimating);
@@ -47,26 +46,6 @@ export function useAnimationQueue({
     isAnimatingRef.current = isAnimating;
     currentAnimationRef.current = currentAnimation;
   }, [isAnimating, currentAnimation]);
-
-  // Initialize audio on mount (client-side only)
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      audioRef.current = new Audio('/sounds/play-card.mp3');
-    }
-    return () => {
-      audioRef.current = null;
-    };
-  }, []);
-
-  // Play sound effect
-  const playSound = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {
-        // Ignore autoplay errors
-      });
-    }
-  }, []);
 
   // Start a new animation when pendingAnimation changes
   useEffect(() => {
@@ -100,19 +79,14 @@ export function useAnimationQueue({
     setCurrentAnimation(pendingAnimation);
     setIsAnimating(true);
     dispatch({ type: 'ANIMATION_STARTED', payload: { moveKey: pendingAnimation.moveKey } });
-    playSound();
 
-    // Scroll the animation into view
+    // Scroll to center the played card
     setTimeout(() => {
       const latestCard = document.querySelector('.game-latest-card-wrapper');
       if (latestCard) {
-        const rect = latestCard.getBoundingClientRect();
-        const inView = rect.top >= 0 && rect.bottom <= window.innerHeight;
-        if (!inView) {
-          latestCard.scrollIntoView({ block: 'center', behavior: 'smooth' });
-        }
+        latestCard.scrollIntoView({ block: 'center', behavior: 'smooth' });
       }
-    }, 0);
+    }, 50);
 
     // End animation after duration - but keep currentAnimation so overlay stays visible
     animationTimeoutRef.current = setTimeout(() => {
@@ -131,7 +105,7 @@ export function useAnimationQueue({
         clearTimeout(animationTimeoutRef.current);
       }
     };
-  }, [pendingAnimation, dispatch, playSound]);
+  }, [pendingAnimation, dispatch]);
 
   // Clean up on unmount
   useEffect(() => {

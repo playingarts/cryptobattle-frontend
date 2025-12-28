@@ -114,10 +114,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   const router = useRouter();
 
-  const startGameBeep = new Audio("../../sounds/start-game.mp3");
-
   const playStartGameSound = () => {
-    startGameBeep.play();
+    // Sound disabled
   };
 
   const quit = () => {

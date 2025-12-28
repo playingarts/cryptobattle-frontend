@@ -294,11 +294,7 @@ body {
   border-color: #aaa;
 }
 
-.drop-target {
-  background-color: rgb(23, 23, 23);
-  border-color: #fff !important;
-  filter: brightness(130%);
-}
+/* .drop-target styling moved to component CSS (CardStack, AnimationOverlay) */
 
 .drag-drop {
   /* display: inline-block;
