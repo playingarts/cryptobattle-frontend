@@ -97,7 +97,10 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
     return null;
   }
 
-  const { card, moveKey } = animation;
+  const { card, moveKey, stackIndex } = animation;
+
+  // Calculate target rotation based on stack index (same as CardStack)
+  const targetRotation = stackIndex > 0 ? stackIndex * 4 : 0;
 
   return (
     <div
@@ -113,19 +116,27 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
         height: CELL_HEIGHT,
       }}
     >
-      {/* Card wrapper with fly-in animation */}
+      {/* Rotation wrapper - applies final rotation for stacked cards */}
       <div
-        className="game-latest-card-wrapper"
         css={{
-          position: 'relative',
           width: '100%',
           height: '100%',
-          animationName: 'cardFlyIn',
-          animationDuration: '400ms',
-          animationTimingFunction: 'ease-out',
-          animationFillMode: 'forwards',
+          transform: `rotate(${targetRotation}deg)`,
         }}
       >
+        {/* Card wrapper with fly-in animation */}
+        <div
+          className="game-latest-card-wrapper"
+          css={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            animationName: 'cardFlyIn',
+            animationDuration: '400ms',
+            animationTimingFunction: 'ease-out',
+            animationFillMode: 'forwards',
+          }}
+        >
         {/* The actual card component */}
         <Card
           card={cardData}
@@ -138,6 +149,7 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
           }}
         />
+        </div>
       </div>
     </div>
   );

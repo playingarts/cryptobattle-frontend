@@ -268,6 +268,16 @@ function hasCardsAdjacent(
 }
 
 /**
+ * Get the number of cards at a position (for stack index calculation)
+ */
+function getCardCountAtPosition(board: GameBoard, position: { x: number; y: number }): number {
+  if (board[position.y] && board[position.y][position.x]) {
+    return board[position.y][position.x].cards.length;
+  }
+  return 0;
+}
+
+/**
  * Add a card to the board (for optimistic updates)
  */
 function addCardToBoard(
@@ -379,6 +389,11 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
       const isSystemCard = !lastPlayedCard?.userId || lastPlayedCard.userId === 'system';
 
       if (isNewMove && newMoveKey && lastPlayedCard && lastPlayedPosition && !isSystemCard) {
+        // Calculate stack index from server table cards (card is already in stack, so length - 1)
+        const positionKey = `${lastPlayedPosition.x}-${lastPlayedPosition.y}`;
+        const cardsAtPosition = gameTableCards[positionKey] || [];
+        const stackIndex = Math.max(0, cardsAtPosition.length - 1);
+
         // Only set pending animation if we don't already have one for this move
         if (!state.pendingAnimation || state.pendingAnimation.moveKey !== newMoveKey) {
           pendingAnimation = {
@@ -387,9 +402,10 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
             position: lastPlayedPosition,
             scoringLevel: lastPlayedCard.scoringLevel || 0,
             playerId: lastPlayedCard.userId,
+            stackIndex,
           };
         } else {
-          // Update existing animation with server's scoringLevel
+          // Update existing animation with server's scoringLevel (keep existing stackIndex)
           pendingAnimation = {
             ...state.pendingAnimation,
             scoringLevel: lastPlayedCard.scoringLevel || 0,
@@ -453,6 +469,7 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
           position: move.position,
           scoringLevel: 0, // Will be updated on server confirm
           playerId: move.playerId,
+          stackIndex: getCardCountAtPosition(state.board, move.position),
         },
         // Optimistically update board
         board: addCardToBoard(state.board, move.position, move.card),

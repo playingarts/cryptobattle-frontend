@@ -201,6 +201,7 @@ export interface PendingAnimation {
   position: { x: number; y: number };
   scoringLevel: number;
   playerId: string;
+  stackIndex: number; // Index in stack (0 = first card, 1 = second, etc.) for rotation
 }
 
 /**
