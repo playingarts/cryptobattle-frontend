@@ -30,7 +30,9 @@ function isLastPlayedPosition(
   lastPlayedCard: NormalizedCard | null,
   isTopCard: boolean
 ): boolean {
-  if (!lastPlayedCard || !isTopCard) return false;
+  if (!lastPlayedCard || !isTopCard) {
+    return false;
+  }
   return (
     lastPlayedCard.suit?.toLowerCase() === card.suit?.toLowerCase() &&
     String(lastPlayedCard.value).toLowerCase() === String(card.value).toLowerCase()
