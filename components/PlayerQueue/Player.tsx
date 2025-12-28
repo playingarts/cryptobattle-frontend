@@ -51,6 +51,10 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
 
       // Calculate progress as percentage of time remaining
       const progressPercent = (timer / totalSeconds) * 100;
+
+      // Debug: log timer values for current player
+      console.log(`[TIMER ${player.username}] timer=${timer}, totalSeconds=${totalSeconds}, progress=${progressPercent.toFixed(1)}%`);
+
       setProgress(Math.max(0, Math.min(100, progressPercent)));
     }, [currentPlayerWithPoints, player, timer, totalSeconds, results])
 
