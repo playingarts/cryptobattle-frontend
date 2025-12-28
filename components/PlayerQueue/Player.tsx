@@ -6,6 +6,10 @@ import "react-circular-progressbar/dist/styles.css";
 import { formatUsername } from "../../utils/helpers";
 import { useGame } from "../GameProvider";
 
+// Fixed display duration for all players (30 seconds)
+const DISPLAY_DURATION_MS = 30000;
+const UPDATE_INTERVAL_MS = 100; // Smooth updates every 100ms
+
 interface PlayerType {
   userId: string;
   color: string;
@@ -26,39 +30,70 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
   ({ player, loadingDelayed, currentPlayerWithPoints, inactive }, ref) => {
     const [progress, setProgress] = useState(100)
     const prevProgressRef = useRef(100)
+    const turnStartTimeRef = useRef<number | null>(null)
+    const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
     // Only animate when counting down, not when resetting to 100%
     const shouldAnimate = progress < prevProgressRef.current
 
-    const { timer, totalSeconds, results } = useGame()
+    const { results } = useGame()
 
-    // Debug: always log timer values
-    useEffect(() => {
-      console.log(`[TIMER DEBUG ${player.username}] timer=${timer}, totalSeconds=${totalSeconds}, currentPlayer=${currentPlayerWithPoints?.username}, isMyAvatar=${currentPlayerWithPoints?.userId === player.userId}`);
-    }, [timer, totalSeconds, currentPlayerWithPoints, player]);
+    // Track when current player changes (new turn starts)
+    const prevCurrentPlayerRef = useRef<string | null>(null)
 
     useEffect(() => {
-      // Reset to full if no current player or game ended
+      const currentPlayerId = currentPlayerWithPoints?.userId || null
+      const isMyTurn = currentPlayerId === player.userId
+      const turnChanged = currentPlayerId !== prevCurrentPlayerRef.current
+
+      // Clear any existing interval
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+
+      // If game ended or no current player, show full
       if (!currentPlayerWithPoints || results) {
-        setProgress(100);
-        return;
+        setProgress(100)
+        turnStartTimeRef.current = null
+        prevCurrentPlayerRef.current = currentPlayerId
+        return
       }
 
-      // Only show timer progress for the current player (whose turn it is)
-      if (currentPlayerWithPoints.userId !== player.userId) {
-        setProgress(100);
-        return;
+      // If it's not this player's turn, show full
+      if (!isMyTurn) {
+        setProgress(100)
+        prevCurrentPlayerRef.current = currentPlayerId
+        return
       }
 
-      // Guard against division by zero
-      if (totalSeconds <= 0) {
-        setProgress(100);
-        return;
+      // It's this player's turn - start/continue countdown
+      if (turnChanged) {
+        // New turn started - reset timer
+        turnStartTimeRef.current = Date.now()
+        setProgress(100)
       }
 
-      // Calculate progress as percentage of time remaining
-      const progressPercent = (timer / totalSeconds) * 100;
-      setProgress(Math.max(0, Math.min(100, progressPercent)));
-    }, [currentPlayerWithPoints, player, timer, totalSeconds, results])
+      // Start countdown interval
+      intervalRef.current = setInterval(() => {
+        if (turnStartTimeRef.current === null) return
+
+        const elapsed = Date.now() - turnStartTimeRef.current
+        const remaining = Math.max(0, DISPLAY_DURATION_MS - elapsed)
+        const newProgress = (remaining / DISPLAY_DURATION_MS) * 100
+
+        setProgress(newProgress)
+      }, UPDATE_INTERVAL_MS)
+
+      prevCurrentPlayerRef.current = currentPlayerId
+
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+          intervalRef.current = null
+        }
+      }
+    }, [currentPlayerWithPoints, player.userId, results])
 
     // Track previous progress for animation decision
     useEffect(() => {
@@ -68,8 +103,11 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
     useEffect(() => {
       if (results) {
         setProgress(100)
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+          intervalRef.current = null
+        }
       }
-
     }, [results])
 
     return (

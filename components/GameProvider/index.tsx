@@ -300,12 +300,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   //   setPlayersGame(gameState.allGamePlayers);
   // }, [gameState]);
 
-  // Reset timer when turn changes - prevents stale timer values from showing
-  // New timer events will arrive from server for the new turn
-  useEffect(() => {
-    setTimer(0);
-    setTotalSeconds(0);
-  }, [state.serverState.turnForPlayer]);
+  // NOTE: Timer display is now handled locally in Player.tsx using Date.now()
+  // Server timer values are still received but only used for "Play again" countdown
 
   useEffect(() => {
     setGlobalRoomId(roomId);

@@ -201,7 +201,6 @@ const STOP: HandlerResult = { handled: true };
  * Handle timer event
  */
 export function handleTimer(data: TimerEventData, deps: HandlerDeps): HandlerResult {
-  console.log(`[TIMER EVENT] secondsLeft=${data.secondsLeft}, totalSeconds=${data.totalSeconds}`);
   deps.stateSetters.setTimer(data.secondsLeft);
   deps.stateSetters.setTotalSeconds(data.totalSeconds);
   return STOP;
