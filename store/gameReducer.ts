@@ -328,6 +328,15 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
       // Check if this is a new move we haven't processed
       const isNewMove = newMoveKey && !state.processedMoveKeys.has(newMoveKey);
 
+      console.log('[DEBUG REDUCER] GAME_STATE_RECEIVED', {
+        moveKey: newMoveKey,
+        isNewMove,
+        processedKeysSize: state.processedMoveKeys.size,
+        processedKeys: Array.from(state.processedMoveKeys),
+        card: lastPlayedCard ? `${lastPlayedCard.suit}-${lastPlayedCard.value}-${lastPlayedCard.userId}` : null,
+        currentPendingAnimation: state.pendingAnimation?.moveKey,
+      });
+
       logAnimation('STATE_RECEIVED', {
         moveKey: newMoveKey,
         isNewMove,
@@ -356,6 +365,7 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
       if (isNewMove && newMoveKey && lastPlayedCard && lastPlayedPosition) {
         // Only set pending animation if we don't already have one for this move
         if (!state.pendingAnimation || state.pendingAnimation.moveKey !== newMoveKey) {
+          console.log('[DEBUG REDUCER] Setting NEW pendingAnimation:', newMoveKey);
           pendingAnimation = {
             moveKey: newMoveKey,
             card: lastPlayedCard,
@@ -364,12 +374,15 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
             playerId: lastPlayedCard.userId,
           };
         } else {
+          console.log('[DEBUG REDUCER] Updating existing pendingAnimation with scoringLevel');
           // Update existing animation with server's scoringLevel
           pendingAnimation = {
             ...state.pendingAnimation,
             scoringLevel: lastPlayedCard.scoringLevel || 0,
           };
         }
+      } else {
+        console.log('[DEBUG REDUCER] NOT setting pendingAnimation. isNewMove:', isNewMove, 'newMoveKey:', newMoveKey, 'lastPlayedCard:', !!lastPlayedCard, 'lastPlayedPosition:', lastPlayedPosition);
       }
 
       return {
