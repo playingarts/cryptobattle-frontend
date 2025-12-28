@@ -25,15 +25,8 @@ import AnimationOverlay from "./AnimationOverlay";
 import { useAnimationQueue } from "../../hooks/useAnimationQueue";
 import { localMoveInitiated } from "../../store/gameActions";
 import { generateMoveKey } from "../../utils/moveUtils";
-import { NormalizedCard, GamePlayer } from "../../types/game";
+import { NormalizedCard, GamePlayer, BoardCell } from "../../types/game";
 import { logAnimation, logGameState } from "../../utils/debug";
-import {
-  setSelectedCard as setGlobalSelectedCard,
-  getSelectedCard as getGlobalSelectedCard,
-  setState as setGlobalState,
-  getState as getGlobalState,
-  setGameStarted,
-} from "../../utils/gameState";
 
 interface Props extends HTMLAttributes<HTMLElement> {
   removeCard?: (cardId: string) => void;
@@ -48,8 +41,10 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   const gameState = state.serverState;
   const isMyTurn = state.isMyTurn;
 
-  // Legacy board state - TODO: migrate to state.board in future phase
-  const [board, setBoard] = useState(() => generateBoard(7, 5));
+  // USE REDUCER STATE for board - single source of truth
+  const board = state.board;
+
+  // UI state (not game state - stays local)
   const [cardError, setCardError] = useState<number[]>([]);
 
   // Animation queue management - uses context state
@@ -58,20 +53,25 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     dispatch,
   });
 
-  // Track last played card for animation (legacy compatibility)
+  // Track last played card for animation
   const [lastPlayedCard, setLastPlayedCard] = useState<NormalizedCard | null>(null);
   const animatingCardIdRef = useRef<string | null>(null);
   const lastProcessedServerCardRef = useRef<string | null>(null);
 
-  const playCardBeep = new Audio("../../sounds/play-card.mp3");
+  // Refs to hold current values for interact.js callbacks (outside React lifecycle)
+  const selectedCardRef = useRef(selectedCard);
+  const gameStateRef = useRef(gameState);
 
-  // Generate empty board
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function generateBoard(x: number, y: number): (any[] | null | "empty")[][] {
-    const columns = Array(x).fill(0).map(() => null);
-    const rows = Array(y).fill(0).map(() => [...columns]);
-    return rows;
-  }
+  // Keep refs in sync with current values
+  useEffect(() => {
+    selectedCardRef.current = selectedCard;
+  }, [selectedCard]);
+
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+
+  const playCardBeep = new Audio("../../sounds/play-card.mp3");
 
   // Get player color by userId
   const getColor = useCallback(
@@ -96,17 +96,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     []
   );
 
-  // Sync selected card to global state
-  useEffect(() => {
-    setGlobalSelectedCard(selectedCard);
-  }, [selectedCard]);
-
-  // Sync game state to global state
-  useEffect(() => {
-    setGlobalState(gameState);
-  }, [gameState]);
-
-  // Log game state changes (dispatch now handled by GameProvider)
+  // Log game state changes (dispatch handled by GameProvider)
   useEffect(() => {
     if (!gameState?.gameId) {
       return;
@@ -119,7 +109,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     });
   }, [gameState?.gameId, gameState?.state, gameState?.turnForPlayer, gameState?.lastPlayedCard]);
 
-  // Start animation for a card (legacy function - now wraps reducer)
+  // Start animation for a card
   const startAnimation = useCallback((card: NormalizedCard, position: { x: number; y: number }, playSound = true) => {
     const cardId = `${card.suit?.toLowerCase()}-${card.value}`;
 
@@ -141,53 +131,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       animatingCardIdRef.current = null;
     }, 2000);
   }, []);
-
-  // Add card to board (legacy function for compatibility)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const addCardToBoard = useCallback(
-    (rowIndex: number, columnIndex: number, card: any = selectedCard) => {
-      const row = Number(rowIndex);
-      const column = Number(columnIndex);
-
-      setBoard((prevBoard) => {
-        const localBoard = [...prevBoard];
-        const placeToPutCard = localBoard[row][column];
-
-        if (placeToPutCard && placeToPutCard !== "empty" && Array.isArray(placeToPutCard)) {
-          // Check for duplicates (case-insensitive)
-          if (!placeToPutCard.find(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (existingCard: any) =>
-              existingCard.value === card.value &&
-              existingCard.suit?.toLowerCase() === card.suit?.toLowerCase()
-          )) {
-            localBoard[row][column] = [...localBoard[row][column] as any[], card];
-          }
-        } else {
-          localBoard[row][column] = [card];
-        }
-
-        // Set adjacent cells as drop targets
-        if (localBoard[row][column + 1] !== undefined && localBoard[row][column + 1] === null) {
-          localBoard[row][column + 1] = "empty";
-        }
-        if (localBoard[row][column - 1] !== undefined && localBoard[row][column - 1] === null) {
-          localBoard[row][column - 1] = "empty";
-        }
-        if (localBoard[row - 1] !== undefined && localBoard[row - 1][column] === null) {
-          localBoard[row - 1][column] = "empty";
-        }
-        if (localBoard[row + 1] !== undefined && localBoard[row + 1][column] === null) {
-          localBoard[row + 1][column] = "empty";
-        }
-
-        return [...localBoard];
-      });
-
-      removeCard ? removeCard(card as unknown as string) : null;
-    },
-    [selectedCard, removeCard]
-  );
 
   // Handle card placement
   const addCard = useCallback(
@@ -254,7 +197,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         position,
       });
 
-      // Dispatch to reducer for optimistic update
+      // Dispatch to reducer (updates board + triggers animation)
       dispatch(localMoveInitiated({
         moveKey,
         card: normalizedCard,
@@ -265,11 +208,11 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         confirmed: false,
       }));
 
-      // Also update legacy board state
-      addCardToBoard(rowIndex, columnIndex, normalizedCard);
-
-      // Start legacy animation (for backwards compatibility during transition)
+      // Start animation
       startAnimation(normalizedCard, position, true);
+
+      // Remove card from hand
+      removeCard?.(card as unknown as string);
 
       // Send to server
       WSProvider.send(
@@ -286,23 +229,17 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         })
       );
     },
-    [WSProvider, selectedCard, addCardToBoard, startAnimation, gameState]
+    [WSProvider, selectedCard, startAnimation, gameState, dispatch, removeCard]
   );
 
-  // Process game state updates (legacy - sync board from server)
+  // Handle auto-pass and opponent animations
   useEffect(() => {
     if (!gameState?.gameId) {
       return;
     }
 
-    // Check if we have table cards
-    const hasTableCards = Object.keys(gameState.gameTableCards).length > 0;
-    if (!hasTableCards) {
-      return;
-    }
-
-    // Auto-pass if no valid placements (use normalized allowedPlacements from reducer)
-    if (Object.keys(gameState.allowedPlacements || {}).length === 0) {
+    // Auto-pass if no valid placements
+    if (isMyTurn && Object.keys(gameState.allowedPlacements || {}).length === 0) {
       setTimeout(() => {
         WSProvider.send(
           JSON.stringify({
@@ -313,23 +250,10 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       }, 2000);
     }
 
-    // Sync board from server state (using normalized gameTableCards from reducer)
-    const normalizedTableCards = gameState.gameTableCards;
-    Object.keys(normalizedTableCards).forEach((key) => {
-      const indexes = key.split("-");
-      const cardsAtPosition = normalizedTableCards[key];
-
-      cardsAtPosition.forEach((card: NormalizedCard) => {
-        const cardF = getCard(card.suit, card.value, card);
-        addCardToBoard(Number(indexes[1]), Number(indexes[0]), cardF);
-      });
-    });
-
-    // Handle opponent animations (legacy path)
-    const lastPlayedCard = gameState.lastPlayedCard;
-    if (lastPlayedCard) {
-      setGameStarted(true);
-      const serverCardId = `${lastPlayedCard.suit?.toLowerCase()}-${lastPlayedCard.value}`;
+    // Handle opponent animations
+    const serverLastPlayedCard = gameState.lastPlayedCard;
+    if (serverLastPlayedCard) {
+      const serverCardId = `${serverLastPlayedCard.suit?.toLowerCase()}-${serverLastPlayedCard.value}`;
 
       // Only animate if this is a new card from server and we're not already animating it
       if (
@@ -337,27 +261,17 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         serverCardId !== animatingCardIdRef.current
       ) {
         const transformedCard = getCard(
-          lastPlayedCard.suit,
-          lastPlayedCard.value,
-          lastPlayedCard
+          serverLastPlayedCard.suit,
+          serverLastPlayedCard.value,
+          serverLastPlayedCard
         );
-        // Find position of this card
-        let cardPosition = { x: 0, y: 0 };
-        Object.keys(normalizedTableCards).forEach((key) => {
-          const cardsAtPos = normalizedTableCards[key];
-          const topCard = cardsAtPos[cardsAtPos.length - 1];
-          if (topCard &&
-              topCard.suit?.toLowerCase() === lastPlayedCard.suit?.toLowerCase() &&
-              topCard.value === lastPlayedCard.value) {
-            const [x, y] = key.split("-");
-            cardPosition = { x: Number(x), y: Number(y) };
-          }
-        });
-        startAnimation(transformedCard, cardPosition, true);
+        // Find position from lastPlayedPosition
+        const position = gameState.lastPlayedPosition || { x: 0, y: 0 };
+        startAnimation(transformedCard, position, true);
       }
       lastProcessedServerCardRef.current = serverCardId;
     }
-  }, [gameState?.gameTableCards, gameState?.lastPlayedCard, startAnimation, addCardToBoard, WSProvider]);
+  }, [gameState?.gameId, gameState?.lastPlayedCard, gameState?.lastPlayedPosition, gameState?.allowedPlacements, isMyTurn, startAnimation, WSProvider]);
 
   // Set up drag and drop
   useEffect(() => {
@@ -398,11 +312,12 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       },
       ondrop: function (event) {
         const target = event.currentTarget.id.split("-");
+        // Use refs to access current values (interact.js runs outside React lifecycle)
         addCard(
           Number(target[0]),
           Number(target[1]),
-          getGlobalSelectedCard(),
-          getGlobalState()
+          selectedCardRef.current,
+          gameStateRef.current
         )();
         event.stopImmediatePropagation();
       },
@@ -449,36 +364,37 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
               justifyContent: "center",
             })}
           >
-            {row.map((column, columnIndex) => (
+            {row.map((cell) => {
+              const { x: columnIndex, y: cellRowIndex, cards, isEmpty, isDropTarget } = cell;
+              const topCard = cards.length > 0 ? cards[cards.length - 1] : null;
+
+              return (
               <div
-                key={`${columnIndex}${rowIndex}-${columnIndex}${rowIndex}`}
+                key={`${columnIndex}-${cellRowIndex}`}
                 css={() => ({
-                  margin: column ? "20px" : "20px",
+                  margin: "20px",
                   borderRadius: 10,
                   position: "relative",
                 })}
               >
                 {/* Empty cell (no cards, not a drop target) */}
-                {!column && (
+                {isEmpty && !isDropTarget && (
                   <div style={{ width: "210px", height: "300px" }}></div>
                 )}
 
-                {/* Legacy animation overlay (keeping for backwards compatibility) */}
-                {column &&
-                  Array.isArray(column) &&
-                  column[column.length - 1]?.suit &&
-                  column[column.length - 1]?.value &&
-                  lastPlayedCard?.value === column[column.length - 1].value &&
-                  lastPlayedCard?.suit?.toLowerCase() === column[column.length - 1].suit?.toLowerCase() &&
-                  (lastPlayedCard?.id || column[column.length - 1].id
-                    ? lastPlayedCard?.id === column[column.length - 1].id
+                {/* Animation overlay for last played card */}
+                {topCard &&
+                  lastPlayedCard?.value === topCard.value &&
+                  lastPlayedCard?.suit?.toLowerCase() === topCard.suit?.toLowerCase() &&
+                  (lastPlayedCard?.id || topCard.id
+                    ? lastPlayedCard?.id === topCard.id
                     : true) && (
                     <div
                       key={animatingCardIdRef.current}
                       className="game-latest-card"
                       css={{
-                        background: getColor(column[column.length - 1].userId)(),
-                        outlineColor: getColor(column[column.length - 1].userId)(),
+                        background: getColor(topCard.userId || '')(),
+                        outlineColor: getColor(topCard.userId || '')(),
                         zIndex: 9999,
                       }}
                     >
@@ -489,19 +405,19 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                   )}
 
                 {/* Empty drop target cell */}
-                {column === "empty" && (
+                {isEmpty && isDropTarget && (
                   <CardEmpty
                     selectedCard={selectedCard}
-                    key={`${columnIndex}${rowIndex}-${columnIndex}${rowIndex}`}
+                    key={`drop-${columnIndex}-${cellRowIndex}`}
                     containerStyles={{
                       border:
-                        cardError[0] === rowIndex && cardError[1] === columnIndex
+                        cardError[0] === cellRowIndex && cardError[1] === columnIndex
                           ? "3px solid #FA5252"
                           : "3px dashed #222",
                       transition: "all 300ms",
                       "&:hover": {
                         border:
-                          cardError[0] === rowIndex && cardError[1] === columnIndex
+                          cardError[0] === cellRowIndex && cardError[1] === columnIndex
                             ? "3px solid #FA5252"
                             : "3px dashed #222",
                       },
@@ -517,7 +433,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                         backgroundPosition: "center center",
                         backgroundRepeat: "no-repeat",
                         opacity:
-                          cardError[0] === rowIndex && cardError[1] === columnIndex
+                          cardError[0] === cellRowIndex && cardError[1] === columnIndex
                             ? 0.75
                             : 0,
                         top: 0,
@@ -534,56 +450,63 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                     style={{
                       pointerEvents: isMyTurn ? "unset" : "none",
                     }}
-                    onClick={addCard(rowIndex, columnIndex)}
-                    id={rowIndex + "-" + columnIndex}
+                    onClick={addCard(cellRowIndex, columnIndex)}
+                    id={cellRowIndex + "-" + columnIndex}
                   ></CardEmpty>
                 )}
 
                 {/* Card stack */}
-                {column && column !== "empty" && Array.isArray(column) && (
+                {cards.length > 0 && (
                   <div className="stack">
-                    {[...column].map((card, index) => (
+                    {cards.map((card, index) => {
+                      // Transform NormalizedCard to Card component's expected format
+                      const cardForComponent = {
+                        ...card,
+                        img: card.imageUrl || '',
+                        video: card.videoUrl,
+                      };
+                      return (
                       <Card
                         selectedCard={selectedCard}
                         key={`${card.value} ${card.suit}`}
-                        onClick={addCard(rowIndex, columnIndex)}
+                        onClick={addCard(cellRowIndex, columnIndex)}
                         animated={card.id ? true : false}
-                        card={card}
+                        card={cardForComponent}
                         index={index}
-                        className={`${index + 1 === column.length ? "dropzone" : ""}`}
-                        id={rowIndex + "-" + columnIndex}
-                        data-row={rowIndex}
+                        className={`${index + 1 === cards.length ? "dropzone" : ""}`}
+                        id={cellRowIndex + "-" + columnIndex}
+                        data-row={cellRowIndex}
                         data-column={columnIndex}
                         isGameBoard={true}
                         css={{
                           pointerEvents: isMyTurn ? "unset" : "none",
                           zIndex: 10 + index,
                           outline:
-                            index + 1 === column.length &&
-                            cardError[0] === rowIndex &&
+                            index + 1 === cards.length &&
+                            cardError[0] === cellRowIndex &&
                             cardError[1] === columnIndex
                               ? "#FA5252 6px solid"
-                              : `6px solid ${getColor(card.userId)()}`,
+                              : `6px solid ${getColor(card.userId || '')()}`,
                           borderRadius: 16,
                           position: "relative",
                           opacity:
-                            column.length - 1 === index &&
-                            column[column.length - 1]?.suit &&
-                            column[column.length - 1]?.value &&
-                            lastPlayedCard?.value === column[column.length - 1].value &&
-                            lastPlayedCard?.suit?.toLowerCase() === column[column.length - 1].suit?.toLowerCase() &&
-                            (lastPlayedCard?.id || column[column.length - 1].id
-                              ? lastPlayedCard?.id === column[column.length - 1].id
+                            cards.length - 1 === index &&
+                            cards[cards.length - 1]?.suit &&
+                            cards[cards.length - 1]?.value &&
+                            lastPlayedCard?.value === cards[cards.length - 1].value &&
+                            lastPlayedCard?.suit?.toLowerCase() === cards[cards.length - 1].suit?.toLowerCase() &&
+                            (lastPlayedCard?.id || cards[cards.length - 1].id
+                              ? lastPlayedCard?.id === cards[cards.length - 1].id
                               : true)
                               ? 0
                               : 1,
                           animation:
-                            column[column.length - 1]?.suit &&
-                            column[column.length - 1]?.value &&
-                            lastPlayedCard?.value === column[column.length - 1].value &&
-                            lastPlayedCard?.suit?.toLowerCase() === column[column.length - 1].suit?.toLowerCase() &&
-                            (column[column.length - 1].id
-                              ? lastPlayedCard?.id === column[column.length - 1].id
+                            cards[cards.length - 1]?.suit &&
+                            cards[cards.length - 1]?.value &&
+                            lastPlayedCard?.value === cards[cards.length - 1].value &&
+                            lastPlayedCard?.suit?.toLowerCase() === cards[cards.length - 1].suit?.toLowerCase() &&
+                            (cards[cards.length - 1].id
+                              ? lastPlayedCard?.id === cards[cards.length - 1].id
                               : true)
                               ? "example3 0.3s linear 0.3s 1 normal forwards"
                               : "",
@@ -602,7 +525,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                             backgroundPosition: "center center",
                             backgroundRepeat: "no-repeat",
                             opacity:
-                              cardError[0] === rowIndex && cardError[1] === columnIndex
+                              cardError[0] === cellRowIndex && cardError[1] === columnIndex
                                 ? 1
                                 : 0,
                             top: 0,
@@ -621,7 +544,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                             transform: getSkew(index)(),
                             color: "#fff",
                             fontFamily: "Aldrich",
-                            background: `${getColor(card.userId)()}`,
+                            background: `${getColor(card.userId || '')()}`,
                             backgroundImage:
                               'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAxNCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEzLjkxNzIgNy4zMTE4Mkw3LjU1MzU3IDE4Ljc2NjRDNy40MzkwMyAxOC45NyA3LjIyOTAzIDE5LjA5MDkgNi45OTk5NCAxOS4wOTA5QzYuOTQ5MDMgMTkuMDkwOSA2Ljg5MTc1IDE5LjA4NDUgNi44NDA4NCAxOS4wNzE4QzYuNTYwODQgMTguOTk1NCA2LjM2MzU3IDE4Ljc0NzMgNi4zNjM1NyAxOC40NTQ1VjExLjQ1NDVIMC42MzYzMDFDMC40MTk5MzggMTEuNDU0NSAwLjIyMjY2NSAxMS4zNDY0IDAuMTAxNzU2IDExLjE2ODJDLTAuMDEyNzg5NSAxMC45OSAtMC4wMzE4ODAzIDEwLjc2MDkgMC4wNTA4NDY5IDEwLjU2MzZMNC41MDUzOSAwLjM4MTgxOEM0LjYwNzIxIDAuMTUyNzI3IDQuODM2MyAwIDUuMDkwODUgMEg4LjkwOTAzQzkuMTE5MDMgMCA5LjMxNjMgMC4xMDE4MTggOS40MzcyMSAwLjI4QzkuNTUxNzUgMC40NTE4MTggOS41NzcyMSAwLjY3NDU0NSA5LjUwMDg0IDAuODcxODE4TDcuMzA1MzkgNi4zNjM2M0gxMy4zNjM2QzEzLjU4NjMgNi4zNjM2MyAxMy43OTYzIDYuNDg0NTQgMTMuOTEwOCA2LjY3NTQ1QzE0LjAyNTQgNi44NzI3MiAxNC4wMzE4IDcuMTE0NTQgMTMuOTE3MiA3LjMxMTgyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==")',
                             backgroundRepeat: "no-repeat",
@@ -643,11 +566,13 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                           },
                         }}
                       ></Card>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
         ))}
       </div>
