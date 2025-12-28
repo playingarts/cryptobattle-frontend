@@ -443,8 +443,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                             index + 1 === cards.length &&
                             cardError[0] === cellRowIndex &&
                             cardError[1] === columnIndex
-                              ? "#FA5252 6px solid"
-                              : `6px solid ${getColor(card.userId || '')()}`,
+                              ? "#FA5252 3px solid"
+                              : `3px solid ${getColor(card.userId || '')()}`,
                           borderRadius: 16,
                           position: "relative",
                           opacity:

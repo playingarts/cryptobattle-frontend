@@ -133,7 +133,7 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
           isStatic={true}
           noShadow={false}
           css={{
-            outline: `6px solid ${playerColor}`,
+            outline: `3px solid ${playerColor}`,
             borderRadius: 16,
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
           }}
