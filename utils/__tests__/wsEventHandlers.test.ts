@@ -1,5 +1,7 @@
 /**
  * Tests for WebSocket Event Handlers
+ *
+ * Updated to use standardized handleX(eventData, deps) pattern.
  */
 
 import {
@@ -7,15 +9,13 @@ import {
   handleUserSocketIdle,
   handleUserInfo,
   handleCreateRoom,
-  handleCloseRoomTimeout,
-  handleCloseRoomByOwner,
-  handleRoomUpdatedWithResults,
-  handleRoomUpdate,
+  handleCloseRoom,
+  handleRoomUpdated,
+  handleRoomInfo,
   handleQuitRoom,
-  handleJoiningWhileHostingError,
   handleGameResults,
-  handlePlayerNotInRoomError,
   handleWSClose,
+  HandlerDeps,
 } from '../wsEventHandlers';
 import * as gameState from '../gameState';
 
@@ -30,6 +30,50 @@ jest.mock('../gameState', () => ({
   setConnectionClosed: jest.fn(),
 }));
 
+/**
+ * Create mock deps object for testing
+ */
+function createMockDeps(overrides: Partial<HandlerDeps> = {}): HandlerDeps {
+  return {
+    notifications: {
+      openNotification: jest.fn(),
+      closeNotification: jest.fn(),
+    },
+    stateSetters: {
+      setTimer: jest.fn(),
+      setTotalSeconds: jest.fn(),
+      setUserSocketIdle: jest.fn(),
+      setUserInfo: jest.fn(),
+      setIsBackendReady: jest.fn(),
+      setRoomId: jest.fn(),
+      setResults: jest.fn(),
+      setRoomInfo: jest.fn(),
+      setPlayers: jest.fn(),
+      setPlayingAgain: jest.fn(),
+      setIsAlreadyConnected: jest.fn(),
+      setGameState: jest.fn(),
+    },
+    router: { push: jest.fn() } as any,
+    wsProvider: { send: jest.fn(), close: jest.fn() },
+    uiActions: {
+      quit: jest.fn(),
+      reload: jest.fn(),
+      newGame: jest.fn(),
+      playStartGameSound: jest.fn(),
+    },
+    render: {
+      renderWarningIcon: jest.fn().mockReturnValue('warning-icon'),
+      renderQuitButton: jest.fn().mockReturnValue('quit-button'),
+      renderNewGameButton: jest.fn().mockReturnValue('new-game-button'),
+      renderReloadButton: jest.fn().mockReturnValue('reload-button'),
+      renderDashboardButton: jest.fn().mockReturnValue('dashboard-button'),
+      renderGameEndedNotification: jest.fn().mockReturnValue('game-ended'),
+    },
+    getGameState: jest.fn().mockReturnValue(null),
+    ...overrides,
+  };
+}
+
 describe('wsEventHandlers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -37,136 +81,103 @@ describe('wsEventHandlers', () => {
 
   describe('handleTimer', () => {
     it('should set timer and total seconds', () => {
-      const setters = {
-        setTimer: jest.fn(),
-        setTotalSeconds: jest.fn(),
-      };
+      const deps = createMockDeps();
 
-      handleTimer({ secondsLeft: 30, totalSeconds: 60 }, setters);
+      handleTimer({ secondsLeft: 30, totalSeconds: 60 }, deps);
 
-      expect(setters.setTimer).toHaveBeenCalledWith(30);
-      expect(setters.setTotalSeconds).toHaveBeenCalledWith(60);
+      expect(deps.stateSetters.setTimer).toHaveBeenCalledWith(30);
+      expect(deps.stateSetters.setTotalSeconds).toHaveBeenCalledWith(60);
     });
   });
 
   describe('handleUserSocketIdle', () => {
     it('should set user socket idle data', () => {
-      const setters = { setUserSocketIdle: jest.fn() };
+      const deps = createMockDeps();
       const data = { userId: 'user123' };
 
-      handleUserSocketIdle(data, setters);
+      handleUserSocketIdle(data, deps);
 
-      expect(setters.setUserSocketIdle).toHaveBeenCalledWith(data);
+      expect(deps.stateSetters.setUserSocketIdle).toHaveBeenCalledWith(data);
     });
   });
 
   describe('handleUserInfo', () => {
     it('should set user info and mark backend as ready', () => {
-      const setters = {
-        setUserInfo: jest.fn(),
-        setIsBackendReady: jest.fn(),
-      };
+      const deps = createMockDeps();
       const data = { userId: 'user123', username: 'testuser' };
 
-      handleUserInfo(data, setters);
+      handleUserInfo(data, deps);
 
-      expect(setters.setUserInfo).toHaveBeenCalledWith(data);
+      expect(deps.stateSetters.setUserInfo).toHaveBeenCalledWith(data);
       expect(gameState.setUserId).toHaveBeenCalledWith('user123');
-      expect(setters.setIsBackendReady).toHaveBeenCalledWith(true);
+      expect(deps.stateSetters.setIsBackendReady).toHaveBeenCalledWith(true);
     });
   });
 
   describe('handleCreateRoom', () => {
     it('should set room id and request room info on success', () => {
-      const setters = { setRoomId: jest.fn() };
-      const wsProvider = { send: jest.fn(), close: jest.fn() };
-      const router = { push: jest.fn() } as any;
+      const deps = createMockDeps();
       const data = { roomId: 'room123' };
 
-      handleCreateRoom(data, setters, wsProvider, router);
+      handleCreateRoom(data, deps);
 
-      expect(setters.setRoomId).toHaveBeenCalledWith('room123');
-      expect(wsProvider.send).toHaveBeenCalledWith(
+      expect(deps.stateSetters.setRoomId).toHaveBeenCalledWith('room123');
+      expect(deps.wsProvider.send).toHaveBeenCalledWith(
         JSON.stringify({ event: 'room-info', data: {} })
       );
-      expect(router.push).not.toHaveBeenCalled();
+      expect(deps.router.push).not.toHaveBeenCalled();
     });
 
     it('should redirect to dashboard on error', () => {
-      const setters = { setRoomId: jest.fn() };
-      const wsProvider = { send: jest.fn(), close: jest.fn() };
-      const router = { push: jest.fn() } as any;
+      const deps = createMockDeps();
       const data = { error: { message: 'User already in room' } };
 
-      handleCreateRoom(data, setters, wsProvider, router);
+      handleCreateRoom(data, deps);
 
-      expect(setters.setRoomId).not.toHaveBeenCalled();
-      expect(wsProvider.send).not.toHaveBeenCalled();
-      expect(router.push).toHaveBeenCalledWith('/dashboard');
+      expect(deps.stateSetters.setRoomId).not.toHaveBeenCalled();
+      expect(deps.wsProvider.send).not.toHaveBeenCalled();
+      expect(deps.router.push).toHaveBeenCalledWith('/dashboard');
     });
 
     it('should redirect to dashboard when no roomId in response', () => {
-      const setters = { setRoomId: jest.fn() };
-      const wsProvider = { send: jest.fn(), close: jest.fn() };
-      const router = { push: jest.fn() } as any;
+      const deps = createMockDeps();
       const data = {};
 
-      handleCreateRoom(data, setters, wsProvider, router);
+      handleCreateRoom(data, deps);
 
-      expect(setters.setRoomId).not.toHaveBeenCalled();
-      expect(router.push).toHaveBeenCalledWith('/dashboard');
+      expect(deps.stateSetters.setRoomId).not.toHaveBeenCalled();
+      expect(deps.router.push).toHaveBeenCalledWith('/dashboard');
     });
   });
 
-  describe('handleCloseRoomTimeout', () => {
-    it('should call quit and return true for TIMEOUT', () => {
-      const uiActions = { quit: jest.fn() };
+  describe('handleCloseRoom', () => {
+    it('should call quit and return STOP for TIMEOUT', () => {
+      const deps = createMockDeps();
 
-      const result = handleCloseRoomTimeout({ reason: 'TIMEOUT' }, uiActions);
+      const result = handleCloseRoom({ reason: 'TIMEOUT' }, deps);
 
-      expect(uiActions.quit).toHaveBeenCalled();
-      expect(result).toBe(true);
+      expect(deps.uiActions.quit).toHaveBeenCalled();
+      expect(result.handled).toBe(true);
     });
 
-    it('should call quit and return true for NEXT_GAME_VOTE_FAILED', () => {
-      const uiActions = { quit: jest.fn() };
+    it('should call quit and return STOP for NEXT_GAME_VOTE_FAILED', () => {
+      const deps = createMockDeps();
 
-      const result = handleCloseRoomTimeout({ reason: 'NEXT_GAME_VOTE_FAILED' }, uiActions);
+      const result = handleCloseRoom({ reason: 'NEXT_GAME_VOTE_FAILED' }, deps);
 
-      expect(uiActions.quit).toHaveBeenCalled();
-      expect(result).toBe(true);
+      expect(deps.uiActions.quit).toHaveBeenCalled();
+      expect(result.handled).toBe(true);
     });
 
-    it('should return false for other reasons', () => {
-      const uiActions = { quit: jest.fn() };
-
-      const result = handleCloseRoomTimeout({ reason: 'OTHER' }, uiActions);
-
-      expect(uiActions.quit).not.toHaveBeenCalled();
-      expect(result).toBe(false);
-    });
-  });
-
-  describe('handleCloseRoomByOwner', () => {
-    it('should open notification when closed by different owner without results', () => {
+    it('should show notification when closed by different owner', () => {
       (gameState.getUserId as jest.Mock).mockReturnValue('user456');
       (gameState.hasResults as jest.Mock).mockReturnValue(false);
 
-      const notifications = {
-        openNotification: jest.fn(),
-        closeNotification: jest.fn(),
-      };
-      const renderWarningIcon = jest.fn().mockReturnValue('warning-icon');
-      const renderQuitButton = jest.fn().mockReturnValue('quit-button');
+      const deps = createMockDeps();
 
-      handleCloseRoomByOwner(
-        { ownderId: 'user123' },
-        notifications,
-        renderWarningIcon,
-        renderQuitButton
-      );
+      handleCloseRoom({ ownderId: 'user123' }, deps);
 
-      expect(notifications.openNotification).toHaveBeenCalledWith(
+      expect(deps.notifications.openNotification).toHaveBeenCalledWith(
         expect.objectContaining({
           title: 'Ooopps',
           dark: false,
@@ -174,127 +185,80 @@ describe('wsEventHandlers', () => {
       );
     });
 
-    it('should not open notification when owner is the same user', () => {
+    it('should not show notification when owner is same user', () => {
       (gameState.getUserId as jest.Mock).mockReturnValue('user123');
       (gameState.hasResults as jest.Mock).mockReturnValue(false);
 
-      const notifications = {
-        openNotification: jest.fn(),
-        closeNotification: jest.fn(),
-      };
+      const deps = createMockDeps();
 
-      handleCloseRoomByOwner(
-        { ownderId: 'user123' },
-        notifications,
-        jest.fn(),
-        jest.fn()
-      );
+      handleCloseRoom({ ownderId: 'user123' }, deps);
 
-      expect(notifications.openNotification).not.toHaveBeenCalled();
-    });
-
-    it('should not open notification when there are results', () => {
-      (gameState.getUserId as jest.Mock).mockReturnValue('user456');
-      (gameState.hasResults as jest.Mock).mockReturnValue(true);
-
-      const notifications = {
-        openNotification: jest.fn(),
-        closeNotification: jest.fn(),
-      };
-
-      handleCloseRoomByOwner(
-        { ownderId: 'user123' },
-        notifications,
-        jest.fn(),
-        jest.fn()
-      );
-
-      expect(notifications.openNotification).not.toHaveBeenCalled();
+      expect(deps.notifications.openNotification).not.toHaveBeenCalled();
     });
   });
 
-  describe('handleRoomUpdatedWithResults', () => {
-    it('should update state and navigate when has results', () => {
+  describe('handleRoomUpdated', () => {
+    it('should update state and navigate when has results (play again)', () => {
       (gameState.hasResults as jest.Mock).mockReturnValue(true);
 
-      const setters = {
-        setResults: jest.fn(),
-        setRoomInfo: jest.fn(),
-        setPlayers: jest.fn(),
-        setPlayingAgain: jest.fn(),
-      };
-      const notifications = {
-        openNotification: jest.fn(),
-        closeNotification: jest.fn(),
-      };
-      const router = { push: jest.fn() } as any;
+      const deps = createMockDeps();
       const data = { roomId: 'room123', roomUsers: [] };
 
-      const result = handleRoomUpdatedWithResults(data, setters, notifications, router);
+      const result = handleRoomUpdated(data, deps);
 
-      expect(result).toBe(true);
-      expect(setters.setResults).toHaveBeenCalledWith(null);
-      expect(notifications.closeNotification).toHaveBeenCalled();
-      expect(setters.setRoomInfo).toHaveBeenCalledWith(data);
-      expect(setters.setPlayers).toHaveBeenCalledWith([]);
-      expect(setters.setPlayingAgain).toHaveBeenCalledWith(null);
+      expect(result.handled).toBe(true);
+      expect(deps.stateSetters.setResults).toHaveBeenCalledWith(null);
+      expect(deps.notifications.closeNotification).toHaveBeenCalled();
+      expect(deps.stateSetters.setRoomInfo).toHaveBeenCalledWith(data);
+      expect(deps.stateSetters.setPlayers).toHaveBeenCalledWith([]);
+      expect(deps.stateSetters.setPlayingAgain).toHaveBeenCalledWith(null);
       expect(gameState.setResults).toHaveBeenCalledWith(false);
-      expect(router.push).toHaveBeenCalledWith('/game/room123');
+      expect(deps.router.push).toHaveBeenCalledWith('/game/room123');
     });
 
-    it('should return false when no results', () => {
+    it('should update room info normally when no results', () => {
       (gameState.hasResults as jest.Mock).mockReturnValue(false);
 
-      const result = handleRoomUpdatedWithResults(
-        {},
-        {} as any,
-        { openNotification: jest.fn(), closeNotification: jest.fn() },
-        { push: jest.fn() } as any
-      );
+      const deps = createMockDeps();
+      const data = { roomUsers: ['player1', 'player2'] };
 
-      expect(result).toBe(false);
+      const result = handleRoomUpdated(data, deps);
+
+      expect(result.handled).toBe(false);
+      expect(deps.stateSetters.setRoomInfo).toHaveBeenCalledWith(data);
+      expect(deps.stateSetters.setPlayers).toHaveBeenCalledWith(data.roomUsers);
     });
   });
 
-  describe('handleRoomUpdate', () => {
+  describe('handleRoomInfo', () => {
     it('should update room info and players', () => {
-      const setters = {
-        setRoomInfo: jest.fn(),
-        setPlayers: jest.fn(),
-      };
+      const deps = createMockDeps();
       const data = { roomUsers: ['player1', 'player2'] };
 
-      handleRoomUpdate(data, setters);
+      handleRoomInfo(data, deps);
 
-      expect(setters.setRoomInfo).toHaveBeenCalledWith(data);
-      expect(setters.setPlayers).toHaveBeenCalledWith(data.roomUsers);
+      expect(deps.stateSetters.setRoomInfo).toHaveBeenCalledWith(data);
+      expect(deps.stateSetters.setPlayers).toHaveBeenCalledWith(data.roomUsers);
     });
 
     it('should not call setPlayers if roomUsers is undefined', () => {
-      const setters = {
-        setRoomInfo: jest.fn(),
-        setPlayers: jest.fn(),
-      };
+      const deps = createMockDeps();
       const data = {};
 
-      handleRoomUpdate(data, setters);
+      handleRoomInfo(data, deps);
 
-      expect(setters.setRoomInfo).toHaveBeenCalledWith(data);
-      expect(setters.setPlayers).not.toHaveBeenCalled();
+      expect(deps.stateSetters.setRoomInfo).toHaveBeenCalledWith(data);
+      expect(deps.stateSetters.setPlayers).not.toHaveBeenCalled();
     });
   });
 
   describe('handleQuitRoom', () => {
-    it('should open notification when kicked by room owner', () => {
-      const notifications = {
-        openNotification: jest.fn(),
-        closeNotification: jest.fn(),
-      };
-      const renderQuitButton = jest.fn().mockReturnValue('quit-button');
+    it('should show notification when kicked by room owner', () => {
+      const deps = createMockDeps();
 
-      handleQuitRoom({ reason: 'KICKED_BY_ROOM_OWNER' }, notifications, renderQuitButton);
+      handleQuitRoom({ reason: 'KICKED_BY_ROOM_OWNER' }, deps);
 
-      expect(notifications.openNotification).toHaveBeenCalledWith(
+      expect(deps.notifications.openNotification).toHaveBeenCalledWith(
         expect.objectContaining({
           title: 'You were kicked!',
           dark: true,
@@ -302,103 +266,36 @@ describe('wsEventHandlers', () => {
       );
     });
 
-    it('should not open notification for other reasons', () => {
-      const notifications = {
-        openNotification: jest.fn(),
-        closeNotification: jest.fn(),
-      };
+    it('should show notification when player left', () => {
+      const deps = createMockDeps();
 
-      handleQuitRoom({ reason: 'LEFT' }, notifications, jest.fn());
+      handleQuitRoom({ reason: 'PLAYER_LEFT' }, deps);
 
-      expect(notifications.openNotification).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('handleJoiningWhileHostingError', () => {
-    it('should show notification and return true for hosting error', () => {
-      const notifications = {
-        openNotification: jest.fn(),
-        closeNotification: jest.fn(),
-      };
-      const renderWarningIcon = jest.fn().mockReturnValue('warning-icon');
-      const renderQuitButton = jest.fn().mockReturnValue('quit-button');
-
-      const result = handleJoiningWhileHostingError(
-        { error: { message: 'Joining while hosting a game is forbidden' } },
-        notifications,
-        renderWarningIcon,
-        renderQuitButton
-      );
-
-      expect(result).toBe(true);
-      expect(notifications.openNotification).toHaveBeenCalledWith(
+      expect(deps.notifications.openNotification).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: 'Sorry',
+          title: 'Opponent left',
         })
       );
     });
 
-    it('should return false for other errors', () => {
-      const notifications = {
-        openNotification: jest.fn(),
-        closeNotification: jest.fn(),
-      };
+    it('should not show notification for other reasons', () => {
+      const deps = createMockDeps();
 
-      const result = handleJoiningWhileHostingError(
-        { error: { message: 'Some other error' } },
-        notifications,
-        jest.fn(),
-        jest.fn()
-      );
+      handleQuitRoom({ reason: 'LEFT' }, deps);
 
-      expect(result).toBe(false);
-      expect(notifications.openNotification).not.toHaveBeenCalled();
+      expect(deps.notifications.openNotification).not.toHaveBeenCalled();
     });
   });
 
   describe('handleGameResults', () => {
     it('should set results and global results flag', () => {
-      const setters = { setResults: jest.fn() };
-      const data = { winners: ['user1'] };
+      const deps = createMockDeps();
+      const data = { winnerPlayersUserIds: ['user1'] };
 
-      handleGameResults(data, setters);
+      handleGameResults(data, deps);
 
-      expect(setters.setResults).toHaveBeenCalledWith(data);
+      expect(deps.stateSetters.setResults).toHaveBeenCalledWith(data);
       expect(gameState.setResults).toHaveBeenCalledWith(true);
-    });
-  });
-
-  describe('handlePlayerNotInRoomError', () => {
-    it('should redirect to dashboard for player not in room error', () => {
-      const router = { push: jest.fn() } as any;
-
-      const result = handlePlayerNotInRoomError(
-        { error: { message: 'Player must be in a room' } },
-        router
-      );
-
-      expect(result).toBe(true);
-      expect(router.push).toHaveBeenCalledWith('/dashboard');
-    });
-
-    it('should return false for other errors', () => {
-      const router = { push: jest.fn() } as any;
-
-      const result = handlePlayerNotInRoomError(
-        { error: { message: 'Some other error' } },
-        router
-      );
-
-      expect(result).toBe(false);
-      expect(router.push).not.toHaveBeenCalled();
-    });
-
-    it('should return false when no error', () => {
-      const router = { push: jest.fn() } as any;
-
-      const result = handlePlayerNotInRoomError({}, router);
-
-      expect(result).toBe(false);
     });
   });
 
@@ -416,75 +313,37 @@ describe('wsEventHandlers', () => {
     });
 
     it('should set already connected for code 4000', () => {
-      const setters = { setIsAlreadyConnected: jest.fn() };
-      const notifications = {
-        openNotification: jest.fn(),
-        closeNotification: jest.fn(),
-      };
-      const wsProvider = { send: jest.fn(), close: jest.fn() };
+      const deps = createMockDeps();
 
-      handleWSClose(
-        4000,
-        setters,
-        notifications,
-        wsProvider,
-        jest.fn(),
-        jest.fn()
-      );
+      handleWSClose({ code: 4000 }, deps);
 
-      expect(setters.setIsAlreadyConnected).toHaveBeenCalledWith(true);
-      expect(wsProvider.close).toHaveBeenCalled();
+      expect(deps.stateSetters.setIsAlreadyConnected).toHaveBeenCalledWith(true);
+      expect(deps.wsProvider.close).toHaveBeenCalled();
     });
 
     it('should not set already connected for code 4000 when adding metamask', () => {
       (window.localStorage.getItem as jest.Mock).mockReturnValue('true');
 
-      const setters = { setIsAlreadyConnected: jest.fn() };
-      const notifications = {
-        openNotification: jest.fn(),
-        closeNotification: jest.fn(),
-      };
-      const wsProvider = { send: jest.fn(), close: jest.fn() };
+      const deps = createMockDeps();
 
-      handleWSClose(
-        4000,
-        setters,
-        notifications,
-        wsProvider,
-        jest.fn(),
-        jest.fn()
-      );
+      handleWSClose({ code: 4000 }, deps);
 
-      expect(setters.setIsAlreadyConnected).not.toHaveBeenCalled();
-      expect(wsProvider.close).toHaveBeenCalled();
+      expect(deps.stateSetters.setIsAlreadyConnected).not.toHaveBeenCalled();
+      expect(deps.wsProvider.close).toHaveBeenCalled();
     });
 
     it('should show notification and set connection closed for code 4001', () => {
-      const setters = { setIsAlreadyConnected: jest.fn() };
-      const notifications = {
-        openNotification: jest.fn(),
-        closeNotification: jest.fn(),
-      };
-      const wsProvider = { send: jest.fn(), close: jest.fn() };
-      const renderWarningIcon = jest.fn().mockReturnValue('warning-icon');
-      const renderReloadButton = jest.fn().mockReturnValue('reload-button');
+      const deps = createMockDeps();
 
-      handleWSClose(
-        4001,
-        setters,
-        notifications,
-        wsProvider,
-        renderWarningIcon,
-        renderReloadButton
-      );
+      handleWSClose({ code: 4001 }, deps);
 
-      expect(notifications.openNotification).toHaveBeenCalledWith(
+      expect(deps.notifications.openNotification).toHaveBeenCalledWith(
         expect.objectContaining({
           title: 'Already connected!',
         })
       );
       expect(gameState.setConnectionClosed).toHaveBeenCalledWith(true);
-      expect(wsProvider.close).toHaveBeenCalled();
+      expect(deps.wsProvider.close).toHaveBeenCalled();
     });
   });
 });

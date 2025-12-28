@@ -1,8 +1,8 @@
 /**
  * WebSocket Event Handlers
  *
- * Modular event handlers extracted from GameProvider.
- * Each handler is a pure function that takes dependencies and returns a handler function.
+ * Standardized handlers with signature: handleX(eventData, deps)
+ * All handlers receive event data as first param and dependencies object as second.
  */
 
 import { NextRouter } from 'next/router';
@@ -22,7 +22,10 @@ import {
 } from './gameState';
 import { WSEventType } from '../types/game';
 
-// Types for dependencies
+// ============================================================================
+// TYPES
+// ============================================================================
+
 export interface NotificationActions {
   openNotification: (config: NotificationConfig) => void;
   closeNotification: () => void;
@@ -65,6 +68,32 @@ export interface UIActions {
   playStartGameSound: () => void;
 }
 
+export interface RenderHelpers {
+  renderWarningIcon: () => ReactNode;
+  renderQuitButton: () => ReactNode;
+  renderNewGameButton: () => ReactNode;
+  renderReloadButton: () => ReactNode;
+  renderDashboardButton: () => ReactNode;
+  renderGameEndedNotification: () => ReactNode;
+}
+
+/**
+ * Dependencies object passed to all handlers
+ */
+export interface HandlerDeps {
+  notifications: NotificationActions;
+  stateSetters: StateSetters;
+  router: NextRouter;
+  wsProvider: WSProviderType;
+  uiActions: UIActions;
+  render: RenderHelpers;
+  getGameState: () => unknown;
+}
+
+/**
+ * Legacy HandlerDependencies - used by GameProvider
+ * Has flat render functions instead of nested render object
+ */
 export interface HandlerDependencies {
   notifications: NotificationActions;
   stateSetters: StateSetters;
@@ -80,23 +109,26 @@ export interface HandlerDependencies {
   renderGameEndedNotification: () => ReactNode;
 }
 
-// Event data types
-interface TimerEventData {
+// ============================================================================
+// EVENT DATA TYPES
+// ============================================================================
+
+export interface TimerEventData {
   secondsLeft: number;
   totalSeconds: number;
 }
 
-interface UserSocketIdleEventData {
+export interface UserSocketIdleEventData {
   userId: string;
 }
 
-interface UserInfoEventData {
+export interface UserInfoEventData {
   userId: string;
   inRoomId?: string;
   inGameId?: string;
 }
 
-interface CreateRoomEventData {
+export interface CreateRoomEventData {
   roomId?: string;
   error?: {
     errorCode?: number;
@@ -104,12 +136,12 @@ interface CreateRoomEventData {
   };
 }
 
-interface CloseRoomEventData {
+export interface CloseRoomEventData {
   reason?: string;
   ownderId?: string;
 }
 
-interface RoomEventData {
+export interface RoomEventData {
   roomId?: string;
   roomUsers?: unknown[];
   error?: {
@@ -118,16 +150,31 @@ interface RoomEventData {
   };
 }
 
-interface GameEventData {
+export interface GameEventData {
   state?: string;
+  gameId?: string;
+  turnForPlayer?: string;
+  allGamePlayers?: unknown[];
+  gameTableCards?: unknown;
+  allowedUserCardsPlacement?: unknown;
+  lastPlayedCard?: unknown;
   error?: {
     message?: string;
   };
 }
 
-interface QuitRoomEventData {
+export interface QuitRoomEventData {
   reason?: string;
   userId?: string;
+}
+
+export interface GameResultsEventData {
+  winnerPlayersUserIds?: string[];
+  playersPoints?: Array<{ odentifier: { odentifier: string }; points: number }>;
+}
+
+export interface WSCloseEventData {
+  code: number;
 }
 
 interface WSEvent {
@@ -135,532 +182,459 @@ interface WSEvent {
   data: unknown;
 }
 
+// ============================================================================
+// HANDLER RESULT TYPE
+// ============================================================================
+
+interface HandlerResult {
+  handled: boolean;  // If true, stop processing further handlers
+}
+
+const CONTINUE: HandlerResult = { handled: false };
+const STOP: HandlerResult = { handled: true };
+
+// ============================================================================
+// STANDARDIZED HANDLERS - handleX(eventData, deps)
+// ============================================================================
+
 /**
  * Handle timer event
  */
-export function handleTimer(
-  data: TimerEventData,
-  setters: Pick<StateSetters, 'setTimer' | 'setTotalSeconds'>
-): void {
-  setters.setTimer(data.secondsLeft);
-  setters.setTotalSeconds(data.totalSeconds);
+export function handleTimer(data: TimerEventData, deps: HandlerDeps): HandlerResult {
+  deps.stateSetters.setTimer(data.secondsLeft);
+  deps.stateSetters.setTotalSeconds(data.totalSeconds);
+  return STOP;
 }
 
 /**
  * Handle user socket idle event
  */
-export function handleUserSocketIdle(
-  data: UserSocketIdleEventData,
-  setters: Pick<StateSetters, 'setUserSocketIdle'>
-): void {
-  setters.setUserSocketIdle(data);
+export function handleUserSocketIdle(data: UserSocketIdleEventData, deps: HandlerDeps): HandlerResult {
+  deps.stateSetters.setUserSocketIdle(data);
+  return STOP;
 }
 
 /**
  * Handle user info event
  */
-export function handleUserInfo(
-  data: UserInfoEventData,
-  setters: Pick<StateSetters, 'setUserInfo' | 'setIsBackendReady'>
-): void {
+export function handleUserInfo(data: UserInfoEventData, deps: HandlerDeps): HandlerResult {
   console.log('[DEBUG user-info] Received:', {
     userId: data.userId,
     inRoomId: data.inRoomId,
     inGameId: data.inGameId,
     currentPath: typeof window !== 'undefined' ? window.location.pathname : 'SSR',
   });
-  setters.setUserInfo(data);
+  deps.stateSetters.setUserInfo(data);
   setGlobalUserId(data.userId);
-  setters.setIsBackendReady(true);
+  deps.stateSetters.setIsBackendReady(true);
+  return CONTINUE;
 }
 
 /**
  * Handle create room event
  */
-export function handleCreateRoom(
-  data: CreateRoomEventData,
-  setters: Pick<StateSetters, 'setRoomId'>,
-  wsProvider: WSProviderType,
-  router: NextRouter
-): void {
+export function handleCreateRoom(data: CreateRoomEventData, deps: HandlerDeps): HandlerResult {
   console.log('[DEBUG create-room] Response received:', data);
 
-  // Handle error case - user might still be in another room
   if (data.error) {
     console.log('[DEBUG create-room] ERROR:', data.error.message);
-    // If user is already in a room/game, redirect to dashboard
-    // The backend should have cleared their state
-    router.push('/dashboard');
-    return;
+    deps.router.push('/dashboard');
+    return CONTINUE;
   }
 
   if (data.roomId) {
     console.log('[DEBUG create-room] Setting roomId to:', data.roomId);
-    setters.setRoomId(data.roomId);
-    wsProvider.send(
-      JSON.stringify({
-        event: 'room-info',
-        data: {},
-      })
-    );
+    deps.stateSetters.setRoomId(data.roomId);
+    deps.wsProvider.send(JSON.stringify({ event: 'room-info', data: {} }));
   } else {
     console.log('[DEBUG create-room] WARNING: No roomId in response, redirecting to dashboard');
-    router.push('/dashboard');
+    deps.router.push('/dashboard');
   }
+  return CONTINUE;
 }
 
 /**
- * Handle close room event (timeout or vote failed)
+ * Handle close room event
  */
-export function handleCloseRoomTimeout(
-  data: CloseRoomEventData,
-  uiActions: Pick<UIActions, 'quit'>
-): boolean {
+export function handleCloseRoom(data: CloseRoomEventData, deps: HandlerDeps): HandlerResult {
+  // Handle timeout or vote failed
   if (data.reason === 'TIMEOUT' || data.reason === 'NEXT_GAME_VOTE_FAILED') {
-    uiActions.quit();
-    return true;
+    deps.uiActions.quit();
+    return STOP;
   }
-  return false;
-}
 
-/**
- * Handle close room event (by owner)
- */
-export function handleCloseRoomByOwner(
-  data: CloseRoomEventData,
-  notifications: NotificationActions,
-  renderWarningIcon: () => ReactNode,
-  renderQuitButton: () => ReactNode
-): void {
+  // Handle closed by owner
   if (data.ownderId && data.ownderId !== getGlobalUserId() && !hasResults()) {
-    notifications.openNotification({
+    deps.notifications.openNotification({
       title: 'Ooopps',
       description: 'This game has been closed by host',
       dark: false,
-      icon: renderWarningIcon(),
+      icon: deps.render.renderWarningIcon(),
       iconColor: '#FF6F41',
-      footer: renderQuitButton(),
+      footer: deps.render.renderQuitButton(),
     });
   }
+  return CONTINUE;
 }
 
 /**
- * Handle room updated event during play-again flow
+ * Handle room updated event
  */
-export function handleRoomUpdatedWithResults(
-  data: RoomEventData,
-  setters: Pick<StateSetters, 'setResults' | 'setRoomInfo' | 'setPlayers' | 'setPlayingAgain'>,
-  notifications: NotificationActions,
-  router: NextRouter
-): boolean {
+export function handleRoomUpdated(data: RoomEventData, deps: HandlerDeps): HandlerResult {
+  // Special case: play again flow
   if (hasResults()) {
-    setters.setResults(null);
-    notifications.closeNotification();
-    setters.setRoomInfo(data);
-    setters.setPlayers(data.roomUsers);
-    setters.setPlayingAgain(null);
+    deps.stateSetters.setResults(null);
+    deps.notifications.closeNotification();
+    deps.stateSetters.setRoomInfo(data);
+    deps.stateSetters.setPlayers(data.roomUsers);
+    deps.stateSetters.setPlayingAgain(null);
     setGlobalResults(false);
-    router.push(`/game/${data.roomId}`);
-    return true;
+    deps.router.push(`/game/${data.roomId}`);
+    return STOP;
   }
-  return false;
-}
 
-/**
- * Handle room updated or room info event
- */
-export function handleRoomUpdate(
-  data: RoomEventData,
-  setters: Pick<StateSetters, 'setRoomInfo' | 'setPlayers'>
-): void {
-  setters.setRoomInfo(data);
+  // Normal update
+  deps.stateSetters.setRoomInfo(data);
   if (data.roomUsers) {
     console.log('Room updated: ', data);
-    setters.setPlayers(data.roomUsers);
+    deps.stateSetters.setPlayers(data.roomUsers);
   }
+  return CONTINUE;
+}
+
+/**
+ * Handle room info event
+ */
+export function handleRoomInfo(data: RoomEventData, deps: HandlerDeps): HandlerResult {
+  deps.stateSetters.setRoomInfo(data);
+  if (data.roomUsers) {
+    console.log('Room info: ', data);
+    deps.stateSetters.setPlayers(data.roomUsers);
+  }
+  return CONTINUE;
 }
 
 /**
  * Handle join room event
  */
-export function handleJoinRoom(
-  data: RoomEventData,
-  notifications: NotificationActions,
-  wsProvider: WSProviderType,
-  router: NextRouter,
-  renderWarningIcon: () => ReactNode,
-  renderNewGameButton: () => ReactNode,
-  renderGameEndedNotification: () => ReactNode
-): void {
+export function handleJoinRoom(data: RoomEventData, deps: HandlerDeps): HandlerResult {
   if (
     data.error?.errorCode === 403 &&
     data.error?.message?.startsWith('No valid server instance for the room')
   ) {
-    notifications.openNotification({
-      description: renderGameEndedNotification(),
+    deps.notifications.openNotification({
+      description: deps.render.renderGameEndedNotification(),
       dark: false,
-      icon: renderWarningIcon(),
+      icon: deps.render.renderWarningIcon(),
       iconColor: '#FF6F41',
-      footer: renderNewGameButton(),
+      footer: deps.render.renderNewGameButton(),
     });
-    router.push('/dashboard');
+    deps.router.push('/dashboard');
   }
-  wsProvider.send(
-    JSON.stringify({
-      event: 'room-info',
-      data: {},
-    })
-  );
+  deps.wsProvider.send(JSON.stringify({ event: 'room-info', data: {} }));
+  return CONTINUE;
 }
 
 /**
- * Handle quit room event (kicked by owner or player left)
+ * Handle quit room event
  */
-export function handleQuitRoom(
-  data: QuitRoomEventData,
-  notifications: NotificationActions,
-  renderQuitButton: () => ReactNode,
-  renderWarningIcon: () => ReactNode
-): void {
+export function handleQuitRoom(data: QuitRoomEventData, deps: HandlerDeps): HandlerResult {
   if (data.reason === 'KICKED_BY_ROOM_OWNER') {
-    notifications.openNotification({
+    deps.notifications.openNotification({
       title: 'You were kicked!',
       dark: true,
       iconColor: 'blue',
-      footer: renderQuitButton(),
+      footer: deps.render.renderQuitButton(),
     });
   } else if (data.reason === 'PLAYER_LEFT') {
-    // Another player left the game mid-play
-    notifications.openNotification({
+    deps.notifications.openNotification({
       title: 'Opponent left',
       description: 'Your opponent has left the game.',
       dark: false,
-      icon: renderWarningIcon(),
+      icon: deps.render.renderWarningIcon(),
       iconColor: '#FF6F41',
-      footer: renderQuitButton(),
+      footer: deps.render.renderQuitButton(),
     });
   }
-}
-
-/**
- * Handle error: Joining while hosting
- */
-export function handleJoiningWhileHostingError(
-  data: GameEventData,
-  notifications: NotificationActions,
-  renderWarningIcon: () => ReactNode,
-  renderQuitButton: () => ReactNode
-): boolean {
-  if (data.error?.message === 'Joining while hosting a game is forbidden') {
-    notifications.openNotification({
-      title: 'Sorry',
-      description: 'Cannot join rooms while hosting a game. Quit the game and try again!',
-      dark: false,
-      icon: renderWarningIcon(),
-      iconColor: '#FF6F41',
-      footer: renderQuitButton(),
-    });
-    return true;
-  }
-  return false;
+  return CONTINUE;
 }
 
 /**
  * Handle game results event
  */
-export function handleGameResults(
-  data: unknown,
-  setters: Pick<StateSetters, 'setResults'>
-): void {
+export function handleGameResults(data: GameResultsEventData, deps: HandlerDeps): HandlerResult {
   console.log('game-results', data);
-  setters.setResults(data);
+  deps.stateSetters.setResults(data);
   setGlobalResults(true);
+  return CONTINUE;
 }
 
 /**
  * Handle game info event
  */
-export function handleGameInfo(
-  data: GameEventData,
-  setters: Pick<StateSetters, 'setGameState'>,
-  getGameState: () => unknown,
-  wsProvider: WSProviderType,
-  notifications: NotificationActions,
-  renderQuitButton: () => ReactNode
-): void {
+export function handleGameInfo(data: GameEventData, deps: HandlerDeps): HandlerResult {
   if (data.state === 'ended' && hasResults()) {
-    return;
+    return CONTINUE;
   }
 
-  const currentState = getGameState();
-  setters.setGameState({ ...currentState as object, ...data });
+  const currentState = deps.getGameState();
+  deps.stateSetters.setGameState({ ...(currentState as object), ...data });
 
   if (data.state === 'ended' && !hasResults()) {
-    wsProvider.send(
-      JSON.stringify({
-        event: 'game-results',
-        data: {},
-      })
-    );
-    notifications.openNotification({
+    deps.wsProvider.send(JSON.stringify({ event: 'game-results', data: {} }));
+    deps.notifications.openNotification({
       title: 'Game Over!',
       dark: true,
       iconColor: 'blue',
-      footer: renderQuitButton(),
+      footer: deps.render.renderQuitButton(),
     });
   }
 
-  console.log(data.state);
   console.log('game-info": ', data);
+  return CONTINUE;
 }
 
 /**
  * Handle game updated event
  */
-export function handleGameUpdated(
-  data: GameEventData,
-  setters: Pick<StateSetters, 'setGameState'>,
-  notifications: NotificationActions,
-  router: NextRouter,
-  uiActions: Pick<UIActions, 'playStartGameSound'>
-): void {
-  setters.setGameState({ ...data });
+export function handleGameUpdated(data: GameEventData, deps: HandlerDeps): HandlerResult {
+  deps.stateSetters.setGameState({ ...data });
 
   setTimeout(() => {
     if (data.state === 'started') {
-      notifications.closeNotification();
+      deps.notifications.closeNotification();
       if (!isGameStarted() && !hasResults()) {
-        uiActions.playStartGameSound();
+        deps.uiActions.playStartGameSound();
         setGameStarted(true);
       }
       if (!window.location.pathname.split('?')[0].endsWith('/dashboard')) {
-        router.push('/play');
+        deps.router.push('/play');
       }
     }
   }, 0);
 
   console.log('game-updated": ', data);
+  return CONTINUE;
 }
 
 /**
- * Handle player must be in room error
+ * Handle next game event
  */
-export function handlePlayerNotInRoomError(
-  data: GameEventData,
-  router: NextRouter
-): boolean {
+export function handleNextGame(data: unknown, deps: HandlerDeps): HandlerResult {
+  console.log('next-game', data);
+  return CONTINUE;
+}
+
+/**
+ * Handle choose NFT cards event
+ */
+export function handleChooseNftCards(data: unknown, deps: HandlerDeps): HandlerResult {
+  console.log('choose-nft-cards sub: ', data);
+  return CONTINUE;
+}
+
+/**
+ * Handle WebSocket close event
+ */
+export function handleWSClose(data: WSCloseEventData, deps: HandlerDeps): HandlerResult {
+  console.log('on close: ' + data.code);
+
+  // Don't reconnect if there's already a connection opened in the backend
+  if (data.code === 4000) {
+    if (!localStorage.getItem('adding-metamask')) {
+      deps.stateSetters.setIsAlreadyConnected(true);
+    }
+    deps.wsProvider.close();
+  }
+
+  // Don't reconnect if there's a new connection opened in the backend
+  if (data.code === 4001) {
+    deps.notifications.openNotification({
+      title: 'Already connected!',
+      description: 'You are already in a lobby or a game in an another browser or tab.',
+      dark: false,
+      footer: deps.render.renderReloadButton(),
+      icon: deps.render.renderWarningIcon(),
+      iconColor: '#FF6F41',
+    });
+    setConnectionClosed(true);
+    deps.wsProvider.close();
+  }
+  return CONTINUE;
+}
+
+// ============================================================================
+// ERROR HANDLERS
+// ============================================================================
+
+/**
+ * Check for "Player must be in a room" error
+ */
+function checkPlayerNotInRoomError(data: GameEventData, deps: HandlerDeps): boolean {
   if (data.error?.message === 'Player must be in a room') {
-    router.push('/dashboard');
+    deps.router.push('/dashboard');
     return true;
   }
   return false;
 }
 
 /**
- * Handle WebSocket close event
+ * Check for "Joining while hosting" error
  */
-export function handleWSClose(
-  code: number,
-  setters: Pick<StateSetters, 'setIsAlreadyConnected'>,
-  notifications: NotificationActions,
-  wsProvider: WSProviderType,
-  renderWarningIcon: () => ReactNode,
-  renderReloadButton: () => ReactNode
-): void {
-  // Don't reconnect if there's already a connection opened in the backend
-  if (code === 4000) {
-    if (!localStorage.getItem('adding-metamask')) {
-      setters.setIsAlreadyConnected(true);
-    }
-    wsProvider.close();
-  }
-
-  // Don't reconnect if there's a new connection opened in the backend
-  if (code === 4001) {
-    notifications.openNotification({
-      title: 'Already connected!',
-      description: 'You are already in a lobby or a game in an another browser or tab.',
+function checkJoiningWhileHostingError(data: GameEventData, deps: HandlerDeps): boolean {
+  if (data.error?.message === 'Joining while hosting a game is forbidden') {
+    deps.notifications.openNotification({
+      title: 'Sorry',
+      description: 'Cannot join rooms while hosting a game. Quit the game and try again!',
       dark: false,
-      footer: renderReloadButton(),
-      icon: renderWarningIcon(),
+      icon: deps.render.renderWarningIcon(),
       iconColor: '#FF6F41',
+      footer: deps.render.renderQuitButton(),
     });
-    setConnectionClosed(true);
-    wsProvider.close();
+    return true;
   }
+  return false;
 }
+
+/**
+ * Check for "No valid server instance" error
+ */
+function checkNoValidServerError(data: GameEventData): boolean {
+  return data.error?.message === 'No valid server instance for the room';
+}
+
+// ============================================================================
+// MAIN HANDLER FACTORY
+// ============================================================================
 
 /**
  * Create the main WebSocket message handler
  */
-export function createWSMessageHandler(deps: HandlerDependencies): (event: MessageEvent) => void {
+export function createWSMessageHandler(legacyDeps: HandlerDependencies): (event: MessageEvent) => void {
+  // Convert legacy deps to new format
+  const deps: HandlerDeps = {
+    notifications: legacyDeps.notifications,
+    stateSetters: legacyDeps.stateSetters,
+    router: legacyDeps.router,
+    wsProvider: legacyDeps.wsProvider,
+    uiActions: legacyDeps.uiActions,
+    getGameState: legacyDeps.getGameState,
+    render: {
+      renderWarningIcon: legacyDeps.renderWarningIcon,
+      renderQuitButton: legacyDeps.renderQuitButton,
+      renderNewGameButton: legacyDeps.renderNewGameButton,
+      renderReloadButton: legacyDeps.renderReloadButton,
+      renderDashboardButton: legacyDeps.renderDashboardButton,
+      renderGameEndedNotification: legacyDeps.renderGameEndedNotification,
+    },
+  };
+
   return function handleMessage({ data }: MessageEvent) {
     deps.stateSetters.setIsAlreadyConnected(false);
 
     const event: WSEvent = JSON.parse(data);
 
+    // Skip pong
     if (event.event === 'pong') {
       return;
     }
 
+    // Log non-timer events
     if (event.event !== 'timer') {
       console.log('Game Provider WS event:', event);
     }
 
-    // Timer event
-    if (event.event === 'timer') {
-      handleTimer(event.data as TimerEventData, deps.stateSetters);
+    const eventData = event.data;
+
+    // Check for global errors first
+    if (checkPlayerNotInRoomError(eventData as GameEventData, deps)) {
+      return;
+    }
+    if (checkNoValidServerError(eventData as GameEventData)) {
+      return;
+    }
+    if (checkJoiningWhileHostingError(eventData as GameEventData, deps)) {
       return;
     }
 
-    // User socket idle event
-    if (event.event === 'user-socket-idle') {
-      handleUserSocketIdle(event.data as UserSocketIdleEventData, deps.stateSetters);
-      return;
+    // Route to appropriate handler
+    let result: HandlerResult = CONTINUE;
+
+    switch (event.event) {
+      case 'timer':
+        result = handleTimer(eventData as unknown as TimerEventData, deps);
+        break;
+      case 'user-socket-idle':
+        result = handleUserSocketIdle(eventData as unknown as UserSocketIdleEventData, deps);
+        break;
+      case 'user-info':
+        result = handleUserInfo(eventData as unknown as UserInfoEventData, deps);
+        break;
+      case 'create-room':
+        result = handleCreateRoom(eventData as unknown as CreateRoomEventData, deps);
+        break;
+      case 'close-room':
+        result = handleCloseRoom(eventData as unknown as CloseRoomEventData, deps);
+        break;
+      case 'room-updated':
+        result = handleRoomUpdated(eventData as unknown as RoomEventData, deps);
+        break;
+      case 'room-info':
+        result = handleRoomInfo(eventData as unknown as RoomEventData, deps);
+        break;
+      case 'join-room':
+        result = handleJoinRoom(eventData as unknown as RoomEventData, deps);
+        break;
+      case 'quit-room':
+        result = handleQuitRoom(eventData as unknown as QuitRoomEventData, deps);
+        break;
+      case 'game-results':
+        result = handleGameResults(eventData as unknown as GameResultsEventData, deps);
+        break;
+      case 'game-info':
+        result = handleGameInfo(eventData as unknown as GameEventData, deps);
+        break;
+      case 'game-updated':
+        result = handleGameUpdated(eventData as unknown as GameEventData, deps);
+        break;
+      case 'next-game':
+        result = handleNextGame(eventData, deps);
+        break;
+      case 'choose-nft-cards':
+        result = handleChooseNftCards(eventData, deps);
+        break;
+      default:
+        console.log('Unhandled WS event:', event.event);
     }
 
-    // Handle player not in room error
-    if (handlePlayerNotInRoomError(event.data as GameEventData, deps.router)) {
-      return;
-    }
-
-    // Log choose-nft-cards
-    if (event.event === 'choose-nft-cards') {
-      console.log('choose-nft-cards sub: ', event);
-    }
-
-    // User info event
-    if (event.event === 'user-info') {
-      handleUserInfo(event.data as UserInfoEventData, deps.stateSetters);
-    }
-
-    // Create room event
-    if (event.event === 'create-room') {
-      handleCreateRoom(event.data as CreateRoomEventData, deps.stateSetters, deps.wsProvider, deps.router);
-    }
-
-    // Close room event (timeout)
-    if (event.event === 'close-room') {
-      if (handleCloseRoomTimeout(event.data as CloseRoomEventData, deps.uiActions)) {
-        return;
-      }
-    }
-
-    // Log next-game
-    if (event.event === 'next-game') {
-      console.log('next-game', event);
-    }
-
-    // Room updated with results (play again)
-    if (event.event === 'room-updated') {
-      if (handleRoomUpdatedWithResults(
-        event.data as RoomEventData,
-        deps.stateSetters,
-        deps.notifications,
-        deps.router
-      )) {
-        return;
-      }
-    }
-
-    // Close room by owner
-    if (event.event === 'close-room') {
-      handleCloseRoomByOwner(
-        event.data as CloseRoomEventData,
-        deps.notifications,
-        deps.renderWarningIcon,
-        deps.renderQuitButton
-      );
-    }
-
-    // Room updated or room info
-    if (event.event === 'room-updated' || event.event === 'room-info') {
-      handleRoomUpdate(event.data as RoomEventData, deps.stateSetters);
-    }
-
-    // Join room
-    if (event.event === 'join-room') {
-      handleJoinRoom(
-        event.data as RoomEventData,
-        deps.notifications,
-        deps.wsProvider,
-        deps.router,
-        deps.renderWarningIcon,
-        deps.renderNewGameButton,
-        deps.renderGameEndedNotification
-      );
-    }
-
-    // Quit room (kicked or player left)
-    if (event.event === 'quit-room') {
-      handleQuitRoom(
-        event.data as QuitRoomEventData,
-        deps.notifications,
-        deps.renderQuitButton,
-        deps.renderWarningIcon
-      );
-    }
-
-    // Handle no valid server instance error
-    const eventData = event.data as GameEventData;
-    if (eventData.error?.message === 'No valid server instance for the room') {
-      return;
-    }
-
-    // Handle joining while hosting error
-    if (handleJoiningWhileHostingError(
-      eventData,
-      deps.notifications,
-      deps.renderWarningIcon,
-      deps.renderQuitButton
-    )) {
-      return;
-    }
-
-    // Game results
-    if (event.event === 'game-results') {
-      handleGameResults(event.data, deps.stateSetters);
-    }
-
-    // Game info
-    if (event.event === 'game-info') {
-      handleGameInfo(
-        eventData,
-        deps.stateSetters,
-        deps.getGameState,
-        deps.wsProvider,
-        deps.notifications,
-        deps.renderQuitButton
-      );
-    }
-
-    // Game updated
-    if (event.event === 'game-updated') {
-      handleGameUpdated(
-        eventData,
-        deps.stateSetters,
-        deps.notifications,
-        deps.router,
-        deps.uiActions
-      );
-    }
+    // Result is used for future extension (e.g., middleware chain)
+    void result;
   };
 }
 
 /**
  * Create the WebSocket close handler
  */
-export function createWSCloseHandler(deps: HandlerDependencies): (event: RWSCloseEvent) => void {
+export function createWSCloseHandler(legacyDeps: HandlerDependencies): (event: RWSCloseEvent) => void {
+  const deps: HandlerDeps = {
+    notifications: legacyDeps.notifications,
+    stateSetters: legacyDeps.stateSetters,
+    router: legacyDeps.router,
+    wsProvider: legacyDeps.wsProvider,
+    uiActions: legacyDeps.uiActions,
+    getGameState: legacyDeps.getGameState,
+    render: {
+      renderWarningIcon: legacyDeps.renderWarningIcon,
+      renderQuitButton: legacyDeps.renderQuitButton,
+      renderNewGameButton: legacyDeps.renderNewGameButton,
+      renderReloadButton: legacyDeps.renderReloadButton,
+      renderDashboardButton: legacyDeps.renderDashboardButton,
+      renderGameEndedNotification: legacyDeps.renderGameEndedNotification,
+    },
+  };
+
   return function handleClose(e: RWSCloseEvent) {
-    console.log('on close: ' + e.code);
-    handleWSClose(
-      e.code,
-      deps.stateSetters,
-      deps.notifications,
-      deps.wsProvider,
-      deps.renderWarningIcon,
-      deps.renderReloadButton
-    );
+    handleWSClose({ code: e.code }, deps);
   };
 }
 
