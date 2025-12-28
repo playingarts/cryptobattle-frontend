@@ -1,4 +1,4 @@
-import { forwardRef, useState, useEffect, useRef } from "react";
+import { forwardRef, useState, useEffect, useRef, useCallback } from "react";
 import UserAvatar from "../UserAvatar";
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -8,7 +8,6 @@ import { useGame } from "../GameProvider";
 
 // Fixed display duration for all players (30 seconds)
 const DISPLAY_DURATION_MS = 30000;
-const UPDATE_INTERVAL_MS = 100; // Smooth updates every 100ms
 
 interface PlayerType {
   userId: string;
@@ -29,39 +28,68 @@ interface PlayerProps {
 const Player = forwardRef<HTMLDivElement, PlayerProps>(
   ({ player, loadingDelayed, currentPlayerWithPoints, inactive }, ref) => {
     const [progress, setProgress] = useState(100)
-    const prevProgressRef = useRef(100)
     const turnStartTimeRef = useRef<number | null>(null)
-    const intervalRef = useRef<NodeJS.Timeout | null>(null)
+    const rafRef = useRef<number | null>(null)
+    const frozenProgressRef = useRef<number | null>(null)
 
-    // Only animate when counting down, not when resetting to 100%
-    const shouldAnimate = progress < prevProgressRef.current
-
-    const { results } = useGame()
+    const { results, state } = useGame()
 
     // Track when current player changes (new turn starts)
     const prevCurrentPlayerRef = useRef<string | null>(null)
+
+    // Check if this player has made a move (animation is pending for their card)
+    const hasMadeMove = state.pendingAnimation?.playerId === player.userId
+
+    // Animation loop using requestAnimationFrame for smooth 60fps
+    const animate = useCallback(() => {
+      if (turnStartTimeRef.current === null) {
+        return;
+      }
+
+      const elapsed = Date.now() - turnStartTimeRef.current
+      const remaining = Math.max(0, DISPLAY_DURATION_MS - elapsed)
+      const newProgress = (remaining / DISPLAY_DURATION_MS) * 100
+
+      setProgress(newProgress)
+
+      // Continue animation
+      rafRef.current = requestAnimationFrame(animate)
+    }, [])
 
     useEffect(() => {
       const currentPlayerId = currentPlayerWithPoints?.userId || null
       const isMyTurn = currentPlayerId === player.userId
       const turnChanged = currentPlayerId !== prevCurrentPlayerRef.current
 
-      // Clear any existing interval
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-        intervalRef.current = null
+      // Cancel any existing animation frame
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current)
+        rafRef.current = null
       }
 
       // If game ended or no current player, show full
       if (!currentPlayerWithPoints || results) {
         setProgress(100)
         turnStartTimeRef.current = null
+        frozenProgressRef.current = null
         prevCurrentPlayerRef.current = currentPlayerId
         return
       }
 
-      // If it's not this player's turn, freeze at current value (don't change progress)
+      // If this player made a move, freeze at current value
+      if (hasMadeMove) {
+        // Store frozen progress if not already frozen
+        if (frozenProgressRef.current === null) {
+          frozenProgressRef.current = progress
+        }
+        prevCurrentPlayerRef.current = currentPlayerId
+        return
+      }
+
+      // If it's not this player's turn, reset to 100%
       if (!isMyTurn) {
+        setProgress(100)
+        frozenProgressRef.current = null
         prevCurrentPlayerRef.current = currentPlayerId
         return
       }
@@ -70,43 +98,29 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
       if (turnChanged) {
         // New turn started - reset timer
         turnStartTimeRef.current = Date.now()
+        frozenProgressRef.current = null
         setProgress(100)
       }
 
-      // Start countdown interval
-      intervalRef.current = setInterval(() => {
-        if (turnStartTimeRef.current === null) {
-          return;
-        }
-
-        const elapsed = Date.now() - turnStartTimeRef.current
-        const remaining = Math.max(0, DISPLAY_DURATION_MS - elapsed)
-        const newProgress = (remaining / DISPLAY_DURATION_MS) * 100
-
-        setProgress(newProgress)
-      }, UPDATE_INTERVAL_MS)
+      // Start animation loop
+      rafRef.current = requestAnimationFrame(animate)
 
       prevCurrentPlayerRef.current = currentPlayerId
 
       return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current)
-          intervalRef.current = null
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current)
+          rafRef.current = null
         }
       }
-    }, [currentPlayerWithPoints, player.userId, results])
-
-    // Track previous progress for animation decision
-    useEffect(() => {
-      prevProgressRef.current = progress
-    }, [progress])
+    }, [currentPlayerWithPoints, player.userId, results, hasMadeMove, animate, progress])
 
     useEffect(() => {
       if (results) {
         setProgress(100)
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current)
-          intervalRef.current = null
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current)
+          rafRef.current = null
         }
       }
     }, [results])
@@ -123,9 +137,8 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
               stroke: inactive ? 'gray' : player.color,
               // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
               strokeLinecap: "butt",
-              // Only animate countdown (progress decreasing), instant reset when increasing
-              // Use 150ms transition for smooth updates with 100ms interval
-              transition: shouldAnimate ? "stroke-dashoffset linear 150ms" : "none",
+              // No CSS transition - we use requestAnimationFrame for smooth 60fps updates
+              transition: "none",
               // Rotate the path
               transform: "rotate(0.25turn)",
               transformOrigin: "center center",
