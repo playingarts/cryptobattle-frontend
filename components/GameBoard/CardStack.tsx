@@ -95,7 +95,7 @@ const CardStack: FC<CardStackProps> = ({
             animated={card.isNft === true}
             card={cardForComponent}
             index={index}
-            className={isTopCard ? 'dropzone' : ''}
+            className={isTopCard && !isHiddenByAnimation ? 'dropzone' : ''}
             id={`${rowIndex}-${columnIndex}`}
             data-row={rowIndex}
             data-column={columnIndex}
