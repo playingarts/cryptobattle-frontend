@@ -176,7 +176,7 @@ function normalizeAllowedPlacements(
  * Server sends points directly as Record<userId, number> (not wrapped in additionalProperties)
  */
 function normalizePoints(
-  serverPoints?: Record<string, number> | { additionalProperties?: Record<string, number> }
+  serverPoints?: Record<string, unknown>
 ): Record<string, number> {
   console.log('[DEBUG normalizePoints] input:', serverPoints);
   if (!serverPoints) {
@@ -184,16 +184,18 @@ function normalizePoints(
     return {};
   }
 
-  // Handle both formats:
-  // 1. Direct format: { "userId1": 10, "userId2": 20 }
-  // 2. Wrapped format: { additionalProperties: { "userId1": 10, "userId2": 20 } }
-  if ('additionalProperties' in serverPoints && serverPoints.additionalProperties) {
-    const result = { ...serverPoints.additionalProperties };
+  // Handle wrapped format: { additionalProperties: { "userId1": 10, "userId2": 20 } }
+  if ('additionalProperties' in serverPoints &&
+      serverPoints.additionalProperties &&
+      typeof serverPoints.additionalProperties === 'object') {
+    const additionalProps = serverPoints.additionalProperties as Record<string, number>;
+    const result = { ...additionalProps };
     console.log('[DEBUG normalizePoints] wrapped format, result:', result);
     return result;
   }
 
-  // Direct format - return as-is (filter out non-numeric values for safety)
+  // Direct format: { "userId1": 10, "userId2": 20 }
+  // Filter out non-numeric values for safety
   const result: Record<string, number> = {};
   for (const [key, value] of Object.entries(serverPoints)) {
     if (typeof value === 'number') {
