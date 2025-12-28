@@ -177,10 +177,14 @@ function normalizeAllowedPlacements(
 function normalizePoints(
   serverPoints?: { additionalProperties?: Record<string, number> }
 ): Record<string, number> {
+  console.log('[DEBUG normalizePoints] raw serverPoints:', serverPoints);
   if (!serverPoints?.additionalProperties) {
+    console.log('[DEBUG normalizePoints] returning empty object - no additionalProperties');
     return {};
   }
-  return { ...serverPoints.additionalProperties };
+  const result = { ...serverPoints.additionalProperties };
+  console.log('[DEBUG normalizePoints] result:', result);
+  return result;
 }
 
 /**
