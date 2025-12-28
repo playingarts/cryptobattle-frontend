@@ -1,4 +1,5 @@
 import { useState, useEffect, FC, HTMLAttributes, createRef } from "react";
+import { motion, LayoutGroup } from "framer-motion";
 import { useGame } from "../GameProvider";
 export type Props = HTMLAttributes<HTMLDivElement>;
 import Player from "./Player";
@@ -92,31 +93,36 @@ const PlayerQueue: FC<PlayerQueue> = ({
       <div className="bubbles-wrapper">
         <div className="bubbles-group"></div>
         {players.length > 0 && (
-          <div
-            css={{
-              display: "flex",
-            }}
-          >
-            {/* // <AnimateBubbles> */}
-            {players.map((player: any) => {
-              return (
-                <Player
-                  currentPlayerWithPoints={currentPlayerWithPoints}
-                  player={player}
-                  inactive={
-                    inactivePlayers.find(
-                      (inactivePlayer: any) =>
-                        player.userId === inactivePlayer.userId
-                    )?.isIdle
-                  }
-                  loadingDelayed={loadingDelayed}
-                  key={player.userId}
-                  ref={createRef()}
-                />
-              );
-            })}
-          </div>
-          // </AnimateBubbles>
+          <LayoutGroup>
+            <div
+              css={{
+                display: "flex",
+              }}
+            >
+              {players.map((player: any) => {
+                return (
+                  <motion.div
+                    key={player.userId}
+                    layout
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  >
+                    <Player
+                      currentPlayerWithPoints={currentPlayerWithPoints}
+                      player={player}
+                      inactive={
+                        inactivePlayers.find(
+                          (inactivePlayer: any) =>
+                            player.userId === inactivePlayer.userId
+                        )?.isIdle
+                      }
+                      loadingDelayed={loadingDelayed}
+                      ref={createRef()}
+                    />
+                  </motion.div>
+                );
+              })}
+            </div>
+          </LayoutGroup>
         )}
       </div>
     </div>
