@@ -36,6 +36,7 @@ export interface GameReducerState {
     gameTableCards: Record<string, NormalizedCard[]>;  // "x-y" -> cards
     allowedPlacements: Record<string, boolean>;        // "x-y" -> allowed
     currentPoints: Record<string, number>;             // userId -> points
+    playersCurrentPoints: Record<string, number>;      // alias for backwards compat
     lastPlayedCard: NormalizedCard | null;
     lastPlayedPosition: { x: number; y: number } | null;
     // Player hands - needed for GameInventory
@@ -76,6 +77,7 @@ export const initialGameState: GameReducerState = {
     gameTableCards: {},
     allowedPlacements: {},
     currentPoints: {},
+    playersCurrentPoints: {},
     lastPlayedCard: null,
     lastPlayedPosition: null,
     gameUsersWithCards: [],
@@ -364,6 +366,7 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
           gameTableCards,
           allowedPlacements,
           currentPoints: normalizePoints(serverData.playersCurrentPoints),
+          playersCurrentPoints: normalizePoints(serverData.playersCurrentPoints),
           lastPlayedCard,
           lastPlayedPosition,
           // Store raw data needed by consumers
