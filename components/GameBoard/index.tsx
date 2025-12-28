@@ -367,6 +367,16 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
             {row.map((cell) => {
               const { x: columnIndex, y: cellRowIndex, cards, isEmpty, isDropTarget } = cell;
               const topCard = cards.length > 0 ? cards[cards.length - 1] : null;
+              const hasCards = cards.length > 0;
+
+              // Determine what to render:
+              // - hasCards: render card stack
+              // - isDropTarget (no cards): render droppable CardEmpty with border
+              // - isEmpty (adjacent to cards, no cards, not drop target): render faded placeholder
+              // - none of above: render invisible placeholder to maintain grid structure
+              const showDropTarget = !hasCards && isDropTarget;
+              const showFadedPlaceholder = !hasCards && isEmpty && !isDropTarget;
+              const showInvisiblePlaceholder = !hasCards && !isEmpty && !isDropTarget;
 
               return (
               <div
@@ -375,16 +385,24 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                   margin: "20px",
                   borderRadius: 10,
                   position: "relative",
+                  // Fixed size to maintain grid structure
+                  width: "210px",
+                  height: "300px",
                 })}
               >
-                {/* Empty cell (no cards, not a drop target) - show as faded placeholder */}
-                {isEmpty && !isDropTarget && (
+                {/* Invisible placeholder for cells outside the active area */}
+                {showInvisiblePlaceholder && (
+                  <div style={{ width: "100%", height: "100%" }} />
+                )}
+
+                {/* Faded placeholder for adjacent cells that aren't drop targets */}
+                {showFadedPlaceholder && (
                   <CardEmpty
                     key={`placeholder-${columnIndex}-${cellRowIndex}`}
                     isPlaceholder={true}
                     containerStyles={{
                       opacity: 0.3,
-                      border: "none",
+                      border: "3px dashed #222",
                     }}
                     css={{
                       pointerEvents: "none",
@@ -414,8 +432,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                     </div>
                   )}
 
-                {/* Empty drop target cell */}
-                {isEmpty && isDropTarget && (
+                {/* Drop target cell (can place cards here) */}
+                {showDropTarget && (
                   <CardEmpty
                     selectedCard={selectedCard}
                     key={`drop-${columnIndex}-${cellRowIndex}`}
@@ -466,7 +484,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                 )}
 
                 {/* Card stack */}
-                {cards.length > 0 && (
+                {hasCards && (
                   <div className="stack">
                     {cards.map((card, index) => {
                       // Transform NormalizedCard to Card component's expected format
