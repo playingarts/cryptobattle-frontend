@@ -109,17 +109,21 @@ function normalizeTableCards(
 
   for (const [key, cards] of Object.entries(serverTableCards.additionalProperties)) {
     if (Array.isArray(cards)) {
-      result[key] = cards.map((card) => ({
-        id: card.id || `${card.suit}-${card.value}-${card.userId}`,
-        suit: card.suit.toLowerCase(),
-        value: String(card.value).toLowerCase(),
-        userId: card.userId,
-        powerLevel: card.powerLevel,
-        scoringLevel: card.scoringLevel,
-        imageUrl: card.imageUrl,
-        videoUrl: card.videoUrl,
-        isNft: !!card.id && card.id !== '',
-      }));
+      result[key] = cards.map((card) => {
+        // Check if this is an NFT card BEFORE we generate a fallback id
+        const isNft = !!card.id && card.id !== '';
+        return {
+          id: card.id || `${card.suit}-${card.value}-${card.userId}`,
+          suit: card.suit.toLowerCase(),
+          value: String(card.value).toLowerCase(),
+          userId: card.userId,
+          powerLevel: card.powerLevel,
+          scoringLevel: card.scoringLevel,
+          imageUrl: card.imageUrl,
+          videoUrl: card.videoUrl,
+          isNft,
+        };
+      });
     }
   }
 
@@ -132,6 +136,9 @@ function normalizeTableCards(
 function normalizeLastPlayedCard(serverCard?: ServerLastPlayedCard): NormalizedCard | null {
   if (!serverCard) return null;
 
+  // Check if this is an NFT card BEFORE we generate a fallback id
+  const isNft = !!serverCard.id && serverCard.id !== '';
+
   return {
     id: serverCard.id || `${serverCard.suit}-${serverCard.value}-${serverCard.userId}`,
     suit: serverCard.suit.toLowerCase(),
@@ -141,7 +148,7 @@ function normalizeLastPlayedCard(serverCard?: ServerLastPlayedCard): NormalizedC
     scoringLevel: serverCard.scoringLevel,
     imageUrl: serverCard.imageUrl,
     videoUrl: serverCard.videoUrl,
-    isNft: !!serverCard.id && serverCard.id !== '',
+    isNft,
   };
 }
 
