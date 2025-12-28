@@ -54,7 +54,7 @@ export function normalizeCard(serverCard: ServerCardInfo): NormalizedCard {
  * Returns { x, y } or null if not found
  *
  * Searches through gameTableCards for a matching card
- * (matches by suit, value, and userId)
+ * (matches by suit and value; userId match is optional since server may not send it)
  */
 export function findCardPosition(
   tableCards: Record<string, NormalizedCard[]>,
@@ -67,10 +67,37 @@ export function findCardPosition(
       topCard &&
       topCard.suit.toLowerCase() === card.suit.toLowerCase() &&
       topCard.value.toLowerCase() === card.value.toLowerCase() &&
-      topCard.userId === card.userId
+      // Only match userId if provided (server doesn't always send it in lastPlayedCard)
+      (!card.userId || topCard.userId === card.userId)
     ) {
       const [xStr, yStr] = key.split('-');
       return { x: parseInt(xStr, 10), y: parseInt(yStr, 10) };
+    }
+  }
+  return null;
+}
+
+/**
+ * Find a card on the board and return the full card with position
+ * Used to get userId from the board when server doesn't send it in lastPlayedCard
+ */
+export function findCardOnBoard(
+  tableCards: Record<string, NormalizedCard[]>,
+  card: { suit: string; value: string }
+): { card: NormalizedCard; position: { x: number; y: number } } | null {
+  for (const [key, cards] of Object.entries(tableCards)) {
+    // Check the top card in each stack
+    const topCard = cards[cards.length - 1];
+    if (
+      topCard &&
+      topCard.suit.toLowerCase() === card.suit.toLowerCase() &&
+      topCard.value.toLowerCase() === card.value.toLowerCase()
+    ) {
+      const [xStr, yStr] = key.split('-');
+      return {
+        card: topCard,
+        position: { x: parseInt(xStr, 10), y: parseInt(yStr, 10) }
+      };
     }
   }
   return null;

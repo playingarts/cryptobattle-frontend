@@ -17,7 +17,7 @@ import {
   GamePlayer,
 } from '../types/game';
 import { GameAction, GameStatePayload, ServerTableCard, ServerLastPlayedCard, GameUserWithCardsInfo, AllowedUserCardsPlacement } from './gameActions';
-import { generateMoveKey, normalizeCard, findCardPosition } from '../utils/moveUtils';
+import { generateMoveKey, normalizeCard, findCardPosition, findCardOnBoard } from '../utils/moveUtils';
 import { logAnimation, logGameState } from '../utils/debug';
 
 // ============================================================
@@ -312,13 +312,25 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
 
       // Normalize server state
       const gameTableCards = normalizeTableCards(serverData.gameTableCards);
-      const lastPlayedCard = normalizeLastPlayedCard(serverData.lastPlayedCard);
+      let lastPlayedCard = normalizeLastPlayedCard(serverData.lastPlayedCard);
       const allowedPlacements = normalizeAllowedPlacements(serverData.allowedUserCardsPlacement);
 
-      // Find position of last played card
-      const lastPlayedPosition = lastPlayedCard
-        ? findCardPosition(gameTableCards, lastPlayedCard)
-        : null;
+      // Find the card on the board to get full info including userId
+      // Server's lastPlayedCard may not include userId, so we look it up from the board
+      let lastPlayedPosition: { x: number; y: number } | null = null;
+      if (lastPlayedCard) {
+        const foundCard = findCardOnBoard(gameTableCards, lastPlayedCard);
+        if (foundCard) {
+          lastPlayedPosition = foundCard.position;
+          // Use the card from the board which has the correct userId
+          lastPlayedCard = {
+            ...lastPlayedCard,
+            userId: foundCard.card.userId,
+            // Also copy scoringLevel if server provided it
+            scoringLevel: lastPlayedCard.scoringLevel ?? foundCard.card.scoringLevel,
+          };
+        }
+      }
 
       // Generate move key for new card (if any)
       const newMoveKey = lastPlayedCard && lastPlayedPosition
@@ -335,6 +347,8 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
         processedKeys: Array.from(state.processedMoveKeys),
         card: lastPlayedCard ? `${lastPlayedCard.suit}-${lastPlayedCard.value}-${lastPlayedCard.userId}` : null,
         currentPendingAnimation: state.pendingAnimation?.moveKey,
+        serverLastPlayedCard: serverData.lastPlayedCard,
+        lastPlayedPosition,
       });
 
       logAnimation('STATE_RECEIVED', {
