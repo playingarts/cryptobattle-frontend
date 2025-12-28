@@ -13,7 +13,6 @@ interface Props extends HTMLAttributes<HTMLElement> {
 
 const Card: FC<Props> = ({
   size,
-  isPlaceholder = false,
   containerStyles,
   ...props
 }) => {
