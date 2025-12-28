@@ -30,7 +30,7 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
     const [progress, setProgress] = useState(100)
     const turnStartTimeRef = useRef<number | null>(null)
     const rafRef = useRef<number | null>(null)
-    const frozenProgressRef = useRef<number | null>(null)
+    const moveMadeThisTurnRef = useRef(false)
 
     const { results, state } = useGame()
 
@@ -38,7 +38,12 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
     const prevCurrentPlayerRef = useRef<string | null>(null)
 
     // Check if this player has made a move (animation is pending for their card)
-    const hasMadeMove = state.pendingAnimation?.playerId === player.userId
+    const animationForThisPlayer = state.pendingAnimation?.playerId === player.userId
+
+    // Once a move is detected, remember it for this turn
+    if (animationForThisPlayer && !moveMadeThisTurnRef.current) {
+      moveMadeThisTurnRef.current = true
+    }
 
     // Animation loop using requestAnimationFrame for smooth 60fps
     const animate = useCallback(() => {
@@ -71,34 +76,31 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
       if (!currentPlayerWithPoints || results) {
         setProgress(100)
         turnStartTimeRef.current = null
-        frozenProgressRef.current = null
+        moveMadeThisTurnRef.current = false
         prevCurrentPlayerRef.current = currentPlayerId
         return
       }
 
-      // If this player made a move, freeze at current value
-      if (hasMadeMove) {
-        // Store frozen progress if not already frozen
-        if (frozenProgressRef.current === null) {
-          frozenProgressRef.current = progress
-        }
+      // If this player made a move this turn, stay frozen
+      if (moveMadeThisTurnRef.current && isMyTurn) {
+        // Stay frozen at current value until turn changes
         prevCurrentPlayerRef.current = currentPlayerId
         return
       }
 
-      // If it's not this player's turn, reset to 100%
+      // If it's not this player's turn, reset to 100% and clear move flag
       if (!isMyTurn) {
         setProgress(100)
-        frozenProgressRef.current = null
+        moveMadeThisTurnRef.current = false
         prevCurrentPlayerRef.current = currentPlayerId
         return
       }
 
       // It's this player's turn - start/continue countdown
       if (turnChanged) {
-        // New turn started - reset timer
+        // New turn started - reset timer and clear move flag
         turnStartTimeRef.current = Date.now()
-        frozenProgressRef.current = null
+        moveMadeThisTurnRef.current = false
         setProgress(100)
       }
 
@@ -113,7 +115,7 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
           rafRef.current = null
         }
       }
-    }, [currentPlayerWithPoints, player.userId, results, hasMadeMove, animate, progress])
+    }, [currentPlayerWithPoints, player.userId, results, animationForThisPlayer, animate])
 
     useEffect(() => {
       if (results) {
