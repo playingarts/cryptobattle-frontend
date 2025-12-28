@@ -83,10 +83,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   const addCard = useCallback(
     (rowIndex: number, columnIndex: number, card = selectedCard, state = gameState) => () => {
       if (!card) {
-        console.log("addCard no card", card, rowIndex, columnIndex);
         return;
       }
-      console.log("addCard", card, rowIndex, columnIndex);
 
       const allowedPlacement = state.allowedUserCardsPlacement?.additionalProperties?.[
         `${columnIndex}-${rowIndex}`
@@ -94,31 +92,26 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
 
       if (!card || !allowedPlacement) {
         setCardError([rowIndex, columnIndex]);
-        console.log("card error", rowIndex, columnIndex);
         setTimeout(() => setCardError([]), 1000);
         return;
       }
 
       // Check if card is allowed at this position
-      if (
-        allowedPlacement &&
-        !allowedPlacement.find(
-          (allowedCard: { suit: string; value: string }) =>
-            allowedCard.value === "joker" && allowedCard.value === card.value
-        ) &&
-        !allowedPlacement.find(
-          (allowedCard: { suit: string; value: string }) =>
-            allowedCard.suit.toLowerCase() === card.suit.toLowerCase() &&
-            allowedCard.value === card.value
-        )
-      ) {
+      // A card is valid if it's a joker OR matches suit+value of an allowed card
+      const isJokerMove = card.value === "joker" && allowedPlacement.some(
+        (allowedCard: { suit: string; value: string }) => allowedCard.value === "joker"
+      );
+      const isStandardMove = allowedPlacement.some(
+        (allowedCard: { suit: string; value: string }) =>
+          allowedCard.suit.toLowerCase() === card.suit.toLowerCase() &&
+          allowedCard.value === card.value
+      );
+
+      if (!isJokerMove && !isStandardMove) {
         setCardError([rowIndex, columnIndex]);
-        console.log("card error 2");
         setTimeout(() => setCardError([]), 1000);
         return;
       }
-
-      console.log("Playing card: ", card);
 
       // Create normalized card with user ID
       const normalizedCard: NormalizedCard = {

@@ -310,6 +310,13 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
     case 'GAME_STATE_RECEIVED': {
       const serverData = action.payload;
 
+      // Clear processedMoveKeys when starting a different game or when game ends
+      // This prevents unbounded memory growth across multiple games
+      // Only clear on game change if we had a previous game (not on initial load)
+      const isNewGame = state.serverState.gameId !== null && serverData.gameId !== state.serverState.gameId;
+      const isGameEnding = serverData.state === 'ended' || serverData.state === 'results';
+      const shouldClearProcessedKeys = isNewGame || isGameEnding;
+
       // Normalize server state
       const gameTableCards = normalizeTableCards(serverData.gameTableCards);
       let lastPlayedCard = normalizeLastPlayedCard(serverData.lastPlayedCard);
@@ -337,13 +344,16 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
         ? generateMoveKey(lastPlayedCard, lastPlayedPosition)
         : null;
 
+      // Start fresh or continue accumulating processed keys
+      const baseProcessedKeys = shouldClearProcessedKeys ? new Set<string>() : state.processedMoveKeys;
+
       // Check if this is a new move we haven't processed
-      const isNewMove = newMoveKey && !state.processedMoveKeys.has(newMoveKey);
+      const isNewMove = newMoveKey && !baseProcessedKeys.has(newMoveKey);
 
       logAnimation('STATE_RECEIVED', {
         moveKey: newMoveKey,
         isNewMove,
-        processedKeys: state.processedMoveKeys.size,
+        processedKeys: baseProcessedKeys.size,
         card: lastPlayedCard ? `${lastPlayedCard.suit}-${lastPlayedCard.value}` : null,
       });
 
@@ -356,7 +366,7 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
       );
 
       // Build new processed keys set
-      const newProcessedKeys = new Set(state.processedMoveKeys);
+      const newProcessedKeys = new Set(baseProcessedKeys);
       if (newMoveKey) {
         newProcessedKeys.add(newMoveKey);
       }

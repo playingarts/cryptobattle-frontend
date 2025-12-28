@@ -435,29 +435,6 @@ html {
   }
 }
 
-/* Score popup animation - grows and fades */
-.game-latest-card-wrapper .game-latest-card__score {
-  animation-name: scorePopup;
-  animation-delay: 200ms;
-  animation-duration: 300ms;
-  animation-fill-mode: both;
-}
-
-@keyframes scorePopup {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.5);
-  }
-  50% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.2);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(2);
-  }
-}
-
 /* Animation overlay container positioning */
 .animation-overlay-container {
   will-change: transform, opacity;
