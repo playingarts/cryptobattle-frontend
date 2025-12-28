@@ -131,7 +131,7 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
     }, [results])
 
     return (
-      <div css={{marginRight: 10}} ref={ref}>
+      <div css={{marginRight: 20}} ref={ref}>
         <CircularProgressbarWithChildren
           styles={{
             // Customize the root svg element

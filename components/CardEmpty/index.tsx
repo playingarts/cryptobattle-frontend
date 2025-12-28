@@ -42,8 +42,8 @@ const Card: FC<Props> = ({
               position: "relative",
               height: theme.spacing(height),
               borderRadius: theme.spacing(1.5),
-              border: isPlaceholder ? "0" : "3px dashed #333",
-              background: "rgba(0, 0, 0, 0.05)",
+              border: "0",
+              background: "rgba(0, 0, 0, 0.1)",
               transition: 'all 400ms',
               ...containerStyles
             },

@@ -95,8 +95,6 @@ const PlayerQueue: FC<PlayerQueue> = ({
           <div
             css={{
               display: "flex",
-              justifyContent: "space-between",
-              width: players.length * 100,
             }}
           >
             {/* // <AnimateBubbles> */}
