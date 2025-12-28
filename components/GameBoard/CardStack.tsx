@@ -56,12 +56,18 @@ function isLastPlayedCard(
   }
 
   const suitMatch = lastPlayedCard.suit?.toLowerCase() === card.suit?.toLowerCase();
-  const valueMatch = lastPlayedCard.value === card.value;
-  const idMatch = lastPlayedCard.id || card.id
-    ? lastPlayedCard.id === card.id
-    : true;
+  const valueMatch = String(lastPlayedCard.value).toLowerCase() === String(card.value).toLowerCase();
 
-  return suitMatch && valueMatch && idMatch;
+  // Debug matching
+  console.log('[CardStack] isLastPlayedCard check:', {
+    lastPlayedCard: `${lastPlayedCard.suit}-${lastPlayedCard.value}`,
+    boardCard: `${card.suit}-${card.value}`,
+    suitMatch,
+    valueMatch,
+    isTopCard,
+  });
+
+  return suitMatch && valueMatch;
 }
 
 const CardStack: FC<CardStackProps> = ({
