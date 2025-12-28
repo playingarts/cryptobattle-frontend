@@ -300,6 +300,13 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   //   setPlayersGame(gameState.allGamePlayers);
   // }, [gameState]);
 
+  // Reset timer when turn changes - prevents stale timer values from showing
+  // New timer events will arrive from server for the new turn
+  useEffect(() => {
+    setTimer(0);
+    setTotalSeconds(0);
+  }, [state.serverState.turnForPlayer]);
+
   useEffect(() => {
     setGlobalRoomId(roomId);
   }, [roomId]);
