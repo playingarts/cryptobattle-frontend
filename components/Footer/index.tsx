@@ -11,6 +11,11 @@ import Instagram from "../Icons/Instagram";
 import Facebook from "../Icons/Facebook";
 import Behance from "../Icons/Behance";
 
+// Get commit info from Vercel environment variables
+const commitSha = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || 'dev';
+const commitShort = commitSha.slice(0, 7);
+const commitRef = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF || 'local';
+
 const Footer: FC<HTMLAttributes<HTMLDivElement>> = (props) => (
   <div
     {...props}
@@ -27,7 +32,7 @@ const Footer: FC<HTMLAttributes<HTMLDivElement>> = (props) => (
       })}
     >
       <Text variant="h6" component="h2" css={{ margin: "0 0 10px 0" }}>
-        © playing arts project
+        {commitRef} @ {commitShort}
       </Text>
       {/* <Text variant="body0">
           All rights reserved. Any artwork displayed on this website may not be
