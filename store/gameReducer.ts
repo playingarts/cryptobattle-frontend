@@ -376,7 +376,10 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
       // If so, update it with the server's scoringLevel but don't start a new one
       let pendingAnimation = state.pendingAnimation;
 
-      if (isNewMove && newMoveKey && lastPlayedCard && lastPlayedPosition) {
+      // Skip animation for system cards (initial center card) - they have no userId or userId is "system"
+      const isSystemCard = !lastPlayedCard?.userId || lastPlayedCard.userId === 'system';
+
+      if (isNewMove && newMoveKey && lastPlayedCard && lastPlayedPosition && !isSystemCard) {
         // Only set pending animation if we don't already have one for this move
         if (!state.pendingAnimation || state.pendingAnimation.moveKey !== newMoveKey) {
           console.log('[DEBUG REDUCER] Setting NEW pendingAnimation:', newMoveKey);
@@ -396,7 +399,7 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
           };
         }
       } else {
-        console.log('[DEBUG REDUCER] NOT setting pendingAnimation. isNewMove:', isNewMove, 'newMoveKey:', newMoveKey, 'lastPlayedCard:', !!lastPlayedCard, 'lastPlayedPosition:', lastPlayedPosition);
+        console.log('[DEBUG REDUCER] NOT setting pendingAnimation. isNewMove:', isNewMove, 'newMoveKey:', newMoveKey, 'lastPlayedCard:', !!lastPlayedCard, 'lastPlayedPosition:', lastPlayedPosition, 'isSystemCard:', isSystemCard);
       }
 
       return {
