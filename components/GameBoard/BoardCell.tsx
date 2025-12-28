@@ -8,7 +8,7 @@
 import { FC } from 'react';
 import CardStack from './CardStack';
 import CardEmpty from '../CardEmpty';
-import { BoardCell as BoardCellType, NormalizedCard, GamePlayer } from '../../types/game';
+import { BoardCell as BoardCellType, GamePlayer } from '../../types/game';
 
 // Cell dimensions
 const CELL_WIDTH = 210;
@@ -25,7 +25,6 @@ interface BoardCellProps {
   players: GamePlayer[];
   isMyTurn: boolean;
   hasError: boolean;
-  lastPlayedCard: NormalizedCard | null;
   selectedCard: unknown;
   onCellClick: (x: number, y: number) => void;
 }
@@ -37,7 +36,6 @@ const BoardCell: FC<BoardCellProps> = ({
   players,
   isMyTurn,
   hasError,
-  lastPlayedCard,
   selectedCard,
   onCellClick,
 }) => {
@@ -139,7 +137,6 @@ const BoardCell: FC<BoardCellProps> = ({
           columnIndex={columnIndex}
           isMyTurn={isMyTurn}
           hasError={hasError}
-          lastPlayedCard={lastPlayedCard}
           selectedCard={selectedCard}
           onCellClick={handleClick}
         />

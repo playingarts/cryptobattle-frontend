@@ -17,7 +17,6 @@ interface CardStackProps {
   columnIndex: number;
   isMyTurn: boolean;
   hasError: boolean;
-  lastPlayedCard: NormalizedCard | null;
   selectedCard: unknown;
   onCellClick: () => void;
 }
@@ -43,33 +42,6 @@ function getCardRotation(index: number): string {
   return `rotate(${index * 4}deg)`;
 }
 
-/**
- * Check if a card matches the last played card (for animation hiding)
- */
-function isLastPlayedCard(
-  card: NormalizedCard,
-  lastPlayedCard: NormalizedCard | null,
-  isTopCard: boolean
-): boolean {
-  if (!lastPlayedCard || !isTopCard) {
-    return false;
-  }
-
-  const suitMatch = lastPlayedCard.suit?.toLowerCase() === card.suit?.toLowerCase();
-  const valueMatch = String(lastPlayedCard.value).toLowerCase() === String(card.value).toLowerCase();
-
-  // Debug matching
-  console.log('[CardStack] isLastPlayedCard check:', {
-    lastPlayedCard: `${lastPlayedCard.suit}-${lastPlayedCard.value}`,
-    boardCard: `${card.suit}-${card.value}`,
-    suitMatch,
-    valueMatch,
-    isTopCard,
-  });
-
-  return suitMatch && valueMatch;
-}
-
 const CardStack: FC<CardStackProps> = ({
   cards,
   players,
@@ -77,7 +49,6 @@ const CardStack: FC<CardStackProps> = ({
   columnIndex,
   isMyTurn,
   hasError,
-  lastPlayedCard,
   selectedCard,
   onCellClick,
 }) => {
@@ -87,7 +58,6 @@ const CardStack: FC<CardStackProps> = ({
         const isTopCard = index === cards.length - 1;
         const playerColor = getPlayerColor(players, card.userId || '');
         const rotation = getCardRotation(index);
-        const isAnimating = isLastPlayedCard(card, lastPlayedCard, isTopCard);
 
         // Transform NormalizedCard to Card component's expected format
         const cardWithImage = getCard(card.suit, card.value, card);
@@ -118,10 +88,9 @@ const CardStack: FC<CardStackProps> = ({
                 : `3px solid ${playerColor}`,
               borderRadius: 16,
               position: 'relative',
-              // Hide card during animation (AnimationOverlay shows it)
-              // No transition on opacity to prevent flash
-              opacity: isAnimating ? 0 : 1,
-              transition: isAnimating ? 'none' : 'all 300ms',
+              // Card is always visible - animation overlay plays on top and fades out
+              opacity: 1,
+              transition: 'all 300ms',
               transform: rotation,
               // Error overlay
               '&::before': {
