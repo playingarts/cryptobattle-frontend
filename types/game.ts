@@ -114,3 +114,109 @@ export type QuitRoomReason = 'KICKED_BY_ROOM_OWNER' | 'LEFT';
 export interface QuitRoomEventData {
   reason: QuitRoomReason;
 }
+
+// ============================================================
+// NEW MOVE SYSTEM TYPES (Phase 3 Implementation)
+// ============================================================
+
+/**
+ * Server card info as received from backend
+ * (before normalization)
+ */
+export interface ServerCardInfo {
+  id: string;
+  name?: string;
+  xp?: number;
+  power?: number;
+  scoring?: number;
+  suit: string;
+  value: string;
+  onSale?: boolean;
+  imageUrl?: string;
+  videoUrl?: string;
+  powerLevel?: number;
+  scoringLevel?: number;
+  userId: string;
+  score?: number;
+}
+
+/**
+ * Server table cards format
+ */
+export interface ServerTableCards {
+  additionalProperties?: Record<string, ServerCardInfo[]>;
+}
+
+/**
+ * Normalized card representation used everywhere in frontend
+ * All suits are lowercase for consistent comparison
+ */
+export interface NormalizedCard {
+  id: string;
+  suit: string;            // Always lowercase: 'hearts' | 'diamonds' | 'clubs' | 'spades'
+  value: string;           // '2'-'10' | 'jack' | 'queen' | 'king' | 'ace' | 'joker'
+  userId: string;          // Who owns/played this card
+  powerLevel?: number;
+  scoringLevel?: number;
+  imageUrl?: string;
+  videoUrl?: string;
+  isNft: boolean;
+}
+
+/**
+ * A move represents a card being played to the board
+ */
+export interface GameMove {
+  moveKey: string;         // Unique key: `${suit}-${value}-${x}-${y}-${userId}`
+  card: NormalizedCard;
+  position: { x: number; y: number };
+  playerId: string;
+  timestamp: number;       // Client-side timestamp for ordering
+  isLocal: boolean;        // true if this was an optimistic local move
+  confirmed: boolean;      // true if server has confirmed
+}
+
+/**
+ * Board cell containing stacked cards
+ */
+export interface BoardCell {
+  x: number;
+  y: number;
+  cards: NormalizedCard[];
+  isEmpty: boolean;
+  isDropTarget: boolean;   // Can drop card here
+}
+
+/**
+ * 2D board derived from server state
+ */
+export type GameBoard = BoardCell[][];
+
+/**
+ * Animation state for a pending animation
+ */
+export interface PendingAnimation {
+  moveKey: string;
+  card: NormalizedCard;
+  position: { x: number; y: number };
+  scoringLevel: number;
+  playerId: string;
+}
+
+/**
+ * Game player as received from allGamePlayers
+ */
+export interface GamePlayer {
+  oddsForWin?: number;
+  oddsForLose?: number;
+  oddsForTie?: number;
+  oddsForHalfGame?: number;
+  oddsForHalfGameSurpass?: number;
+  oddsForHalfGameNotReach?: number;
+  oddsForGameSurpass?: number;
+  oddsForGameNotReach?: number;
+  oddsForExact?: number;
+  userId: string;
+  username?: string;
+  color?: string;
+}

@@ -1,11 +1,33 @@
-import { FC, useState, useEffect, useCallback, useRef, HTMLAttributes } from "react";
+/**
+ * GameBoard Component - Phase 3 Refactored
+ *
+ * Responsibilities:
+ * - Render the game board grid from reducer state
+ * - Handle drag & drop for card placement
+ * - Dispatch local moves to reducer
+ * - Render AnimationOverlay for move animations
+ *
+ * Key changes from previous version:
+ * - Board state derived from reducer (not local state)
+ * - Animation managed via reducer + useAnimationQueue hook
+ * - Single code path for local and remote moves
+ * - Move key-based animation deduplication
+ */
+
+import { FC, useState, useEffect, useCallback, useRef, HTMLAttributes, useReducer } from "react";
 import Card from "../../components/CardNew";
 import { getCard } from "../../components/Cards";
-
 import CardEmpty from "../../components/CardEmpty";
 import { useGame } from "../GameProvider";
 import { useWS } from "../WsProvider";
 import interact from "interactjs";
+import AnimationOverlay from "./AnimationOverlay";
+import { useAnimationQueue } from "../../hooks/useAnimationQueue";
+import { gameReducer, initialGameState } from "../../store/gameReducer";
+import { gameStateReceived, localMoveInitiated } from "../../store/gameActions";
+import { generateMoveKey } from "../../utils/moveUtils";
+import { NormalizedCard, GamePlayer } from "../../types/game";
+import { logAnimation, logGameState } from "../../utils/debug";
 import {
   setSelectedCard as setGlobalSelectedCard,
   getSelectedCard as getGlobalSelectedCard,
@@ -20,50 +42,51 @@ interface Props extends HTMLAttributes<HTMLElement> {
 
 const GameBoard: FC<Props> = ({ children, removeCard }) => {
   const WSProvider = useWS();
-
-  const generateBoard = (x: number, y: number) => {
-    const columns: any = Array(x)
-      .fill(0)
-      .map(() => null);
-
-    const rows: any = Array(y)
-      .fill(0)
-      .map(() => [...columns]);
-
-    return rows;
-  };
   const { gameState, isMyTurn, players, selectedCard } = useGame();
 
-  const [board, setBoard] = useState(generateBoard(7, 5));
-  const [cardError, setCardError] = useState<any>([]);
-  const [lastPlayedCard, setLastPlayedCard] = useState<any>(null);
+  // Use reducer for game state management
+  const [reducerState, dispatch] = useReducer(gameReducer, initialGameState);
 
-  // Track which card we're currently animating - stored as "suit-value" string
-  // This ref is the SINGLE SOURCE OF TRUTH for animation state
+  // Legacy board state for backwards compatibility during transition
+  const [board, setBoard] = useState(() => generateBoard(7, 5));
+  const [cardError, setCardError] = useState<number[]>([]);
+
+  // Animation queue management
+  const { currentAnimation } = useAnimationQueue({
+    pendingAnimation: reducerState.pendingAnimation,
+    dispatch,
+  });
+
+  // Track last played card for animation (legacy compatibility)
+  const [lastPlayedCard, setLastPlayedCard] = useState<NormalizedCard | null>(null);
   const animatingCardIdRef = useRef<string | null>(null);
-  const animatingCardRef = useRef<any>(null);
-  const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
-  // Track the last card we processed from gameState to detect new cards from opponents
   const lastProcessedServerCardRef = useRef<string | null>(null);
 
   const playCardBeep = new Audio("../../sounds/play-card.mp3");
 
+  // Generate empty board
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function generateBoard(x: number, y: number): (any[] | null | "empty")[][] {
+    const columns = Array(x).fill(0).map(() => null);
+    const rows = Array(y).fill(0).map(() => [...columns]);
+    return rows;
+  }
+
+  // Get player color by userId
   const getColor = useCallback(
-    (userId) => () => {
+    (userId: string) => () => {
       if (userId === "system") {
         return "#2D3038";
       }
-      const foundPlayer = players.find(
-        (player: any) => player.userId === userId
-      );
-
+      const foundPlayer = players.find((player: GamePlayer) => player.userId === userId);
       return foundPlayer ? foundPlayer.color : "gray";
     },
     [players]
   );
 
+  // Get rotation for stacked cards
   const getSkew = useCallback(
-    (index) => () => {
+    (index: number) => () => {
       if (!index || index === 0) {
         return "";
       }
@@ -72,214 +95,204 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     []
   );
 
+  // Sync selected card to global state
   useEffect(() => {
     setGlobalSelectedCard(selectedCard);
   }, [selectedCard]);
 
+  // Sync game state to global state
   useEffect(() => {
     setGlobalState(gameState);
   }, [gameState]);
 
-  // Start animation for a card - this is the ONLY function that should set lastPlayedCard
-  const startAnimation = useCallback((card: any, playSound = true) => {
-    // Normalize to lowercase for consistent comparison
+  // Dispatch game state to reducer when it changes
+  useEffect(() => {
+    if (!gameState) {
+      return;
+    }
+
+    logGameState("Received from provider", {
+      state: gameState.state,
+      turnForPlayer: gameState.turnForPlayer,
+      hasLastPlayedCard: !!gameState.lastPlayedCard,
+    });
+
+    // Dispatch to reducer for new animation system
+    dispatch(gameStateReceived(gameState));
+  }, [gameState]);
+
+  // Start animation for a card (legacy function - now wraps reducer)
+  const startAnimation = useCallback((card: NormalizedCard, position: { x: number; y: number }, playSound = true) => {
     const cardId = `${card.suit?.toLowerCase()}-${card.value}`;
 
-    // If we're already animating this exact card, do nothing
+    // If already animating this card, skip
     if (animatingCardIdRef.current === cardId) {
       return;
     }
 
-    // Clear any existing animation timer
-    if (animationTimerRef.current) {
-      clearTimeout(animationTimerRef.current);
-    }
-
-    // Set the animation state - store card in ref to keep stable reference
     animatingCardIdRef.current = cardId;
-    animatingCardRef.current = card;
     setLastPlayedCard(card);
 
     if (playSound) {
       playCardBeep.play();
     }
 
-    // Scroll to card if needed
+    // Auto-clear after animation duration
     setTimeout(() => {
-      const latestCard = document.getElementsByClassName("game-latest-card")[0];
-      if (latestCard) {
-        const rect = latestCard.getBoundingClientRect();
-        const inView = rect.top >= 0 && rect.bottom <= window.innerHeight;
-        if (!inView) {
-          latestCard.scrollIntoView({ block: "center", behavior: "smooth" });
-        }
-      }
-    }, 0);
-
-    // End animation after 2 seconds
-    animationTimerRef.current = setTimeout(() => {
       setLastPlayedCard(null);
       animatingCardIdRef.current = null;
-      animatingCardRef.current = null;
     }, 2000);
   }, []);
 
+  // Add card to board (legacy function for compatibility)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const addCardToBoard = useCallback(
     (rowIndex: number, columnIndex: number, card: any = selectedCard) => {
       const row = Number(rowIndex);
       const column = Number(columnIndex);
 
-      setBoard((prevBoard: any) => {
+      setBoard((prevBoard) => {
         const localBoard = [...prevBoard];
-
         const placeToPutCard = localBoard[row][column];
 
-        if (
-          placeToPutCard &&
-          placeToPutCard !== "empty" &&
-          Array.isArray(placeToPutCard)
-        ) {
-          // Case-insensitive suit comparison to prevent duplicates from optimistic + server updates
-          if (
-            !placeToPutCard.find(
-              (existingCard) =>
-                existingCard.value === card.value &&
-                existingCard.suit?.toLowerCase() === card.suit?.toLowerCase()
-            )
-          ) {
-            localBoard[row][column] = [...localBoard[row][column], card];
+        if (placeToPutCard && placeToPutCard !== "empty" && Array.isArray(placeToPutCard)) {
+          // Check for duplicates (case-insensitive)
+          if (!placeToPutCard.find(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (existingCard: any) =>
+              existingCard.value === card.value &&
+              existingCard.suit?.toLowerCase() === card.suit?.toLowerCase()
+          )) {
+            localBoard[row][column] = [...localBoard[row][column] as any[], card];
           }
         } else {
           localBoard[row][column] = [card];
         }
 
-        if (
-          localBoard[row][column + 1] !== undefined &&
-          localBoard[row][column + 1] === null
-        ) {
+        // Set adjacent cells as drop targets
+        if (localBoard[row][column + 1] !== undefined && localBoard[row][column + 1] === null) {
           localBoard[row][column + 1] = "empty";
         }
-
-        if (
-          localBoard[row][column - 1] !== undefined &&
-          localBoard[row][column - 1] === null
-        ) {
+        if (localBoard[row][column - 1] !== undefined && localBoard[row][column - 1] === null) {
           localBoard[row][column - 1] = "empty";
         }
-
-        if (
-          localBoard[row - 1] !== undefined &&
-          localBoard[row - 1][column] === null
-        ) {
+        if (localBoard[row - 1] !== undefined && localBoard[row - 1][column] === null) {
           localBoard[row - 1][column] = "empty";
         }
-
-        if (
-          localBoard[row + 1] !== undefined &&
-          localBoard[row + 1][column] === null
-        ) {
+        if (localBoard[row + 1] !== undefined && localBoard[row + 1][column] === null) {
           localBoard[row + 1][column] = "empty";
         }
 
         return [...localBoard];
       });
 
-      removeCard ? removeCard(card) : null;
+      removeCard ? removeCard(card as unknown as string) : null;
     },
     [selectedCard, removeCard]
   );
 
+  // Handle card placement
   const addCard = useCallback(
-    (rowIndex, columnIndex, card = selectedCard, state = gameState) =>
-      () => {
-        if (!card) {
-          console.log("addCard no card", card, rowIndex, columnIndex);
+    (rowIndex: number, columnIndex: number, card = selectedCard, state = gameState) => () => {
+      if (!card) {
+        console.log("addCard no card", card, rowIndex, columnIndex);
+        return;
+      }
+      console.log("addCard", card, rowIndex, columnIndex);
 
-          return;
-        }
-        console.log("addCard", card, rowIndex, columnIndex);
+      const allowedPlacement = state.allowedUserCardsPlacement?.additionalProperties?.[
+        `${columnIndex}-${rowIndex}`
+      ];
 
-        const allowedPlacement =
-          state.allowedUserCardsPlacement.additionalProperties[
-            `${columnIndex}-${rowIndex}`
-          ];
+      if (!card || !allowedPlacement) {
+        setCardError([rowIndex, columnIndex]);
+        console.log("card error", rowIndex, columnIndex);
+        setTimeout(() => setCardError([]), 1000);
+        return;
+      }
 
-        console.log(rowIndex, columnIndex, state);
+      // Check if card is allowed at this position
+      if (
+        allowedPlacement &&
+        !allowedPlacement.find(
+          (allowedCard: { suit: string; value: string }) =>
+            allowedCard.value === "joker" && allowedCard.value === card.value
+        ) &&
+        !allowedPlacement.find(
+          (allowedCard: { suit: string; value: string }) =>
+            allowedCard.suit.toLowerCase() === card.suit.toLowerCase() &&
+            allowedCard.value === card.value
+        )
+      ) {
+        setCardError([rowIndex, columnIndex]);
+        console.log("card error 2");
+        setTimeout(() => setCardError([]), 1000);
+        return;
+      }
 
-        if (!card || !allowedPlacement) {
-          setCardError([rowIndex, columnIndex]);
-          console.log("card error", rowIndex, columnIndex);
-          setTimeout(() => {
-            setCardError([]);
-          }, 1000);
+      console.log("Playing card: ", card);
 
-          return;
-        }
+      // Create normalized card with user ID
+      const normalizedCard: NormalizedCard = {
+        id: card.id || `${card.suit}-${card.value}-${state.turnForPlayer}`,
+        suit: card.suit.toLowerCase(),
+        value: String(card.value).toLowerCase(),
+        userId: state.turnForPlayer,
+        powerLevel: card.powerLevel,
+        scoringLevel: 0,
+        imageUrl: card.imageUrl || card.img,
+        videoUrl: card.videoUrl || card.video,
+        isNft: !!card.id && card.id !== "",
+      };
 
-        console.log(
-          rowIndex,
-          columnIndex,
-          allowedPlacement,
-          "allowedPlacement"
-        );
+      const position = { x: columnIndex, y: rowIndex };
 
-        if (
-          allowedPlacement &&
-          !allowedPlacement.find(
-            (allowedCard: any) =>
-              allowedCard.value === "joker" && allowedCard.value === card.value
-          ) &&
-          !allowedPlacement.find(
-            (allowedCard: any) =>
-              allowedCard.suit.toLowerCase() === card.suit.toLowerCase() &&
-              allowedCard.value === card.value
-          )
-        ) {
-          // alert("Not allowed to place card there.");
-          setCardError([rowIndex, columnIndex]);
-          console.log("card error 2");
-          console.log(rowIndex, columnIndex);
+      // Generate move key for this move
+      const moveKey = generateMoveKey(normalizedCard, position);
 
-          setTimeout(() => {
-            setCardError([]);
-          }, 1000);
-          return;
-        }
+      logAnimation("LOCAL_MOVE", {
+        moveKey,
+        card: `${normalizedCard.suit}-${normalizedCard.value}`,
+        position,
+      });
 
-        console.log("Playing card: ", card);
+      // Dispatch to reducer for optimistic update
+      dispatch(localMoveInitiated({
+        moveKey,
+        card: normalizedCard,
+        position,
+        playerId: state.turnForPlayer,
+        timestamp: Date.now(),
+        isLocal: true,
+        confirmed: false,
+      }));
 
-        // Optimistic UI - immediately add card to board and show animation
-        // Use turnForPlayer from gameState as the current user's ID for proper color
-        const cardWithUserId = {
-          ...card,
-          userId: state.turnForPlayer,
-          scoringLevel: 0, // Will show 0 initially
-        };
+      // Also update legacy board state
+      addCardToBoard(rowIndex, columnIndex, normalizedCard);
 
-        addCardToBoard(rowIndex, columnIndex, cardWithUserId);
+      // Start legacy animation (for backwards compatibility during transition)
+      startAnimation(normalizedCard, position, true);
 
-        // Start animation immediately for instant feedback (optimistic UI)
-        startAnimation(cardWithUserId, true);
-
-        WSProvider.send(
-          JSON.stringify({
-            event: "play-card",
-            data: {
-              action: "move",
-              x: columnIndex,
-              y: rowIndex,
-              suit: card.suit,
-              value: card.value.toString(),
-              nftId: card.id ? card.id : "",
-            },
-          })
-        );
-      },
-    [WSProvider, selectedCard, setCardError, addCardToBoard, startAnimation]
+      // Send to server
+      WSProvider.send(
+        JSON.stringify({
+          event: "play-card",
+          data: {
+            action: "move",
+            x: columnIndex,
+            y: rowIndex,
+            suit: card.suit,
+            value: card.value.toString(),
+            nftId: card.id ? card.id : "",
+          },
+        })
+      );
+    },
+    [WSProvider, selectedCard, addCardToBoard, startAnimation, gameState]
   );
 
+  // Process game state updates (legacy - sync board from server)
   useEffect(() => {
-    console.log("gameState:", gameState);
     if (!gameState) {
       return;
     }
@@ -289,62 +302,65 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       return;
     }
 
-    console.log(
-      Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties || {})
-        .length === 0,
-      "length"
-    );
-
+    // Auto-pass if no valid placements
     if (
-      Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties || {})
-        .length === 0
+      Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties || {}).length === 0
     ) {
       setTimeout(() => {
         WSProvider.send(
           JSON.stringify({
             event: "play-card",
-            data: {
-              action: "pass",
-            },
+            data: { action: "pass" },
           })
         );
       }, 2000);
     }
 
+    // Sync board from server state
     Object.keys(tableCards).forEach((key) => {
       const cards = gameState.gameTableCards?.additionalProperties;
       const indexes = key.split("-");
 
-      cards[key].forEach((card: any) => {
+      cards[key].forEach((card: NormalizedCard) => {
         const cardF = getCard(card.suit, card.value, card);
         addCardToBoard(Number(indexes[1]), Number(indexes[0]), cardF);
       });
     });
 
+    // Handle opponent animations (legacy path)
     if (gameState.lastPlayedCard) {
       setGameStarted(true);
-      // Normalize to lowercase for consistent comparison
       const serverCardId = `${gameState.lastPlayedCard.suit?.toLowerCase()}-${gameState.lastPlayedCard.value}`;
 
-      // Only trigger animation if:
-      // 1. This is a NEW card from server (different from last processed server card)
-      // 2. AND we're not already animating this card (from optimistic UI)
-      if (serverCardId !== lastProcessedServerCardRef.current &&
-          serverCardId !== animatingCardIdRef.current) {
-        // This is an opponent's card - animate it
-        // Transform via getCard to match board card structure for render condition
+      // Only animate if this is a new card from server and we're not already animating it
+      if (
+        serverCardId !== lastProcessedServerCardRef.current &&
+        serverCardId !== animatingCardIdRef.current
+      ) {
         const transformedCard = getCard(
           gameState.lastPlayedCard.suit,
           gameState.lastPlayedCard.value,
           gameState.lastPlayedCard
         );
-        startAnimation(transformedCard, true);
+        // Find position of this card
+        let cardPosition = { x: 0, y: 0 };
+        Object.keys(tableCards).forEach((key) => {
+          const cardsAtPos = tableCards[key];
+          const topCard = cardsAtPos[cardsAtPos.length - 1];
+          if (topCard &&
+              topCard.suit?.toLowerCase() === gameState.lastPlayedCard.suit?.toLowerCase() &&
+              topCard.value === gameState.lastPlayedCard.value) {
+            const [x, y] = key.split("-");
+            cardPosition = { x: Number(x), y: Number(y) };
+          }
+        });
+        startAnimation(transformedCard, cardPosition, true);
       }
-      // Always update the last processed server card
       lastProcessedServerCardRef.current = serverCardId;
     }
-  }, [gameState, startAnimation]);
+  }, [gameState, startAnimation, addCardToBoard, WSProvider]);
 
+  // Set up drag and drop
   useEffect(() => {
     console.log("interact happens");
     interact.dynamicDrop(true);
@@ -353,64 +369,35 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
 
     interact(".draggable").draggable({
       autoScroll: { container: ".scroll-container", margin: 70, speed: 1000 },
-
       inertia: true,
       max: 1,
-
       listeners: {
         start(event) {
-          console.log("start");
-
           event.target.style.transform = `translate(0px, 0px)`;
         },
         end(event) {
-          console.log("ended", event);
-          // event.target.style.display = `none`;
           position.x = 0;
           position.y = 0;
-
           event.target.style.transform = `translate(0px, 0px)`;
         },
         move(event) {
           position.x += event.dx;
           position.y += event.dy;
-
-          // event.target.style.position = "absolute";
           event.target.style.transform = `translate(${position.x}px, ${position.y}px)`;
         },
       },
     });
 
     interact(".dropzone").dropzone({
-      // only accept elements matching this CSS selector
       accept: ".draggable",
-      // Require a 75% element overlap for a drop to be possible
       overlap: 0.4,
-
-      // listen for drop related events:
-
-      // ondropactivate: function (event) {
-      //   // add active dropzone feedback
-      //   event.target.classList.add("drop-active");
-      // },
       ondragenter: function (event) {
-        // const draggableElement = event.relatedTarget;
-        const dropzoneElement = event.target;
-        // event.stopImmediatePropagation()
-
-        // feedback the possibility of a drop
-        dropzoneElement.classList.add("drop-target");
-        // draggableElement.classList.add("can-drop");
-        // draggableElement.textContent = 'Dragged in'
+        event.target.classList.add("drop-target");
       },
       ondragleave: function (event) {
-        // remove the drop feedback style
         event.target.classList.remove("drop-target");
       },
       ondrop: function (event) {
-        console.log(selectedCard, "ondrop");
-        console.log(event, "ondrop event");
-
         const target = event.currentTarget.id.split("-");
         addCard(
           Number(target[0]),
@@ -420,9 +407,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         )();
         event.stopImmediatePropagation();
       },
-
       ondropdeactivate: function (event) {
-        // remove active dropzone feedback
         event.target.classList.remove("drop-active");
         event.target.classList.remove("drop-target");
       },
@@ -433,14 +418,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     };
   }, []);
 
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-      if (animationTimerRef.current) {
-        clearTimeout(animationTimerRef.current);
-      }
-    };
-  }, []);
+  // Calculate board position for animation overlay
+  const boardRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
@@ -450,85 +429,173 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         justifyContent: "center",
         padding: "50px",
         minHeight: "100vh",
+        position: "relative",
       })}
     >
-      <div>
-        {board.map((row: any, rowIndex: number) => {
-          return (
-            <div
-              key={rowIndex}
-              css={() => ({
-                display: "flex",
-                justifyContent: "center",
-              })}
-            >
-              {row.map((column: any, columnIndex: number) => {
-                return (
-                  <div
+      <div ref={boardRef} css={{ position: "relative" }}>
+        {/* Animation Overlay - renders above the board */}
+        {currentAnimation && (
+          <AnimationOverlay
+            animation={currentAnimation}
+            players={players}
+          />
+        )}
+
+        {/* Board Grid */}
+        {board.map((row, rowIndex) => (
+          <div
+            key={rowIndex}
+            css={() => ({
+              display: "flex",
+              justifyContent: "center",
+            })}
+          >
+            {row.map((column, columnIndex) => (
+              <div
+                key={`${columnIndex}${rowIndex}-${columnIndex}${rowIndex}`}
+                css={() => ({
+                  margin: column ? "20px" : "20px",
+                  borderRadius: 10,
+                  position: "relative",
+                })}
+              >
+                {/* Empty cell (no cards, not a drop target) */}
+                {!column && (
+                  <div style={{ width: "210px", height: "300px" }}></div>
+                )}
+
+                {/* Legacy animation overlay (keeping for backwards compatibility) */}
+                {column &&
+                  Array.isArray(column) &&
+                  column[column.length - 1]?.suit &&
+                  column[column.length - 1]?.value &&
+                  lastPlayedCard?.value === column[column.length - 1].value &&
+                  lastPlayedCard?.suit?.toLowerCase() === column[column.length - 1].suit?.toLowerCase() &&
+                  (lastPlayedCard?.id || column[column.length - 1].id
+                    ? lastPlayedCard?.id === column[column.length - 1].id
+                    : true) && (
+                    <div
+                      key={animatingCardIdRef.current}
+                      className="game-latest-card"
+                      css={{
+                        background: getColor(column[column.length - 1].userId)(),
+                        outlineColor: getColor(column[column.length - 1].userId)(),
+                        zIndex: 9999,
+                      }}
+                    >
+                      <div className="game-latest-card__score">
+                        +{lastPlayedCard?.scoringLevel || 0}
+                      </div>
+                    </div>
+                  )}
+
+                {/* Empty drop target cell */}
+                {column === "empty" && (
+                  <CardEmpty
+                    selectedCard={selectedCard}
                     key={`${columnIndex}${rowIndex}-${columnIndex}${rowIndex}`}
-                    css={() => ({
-                      margin: column ? "20px" : "20px",
+                    containerStyles={{
+                      border:
+                        cardError[0] === rowIndex && cardError[1] === columnIndex
+                          ? "3px solid #FA5252"
+                          : "3px dashed #222",
+                      transition: "all 300ms",
+                      "&:hover": {
+                        border:
+                          cardError[0] === rowIndex && cardError[1] === columnIndex
+                            ? "3px solid #FA5252"
+                            : "3px dashed #222",
+                      },
+                      "&::before": {
+                        transition: "all 300ms",
+                        position: "absolute",
+                        content: `' '`,
+                        background: "#000",
+                        zIndex: 99999,
+                        borderRadius: 20,
+                        backgroundImage:
+                          "url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzIxMTZfMjU1MCkiPgo8cGF0aCBkPSJNMjUgMEMyMC4wNTU1IDAgMTUuMjIyIDEuNDY2MjIgMTEuMTEwOCA0LjIxMzI2QzYuOTk5NTMgNi45NjAyOSAzLjc5NTIxIDEwLjg2NDggMS45MDMwMiAxNS40MzI5QzAuMDEwODMyMiAyMC4wMDExIC0wLjQ4NDI1MSAyNS4wMjc3IDAuNDgwMzc5IDI5Ljg3NzNDMS40NDUwMSAzNC43MjY4IDMuODI2MDMgMzkuMTgxNCA3LjMyMjM0IDQyLjY3NzdDMTAuODE4NyA0Ni4xNzQgMTUuMjczMiA0OC41NTUgMjAuMTIyOCA0OS41MTk2QzI0Ljk3MjMgNTAuNDg0MyAyOS45OTg5IDQ5Ljk4OTIgMzQuNTY3MSA0OC4wOTdDMzkuMTM1MyA0Ni4yMDQ4IDQzLjAzOTcgNDMuMDAwNSA0NS43ODY3IDM4Ljg4OTNDNDguNTMzOCAzNC43NzggNTAgMjkuOTQ0NSA1MCAyNUM0OS45OTI4IDE4LjM3MTggNDcuMzU2NiAxMi4wMTcxIDQyLjY2OTggNy4zMzAyNUMzNy45ODI5IDIuNjQzMzkgMzEuNjI4MiAwLjAwNzE2ODkyIDI1IDBWMFpNMjUgNDUuODMzM0MyMC44Nzk2IDQ1LjgzMzMgMTYuODUxNyA0NC42MTE1IDEzLjQyNTYgNDIuMzIyM0M5Ljk5OTYxIDQwLjAzMzEgNy4zMjkzNSAzNi43Nzk0IDUuNzUyNTIgMzIuOTcyNkM0LjE3NTcgMjkuMTY1OCAzLjc2MzEzIDI0Ljk3NjkgNC41NjY5OCAyMC45MzU2QzUuMzcwODQgMTYuODk0MyA3LjM1NTAzIDEzLjE4MjIgMTAuMjY4NiAxMC4yNjg2QzEzLjE4MjIgNy4zNTUwMSAxNi44OTQ0IDUuMzcwODMgMjAuOTM1NiA0LjU2Njk3QzI0Ljk3NjkgMy43NjMxMSAyOS4xNjU4IDQuMTc1NjggMzIuOTcyNiA1Ljc1MjUxQzM2Ljc3OTQgNy4zMjkzNCA0MC4wMzMxIDkuOTk5NiA0Mi4zMjIzIDEzLjQyNTZDNDQuNjExNSAxNi44NTE2IDQ1LjgzMzMgMjAuODc5NiA0NS44MzMzIDI1QzQ1LjgyNzMgMzAuNTIzNSA0My42MzA0IDM1LjgxOSAzOS43MjQ3IDM5LjcyNDdDMzUuODE5IDQzLjYzMDQgMzAuNTIzNSA0NS44MjczIDI1IDQ1LjgzMzNaIiBmaWxsPSIjRkU1NjIxIi8+CjxwYXRoIGQ9Ik0zNC44MDYxIDE1LjE5MzhDMzQuNDE1NSAxNC44MDMyIDMzLjg4NTYgMTQuNTgzOCAzMy4zMzMyIDE0LjU4MzhDMzIuNzgwOCAxNC41ODM4IDMyLjI1MSAxNC44MDMyIDMxLjg2MDMgMTUuMTkzOEwyNC45OTk5IDIyLjA1NDJMMTguMTM5NSAxNS4xOTM4QzE3Ljk0NzMgMTQuOTk0OCAxNy43MTc0IDE0LjgzNjEgMTcuNDYzMiAxNC43MjY5QzE3LjIwOTEgMTQuNjE3NyAxNi45MzU3IDE0LjU2MDIgMTYuNjU5MSAxNC41NTc4QzE2LjM4MjQgMTQuNTU1NCAxNi4xMDgxIDE0LjYwODEgMTUuODUyMSAxNC43MTI5QzE1LjU5NiAxNC44MTc2IDE1LjM2MzQgMTQuOTcyMyAxNS4xNjc4IDE1LjE2NzlDMTQuOTcyMiAxNS4zNjM1IDE0LjgxNzUgMTUuNTk2MiAxNC43MTI4IDE1Ljg1MjJDMTQuNjA4IDE2LjEwODIgMTQuNTU1MyAxNi4zODI2IDE0LjU1NzcgMTYuNjU5MkMxNC41NjAxIDE2LjkzNTggMTQuNjE3NiAxNy4yMDkyIDE0LjcyNjggMTcuNDYzM0MxNC44MzU5IDE3LjcxNzUgMTQuOTk0NyAxNy45NDc0IDE1LjE5MzYgMTguMTM5NkwyMi4wNTQxIDI1TDE1LjE5MzYgMzEuODYwNEMxNC45OTQ3IDMyLjA1MjYgMTQuODM1OSAzMi4yODI1IDE0LjcyNjggMzIuNTM2N0MxNC42MTc2IDMyLjc5MDggMTQuNTYwMSAzMy4wNjQyIDE0LjU1NzcgMzMuMzQwOEMxNC41NTUzIDMzLjYxNzUgMTQuNjA4IDMzLjg5MTggMTQuNzEyOCAzNC4xNDc4QzE0LjgxNzUgMzQuNDAzOSAxNC45NzIyIDM0LjYzNjUgMTUuMTY3OCAzNC44MzIxQzE1LjM2MzQgMzUuMDI3NyAxNS41OTYgMzUuMTgyNCAxNS44NTIxIDM1LjI4NzFDMTYuMTA4MSAzNS4zOTE5IDE2LjM4MjQgMzUuNDQ0NiAxNi42NTkxIDM1LjQ0MjJDMTYuOTM1NyAzNS40Mzk4IDE3LjIwOTEgMzUuMzgyMyAxNy40NjMyIDM1LjI3MzFDMTcuNzE3NCAzNS4xNjM5IDE3Ljk0NzMgMzUuMDA1MiAxOC4xMzk1IDM0LjgwNjNMMjQuOTk5OSAyNy45NDU4TDMxLjg2MDMgMzQuODA2M0MzMi4yNTMyIDM1LjE4NTggMzIuNzc5NSAzNS4zOTU3IDMzLjMyNTcgMzUuMzkxQzMzLjg3MiAzNS4zODYyIDM0LjM5NDUgMzUuMTY3MSAzNC43ODA4IDM0Ljc4MDlDMzUuMTY3IDM0LjM5NDYgMzUuMzg2MSAzMy44NzIxIDM1LjM5MDkgMzMuMzI1OEMzNS4zOTU2IDMyLjc3OTYgMzUuMTg1NiAzMi4yNTMzIDM0LjgwNjEgMzEuODYwNEwyNy45NDU3IDI1TDM0LjgwNjEgMTguMTM5NkMzNS4xOTY3IDE3Ljc0ODkgMzUuNDE2MSAxNy4yMTkxIDM1LjQxNjEgMTYuNjY2N0MzNS40MTYxIDE2LjExNDIgMzUuMTk2NyAxNS41ODQ0IDM0LjgwNjEgMTUuMTkzOFoiIGZpbGw9IiNGRTU2MjEiLz4KPC9nPgo8ZGVmcz4KPGNsaXBQYXRoIGlkPSJjbGlwMF8yMTE2XzI1NTAiPgo8cmVjdCB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==)",
+                        backgroundPosition: "center center",
+                        backgroundRepeat: "no-repeat",
+                        opacity:
+                          cardError[0] === rowIndex && cardError[1] === columnIndex
+                            ? 0.75
+                            : 0,
+                        top: 0,
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                      },
+                    }}
+                    css={{
+                      transition: "all 300ms",
                       borderRadius: 10,
                       position: "relative",
-                    })}
-                  >
-                    {!column && (
-                      <div style={{ width: "210px", height: "300px" }}></div>
-                    )}
+                    }}
+                    style={{
+                      pointerEvents: isMyTurn ? "unset" : "none",
+                    }}
+                    onClick={addCard(rowIndex, columnIndex)}
+                    id={rowIndex + "-" + columnIndex}
+                  ></CardEmpty>
+                )}
 
-                    {column &&
-                      column[column.length - 1].suit &&
-                      column[column.length - 1].value &&
-                      lastPlayedCard?.value ===
-                        column[column.length - 1].value &&
-                      lastPlayedCard?.suit?.toLowerCase() === column[column.length - 1].suit?.toLowerCase() &&
-                      (lastPlayedCard?.id || column[column.length - 1].id
-                        ? lastPlayedCard?.id === column[column.length - 1].id
-                        : true) && (
-                        <div
-                          key={animatingCardIdRef.current}
-                          className="game-latest-card"
-                          css={{
-                            background: getColor(
-                              column[column.length - 1].userId
-                            )(),
-                            outlineColor: getColor(
-                              column[column.length - 1].userId
-                            )(),
-                            zIndex: 9999,
-                          }}
-                        >
-                          <div className="game-latest-card__score">
-                            {" "}
-                            +{lastPlayedCard.scoringLevel}
-                          </div>
-                        </div>
-                      )}
-
-                    {column === "empty" && (
-                      <CardEmpty
+                {/* Card stack */}
+                {column && column !== "empty" && Array.isArray(column) && (
+                  <div className="stack">
+                    {[...column].map((card, index) => (
+                      <Card
                         selectedCard={selectedCard}
-                        key={`${columnIndex}${rowIndex}-${columnIndex}${rowIndex}`}
-                        containerStyles={{
-                          border:
+                        key={`${card.value} ${card.suit}`}
+                        onClick={addCard(rowIndex, columnIndex)}
+                        animated={card.id ? true : false}
+                        card={card}
+                        index={index}
+                        className={`${index + 1 === column.length ? "dropzone" : ""}`}
+                        id={rowIndex + "-" + columnIndex}
+                        data-row={rowIndex}
+                        data-column={columnIndex}
+                        isGameBoard={true}
+                        css={{
+                          pointerEvents: isMyTurn ? "unset" : "none",
+                          zIndex: 10 + index,
+                          outline:
+                            index + 1 === column.length &&
                             cardError[0] === rowIndex &&
                             cardError[1] === columnIndex
-                              ? "3px solid #FA5252"
-                              : "3px dashed #222",
+                              ? "#FA5252 6px solid"
+                              : `6px solid ${getColor(card.userId)()}`,
+                          borderRadius: 16,
+                          position: "relative",
+                          opacity:
+                            column.length - 1 === index &&
+                            column[column.length - 1]?.suit &&
+                            column[column.length - 1]?.value &&
+                            lastPlayedCard?.value === column[column.length - 1].value &&
+                            lastPlayedCard?.suit?.toLowerCase() === column[column.length - 1].suit?.toLowerCase() &&
+                            (lastPlayedCard?.id || column[column.length - 1].id
+                              ? lastPlayedCard?.id === column[column.length - 1].id
+                              : true)
+                              ? 0
+                              : 1,
+                          animation:
+                            column[column.length - 1]?.suit &&
+                            column[column.length - 1]?.value &&
+                            lastPlayedCard?.value === column[column.length - 1].value &&
+                            lastPlayedCard?.suit?.toLowerCase() === column[column.length - 1].suit?.toLowerCase() &&
+                            (column[column.length - 1].id
+                              ? lastPlayedCard?.id === column[column.length - 1].id
+                              : true)
+                              ? "example3 0.3s linear 0.3s 1 normal forwards"
+                              : "",
+                          animationDelay: "1.6s",
                           transition: "all 300ms",
-
-                          "&:hover": {
-                            border:
-                              cardError[0] === rowIndex &&
-                              cardError[1] === columnIndex
-                                ? "3px solid #FA5252"
-                                : "3px dashed #222",
-                          },
+                          transform: getSkew(index)(),
                           "&::before": {
                             transition: "all 300ms",
                             position: "absolute",
                             content: `' '`,
-                            background: "#000",
+                            background: "rgba(0, 0, 0, 0.75)",
                             zIndex: 99999,
                             borderRadius: 20,
                             backgroundImage:
@@ -536,155 +603,54 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                             backgroundPosition: "center center",
                             backgroundRepeat: "no-repeat",
                             opacity:
-                              cardError[0] === rowIndex &&
-                              cardError[1] === columnIndex
-                                ? 0.75
+                              cardError[0] === rowIndex && cardError[1] === columnIndex
+                                ? 1
                                 : 0,
                             top: 0,
                             bottom: 0,
                             left: 0,
                             right: 0,
                           },
+                          "&::after": {
+                            opacity: card.id ? 1 : 0,
+                            content: `"${card.powerLevel}"`,
+                            display: card ? "flex" : "none",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            transition: "all 400ms",
+                            zIndex: 999 + index,
+                            transform: getSkew(index)(),
+                            color: "#fff",
+                            fontFamily: "Aldrich",
+                            background: `${getColor(card.userId)()}`,
+                            backgroundImage:
+                              'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAxNCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEzLjkxNzIgNy4zMTE4Mkw3LjU1MzU3IDE4Ljc2NjRDNy40MzkwMyAxOC45NyA3LjIyOTAzIDE5LjA5MDkgNi45OTk5NCAxOS4wOTA5QzYuOTQ5MDMgMTkuMDkwOSA2Ljg5MTc1IDE5LjA4NDUgNi44NDA4NCAxOS4wNzE4QzYuNTYwODQgMTguOTk1NCA2LjM2MzU3IDE4Ljc0NzMgNi4zNjM1NyAxOC40NTQ1VjExLjQ1NDVIMC42MzYzMDFDMC40MTk5MzggMTEuNDU0NSAwLjIyMjY2NSAxMS4zNDY0IDAuMTAxNzU2IDExLjE2ODJDLTAuMDEyNzg5NSAxMC45OSAtMC4wMzE4ODAzIDEwLjc2MDkgMC4wNTA4NDY5IDEwLjU2MzZMNC41MDUzOSAwLjM4MTgxOEM0LjYwNzIxIDAuMTUyNzI3IDQuODM2MyAwIDUuMDkwODUgMEg4LjkwOTAzQzkuMTE5MDMgMCA5LjMxNjMgMC4xMDE4MTggOS40MzcyMSAwLjI4QzkuNTUxNzUgMC40NTE4MTggOS41NzcyMSAwLjY3NDU0NSA5LjUwMDg0IDAuODcxODE4TDcuMzA1MzkgNi4zNjM2M0gxMy4zNjM2QzEzLjU4NjMgNi4zNjM2MyAxMy43OTYzIDYuNDg0NTQgMTMuOTEwOCA2LjY3NTQ1QzE0LjAyNTQgNi44NzI3MiAxNC4wMzE4IDcuMTE0NTQgMTMuOTE3MiA3LjMxMTgyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==")',
+                            backgroundRepeat: "no-repeat",
+                            backgroundPosition: "12px 8px",
+                            position: "absolute",
+                            borderRadius: 20,
+                            fontSize: 24,
+                            top: -10,
+                            right: 0,
+                            left: 160,
+                            padding: "14px 0",
+                            paddingTop: 18,
+                            paddingLeft: 20,
+                            width: 40,
+                            minWidth: 62,
+                            height: 38,
+                            pointerEvents: "none",
+                            textTransform: "uppercase",
+                          },
                         }}
-                        css={{
-                          transition: "all 300ms",
-                          borderRadius: 10,
-                          position: "relative",
-                        }}
-                        style={{
-                          pointerEvents: isMyTurn ? "unset" : "none",
-                        }}
-                        onClick={addCard(rowIndex, columnIndex)}
-                        id={rowIndex + "-" + columnIndex}
-                      ></CardEmpty>
-                    )}
-                    {column && column !== "empty" && (
-                      <div className="stack">
-                        {[...column].map((card: any, index) => (
-                          <Card
-                            selectedCard={selectedCard}
-                            key={`${card.value} ${card.suit}`}
-                            onClick={addCard(rowIndex, columnIndex)}
-                            animated={card.id ? true : false}
-                            card={card}
-                            index={index}
-                            className={`${
-                              index + 1 === column.length ? "dropzone" : ""
-                            }`}
-                            id={rowIndex + "-" + columnIndex}
-                            data-row={rowIndex}
-                            data-column={columnIndex}
-                            isGameBoard={true}
-                            css={{
-                              pointerEvents: isMyTurn ? "unset" : "none",
-                              zIndex: 10 + index,
-                              outline:
-                                index + 1 === column.length &&
-                                cardError[0] === rowIndex &&
-                                cardError[1] === columnIndex
-                                  ? "#FA5252 6px solid"
-                                  : `6px solid ${getColor(card.userId)()}`,
-                              borderRadius: 16,
-                              position: "relative",
-                              // animationDuration: "10s",
-                              opacity:
-                                column &&
-                                column.length - 1 === index &&
-                                column[column.length - 1].suit &&
-                                column[column.length - 1].value &&
-                                lastPlayedCard?.value ===
-                                  column[column.length - 1].value &&
-                                lastPlayedCard?.suit?.toLowerCase() ===
-                                  column[column.length - 1].suit?.toLowerCase() &&
-                                (lastPlayedCard?.id ||
-                                column[column.length - 1].id
-                                  ? lastPlayedCard?.id ===
-                                    column[column.length - 1].id
-                                  : true)
-                                  ? 0
-                                  : 1,
-                              animation:
-                                column &&
-                                column[column.length - 1].suit &&
-                                column[column.length - 1].value &&
-                                lastPlayedCard?.value ===
-                                  column[column.length - 1].value &&
-                                lastPlayedCard?.suit?.toLowerCase() ===
-                                  column[column.length - 1].suit?.toLowerCase() &&
-                                (column[column.length - 1].id
-                                  ? lastPlayedCard?.id ===
-                                    column[column.length - 1].id
-                                  : true)
-                                  ? "example3  0.3s linear 0.3s 1 normal forwards"
-                                  : "",
-                              animationDelay: "1.6s",
-                              transition: "all 300ms",
-                              // animationName: 'example3',
-                              transform: getSkew(index)(),
-                              "&::before": {
-                                transition: "all 300ms",
-                                position: "absolute",
-                                content: `' '`,
-                                background: "rgba(0, 0, 0, 0.75)",
-                                zIndex: 99999,
-                                borderRadius: 20,
-                                backgroundImage:
-                                  "url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzIxMTZfMjU1MCkiPgo8cGF0aCBkPSJNMjUgMEMyMC4wNTU1IDAgMTUuMjIyIDEuNDY2MjIgMTEuMTEwOCA0LjIxMzI2QzYuOTk5NTMgNi45NjAyOSAzLjc5NTIxIDEwLjg2NDggMS45MDMwMiAxNS40MzI5QzAuMDEwODMyMiAyMC4wMDExIC0wLjQ4NDI1MSAyNS4wMjc3IDAuNDgwMzc5IDI5Ljg3NzNDMS40NDUwMSAzNC43MjY4IDMuODI2MDMgMzkuMTgxNCA3LjMyMjM0IDQyLjY3NzdDMTAuODE4NyA0Ni4xNzQgMTUuMjczMiA0OC41NTUgMjAuMTIyOCA0OS41MTk2QzI0Ljk3MjMgNTAuNDg0MyAyOS45OTg5IDQ5Ljk4OTIgMzQuNTY3MSA0OC4wOTdDMzkuMTM1MyA0Ni4yMDQ4IDQzLjAzOTcgNDMuMDAwNSA0NS43ODY3IDM4Ljg4OTNDNDguNTMzOCAzNC43NzggNTAgMjkuOTQ0NSA1MCAyNUM0OS45OTI4IDE4LjM3MTggNDcuMzU2NiAxMi4wMTcxIDQyLjY2OTggNy4zMzAyNUMzNy45ODI5IDIuNjQzMzkgMzEuNjI4MiAwLjAwNzE2ODkyIDI1IDBWMFpNMjUgNDUuODMzM0MyMC44Nzk2IDQ1LjgzMzMgMTYuODUxNyA0NC42MTE1IDEzLjQyNTYgNDIuMzIyM0M5Ljk5OTYxIDQwLjAzMzEgNy4zMjkzNSAzNi43Nzk0IDUuNzUyNTIgMzIuOTcyNkM0LjE3NTcgMjkuMTY1OCAzLjc2MzEzIDI0Ljk3NjkgNC41NjY5OCAyMC45MzU2QzUuMzcwODQgMTYuODk0MyA3LjM1NTAzIDEzLjE4MjIgMTAuMjY4NiAxMC4yNjg2QzEzLjE4MjIgNy4zNTUwMSAxNi44OTQ0IDUuMzcwODMgMjAuOTM1NiA0LjU2Njk3QzI0Ljk3NjkgMy43NjMxMSAyOS4xNjU4IDQuMTc1NjggMzIuOTcyNiA1Ljc1MjUxQzM2Ljc3OTQgNy4zMjkzNCA0MC4wMzMxIDkuOTk5NiA0Mi4zMjIzIDEzLjQyNTZDNDQuNjExNSAxNi44NTE2IDQ1LjgzMzMgMjAuODc5NiA0NS44MzMzIDI1QzQ1LjgyNzMgMzAuNTIzNSA0My42MzA0IDM1LjgxOSAzOS43MjQ3IDM5LjcyNDdDMzUuODE5IDQzLjYzMDQgMzAuNTIzNSA0NS44MjczIDI1IDQ1LjgzMzNaIiBmaWxsPSIjRkU1NjIxIi8+CjxwYXRoIGQ9Ik0zNC44MDYxIDE1LjE5MzhDMzQuNDE1NSAxNC44MDMyIDMzLjg4NTYgMTQuNTgzOCAzMy4zMzMyIDE0LjU4MzhDMzIuNzgwOCAxNC41ODM4IDMyLjI1MSAxNC44MDMyIDMxLjg2MDMgMTUuMTkzOEwyNC45OTk5IDIyLjA1NDJMMTguMTM5NSAxNS4xOTM4QzE3Ljk0NzMgMTQuOTk0OCAxNy43MTc0IDE0LjgzNjEgMTcuNDYzMiAxNC43MjY5QzE3LjIwOTEgMTQuNjE3NyAxNi45MzU3IDE0LjU2MDIgMTYuNjU5MSAxNC41NTc4QzE2LjM4MjQgMTQuNTU1NCAxNi4xMDgxIDE0LjYwODEgMTUuODUyMSAxNC43MTI5QzE1LjU5NiAxNC44MTc2IDE1LjM2MzQgMTQuOTcyMyAxNS4xNjc4IDE1LjE2NzlDMTQuOTcyMiAxNS4zNjM1IDE0LjgxNzUgMTUuNTk2MiAxNC43MTI4IDE1Ljg1MjJDMTQuNjA4IDE2LjEwODIgMTQuNTU1MyAxNi4zODI2IDE0LjU1NzcgMTYuNjU5MkMxNC41NjAxIDE2LjkzNTggMTQuNjE3NiAxNy4yMDkyIDE0LjcyNjggMTcuNDYzM0MxNC44MzU5IDE3LjcxNzUgMTQuOTk0NyAxNy45NDc0IDE1LjE5MzYgMTguMTM5NkwyMi4wNTQxIDI1TDE1LjE5MzYgMzEuODYwNEMxNC45OTQ3IDMyLjA1MjYgMTQuODM1OSAzMi4yODI1IDE0LjcyNjggMzIuNTM2N0MxNC42MTc2IDMyLjc5MDggMTQuNTYwMSAzMy4wNjQyIDE0LjU1NzcgMzMuMzQwOEMxNC41NTUzIDMzLjYxNzUgMTQuNjA4IDMzLjg5MTggMTQuNzEyOCAzNC4xNDc4QzE0LjgxNzUgMzQuNDAzOSAxNC45NzIyIDM0LjYzNjUgMTUuMTY3OCAzNC44MzIxQzE1LjM2MzQgMzUuMDI3NyAxNS41OTYgMzUuMTgyNCAxNS44NTIxIDM1LjI4NzFDMTYuMTA4MSAzNS4zOTE5IDE2LjM4MjQgMzUuNDQ0NiAxNi42NTkxIDM1LjQ0MjJDMTYuOTM1NyAzNS40Mzk4IDE3LjIwOTEgMzUuMzgyMyAxNy40NjMyIDM1LjI3MzFDMTcuNzE3NCAzNS4xNjM5IDE3Ljk0NzMgMzUuMDA1MiAxOC4xMzk1IDM0LjgwNjNMMjQuOTk5OSAyNy45NDU4TDMxLjg2MDMgMzQuODA2M0MzMi4yNTMyIDM1LjE4NTggMzIuNzc5NSAzNS4zOTU3IDMzLjMyNTcgMzUuMzkxQzMzLjg3MiAzNS4zODYyIDM0LjM5NDUgMzUuMTY3MSAzNC43ODA4IDM0Ljc4MDlDMzUuMTY3IDM0LjM5NDYgMzUuMzg2MSAzMy44NzIxIDM1LjM5MDkgMzMuMzI1OEMzNS4zOTU2IDMyLjc3OTYgMzUuMTg1NiAzMi4yNTMzIDM0LjgwNjEgMzEuODYwNEwyNy45NDU3IDI1TDM0LjgwNjEgMTguMTM5NkMzNS4xOTY3IDE3Ljc0ODkgMzUuNDE2MSAxNy4yMTkxIDM1LjQxNjEgMTYuNjY2N0MzNS40MTYxIDE2LjExNDIgMzUuMTk2NyAxNS41ODQ0IDM0LjgwNjEgMTUuMTkzOFoiIGZpbGw9IiNGRTU2MjEiLz4KPC9nPgo8ZGVmcz4KPGNsaXBQYXRoIGlkPSJjbGlwMF8yMTE2XzI1NTAiPgo8cmVjdCB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIGZpbGw9IndoaXRlIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==)",
-                                backgroundPosition: "center center",
-                                backgroundRepeat: "no-repeat",
-                                opacity:
-                                  cardError[0] === rowIndex &&
-                                  cardError[1] === columnIndex
-                                    ? 1
-                                    : 0,
-                                top: 0,
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                              },
-                              "&::after": {
-                                opacity: card.id ? 1 : 0,
-                                content: `"${card.powerLevel}"`,
-                                display: card ? "flex" : "none",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                transition: "all  400ms",
-                                zIndex: 999 + index,
-                                transform: getSkew(index)(),
-
-                                color: "#fff",
-                                fontFamily: "Aldrich",
-                                background: `${getColor(card.userId)()}`,
-                                backgroundImage:
-                                  'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAxNCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEzLjkxNzIgNy4zMTE4Mkw3LjU1MzU3IDE4Ljc2NjRDNy40MzkwMyAxOC45NyA3LjIyOTAzIDE5LjA5MDkgNi45OTk5NCAxOS4wOTA5QzYuOTQ5MDMgMTkuMDkwOSA2Ljg5MTc1IDE5LjA4NDUgNi44NDA4NCAxOS4wNzE4QzYuNTYwODQgMTguOTk1NCA2LjM2MzU3IDE4Ljc0NzMgNi4zNjM1NyAxOC40NTQ1VjExLjQ1NDVIMC42MzYzMDFDMC40MTk5MzggMTEuNDU0NSAwLjIyMjY2NSAxMS4zNDY0IDAuMTAxNzU2IDExLjE2ODJDLTAuMDEyNzg5NSAxMC45OSAtMC4wMzE4ODAzIDEwLjc2MDkgMC4wNTA4NDY5IDEwLjU2MzZMNC41MDUzOSAwLjM4MTgxOEM0LjYwNzIxIDAuMTUyNzI3IDQuODM2MyAwIDUuMDkwODUgMEg4LjkwOTAzQzkuMTE5MDMgMCA5LjMxNjMgMC4xMDE4MTggOS40MzcyMSAwLjI4QzkuNTUxNzUgMC40NTE4MTggOS41NzcyMSAwLjY3NDU0NSA5LjUwMDg0IDAuODcxODE4TDcuMzA1MzkgNi4zNjM2M0gxMy4zNjM2QzEzLjU4NjMgNi4zNjM2MyAxMy43OTYzIDYuNDg0NTQgMTMuOTEwOCA2LjY3NTQ1QzE0LjAyNTQgNi44NzI3MiAxNC4wMzE4IDcuMTE0NTQgMTMuOTE3MiA3LjMxMTgyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==")',
-                                backgroundRepeat: "no-repeat",
-                                backgroundPosition: "12px 8px",
-                                position: "absolute",
-                                borderRadius: 20,
-                                fontSize: 24,
-                                top: -10,
-                                right: 0,
-                                left: 160,
-                                padding: "14px 0",
-                                paddingTop: 18,
-                                paddingLeft: 20,
-                                width: 40,
-                                minWidth: 62,
-                                height: 38,
-                                pointerEvents: "none",
-                                textTransform: "uppercase",
-                              },
-                            }}
-                          ></Card>
-                        ))}
-                      </div>
-                    )}
+                      ></Card>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
-          );
-        })}
+                )}
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
       {children}
     </div>
