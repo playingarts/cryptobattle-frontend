@@ -80,20 +80,11 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   }, [gameState]);
 
   // Start animation for a card - this is the ONLY function that should set lastPlayedCard
-  const startAnimation = useCallback((card: any, playSound = true, source = 'unknown') => {
+  const startAnimation = useCallback((card: any, playSound = true) => {
     const cardId = `${card.suit}-${card.value}`;
-
-    console.log('[ANIMTRACE] startAnimation called', {
-      source,
-      cardId,
-      card,
-      currentAnimatingCardId: animatingCardIdRef.current,
-      willAnimate: animatingCardIdRef.current !== cardId,
-    });
 
     // If we're already animating this exact card, do nothing
     if (animatingCardIdRef.current === cardId) {
-      console.log('[ANIMTRACE] BLOCKED - already animating this card');
       return;
     }
 
@@ -104,7 +95,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
 
     // Set the animation state
     animatingCardIdRef.current = cardId;
-    console.log('[ANIMTRACE] Setting lastPlayedCard state to:', card);
     setLastPlayedCard(card);
 
     if (playSound) {
@@ -261,17 +251,10 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
           scoringLevel: 0, // Will show 0 initially
         };
 
-        console.log('[ANIMTRACE] LOCAL MOVE - addCard() called', {
-          cardId: `${card.suit}-${card.value}`,
-          rowIndex,
-          columnIndex,
-          userId: state.turnForPlayer,
-        });
-
         addCardToBoard(rowIndex, columnIndex, cardWithUserId);
 
         // Start animation immediately for instant feedback (optimistic UI)
-        startAnimation(cardWithUserId, true, 'LOCAL_MOVE');
+        startAnimation(cardWithUserId, true);
 
         WSProvider.send(
           JSON.stringify({
@@ -337,26 +320,19 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       setGameStarted(true);
       const serverCardId = `${gameState.lastPlayedCard.suit}-${gameState.lastPlayedCard.value}`;
 
-      console.log('[ANIMTRACE] gameState.lastPlayedCard received', {
-        serverCardId,
-        lastPlayedCard: gameState.lastPlayedCard,
-        lastProcessedServerCardRef: lastProcessedServerCardRef.current,
-        animatingCardIdRef: animatingCardIdRef.current,
-        check1_isNewCard: serverCardId !== lastProcessedServerCardRef.current,
-        check2_notAlreadyAnimating: serverCardId !== animatingCardIdRef.current,
-        willTriggerAnimation: serverCardId !== lastProcessedServerCardRef.current && serverCardId !== animatingCardIdRef.current,
-      });
-
       // Only trigger animation if:
       // 1. This is a NEW card from server (different from last processed server card)
       // 2. AND we're not already animating this card (from optimistic UI)
       if (serverCardId !== lastProcessedServerCardRef.current &&
           serverCardId !== animatingCardIdRef.current) {
         // This is an opponent's card - animate it
-        console.log('[ANIMTRACE] REMOTE MOVE - triggering animation from gameState');
-        startAnimation(gameState.lastPlayedCard, true, 'REMOTE_MOVE');
-      } else {
-        console.log('[ANIMTRACE] REMOTE MOVE - SKIPPED animation (already processed or animating)');
+        // Transform via getCard to match board card structure for render condition
+        const transformedCard = getCard(
+          gameState.lastPlayedCard.suit,
+          gameState.lastPlayedCard.value,
+          gameState.lastPlayedCard
+        );
+        startAnimation(transformedCard, true);
       }
       // Always update the last processed server card
       lastProcessedServerCardRef.current = serverCardId;
@@ -494,23 +470,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                       <div style={{ width: "210px", height: "300px" }}></div>
                     )}
 
-                    {/* Animation overlay render check */}
-                    {(() => {
-                      if (column && column[column.length - 1]?.suit && column[column.length - 1]?.value && lastPlayedCard) {
-                        const topCard = column[column.length - 1];
-                        const matchesValue = lastPlayedCard.value === topCard.value;
-                        const matchesSuit = lastPlayedCard.suit === topCard.suit;
-                        const matchesId = lastPlayedCard.id || topCard.id ? lastPlayedCard.id === topCard.id : true;
-                        const shouldRender = matchesValue && matchesSuit && matchesId;
-                        console.log('[ANIMTRACE] Animation overlay check', {
-                          rowIndex, columnIndex,
-                          lastPlayedCard: `${lastPlayedCard.suit}-${lastPlayedCard.value}`,
-                          topCard: `${topCard.suit}-${topCard.value}`,
-                          matchesValue, matchesSuit, matchesId, shouldRender,
-                        });
-                      }
-                      return null;
-                    })()}
                     {column &&
                       column[column.length - 1].suit &&
                       column[column.length - 1].value &&
