@@ -21,7 +21,9 @@ const Play: NextPage = () => {
   const [myCards, setMyCards] = useState<Array<any>>([]);
   const { openNotification } = useNotifications();
 
-  const { gameState, isBackendReady, isAlreadyConnected } = useGame();
+  // Use reducer state for game data
+  const { state, isBackendReady, isAlreadyConnected } = useGame();
+  const gameState = state.serverState; // Derive gameState from reducer
   useEffect(() => {
     if (!isBackendReady) {
       return;
@@ -44,12 +46,12 @@ const Play: NextPage = () => {
   }, [isBackendReady]);
 
   useEffect(() => {
-    if (!gameState) {
+    if (!gameState?.gameId) {
       return;
     }
 
     setMinWidth(7 * 250);
-  }, [gameState]);
+  }, [gameState?.gameId]);
 
   useEffect(() => {
     if (!isAlreadyConnected) {
@@ -69,7 +71,7 @@ const Play: NextPage = () => {
   }, [isAlreadyConnected]);
 
   useEffect(() => {
-    if (!gameState || !user || !user.userId) {
+    if (!gameState?.gameId || !user || !user.userId) {
       return;
     }
 
@@ -79,9 +81,11 @@ const Play: NextPage = () => {
 
     console.log("Game users with cards: ", gameState.gameUsersWithCards);
 
-    const cards = gameState.gameUsersWithCards.filter(
+    // Find current user's cards from gameUsersWithCards array
+    const userWithCards = gameState.gameUsersWithCards?.find(
       (userCards: any) => userCards.userId === user.userId
-    )[0].cards;
+    );
+    const cards = userWithCards?.cards;
 
     if (!cards) {
       return;
@@ -92,7 +96,7 @@ const Play: NextPage = () => {
     });
 
     setMyCards(cardsFormatted);
-  }, [gameState, user]);
+  }, [gameState?.gameId, gameState?.gameUsersWithCards, user]);
 
   if (loading) {
     return (

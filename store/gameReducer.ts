@@ -16,7 +16,7 @@ import {
   BoardCell,
   GamePlayer,
 } from '../types/game';
-import { GameAction, GameStatePayload, ServerTableCard, ServerLastPlayedCard } from './gameActions';
+import { GameAction, GameStatePayload, ServerTableCard, ServerLastPlayedCard, GameUserWithCardsInfo, AllowedUserCardsPlacement } from './gameActions';
 import { generateMoveKey, normalizeCard, findCardPosition } from '../utils/moveUtils';
 import { logAnimation, logGameState } from '../utils/debug';
 
@@ -38,6 +38,10 @@ export interface GameReducerState {
     currentPoints: Record<string, number>;             // userId -> points
     lastPlayedCard: NormalizedCard | null;
     lastPlayedPosition: { x: number; y: number } | null;
+    // Player hands - needed for GameInventory
+    gameUsersWithCards: GameUserWithCardsInfo[];
+    // Raw allowed placements - needed for card validation
+    allowedUserCardsPlacement: AllowedUserCardsPlacement | null;
   };
 
   // Derived state
@@ -74,6 +78,8 @@ export const initialGameState: GameReducerState = {
     currentPoints: {},
     lastPlayedCard: null,
     lastPlayedPosition: null,
+    gameUsersWithCards: [],
+    allowedUserCardsPlacement: null,
   },
   board: [],
   isMyTurn: false,
@@ -353,6 +359,9 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
           currentPoints: normalizePoints(serverData.playersCurrentPoints),
           lastPlayedCard,
           lastPlayedPosition,
+          // Store raw data needed by consumers
+          gameUsersWithCards: serverData.gameUsersWithCards || [],
+          allowedUserCardsPlacement: serverData.allowedUserCardsPlacement || null,
         },
         board,
         isMyTurn: serverData.turnForPlayer === state.currentPlayerId,
