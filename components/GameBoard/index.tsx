@@ -55,6 +55,14 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   // This ensures card is hidden from the moment it's added to board
   const lastPlayedCard = state.pendingAnimation?.card || currentAnimation?.card || null;
 
+  // Debug: log render timing
+  console.log('[GameBoard Render]', {
+    hasPendingAnimation: !!state.pendingAnimation,
+    hasCurrentAnimation: !!currentAnimation,
+    lastPlayedCard: lastPlayedCard ? `${lastPlayedCard.suit}-${lastPlayedCard.value}` : null,
+    pendingCard: state.pendingAnimation?.card ? `${state.pendingAnimation.card.suit}-${state.pendingAnimation.card.value}` : null,
+  });
+
   // Refs to hold current values for interact.js callbacks (outside React lifecycle)
   const selectedCardRef = useRef(selectedCard);
   const gameStateRef = useRef(gameState);
