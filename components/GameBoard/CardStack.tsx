@@ -10,10 +10,6 @@ import Card from '../CardNew';
 import { getCard } from '../Cards';
 import { NormalizedCard, GamePlayer } from '../../types/game';
 
-// Cell dimensions
-const CELL_WIDTH = 210;
-const CELL_HEIGHT = 300;
-
 interface CardStackProps {
   cards: NormalizedCard[];
   players: GamePlayer[];
@@ -55,7 +51,9 @@ function isLastPlayedCard(
   lastPlayedCard: NormalizedCard | null,
   isTopCard: boolean
 ): boolean {
-  if (!lastPlayedCard || !isTopCard) return false;
+  if (!lastPlayedCard || !isTopCard) {
+    return false;
+  }
 
   const suitMatch = lastPlayedCard.suit?.toLowerCase() === card.suit?.toLowerCase();
   const valueMatch = lastPlayedCard.value === card.value;
