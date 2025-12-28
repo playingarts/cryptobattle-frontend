@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useReducer,
 } from "react";
 import { useNotifications } from "../NotificationProvider";
 import Text from "../Text/";
@@ -23,6 +24,8 @@ import {
   setGameStarted,
   setRoomId as setGlobalRoomId,
 } from "../../utils/gameState";
+import { gameReducer, initialGameState, GameReducerState } from "../../store/gameReducer";
+import { GameAction, gameStateReceived, setCurrentPlayer } from "../../store/gameActions";
 import {
   createWSMessageHandler,
   createWSCloseHandler,
@@ -33,24 +36,38 @@ import {
 type GameProviderProps = { children: ReactNode };
 
 export type IGameProviderContext = {
-  gameState: any;
+  // NEW: Reducer state and dispatch (single source of truth for game state)
+  state: GameReducerState;
+  dispatch: React.Dispatch<GameAction>;
+
+  // KEEP: Room/lobby state (separate concern, will be migrated later)
   players: any;
-  playersGame: any;
-  isBackendReady: boolean;
   roomId: any;
-  userInfo: any;
   roomInfo: any;
-  selectedCard: any;
-  setSelectedCard: any;
-  isMyTurn: any;
   setRoomId: any;
   setPlayers: any;
+
+  // KEEP: UI state
+  selectedCard: any;
+  setSelectedCard: any;
   timer: any;
   totalSeconds: any;
+
+  // KEEP: Results flow
   results: any;
+
+  // KEEP: Connection state
+  userInfo: any;
+  isBackendReady: boolean;
+  isAlreadyConnected: boolean;
   userSocketIdle: any;
   setUserSocketIdle: any;
-  isAlreadyConnected: boolean;
+
+  // DEPRECATED: These are derived from state.serverState - kept temporarily for consumers
+  // Will be removed when consumers are migrated
+  gameState: any;
+  isMyTurn: any;
+  playersGame: any;
 };
 
 const getUser = async (playerId: string) => {
@@ -69,7 +86,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   const [players, setPlayers] = useState<any>([]);
   const [playersInfo, setPlayersInfo] = useState<any>([]);
-  const [playersGame, setPlayersGame] = useState<any>([]);
+  // DELETED: playersGame - now derived from state.serverState.allGamePlayers
+  // const [playersGame, setPlayersGame] = useState<any>([]);
 
   const [playingAgain, setPlayingAgain] = useState<any>(false);
 
@@ -85,6 +103,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   const WSProvider = useWS(false);
 
   const { user } = useAuth();
+
+  // SINGLE SOURCE OF TRUTH for game state
+  const [state, dispatch] = useReducer(gameReducer, initialGameState);
 
   const [roomInfo, setRoomInfo] = useState<any>([]);
   const [selectedCard, setSelectedCard] = useState<any>(null);
@@ -226,9 +247,17 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     }
   };
 
-  const [gameState, setGameState] = useState<any>(null);
-  const [isMyTurn, setIsMyTurn] = useState<any>(null);
+  // DELETED: gameState, isMyTurn - now derived from reducer state
+  // const [gameState, setGameState] = useState<any>(null);
+  // const [isMyTurn, setIsMyTurn] = useState<any>(null);
   const [userSocketIdle, setUserSocketIdle] = useState<any>(null);
+
+  // Set current player in reducer when user is authenticated
+  useEffect(() => {
+    if (user?.userId) {
+      dispatch(setCurrentPlayer(user.userId));
+    }
+  }, [user?.userId]);
 
   useEffect(() => {
     if (!players) {
@@ -264,14 +293,12 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     });
   }, [players]);
 
-  useEffect(() => {
-    if (!gameState) {
-      return;
-    }
-    setIsMyTurn(user.userId === gameState.turnForPlayer);
-
-    setPlayersGame(gameState.allGamePlayers);
-  }, [gameState]);
+  // DELETED: Sync useEffect - isMyTurn and playersGame now derived from reducer state
+  // useEffect(() => {
+  //   if (!gameState) { return; }
+  //   setIsMyTurn(user.userId === gameState.turnForPlayer);
+  //   setPlayersGame(gameState.allGamePlayers);
+  // }, [gameState]);
 
   useEffect(() => {
     setGlobalRoomId(roomId);
@@ -336,6 +363,13 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       return;
     }
 
+    // Wrapper: dispatch to reducer when game state is received
+    const setGameState = (data: unknown) => {
+      if (data && typeof data === 'object' && 'gameId' in data) {
+        dispatch(gameStateReceived(data as Parameters<typeof gameStateReceived>[0]));
+      }
+    };
+
     const handlerDeps: HandlerDependencies = {
       notifications: { openNotification, closeNotification },
       stateSetters: {
@@ -360,7 +394,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         newGame,
         playStartGameSound,
       },
-      getGameState: () => gameState,
+      getGameState: () => state.serverState,
       renderWarningIcon,
       renderQuitButton,
       renderNewGameButton,
@@ -382,6 +416,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     if (!results || !router.pathname.endsWith("/play")) {
       return;
     }
+
+    // Use allGamePlayers from reducer state
+    const playersGame = state.serverState.allGamePlayers || [];
+
     const getTitle = () => {
       if (results.winnerPlayersUserIds.length === playersGame.length) {
         return "Tie!";
@@ -393,7 +431,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
       const winners = results.winnerPlayersUserIds.map((winnerId: any) =>
         formatUsername(
-          playersGame.find((player: any) => player.userId === winnerId).username
+          playersGame.find((player: any) => player.userId === winnerId)?.username || ''
         )
       );
 
@@ -529,47 +567,56 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         </div>
       ),
     });
-  }, [results, openNotification, timer, router]);
+  }, [results, openNotification, timer, router, state.serverState.allGamePlayers]);
 
   const memoedValue = useMemo(
     () => ({
-      gameState,
+      // NEW: Reducer state and dispatch
+      state,
+      dispatch,
+
+      // Room/lobby state
       players,
-      playersGame,
       roomId,
-      userInfo,
       roomInfo,
-      selectedCard,
-      setSelectedCard,
-      isMyTurn,
       setRoomId,
       setPlayers,
+
+      // UI state
+      selectedCard,
+      setSelectedCard,
       timer,
       totalSeconds,
-      userSocketIdle,
-      setUserSocketIdle,
+
+      // Results
       results,
+
+      // Connection state
+      userInfo,
       isBackendReady,
       isAlreadyConnected,
+      userSocketIdle,
+      setUserSocketIdle,
+
+      // DEPRECATED: Derived from reducer state for backwards compatibility
+      // These will be removed when all consumers are migrated
+      gameState: state.serverState,
+      isMyTurn: state.isMyTurn,
+      playersGame: state.serverState.allGamePlayers,
     }),
     [
-      gameState,
+      state,
       players,
-      userSocketIdle,
-      setUserSocketIdle,
-      playersGame,
       roomId,
-      userInfo,
+      roomInfo,
       selectedCard,
-      setSelectedCard,
-      isMyTurn,
-      setRoomId,
-      setPlayers,
       timer,
       totalSeconds,
       results,
+      userInfo,
       isBackendReady,
       isAlreadyConnected,
+      userSocketIdle,
     ]
   );
 
