@@ -48,8 +48,6 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
       return;
     }
 
-    console.log('[DEBUG GameHeader] gameState.playersCurrentPoints:', gameState.playersCurrentPoints);
-
     const currentPlayer = playersGame.find(
       (player: any) => player.userId === gameState.turnForPlayer
     );

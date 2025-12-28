@@ -173,17 +173,29 @@ function normalizeAllowedPlacements(
 
 /**
  * Normalize player points from server format
+ * Server sends points directly as Record<userId, number> (not wrapped in additionalProperties)
  */
 function normalizePoints(
-  serverPoints?: { additionalProperties?: Record<string, number> }
+  serverPoints?: Record<string, number> | { additionalProperties?: Record<string, number> }
 ): Record<string, number> {
-  console.log('[DEBUG normalizePoints] raw serverPoints:', serverPoints);
-  if (!serverPoints?.additionalProperties) {
-    console.log('[DEBUG normalizePoints] returning empty object - no additionalProperties');
+  if (!serverPoints) {
     return {};
   }
-  const result = { ...serverPoints.additionalProperties };
-  console.log('[DEBUG normalizePoints] result:', result);
+
+  // Handle both formats:
+  // 1. Direct format: { "userId1": 10, "userId2": 20 }
+  // 2. Wrapped format: { additionalProperties: { "userId1": 10, "userId2": 20 } }
+  if ('additionalProperties' in serverPoints && serverPoints.additionalProperties) {
+    return { ...serverPoints.additionalProperties };
+  }
+
+  // Direct format - return as-is (filter out non-numeric values for safety)
+  const result: Record<string, number> = {};
+  for (const [key, value] of Object.entries(serverPoints)) {
+    if (typeof value === 'number') {
+      result[key] = value;
+    }
+  }
   return result;
 }
 

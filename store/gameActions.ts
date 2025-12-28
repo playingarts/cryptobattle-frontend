@@ -102,9 +102,14 @@ export interface AllowedCard {
   value: string;
 }
 
-export interface PlayersCurrentPoints {
-  additionalProperties?: Record<string, number>;
-}
+/**
+ * Server sends points in one of two formats:
+ * 1. Direct: { "userId1": 10, "userId2": 20 }
+ * 2. Wrapped: { additionalProperties: { "userId1": 10, "userId2": 20 } }
+ */
+export type PlayersCurrentPoints =
+  | Record<string, number>
+  | { additionalProperties?: Record<string, number> };
 
 export interface ServerLastPlayedCard {
   id: string;
