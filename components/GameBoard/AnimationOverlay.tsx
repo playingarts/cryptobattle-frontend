@@ -111,17 +111,29 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
         top: animPosition.top,
         left: animPosition.left,
         zIndex: 9999,
-        pointerEvents: 'none',
         width: CELL_WIDTH,
         height: CELL_HEIGHT,
       }}
     >
-      {/* Rotation wrapper - applies final rotation for stacked cards */}
+      {/* Dropzone wrapper - positioned at top level for proper detection */}
       <div
+        className="dropzone"
+        id={`${position.y}-${position.x}`}
         css={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
           width: '100%',
           height: '100%',
+          pointerEvents: 'auto',
+          borderRadius: 16,
+          transition: 'transform 150ms ease-out, box-shadow 150ms ease-out',
           transform: `rotate(${targetRotation}deg)`,
+          // Hover effect when dragging a card over this card
+          '&.drop-target': {
+            transform: `rotate(${targetRotation}deg) scale(1.05)`,
+            boxShadow: `0 0 20px 8px ${playerColor}80`,
+          },
         }}
       >
         {/* Animation wrapper - handles fly-in */}
@@ -137,36 +149,19 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
             animationFillMode: 'forwards',
           }}
         >
-          {/* Dropzone wrapper - handles drag hover effect */}
-          <div
-            className="dropzone"
-            id={`${position.y}-${position.x}`}
+          {/* The actual card component */}
+          <Card
+            card={cardData}
+            animated={!!card.videoUrl && card.isNft}
+            isStatic={true}
+            isGameBoard={true}
+            noShadow={false}
             css={{
-              width: '100%',
-              height: '100%',
-              pointerEvents: 'auto',
+              outline: `3px solid ${playerColor}`,
               borderRadius: 16,
-              transition: 'transform 150ms ease-out, box-shadow 150ms ease-out',
-              // Hover effect when dragging a card over this card
-              '&.drop-target': {
-                transform: 'scale(1.05)',
-                boxShadow: `0 0 20px 8px ${playerColor}80`,
-              },
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
             }}
-          >
-            {/* The actual card component */}
-            <Card
-              card={cardData}
-              animated={!!card.videoUrl && card.isNft}
-              isStatic={true}
-              noShadow={false}
-              css={{
-                outline: `3px solid ${playerColor}`,
-                borderRadius: 16,
-                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
-              }}
-            />
-          </div>
+          />
         </div>
       </div>
     </div>
