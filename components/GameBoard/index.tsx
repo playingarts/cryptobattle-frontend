@@ -41,6 +41,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   // Track which card we're currently animating - stored as "suit-value" string
   // This ref is the SINGLE SOURCE OF TRUTH for animation state
   const animatingCardIdRef = useRef<string | null>(null);
+  const animatingCardRef = useRef<any>(null);
   const animationTimerRef = useRef<NodeJS.Timeout | null>(null);
   // Track the last card we processed from gameState to detect new cards from opponents
   const lastProcessedServerCardRef = useRef<string | null>(null);
@@ -94,8 +95,9 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       clearTimeout(animationTimerRef.current);
     }
 
-    // Set the animation state
+    // Set the animation state - store card in ref to keep stable reference
     animatingCardIdRef.current = cardId;
+    animatingCardRef.current = card;
     setLastPlayedCard(card);
 
     if (playSound) {
@@ -118,6 +120,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     animationTimerRef.current = setTimeout(() => {
       setLastPlayedCard(null);
       animatingCardIdRef.current = null;
+      animatingCardRef.current = null;
     }, 2000);
   }, []);
 
@@ -136,11 +139,12 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
           placeToPutCard !== "empty" &&
           Array.isArray(placeToPutCard)
         ) {
+          // Case-insensitive suit comparison to prevent duplicates from optimistic + server updates
           if (
             !placeToPutCard.find(
               (existingCard) =>
                 existingCard.value === card.value &&
-                existingCard.suit === card.suit
+                existingCard.suit?.toLowerCase() === card.suit?.toLowerCase()
             )
           ) {
             localBoard[row][column] = [...localBoard[row][column], card];
@@ -477,7 +481,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                       column[column.length - 1].value &&
                       lastPlayedCard?.value ===
                         column[column.length - 1].value &&
-                      lastPlayedCard?.suit === column[column.length - 1].suit &&
+                      lastPlayedCard?.suit?.toLowerCase() === column[column.length - 1].suit?.toLowerCase() &&
                       (lastPlayedCard?.id || column[column.length - 1].id
                         ? lastPlayedCard?.id === column[column.length - 1].id
                         : true) && (
@@ -590,8 +594,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                                 column[column.length - 1].value &&
                                 lastPlayedCard?.value ===
                                   column[column.length - 1].value &&
-                                lastPlayedCard?.suit ===
-                                  column[column.length - 1].suit &&
+                                lastPlayedCard?.suit?.toLowerCase() ===
+                                  column[column.length - 1].suit?.toLowerCase() &&
                                 (lastPlayedCard?.id ||
                                 column[column.length - 1].id
                                   ? lastPlayedCard?.id ===
@@ -605,8 +609,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                                 column[column.length - 1].value &&
                                 lastPlayedCard?.value ===
                                   column[column.length - 1].value &&
-                                lastPlayedCard?.suit ===
-                                  column[column.length - 1].suit &&
+                                lastPlayedCard?.suit?.toLowerCase() ===
+                                  column[column.length - 1].suit?.toLowerCase() &&
                                 (column[column.length - 1].id
                                   ? lastPlayedCard?.id ===
                                     column[column.length - 1].id
