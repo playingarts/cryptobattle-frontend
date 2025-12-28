@@ -206,15 +206,25 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   // Handle auto-pass when no valid placements available
   useEffect(() => {
     // Only auto-pass when game is actively in progress
-    if (!gameState?.gameId || gameState.state !== 'inGame') {
+    const isGameActive = gameState?.state === 'inGame' || gameState?.state === 'started';
+    if (!gameState?.gameId || !isGameActive) {
+      console.log('[DEBUG GameBoard] Auto-pass check: skipped (not active)', { gameId: gameState?.gameId, state: gameState?.state });
       return;
     }
 
     // Auto-pass if no valid placements and it's my turn
     // Check that allowedPlacements is actually defined (not just empty during loading)
+    // Also check that we have cards in hand (gameUsersWithCards should have our cards)
     const placements = gameState.allowedPlacements;
-    if (isMyTurn && placements && Object.keys(placements).length === 0) {
-      console.log('[DEBUG GameBoard] Auto-pass: no valid placements available');
+    const hasCards = gameState.gameUsersWithCards?.some(
+      (u) => u.cards && u.cards.length > 0
+    );
+    const placementsCount = placements ? Object.keys(placements).length : -1;
+
+    console.log('[DEBUG GameBoard] Auto-pass check:', { isMyTurn, placementsCount, hasCards, state: gameState.state });
+
+    if (isMyTurn && placements && placementsCount === 0 && hasCards) {
+      console.log('[DEBUG GameBoard] Auto-pass: SENDING PASS');
       setTimeout(() => {
         WSProvider.send(
           JSON.stringify({
@@ -224,7 +234,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         );
       }, 2000);
     }
-  }, [gameState?.gameId, gameState?.state, gameState?.allowedPlacements, isMyTurn, WSProvider]);
+  }, [gameState?.gameId, gameState?.state, gameState?.allowedPlacements, gameState?.gameUsersWithCards, isMyTurn, WSProvider]);
 
   // Set up drag and drop
   useEffect(() => {
