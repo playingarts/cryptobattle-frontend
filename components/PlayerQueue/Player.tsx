@@ -76,7 +76,9 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
 
       // Start countdown interval
       intervalRef.current = setInterval(() => {
-        if (turnStartTimeRef.current === null) return
+        if (turnStartTimeRef.current === null) {
+          return;
+        }
 
         const elapsed = Date.now() - turnStartTimeRef.current
         const remaining = Math.max(0, DISPLAY_DURATION_MS - elapsed)
