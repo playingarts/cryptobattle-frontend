@@ -315,7 +315,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
           >
             {row.map((cell) => {
               const { x: columnIndex, y: cellRowIndex, cards, isEmpty, isDropTarget } = cell;
-              const topCard = cards.length > 0 ? cards[cards.length - 1] : null;
               const hasCards = cards.length > 0;
 
               // Determine what to render:
