@@ -128,9 +128,9 @@ const Play: NextPage = () => {
     <GameLayout loading={loading}>
       <Layout
         css={(theme) => ({
-          background: theme.colors.dark_gray,
+          background: "transparent",
           color: theme.colors.text_title_light,
-          backgroundColor: "#0A0A0A",
+          backgroundColor: "transparent",
           backgroundSize: "cover",
           minHeight: "100vh",
           padding: "20px 50px",
