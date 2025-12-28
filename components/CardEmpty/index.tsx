@@ -13,6 +13,7 @@ interface Props extends HTMLAttributes<HTMLElement> {
 
 const Card: FC<Props> = ({
   size,
+  isPlaceholder = false,
   containerStyles,
   ...props
 }) => {
@@ -41,8 +42,8 @@ const Card: FC<Props> = ({
               position: "relative",
               height: theme.spacing(height),
               borderRadius: theme.spacing(1.5),
-              border: "0",
-              background: "rgba(0, 0, 0, 0.1)",
+              border: 0,
+              background: isPlaceholder ? "rgba(0, 0, 0, 0.05)" : "rgba(0, 0, 0, 0.1)",
               transition: 'all 400ms',
               ...containerStyles
             },

@@ -79,10 +79,6 @@ const BoardCell: FC<BoardCellProps> = ({
         <CardEmpty
           key={`placeholder-${columnIndex}-${rowIndex}`}
           isPlaceholder={true}
-          containerStyles={{
-            opacity: 0.3,
-            border: '3px dashed #222',
-          }}
           css={{
             pointerEvents: 'none',
           }}
@@ -95,11 +91,7 @@ const BoardCell: FC<BoardCellProps> = ({
           selectedCard={selectedCard}
           key={`drop-${columnIndex}-${rowIndex}`}
           containerStyles={{
-            border: hasError ? '3px solid #FA5252' : '3px dashed #222',
-            transition: 'all 300ms',
-            '&:hover': {
-              border: hasError ? '3px solid #FA5252' : '3px dashed #222',
-            },
+            border: hasError ? '3px solid #FA5252' : 0,
             '&::before': {
               transition: 'all 300ms',
               position: 'absolute',
@@ -118,7 +110,6 @@ const BoardCell: FC<BoardCellProps> = ({
             },
           }}
           css={{
-            transition: 'all 300ms',
             borderRadius: 10,
             position: 'relative',
           }}
