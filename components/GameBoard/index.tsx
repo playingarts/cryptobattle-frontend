@@ -50,9 +50,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     dispatch,
   });
 
-  // The last played card - used to hide board card while animation overlay shows it
-  const lastPlayedCard = currentAnimation?.card || null;
-
   // Refs to hold current values for interact.js callbacks (outside React lifecycle)
   const selectedCardRef = useRef(selectedCard);
   const gameStateRef = useRef(gameState);
@@ -251,7 +248,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
           board={board}
           players={players}
           isMyTurn={isMyTurn}
-          lastPlayedCard={lastPlayedCard}
           selectedCard={selectedCard}
           errorPosition={errorPosition}
           onCellClick={handleCellClick}

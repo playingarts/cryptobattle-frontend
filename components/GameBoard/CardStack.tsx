@@ -17,25 +17,8 @@ interface CardStackProps {
   columnIndex: number;
   isMyTurn: boolean;
   hasError: boolean;
-  lastPlayedCard: NormalizedCard | null;
   selectedCard: unknown;
   onCellClick: () => void;
-}
-
-/**
- * Check if this card position matches the last played card position
- */
-function isLastPlayedPosition(
-  card: NormalizedCard,
-  lastPlayedCard: NormalizedCard | null,
-  isTopCard: boolean
-): boolean {
-  if (!lastPlayedCard || !isTopCard) {
-    return false;
-  }
-  const suitMatch = lastPlayedCard.suit?.toLowerCase() === card.suit?.toLowerCase();
-  const valueMatch = String(lastPlayedCard.value).toLowerCase() === String(card.value).toLowerCase();
-  return suitMatch && valueMatch;
 }
 
 /**
@@ -66,7 +49,6 @@ const CardStack: FC<CardStackProps> = ({
   columnIndex,
   isMyTurn,
   hasError,
-  lastPlayedCard,
   selectedCard,
   onCellClick,
 }) => {
@@ -76,8 +58,6 @@ const CardStack: FC<CardStackProps> = ({
         const isTopCard = index === cards.length - 1;
         const playerColor = getPlayerColor(players, card.userId || '');
         const rotation = getCardRotation(index);
-        // Hide card if it's the last played (animation overlay shows it instead)
-        const isHiddenByAnimation = isLastPlayedPosition(card, lastPlayedCard, isTopCard);
 
         // Transform NormalizedCard to Card component's expected format
         const cardWithImage = getCard(card.suit, card.value, card);
@@ -108,8 +88,6 @@ const CardStack: FC<CardStackProps> = ({
                 : `3px solid ${playerColor}`,
               borderRadius: 16,
               position: 'relative',
-              // Hide if animation overlay is showing this card
-              opacity: isHiddenByAnimation ? 0 : 1,
               transition: 'all 150ms ease-out',
               transform: rotation,
               // Hover effect when dragging a card over this card

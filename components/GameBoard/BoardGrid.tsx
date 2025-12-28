@@ -7,13 +7,12 @@
 
 import { FC } from 'react';
 import BoardCell from './BoardCell';
-import { GameBoard, NormalizedCard, GamePlayer } from '../../types/game';
+import { GameBoard, GamePlayer } from '../../types/game';
 
 interface BoardGridProps {
   board: GameBoard;
   players: GamePlayer[];
   isMyTurn: boolean;
-  lastPlayedCard: NormalizedCard | null;
   selectedCard: unknown;
   errorPosition: { x: number; y: number } | null;
   onCellClick: (x: number, y: number) => void;
@@ -23,7 +22,6 @@ const BoardGrid: FC<BoardGridProps> = ({
   board,
   players,
   isMyTurn,
-  lastPlayedCard,
   selectedCard,
   errorPosition,
   onCellClick,
@@ -54,7 +52,6 @@ const BoardGrid: FC<BoardGridProps> = ({
                 players={players}
                 isMyTurn={isMyTurn}
                 hasError={hasError}
-                lastPlayedCard={lastPlayedCard}
                 selectedCard={selectedCard}
                 onCellClick={onCellClick}
               />
