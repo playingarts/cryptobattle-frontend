@@ -208,7 +208,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     // Only auto-pass when game is actively in progress
     const isGameActive = gameState?.state === 'inGame' || gameState?.state === 'started';
     if (!gameState?.gameId || !isGameActive) {
-      console.log('[DEBUG GameBoard] Auto-pass check: skipped (not active)', { gameId: gameState?.gameId, state: gameState?.state });
       return;
     }
 
@@ -221,10 +220,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     );
     const placementsCount = placements ? Object.keys(placements).length : -1;
 
-    console.log('[DEBUG GameBoard] Auto-pass check:', { isMyTurn, placementsCount, hasCards, state: gameState.state });
-
     if (isMyTurn && placements && placementsCount === 0 && hasCards) {
-      console.log('[DEBUG GameBoard] Auto-pass: SENDING PASS');
+      console.log('[GameBoard] Auto-pass: no valid placements');
       setTimeout(() => {
         WSProvider.send(
           JSON.stringify({

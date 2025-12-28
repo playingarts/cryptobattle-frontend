@@ -70,19 +70,13 @@ export function useAnimationQueue({
 
   // Start a new animation when pendingAnimation changes
   useEffect(() => {
-    console.log('[DEBUG useAnimationQueue] pendingAnimation:', pendingAnimation?.moveKey);
-    console.log('[DEBUG useAnimationQueue] isAnimatingRef:', isAnimatingRef.current);
-    console.log('[DEBUG useAnimationQueue] currentAnimationRef:', currentAnimationRef.current?.moveKey);
-
     // If no pending animation, skip
     if (!pendingAnimation) {
-      console.log('[DEBUG useAnimationQueue] No pending animation, skipping');
       return;
     }
 
     // If already animating the same move, skip
     if (isAnimatingRef.current && currentAnimationRef.current?.moveKey === pendingAnimation.moveKey) {
-      console.log('[DEBUG useAnimationQueue] Already animating this move, skipping');
       return;
     }
 
@@ -93,11 +87,8 @@ export function useAnimationQueue({
 
     // If we're animating a different move, complete it first
     if (isAnimatingRef.current && currentAnimationRef.current && currentAnimationRef.current.moveKey !== pendingAnimation.moveKey) {
-      console.log('[DEBUG useAnimationQueue] Completing previous animation:', currentAnimationRef.current.moveKey);
       dispatch({ type: 'ANIMATION_COMPLETED', payload: { moveKey: currentAnimationRef.current.moveKey } });
     }
-
-    console.log('[DEBUG useAnimationQueue] Starting animation for:', pendingAnimation.moveKey);
 
     logAnimation('ANIM_START', {
       moveKey: pendingAnimation.moveKey,
@@ -108,7 +99,6 @@ export function useAnimationQueue({
     // Start the new animation
     setCurrentAnimation(pendingAnimation);
     setIsAnimating(true);
-    console.log('[DEBUG useAnimationQueue] Set currentAnimation and isAnimating=true');
     dispatch({ type: 'ANIMATION_STARTED', payload: { moveKey: pendingAnimation.moveKey } });
     playSound();
 
