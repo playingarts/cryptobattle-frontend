@@ -119,12 +119,9 @@ const CardStack: FC<CardStackProps> = ({
               borderRadius: 16,
               position: 'relative',
               // Hide card during animation (AnimationOverlay shows it)
+              // No transition on opacity to prevent flash
               opacity: isAnimating ? 0 : 1,
-              animation: isAnimating
-                ? 'example3 0.3s linear 0.3s 1 normal forwards'
-                : '',
-              animationDelay: '1.6s',
-              transition: 'all 300ms',
+              transition: isAnimating ? 'none' : 'all 300ms',
               transform: rotation,
               // Error overlay
               '&::before': {
