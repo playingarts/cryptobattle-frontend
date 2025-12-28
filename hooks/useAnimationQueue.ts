@@ -38,6 +38,16 @@ export function useAnimationQueue({
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Use refs to track state inside useEffect without re-running on every state change
+  const isAnimatingRef = useRef(isAnimating);
+  const currentAnimationRef = useRef(currentAnimation);
+
+  // Keep refs in sync
+  useEffect(() => {
+    isAnimatingRef.current = isAnimating;
+    currentAnimationRef.current = currentAnimation;
+  }, [isAnimating, currentAnimation]);
+
   // Initialize audio on mount (client-side only)
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -58,20 +68,23 @@ export function useAnimationQueue({
     }
   }, []);
 
-  // Complete the current animation
-  const completeAnimation = useCallback(() => {
-    if (currentAnimation) {
-      dispatch({ type: 'ANIMATION_COMPLETED', payload: { moveKey: currentAnimation.moveKey } });
-      setCurrentAnimation(null);
-      setIsAnimating(false);
-    }
-  }, [currentAnimation, dispatch]);
-
   // Start a new animation when pendingAnimation changes
   useEffect(() => {
-    // If no pending animation or already animating the same one, skip
-    if (!pendingAnimation) return;
-    if (isAnimating && currentAnimation?.moveKey === pendingAnimation.moveKey) return;
+    console.log('[DEBUG useAnimationQueue] pendingAnimation:', pendingAnimation?.moveKey);
+    console.log('[DEBUG useAnimationQueue] isAnimatingRef:', isAnimatingRef.current);
+    console.log('[DEBUG useAnimationQueue] currentAnimationRef:', currentAnimationRef.current?.moveKey);
+
+    // If no pending animation, skip
+    if (!pendingAnimation) {
+      console.log('[DEBUG useAnimationQueue] No pending animation, skipping');
+      return;
+    }
+
+    // If already animating the same move, skip
+    if (isAnimatingRef.current && currentAnimationRef.current?.moveKey === pendingAnimation.moveKey) {
+      console.log('[DEBUG useAnimationQueue] Already animating this move, skipping');
+      return;
+    }
 
     // Clear any existing animation timer
     if (animationTimeoutRef.current) {
@@ -79,9 +92,12 @@ export function useAnimationQueue({
     }
 
     // If we're animating a different move, complete it first
-    if (isAnimating && currentAnimation && currentAnimation.moveKey !== pendingAnimation.moveKey) {
-      completeAnimation();
+    if (isAnimatingRef.current && currentAnimationRef.current && currentAnimationRef.current.moveKey !== pendingAnimation.moveKey) {
+      console.log('[DEBUG useAnimationQueue] Completing previous animation:', currentAnimationRef.current.moveKey);
+      dispatch({ type: 'ANIMATION_COMPLETED', payload: { moveKey: currentAnimationRef.current.moveKey } });
     }
+
+    console.log('[DEBUG useAnimationQueue] Starting animation for:', pendingAnimation.moveKey);
 
     logAnimation('ANIM_START', {
       moveKey: pendingAnimation.moveKey,
@@ -92,6 +108,7 @@ export function useAnimationQueue({
     // Start the new animation
     setCurrentAnimation(pendingAnimation);
     setIsAnimating(true);
+    console.log('[DEBUG useAnimationQueue] Set currentAnimation and isAnimating=true');
     dispatch({ type: 'ANIMATION_STARTED', payload: { moveKey: pendingAnimation.moveKey } });
     playSound();
 
