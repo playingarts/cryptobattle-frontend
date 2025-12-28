@@ -50,9 +50,10 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     dispatch,
   });
 
-  // Use currentAnimation from useAnimationQueue for animation state
-  // This replaces the old lastPlayedCard state system
-  const lastPlayedCard = currentAnimation?.card || null;
+  // Use pendingAnimation for hiding cards (immediate, same render cycle as board update)
+  // Use currentAnimation for showing the animation overlay
+  // This ensures card is hidden from the moment it's added to board
+  const lastPlayedCard = state.pendingAnimation?.card || currentAnimation?.card || null;
 
   // Refs to hold current values for interact.js callbacks (outside React lifecycle)
   const selectedCardRef = useRef(selectedCard);
