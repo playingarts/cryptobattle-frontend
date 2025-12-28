@@ -1,4 +1,4 @@
-import { forwardRef, useState, useEffect} from "react";
+import { forwardRef, useState, useEffect, useRef } from "react";
 import UserAvatar from "../UserAvatar";
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
@@ -25,7 +25,10 @@ interface PlayerProps {
 const Player = forwardRef<HTMLDivElement, PlayerProps>(
   ({ player, loadingDelayed, currentPlayerWithPoints, inactive }, ref) => {
     const [progress, setProgress] = useState(100)
-    // const [first, setFirst] = useState(false)
+    const prevProgressRef = useRef(100)
+    // Only animate when counting down, not when resetting to 100%
+    const shouldAnimate = progress < prevProgressRef.current
+
     const { timer, totalSeconds, results } = useGame()
     useEffect(() => {
       // Reset to full if no current player or game ended
@@ -50,7 +53,12 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
       const progressPercent = (timer / totalSeconds) * 100;
       setProgress(Math.max(0, Math.min(100, progressPercent)));
     }, [currentPlayerWithPoints, player, timer, totalSeconds, results])
-    
+
+    // Track previous progress for animation decision
+    useEffect(() => {
+      prevProgressRef.current = progress
+    }, [progress])
+
     useEffect(() => {
       if (results) {
         setProgress(100)
@@ -70,8 +78,8 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
               stroke: inactive ? 'gray' : player.color,
               // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
               strokeLinecap: "butt",
-              // Customize transition animation
-              transition: "stroke-dashoffset linear " +  '1000' + 'ms',
+              // Only animate countdown (progress decreasing), instant reset when increasing
+              transition: shouldAnimate ? "stroke-dashoffset linear 1000ms" : "none",
               // Rotate the path
               transform: "rotate(0.25turn)",
               transformOrigin: "center center",
