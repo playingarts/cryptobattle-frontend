@@ -81,7 +81,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
 
   // Start animation for a card - this is the ONLY function that should set lastPlayedCard
   const startAnimation = useCallback((card: any, playSound = true) => {
-    const cardId = `${card.suit}-${card.value}`;
+    // Normalize to lowercase for consistent comparison
+    const cardId = `${card.suit?.toLowerCase()}-${card.value}`;
 
     // If we're already animating this exact card, do nothing
     if (animatingCardIdRef.current === cardId) {
@@ -318,7 +319,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
 
     if (gameState.lastPlayedCard) {
       setGameStarted(true);
-      const serverCardId = `${gameState.lastPlayedCard.suit}-${gameState.lastPlayedCard.value}`;
+      // Normalize to lowercase for consistent comparison
+      const serverCardId = `${gameState.lastPlayedCard.suit?.toLowerCase()}-${gameState.lastPlayedCard.value}`;
 
       // Only trigger animation if:
       // 1. This is a NEW card from server (different from last processed server card)
