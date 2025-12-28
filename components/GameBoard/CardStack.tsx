@@ -112,6 +112,11 @@ const CardStack: FC<CardStackProps> = ({
               opacity: isHiddenByAnimation ? 0 : 1,
               transition: 'all 300ms',
               transform: rotation,
+              // Hover effect when dragging a card over this stack
+              '&.drop-target': {
+                transform: `${rotation} scale(1.05)`,
+                boxShadow: '0 0 20px 8px rgba(0, 255, 0, 0.5)',
+              },
               // Error overlay
               '&::before': {
                 transition: 'all 300ms',
