@@ -50,8 +50,8 @@ export type IGameProviderContext = {
   // KEEP: UI state
   selectedCard: any;
   setSelectedCard: any;
-  timer: any;
-  totalSeconds: any;
+  timer: number;
+  totalSeconds: number;
 
   // KEEP: Results flow
   results: any;
@@ -91,8 +91,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   const [playingAgain, setPlayingAgain] = useState<any>(false);
 
-  const [timer, setTimer] = useState<any>([]);
-  const [totalSeconds, setTotalSeconds] = useState<any>([]);
+  const [timer, setTimer] = useState<number>(0);
+  const [totalSeconds, setTotalSeconds] = useState<number>(0);
   const [isAlreadyConnected, setIsAlreadyConnected] = useState<boolean>(false);
 
   const [userInfo, setUserInfo] = useState<any>([]);
