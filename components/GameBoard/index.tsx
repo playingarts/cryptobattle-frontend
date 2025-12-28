@@ -25,7 +25,7 @@ import AnimationOverlay from "./AnimationOverlay";
 import { useAnimationQueue } from "../../hooks/useAnimationQueue";
 import { localMoveInitiated } from "../../store/gameActions";
 import { generateMoveKey } from "../../utils/moveUtils";
-import { NormalizedCard, GamePlayer, BoardCell } from "../../types/game";
+import { NormalizedCard, GamePlayer } from "../../types/game";
 import { logAnimation, logGameState } from "../../utils/debug";
 
 interface Props extends HTMLAttributes<HTMLElement> {
