@@ -33,8 +33,12 @@ const GameInventory: FC<Props> = ({
   const [cardsNft, setCardsNft] = useState<any>([]);
   const [loadingDelayed, setLoadingDelayed] = useState(true);
 
-  const { gameState, selectedCard, setSelectedCard, players } = useGame();
+  // Use reducer state for turn information
+  const { state, selectedCard, setSelectedCard, players } = useGame();
   const { user } = useAuth();
+
+  // Derive turn status from reducer state
+  const isMyTurn = state.serverState.turnForPlayer === user?.userId;
 
   const WSProvider = useWS();
 
@@ -139,8 +143,8 @@ const GameInventory: FC<Props> = ({
       <div
         style={{
           background:
-            (gameState?.turnForPlayer === user.userId && !isOpponentsCards) ||
-            (gameState?.turnForPlayer !== user.userId && isOpponentsCards)
+            (isMyTurn && !isOpponentsCards) ||
+            (!isMyTurn && isOpponentsCards)
               ? "#fff"
               : "#181818",
           borderRadius: isOpponentsCards ? 10 : 20,
@@ -150,7 +154,7 @@ const GameInventory: FC<Props> = ({
           position: "relative",
           display: "flex",
           justifyContent:
-            gameState?.turnForPlayer === user.userId && isOpponentsCards
+            isMyTurn && isOpponentsCards
               ? "space-between"
               : "space-around",
           zIndex: 999999,
@@ -171,12 +175,12 @@ const GameInventory: FC<Props> = ({
                 <div
                   style={{
                     width:
-                      gameState?.turnForPlayer === user.userId &&
+                      isMyTurn &&
                       !isOpponentsCards
                         ? 72
                         : 84,
                     marginRight:
-                      gameState?.turnForPlayer === user.userId &&
+                      isMyTurn &&
                       !isOpponentsCards
                         ? index + 1 === cardsRegular.length
                           ? 0
@@ -194,7 +198,7 @@ const GameInventory: FC<Props> = ({
                       selectedCard ? selectedCard.uid === card.uid : false
                     }
                     background={
-                      gameState?.turnForPlayer === user.userId &&
+                      isMyTurn &&
                       isOpponentsCards
                         ? "#181818"
                         : isOpponentsCards
@@ -202,7 +206,7 @@ const GameInventory: FC<Props> = ({
                         : "#0C0E11"
                     }
                     color={
-                      gameState?.turnForPlayer === user.userId &&
+                      isMyTurn &&
                       isOpponentsCards
                         ? !isOpponentsCards
                           ? "#0C0E11"
@@ -219,12 +223,12 @@ const GameInventory: FC<Props> = ({
                         : index + 1 === cardsRegular.length
                         ? "none"
                         : `1px solid ${
-                            gameState?.turnForPlayer === user.userId
+                            isMyTurn
                               ? "rgba(221, 221, 221, 0.2)"
                               : "rgba(221, 221, 221, 0.8)"
                           } `,
                       padding:
-                        gameState?.turnForPlayer === user.userId &&
+                        isMyTurn &&
                         !isOpponentsCards
                           ? "0 0"
                           : isOpponentsCards
@@ -232,7 +236,7 @@ const GameInventory: FC<Props> = ({
                           : "0 6px",
                       pointerEvents:
                         !isOpponentsCards &&
-                        gameState?.turnForPlayer === user.userId
+                        isMyTurn
                           ? "auto"
                           : "none",
                     }}
@@ -254,10 +258,10 @@ const GameInventory: FC<Props> = ({
               borderBottomRightRadius: isOpponentsCards ? 10 : 20,
               padding: isOpponentsCards ? 5 : "15px 10px 15px 15px",
               background: isOpponentsCards
-                ? gameState?.turnForPlayer === user.userId
+                ? isMyTurn
                   ? "#282828"
                   : "#E5E5E5"
-                : gameState?.turnForPlayer === user.userId
+                : isMyTurn
                 ? "linear-gradient(90.19deg, #8482F8 14%, #A6FBF6 86.07%)"
                 : "#282828",
             }}
@@ -267,12 +271,12 @@ const GameInventory: FC<Props> = ({
                 <div
                   style={{
                     width:
-                      gameState?.turnForPlayer === user.userId &&
+                      isMyTurn &&
                       !isOpponentsCards
                         ? 72
                         : 84,
                     marginRight:
-                      gameState?.turnForPlayer === user.userId &&
+                      isMyTurn &&
                       !isOpponentsCards
                         ? index + 1 === cardsNft.length
                           ? 0
@@ -289,17 +293,17 @@ const GameInventory: FC<Props> = ({
                       selectedCard ? selectedCard.uid === card.uid : false
                     }
                     background={
-                      gameState?.turnForPlayer === user.userId &&
+                      isMyTurn &&
                       isOpponentsCards
                         ? "#282828"
                         : isOpponentsCards
                         ? "E5E5E5"
-                        : gameState?.turnForPlayer === user.userId
+                        : isMyTurn
                         ? "#0C0E11"
                         : "#0C0E11"
                     }
                     color={
-                      gameState?.turnForPlayer === user.userId &&
+                      isMyTurn &&
                       isOpponentsCards
                         ? "#fff"
                         : isOpponentsCards
@@ -313,11 +317,11 @@ const GameInventory: FC<Props> = ({
                           : 10,
                       pointerEvents:
                         !isOpponentsCards &&
-                        gameState?.turnForPlayer === user.userId
+                        isMyTurn
                           ? "auto"
                           : "none",
                       borderRight:
-                        gameState?.turnForPlayer === user.userId &&
+                        isMyTurn &&
                         !isOpponentsCards &&
                         index + 1 === cardsRegular.length
                           ? "none"
@@ -382,12 +386,12 @@ const GameInventory: FC<Props> = ({
               top: 32,
               background: "#181818",
               color:
-                gameState?.turnForPlayer !== user.userId ? "#282828" : "white",
+                !isMyTurn ? "#282828" : "white",
               height: 60,
               width: 60,
               transition: "all 400ms",
               pointerEvents:
-                gameState?.turnForPlayer !== user.userId ? "none" : "auto",
+                !isMyTurn ? "none" : "auto",
 
               "&::before": {
                 opacity: 0,
