@@ -30,6 +30,12 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
     const shouldAnimate = progress < prevProgressRef.current
 
     const { timer, totalSeconds, results } = useGame()
+
+    // Debug: always log timer values
+    useEffect(() => {
+      console.log(`[TIMER DEBUG ${player.username}] timer=${timer}, totalSeconds=${totalSeconds}, currentPlayer=${currentPlayerWithPoints?.username}, isMyAvatar=${currentPlayerWithPoints?.userId === player.userId}`);
+    }, [timer, totalSeconds, currentPlayerWithPoints, player]);
+
     useEffect(() => {
       // Reset to full if no current player or game ended
       if (!currentPlayerWithPoints || results) {
@@ -51,10 +57,6 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
 
       // Calculate progress as percentage of time remaining
       const progressPercent = (timer / totalSeconds) * 100;
-
-      // Debug: log timer values for current player
-      console.log(`[TIMER ${player.username}] timer=${timer}, totalSeconds=${totalSeconds}, progress=${progressPercent.toFixed(1)}%`);
-
       setProgress(Math.max(0, Math.min(100, progressPercent)));
     }, [currentPlayerWithPoints, player, timer, totalSeconds, results])
 
