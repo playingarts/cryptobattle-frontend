@@ -460,7 +460,9 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                   <div className="stack">
                     {cards.map((card, index) => {
                       // Transform NormalizedCard to Card component's expected format
-                      const cardForComponent = {
+                      // Use getCard to look up the image from cards.json for regular cards
+                      const cardWithImage = getCard(card.suit, card.value, card);
+                      const cardForComponent = cardWithImage || {
                         ...card,
                         img: card.imageUrl || '',
                         video: card.videoUrl,
