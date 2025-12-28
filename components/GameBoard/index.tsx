@@ -472,7 +472,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                         selectedCard={selectedCard}
                         key={`${card.value} ${card.suit}`}
                         onClick={addCard(cellRowIndex, columnIndex)}
-                        animated={card.id ? true : false}
+                        animated={card.isNft === true}
                         card={cardForComponent}
                         index={index}
                         className={`${index + 1 === cards.length ? "dropzone" : ""}`}
@@ -536,7 +536,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                             right: 0,
                           },
                           "&::after": {
-                            opacity: card.id ? 1 : 0,
+                            opacity: card.isNft ? 1 : 0,
                             content: `"${card.powerLevel}"`,
                             display: card ? "flex" : "none",
                             justifyContent: "center",
