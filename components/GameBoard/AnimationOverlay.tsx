@@ -14,6 +14,7 @@
 import { FC, useMemo } from 'react';
 import Card from '../CardNew';
 import { PendingAnimation, GamePlayer } from '../../types/game';
+import { getCardImageUrl, getCardVideoUrl } from '../../utils/moveUtils';
 
 // Cell dimensions (must match GameBoard cell sizing)
 const CELL_WIDTH = 210;
@@ -80,8 +81,8 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
       const color = getPlayerColor(players, animation.playerId);
       return {
         cardData: {
-          img: animation.card.imageUrl || `/cards/${animation.card.suit}-${animation.card.value}.png`,
-          video: animation.card.videoUrl,
+          img: getCardImageUrl(animation.card),
+          video: getCardVideoUrl(animation.card),
           background: color,
           info: `${animation.card.value} of ${animation.card.suit}`,
         },

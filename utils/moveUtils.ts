@@ -8,6 +8,7 @@
  */
 
 import { NormalizedCard, ServerCardInfo, ServerTableCards } from '../types/game';
+import cards from '../components/Cards/cards.json';
 
 /**
  * Generate a unique, deterministic key for a move
@@ -119,12 +120,43 @@ export function isMatchingMove(
 
 /**
  * Get the card image URL
- * Returns a placeholder if no URL is provided
+ * Looks up the card in cards.json if no imageUrl provided
  */
-export function getCardImageUrl(card: NormalizedCard): string {
+export function getCardImageUrl(card: { suit: string; value: string; imageUrl?: string }): string {
   if (card.imageUrl) {
     return card.imageUrl;
   }
-  // Return placeholder based on suit and value
-  return `/cards/${card.suit}-${card.value}.png`;
+
+  // Look up in cards.json
+  // Note: Using any[] because cards.json has joker entries with suit?: undefined
+  const foundCard = (cards as { suit?: string; value: string | number; img: string }[]).find((c) =>
+    c.suit?.toLowerCase() === card.suit?.toLowerCase() &&
+    String(c.value).toLowerCase() === String(card.value).toLowerCase()
+  );
+
+  if (foundCard && foundCard.img) {
+    return foundCard.img;
+  }
+
+  // Fallback - should never reach here if cards.json is complete
+  return '';
+}
+
+/**
+ * Get the card video URL
+ * Looks up the card in cards.json if no videoUrl provided
+ */
+export function getCardVideoUrl(card: { suit: string; value: string; videoUrl?: string }): string | undefined {
+  if (card.videoUrl) {
+    return card.videoUrl;
+  }
+
+  // Look up in cards.json
+  // Note: Using explicit type because cards.json has joker entries with suit?: undefined
+  const foundCard = (cards as { suit?: string; value: string | number; video?: string }[]).find((c) =>
+    c.suit?.toLowerCase() === card.suit?.toLowerCase() &&
+    String(c.value).toLowerCase() === String(card.value).toLowerCase()
+  );
+
+  return foundCard?.video;
 }
