@@ -97,7 +97,7 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
     return null;
   }
 
-  const { card, moveKey, stackIndex } = animation;
+  const { card, moveKey, stackIndex, position } = animation;
 
   // Calculate target rotation based on stack index (same as CardStack)
   const targetRotation = stackIndex > 0 ? stackIndex * 4 : 0;
@@ -126,15 +126,24 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
       >
         {/* Card wrapper with fly-in animation */}
         <div
-          className="game-latest-card-wrapper"
+          className="game-latest-card-wrapper dropzone"
+          id={`${position.y}-${position.x}`}
           css={{
             position: 'relative',
             width: '100%',
             height: '100%',
+            pointerEvents: 'auto',
             animationName: 'cardFlyIn',
             animationDuration: '400ms',
             animationTimingFunction: 'ease-out',
             animationFillMode: 'forwards',
+            transition: 'transform 150ms ease-out, box-shadow 150ms ease-out',
+            borderRadius: 16,
+            // Hover effect when dragging a card over this card
+            '&.drop-target': {
+              transform: 'scale(1.05)',
+              boxShadow: `0 0 20px 8px ${playerColor}80`,
+            },
           }}
         >
         {/* The actual card component */}
