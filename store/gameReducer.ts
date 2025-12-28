@@ -178,9 +178,7 @@ function normalizeAllowedPlacements(
 function normalizePoints(
   serverPoints?: Record<string, unknown>
 ): Record<string, number> {
-  console.log('[DEBUG normalizePoints] input:', serverPoints);
   if (!serverPoints) {
-    console.log('[DEBUG normalizePoints] no serverPoints, returning {}');
     return {};
   }
 
@@ -189,9 +187,7 @@ function normalizePoints(
       serverPoints.additionalProperties &&
       typeof serverPoints.additionalProperties === 'object') {
     const additionalProps = serverPoints.additionalProperties as Record<string, number>;
-    const result = { ...additionalProps };
-    console.log('[DEBUG normalizePoints] wrapped format, result:', result);
-    return result;
+    return { ...additionalProps };
   }
 
   // Direct format: { "userId1": 10, "userId2": 20 }
@@ -202,7 +198,6 @@ function normalizePoints(
       result[key] = value;
     }
   }
-  console.log('[DEBUG normalizePoints] direct format, result:', result);
   return result;
 }
 
