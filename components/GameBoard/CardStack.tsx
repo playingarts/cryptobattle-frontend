@@ -70,8 +70,23 @@ const CardStack: FC<CardStackProps> = ({
   selectedCard,
   onCellClick,
 }) => {
+  // Get top card's player color for the hover glow
+  const topCard = cards[cards.length - 1];
+  const topCardColor = topCard ? getPlayerColor(players, topCard.userId || '') : 'gray';
+
   return (
-    <div className="stack">
+    <div
+      className="stack"
+      css={{
+        // Hover effect when dragging a card over this stack (using :has for whole stack)
+        '&:has(.drop-target)': {
+          transform: 'scale(1.05)',
+          boxShadow: `0 0 20px 8px ${topCardColor}80`, // 80 = 50% opacity in hex
+          borderRadius: 16,
+          transition: 'none', // Instant effect
+        },
+      }}
+    >
       {cards.map((card, index) => {
         const isTopCard = index === cards.length - 1;
         const playerColor = getPlayerColor(players, card.userId || '');
@@ -112,11 +127,6 @@ const CardStack: FC<CardStackProps> = ({
               opacity: isHiddenByAnimation ? 0 : 1,
               transition: 'all 300ms',
               transform: rotation,
-              // Hover effect when dragging a card over this stack
-              '&.drop-target': {
-                transform: `${rotation} scale(1.05)`,
-                boxShadow: '0 0 20px 8px rgba(0, 255, 0, 0.5)',
-              },
               // Error overlay
               '&::before': {
                 transition: 'all 300ms',
