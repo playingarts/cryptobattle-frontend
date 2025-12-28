@@ -219,10 +219,10 @@ function deriveBoard(
       const cards = tableCards[key] || [];
       const isDropTarget = allowedPlacements[key] || false;
 
-      // A cell is considered "empty" (droppable placeholder) if it has no cards
-      // but is adjacent to a cell with cards
+      // A cell is considered "empty" if it has no cards
+      // It should show a placeholder if it's adjacent to cards OR is a valid drop target
       const hasAdjacentCards = hasCardsAdjacent(tableCards, x, y, tableSizeX, tableSizeY);
-      const isEmpty = cards.length === 0 && hasAdjacentCards;
+      const isEmpty = cards.length === 0 && (hasAdjacentCards || isDropTarget);
 
       row.push({
         x,
