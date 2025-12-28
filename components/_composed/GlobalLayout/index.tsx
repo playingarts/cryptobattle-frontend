@@ -49,7 +49,7 @@ const ComposedGlobalLayout: FC<
   }, [query, replace, scrollIntoView, scrollIntoViewBehavior]);
 
   return (
-    <div style={{ background: "#0a0a0a", minHeight: "100vh" }}>
+    <div style={{ background: "#1A1A1A", minHeight: "100vh" }}>
       <Header
         headerTitle={headerTitle}
         headerMiddle={headerMiddle}
