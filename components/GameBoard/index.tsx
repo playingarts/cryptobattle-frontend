@@ -255,11 +255,17 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     if (serverLastPlayedCard) {
       const serverCardId = `${serverLastPlayedCard.suit?.toLowerCase()}-${serverLastPlayedCard.value}`;
 
+      console.log('[DEBUG Animation] serverCardId:', serverCardId);
+      console.log('[DEBUG Animation] lastProcessedServerCardRef:', lastProcessedServerCardRef.current);
+      console.log('[DEBUG Animation] animatingCardIdRef:', animatingCardIdRef.current);
+      console.log('[DEBUG Animation] isMyTurn:', isMyTurn);
+
       // Only animate if this is a new card from server and we're not already animating it
       if (
         serverCardId !== lastProcessedServerCardRef.current &&
         serverCardId !== animatingCardIdRef.current
       ) {
+        console.log('[DEBUG Animation] Starting animation for:', serverCardId);
         const transformedCard = getCard(
           serverLastPlayedCard.suit,
           serverLastPlayedCard.value,
@@ -268,6 +274,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         // Find position from lastPlayedPosition
         const position = gameState.lastPlayedPosition || { x: 0, y: 0 };
         startAnimation(transformedCard, position, true);
+      } else {
+        console.log('[DEBUG Animation] Skipping animation - already processed or animating');
       }
       lastProcessedServerCardRef.current = serverCardId;
     }
