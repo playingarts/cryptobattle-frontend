@@ -7,11 +7,11 @@ interface UserAvatar extends Props {
 }
 
 const UserAvatar: FC<UserAvatar> = ({ profilePictureUrl, avatarBgColor, ...props }) => {
-  if (
-    profilePictureUrl &&
-    profilePictureUrl !==
-      "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png"
-  ) {
+  // If avatarBgColor is provided, use default avatar with custom color (ignore profile picture)
+  const useDefaultAvatar = avatarBgColor || !profilePictureUrl ||
+    profilePictureUrl === "https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png";
+
+  if (!useDefaultAvatar) {
     return (
       <div
         {...props}

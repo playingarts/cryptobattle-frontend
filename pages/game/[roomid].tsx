@@ -415,7 +415,7 @@ const JoinGame: NextPage = () => {
           overflow: "hidden",
           paddingTop: theme.spacing(12),
           paddingBottom: theme.spacing(6.5),
-          backgroundColor: "#0A0A0A",
+          backgroundColor: "transparent",
           backgroundSize: "cover",
           maxWidth: "940px",
           margin: "0 auto",
