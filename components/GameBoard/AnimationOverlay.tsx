@@ -124,40 +124,49 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
           transform: `rotate(${targetRotation}deg)`,
         }}
       >
-        {/* Card wrapper with fly-in animation */}
+        {/* Animation wrapper - handles fly-in */}
         <div
-          className="game-latest-card-wrapper dropzone"
-          id={`${position.y}-${position.x}`}
+          className="game-latest-card-wrapper"
           css={{
             position: 'relative',
             width: '100%',
             height: '100%',
-            pointerEvents: 'auto',
             animationName: 'cardFlyIn',
             animationDuration: '400ms',
             animationTimingFunction: 'ease-out',
             animationFillMode: 'forwards',
-            transition: 'transform 150ms ease-out, box-shadow 150ms ease-out',
-            borderRadius: 16,
-            // Hover effect when dragging a card over this card
-            '&.drop-target': {
-              transform: 'scale(1.05)',
-              boxShadow: `0 0 20px 8px ${playerColor}80`,
-            },
           }}
         >
-        {/* The actual card component */}
-        <Card
-          card={cardData}
-          animated={!!card.videoUrl && card.isNft}
-          isStatic={true}
-          noShadow={false}
-          css={{
-            outline: `3px solid ${playerColor}`,
-            borderRadius: 16,
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
-          }}
-        />
+          {/* Dropzone wrapper - handles drag hover effect */}
+          <div
+            className="dropzone"
+            id={`${position.y}-${position.x}`}
+            css={{
+              width: '100%',
+              height: '100%',
+              pointerEvents: 'auto',
+              borderRadius: 16,
+              transition: 'transform 150ms ease-out, box-shadow 150ms ease-out',
+              // Hover effect when dragging a card over this card
+              '&.drop-target': {
+                transform: 'scale(1.05)',
+                boxShadow: `0 0 20px 8px ${playerColor}80`,
+              },
+            }}
+          >
+            {/* The actual card component */}
+            <Card
+              card={cardData}
+              animated={!!card.videoUrl && card.isNft}
+              isStatic={true}
+              noShadow={false}
+              css={{
+                outline: `3px solid ${playerColor}`,
+                borderRadius: 16,
+                boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>

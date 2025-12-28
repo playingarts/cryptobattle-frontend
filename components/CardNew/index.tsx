@@ -48,7 +48,7 @@ const Card: FC<Props> = ({
     <div
       {...props}
       css={(theme) => ({
-        "&:hover": {
+        "&:hover": isGameBoard ? {} : {
           color: "rgba(10, 10, 10, 0.7)",
         },
         transition: theme.transitions.fast("color"),
@@ -59,10 +59,10 @@ const Card: FC<Props> = ({
         fontsize: 18,
         lineheight: 21,
         position: "relative",
-        background: hovered && isGameBoard ? "#fff" : "transparent",
+        background: "transparent",
       })}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      onMouseEnter={() => !isGameBoard && setHover(true)}
+      onMouseLeave={() => !isGameBoard && setHover(false)}
     >
       {/* {isGameBoard && selectedCard && 
         <div
