@@ -13,8 +13,8 @@ import { PendingAnimation } from '../types/game';
 import { GameAction } from '../store/gameActions';
 import { logAnimation } from '../utils/debug';
 
-// Animation duration matches CSS (800ms) + buffer for smoothness
-const ANIMATION_DURATION_MS = 1000;
+// Animation duration matches CSS (400ms) + buffer for smoothness
+const ANIMATION_DURATION_MS = 500;
 
 interface UseAnimationQueueOptions {
   pendingAnimation: PendingAnimation | null;

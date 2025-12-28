@@ -121,7 +121,7 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
           width: '100%',
           height: '100%',
           animationName: 'cardFlyIn',
-          animationDuration: '800ms',
+          animationDuration: '400ms',
           animationTimingFunction: 'ease-out',
           animationFillMode: 'forwards',
         }}

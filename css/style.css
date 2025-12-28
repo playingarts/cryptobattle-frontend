@@ -438,8 +438,8 @@ html {
 /* Score popup animation - grows and fades */
 .game-latest-card-wrapper .game-latest-card__score {
   animation-name: scorePopup;
-  animation-delay: 400ms;
-  animation-duration: 600ms;
+  animation-delay: 200ms;
+  animation-duration: 300ms;
   animation-fill-mode: both;
 }
 
