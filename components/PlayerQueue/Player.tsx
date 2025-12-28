@@ -34,10 +34,6 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
 
     const { results, state } = useGame()
 
-    // Detect if player is a bot and use gray color
-    const isBot = player.username?.toLowerCase().includes('bot')
-    const playerColor = isBot ? '#4c4c4c' : player.color
-
     // Track when current player changes (new turn starts)
     const prevCurrentPlayerRef = useRef<string | null>(null)
 
@@ -140,7 +136,7 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
             // Customize the path, i.e. the "completed progress"
             path: {
               // Path color
-              stroke: inactive ? 'gray' : playerColor,
+              stroke: inactive ? 'gray' : player.color,
               // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
               strokeLinecap: "butt",
               // No CSS transition - we use requestAnimationFrame for smooth 60fps updates
@@ -192,14 +188,14 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
                 borderRadius: 9999,
                 zIndex: 999999,
                 paddingTop: 10,
-                // outline: "6px solid" + playerColor,
+                // outline: "6px solid" + player.color,
                 justifyContent: "center",
                 alignItems: "center",
                 fontSize: 60,
                 fontFamily: "Aldrich",
                 position: "absolute",
                 color: "#fff",
-                background: playerColor,
+                background: player.color,
                 bottom: 0,
                 top: 0,
                 left: 0,
@@ -248,10 +244,10 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
           >
             <UserAvatar
               css={{
-                // outline: "6px solid" + playerColor,
+                // outline: "6px solid" + player.color,
                 zIndex: 0,
                 "&:hover": {
-                  background: playerColor,
+                  background: player.color,
                 },
                 transform: 'scale(0.84,0.84)'
               }}

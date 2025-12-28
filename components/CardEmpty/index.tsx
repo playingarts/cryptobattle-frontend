@@ -55,7 +55,7 @@ const Card: FC<Props> = ({
               height: theme.spacing(height),
               borderRadius: theme.spacing(1.5),
               border: isPlaceholder ? "0" : "3px dashed #333",
-              background: isPlaceholder ? "#1A1A1A" : "transparent",
+              background: isPlaceholder ? "#181818" : "transparent",
               transition: 'all 400ms',
               "&:hover": {
               border: isPlaceholder ? "0" : "3px dashed #444",
