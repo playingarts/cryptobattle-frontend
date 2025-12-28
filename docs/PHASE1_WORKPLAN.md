@@ -1,68 +1,81 @@
-# Phase 1: GameProvider Refactor - Detailed Workplan
+# Phase 1: Atomic State Migration - Detailed Workplan
 
-**Goal:** Move game state management to reducer, make it the single source of truth
-
----
-
-## Current State Analysis
-
-### GameProvider useState Inventory (16 total)
-
-| State Variable | Used For | Decision |
-|---------------|----------|----------|
-| `gameState` | Board, cards, turn, placements | **MOVE TO REDUCER** |
-| `isMyTurn` | Turn indicator | **DERIVE FROM REDUCER** |
-| `playersGame` | Players with points | **MOVE TO REDUCER** (it's `allGamePlayers`) |
-| `selectedCard` | Currently selected card in hand | **KEEP** (UI state, not game state) |
-| `players` | Room players (lobby) | **KEEP** (room state, not game state) |
-| `playersInfo` | Fetched player details | **KEEP** (cache, not game state) |
-| `roomInfo` | Room metadata | **KEEP** (room state) |
-| `roomId` | Current room ID | **KEEP** (room state) |
-| `results` | Game results | **KEEP** (results flow) |
-| `timer` | Countdown timer | **KEEP** (UI state) |
-| `totalSeconds` | Timer total | **KEEP** (UI state) |
-| `isBackendReady` | WS connected | **KEEP** (connection state) |
-| `isAlreadyConnected` | Duplicate tab detection | **KEEP** (connection state) |
-| `userInfo` | Current user WS info | **KEEP** (user state) |
-| `userSocketIdle` | Idle detection | **KEEP** (connection state) |
-| `playingAgain` | Play again flow | **KEEP** (UI state) |
-
-### What Consumers Need
-
-| Consumer | Currently Uses | After Refactor |
-|----------|---------------|----------------|
-| `GameBoard` | `gameState`, `isMyTurn`, `players`, `selectedCard` | `state` (from reducer), `players`, `selectedCard` |
-| `GameInventory` | `gameState.turnForPlayer`, `selectedCard`, `players` | `state.serverState.turnForPlayer`, `selectedCard`, `players` |
-| `pages/play` | `gameState.gameUsersWithCards`, `isBackendReady` | `state.serverState`, `isBackendReady` |
+**Goal:** Replace ALL game state with reducer in ONE atomic change
+**Principle:** NO DUAL STATE - delete old, not "keep temporarily"
 
 ---
 
-## Step-by-Step Implementation
+## Overview
 
-### Step 1.1: Add reducer to GameProvider
+This is a single atomic commit that:
+1. Adds reducer to GameProvider
+2. DELETES all useState that the reducer replaces
+3. Updates ALL consumers in the same commit
+4. Deletes global state module
+
+If any part breaks, we revert the whole commit. No partial state.
+
+---
+
+## Pre-Flight Checklist
+
+Before starting:
+- [ ] On branch `rebuild/gameboard-v2`
+- [ ] `yarn lint:tsc` passes
+- [ ] `yarn test` passes
+- [ ] Understand what `state.serverState` and `state.board` contain
+
+---
+
+## Step 1: Modify GameProvider
+
 **File:** `components/GameProvider/index.tsx`
 
+### 1.1 Add imports
+
 ```typescript
-// Add import
 import { useReducer } from 'react';
 import { gameReducer, initialGameState, GameReducerState } from '../../store/gameReducer';
-import { gameStateReceived, setCurrentPlayer } from '../../store/gameActions';
+import {
+  gameStateReceived,
+  setCurrentPlayer,
+  GameAction
+} from '../../store/gameActions';
+```
 
-// Add reducer hook (after other useState declarations)
+### 1.2 Add reducer hook
+
+After the WSProvider line (~line 85):
+```typescript
+// SINGLE SOURCE OF TRUTH for game state
 const [state, dispatch] = useReducer(gameReducer, initialGameState);
 ```
 
-**Validation:** App compiles, no runtime errors
+### 1.3 DELETE these useState declarations
 
----
+Remove completely:
+```typescript
+// DELETE: const [gameState, setGameState] = useState<any>(null);
+// DELETE: const [isMyTurn, setIsMyTurn] = useState<any>(null);
+// DELETE: const [playersGame, setPlayersGame] = useState<any>([]);
+```
 
-### Step 1.2: Dispatch SET_CURRENT_PLAYER when user is known
-**File:** `components/GameProvider/index.tsx`
+### 1.4 DELETE these useEffects
 
-Add useEffect to set current player when auth user is available:
+Remove the useEffect that syncs isMyTurn/playersGame (~line 267-274):
+```typescript
+// DELETE THIS ENTIRE BLOCK:
+// useEffect(() => {
+//   if (!gameState) { return; }
+//   setIsMyTurn(user.userId === gameState.turnForPlayer);
+//   setPlayersGame(gameState.allGamePlayers);
+// }, [gameState]);
+```
+
+### 1.5 Add useEffect to set current player
 
 ```typescript
-// After user is known from auth, set it in reducer
+// Set current player in reducer when user is authenticated
 useEffect(() => {
   if (user?.userId) {
     dispatch(setCurrentPlayer(user.userId));
@@ -70,210 +83,519 @@ useEffect(() => {
 }, [user?.userId]);
 ```
 
-**Validation:** Console log in reducer shows SET_CURRENT_PLAYER action
-
----
-
-### Step 1.3: Dispatch GAME_STATE_RECEIVED on game-updated event
-**File:** `utils/wsEventHandlers.ts`
-
-Modify `handleGameUpdated` to also dispatch to reducer:
-
-```typescript
-// Current code sets gameState via useState
-setters.setGameState({ ...data });
-
-// ADD: Also dispatch to reducer
-if (deps.dispatch) {
-  deps.dispatch(gameStateReceived(data));
-}
-```
-
-**Also update HandlerDependencies type:**
-```typescript
-export interface HandlerDependencies {
-  // ... existing fields
-  dispatch?: (action: GameAction) => void;  // Add this
-}
-```
-
-**Validation:** Console shows GAME_STATE_RECEIVED in reducer when game updates
-
----
-
-### Step 1.4: Update context type and value
-**File:** `components/GameProvider/index.tsx`
-
-Update `IGameProviderContext`:
+### 1.6 Update context type
 
 ```typescript
 export type IGameProviderContext = {
-  // NEW - reducer state and dispatch
+  // NEW: Reducer state and dispatch
   state: GameReducerState;
   dispatch: React.Dispatch<GameAction>;
 
-  // KEEP - these stay as useState
+  // KEEP: Room/lobby state (separate concern)
   players: any;
-  playersGame: any;  // Will derive from state.serverState.allGamePlayers later
   roomId: any;
-  userInfo: any;
   roomInfo: any;
-  selectedCard: any;
-  setSelectedCard: any;
   setRoomId: any;
   setPlayers: any;
+
+  // KEEP: UI state
+  selectedCard: any;
+  setSelectedCard: any;
   timer: any;
   totalSeconds: any;
+
+  // KEEP: Results flow
   results: any;
-  userSocketIdle: any;
-  setUserSocketIdle: any;
+
+  // KEEP: Connection state
+  userInfo: any;
   isBackendReady: boolean;
   isAlreadyConnected: boolean;
-
-  // DEPRECATED - will remove in Phase 2
-  gameState: any;  // Keep temporarily for backwards compat
-  isMyTurn: any;   // Keep temporarily for backwards compat
+  userSocketIdle: any;
+  setUserSocketIdle: any;
 };
 ```
 
-Update `memoedValue`:
+### 1.7 Update memoedValue
+
 ```typescript
 const memoedValue = useMemo(
   () => ({
-    // NEW
     state,
     dispatch,
-
-    // Existing...
-    gameState,  // Temporary - remove in Phase 2
-    isMyTurn,   // Temporary - remove in Phase 2
     players,
-    playersGame,
-    // ... rest
+    roomId,
+    roomInfo,
+    selectedCard,
+    setSelectedCard,
+    setRoomId,
+    setPlayers,
+    timer,
+    totalSeconds,
+    results,
+    userInfo,
+    isBackendReady,
+    isAlreadyConnected,
+    userSocketIdle,
+    setUserSocketIdle,
   }),
-  [state, dispatch, gameState, isMyTurn, players, /* ... */]
+  [
+    state,
+    players,
+    roomId,
+    roomInfo,
+    selectedCard,
+    timer,
+    totalSeconds,
+    results,
+    userInfo,
+    isBackendReady,
+    isAlreadyConnected,
+    userSocketIdle,
+  ]
 );
 ```
 
-**Validation:** TypeScript compiles, context provides state and dispatch
+### 1.8 Update handler dependencies
 
----
-
-### Step 1.5: Pass dispatch to WS handler dependencies
-**File:** `components/GameProvider/index.tsx`
-
-In the useEffect that sets up WS handlers:
+In the WS setup useEffect, update handlerDeps:
 
 ```typescript
 const handlerDeps: HandlerDependencies = {
-  // ... existing fields
-  dispatch,  // ADD THIS
+  notifications: { openNotification, closeNotification },
+  stateSetters: {
+    setTimer,
+    setTotalSeconds,
+    setUserSocketIdle,
+    setUserInfo,
+    setIsBackendReady,
+    setRoomId,
+    setResults,
+    setRoomInfo,
+    setPlayers,
+    setPlayingAgain,
+    setIsAlreadyConnected,
+    // REMOVE: setGameState - no longer exists
+  },
+  dispatch,  // ADD: dispatch for reducer actions
+  router,
+  wsProvider: WSProvider,
+  // ... rest stays same
 };
 ```
 
-**Validation:** reducer receives GAME_STATE_RECEIVED when game-updated fires
-
 ---
 
-### Step 1.6: Derive isMyTurn from reducer state
-**File:** `components/GameProvider/index.tsx`
+## Step 2: Modify wsEventHandlers.ts
 
-Replace the derived `isMyTurn` logic:
-
-```typescript
-// REMOVE this useEffect:
-// useEffect(() => {
-//   if (!gameState) return;
-//   setIsMyTurn(user.userId === gameState.turnForPlayer);
-//   setPlayersGame(gameState.allGamePlayers);
-// }, [gameState]);
-
-// The reducer already computes isMyTurn in state.isMyTurn
-// Consumers will use state.isMyTurn instead
-```
-
-For backwards compatibility during transition, keep `isMyTurn` in context but derive it:
-
-```typescript
-// In memoedValue, derive from reducer:
-isMyTurn: state.isMyTurn,
-playersGame: state.serverState.allGamePlayers,
-```
-
-**Validation:** Turn changes work, card tray highlights correctly
-
----
-
-### Step 1.7: Verify game-info event also dispatches
 **File:** `utils/wsEventHandlers.ts`
 
-Check `handleGameInfo` - it also updates game state:
+### 2.1 Update HandlerDependencies type
+
+```typescript
+import { GameAction, gameStateReceived } from '../store/gameActions';
+
+export interface HandlerDependencies {
+  notifications: NotificationActions;
+  stateSetters: StateSetters;
+  dispatch: React.Dispatch<GameAction>;  // ADD
+  router: NextRouter;
+  // ... rest
+}
+```
+
+### 2.2 Update StateSetters - remove setGameState
+
+```typescript
+export interface StateSetters {
+  setTimer: (timer: number) => void;
+  setTotalSeconds: (seconds: number) => void;
+  setUserSocketIdle: (data: unknown) => void;
+  setUserInfo: (info: unknown) => void;
+  setIsBackendReady: (ready: boolean) => void;
+  setRoomId: (id: string) => void;
+  setResults: (results: unknown) => void;
+  setRoomInfo: (info: unknown) => void;
+  setPlayers: (players: unknown) => void;
+  setPlayingAgain: (playing: boolean | null) => void;
+  setIsAlreadyConnected: (connected: boolean) => void;
+  // REMOVE: setGameState - replaced by dispatch
+}
+```
+
+### 2.3 Update handleGameUpdated
+
+```typescript
+export function handleGameUpdated(
+  data: GameEventData,
+  dispatch: React.Dispatch<GameAction>,  // CHANGE parameter
+  notifications: NotificationActions,
+  router: NextRouter,
+  uiActions: Pick<UIActions, 'playStartGameSound'>
+): void {
+  // Dispatch to reducer instead of setState
+  dispatch(gameStateReceived(data as GameStatePayload));
+
+  setTimeout(() => {
+    if (data.state === 'started') {
+      notifications.closeNotification();
+      if (!isGameStarted() && !hasResults()) {
+        uiActions.playStartGameSound();
+        setGameStarted(true);
+      }
+      if (!window.location.pathname.split('?')[0].endsWith('/dashboard')) {
+        router.push('/play');
+      }
+    }
+  }, 0);
+}
+```
+
+### 2.4 Update handleGameInfo
 
 ```typescript
 export function handleGameInfo(
   data: GameEventData,
-  setters: Pick<StateSetters, 'setGameState'>,
-  getGameState: () => unknown,
+  dispatch: React.Dispatch<GameAction>,  // CHANGE parameter
   wsProvider: WSProviderType,
   notifications: NotificationActions,
-  renderQuitButton: () => ReactNode,
-  dispatch?: (action: GameAction) => void  // ADD
+  renderQuitButton: () => ReactNode
 ): void {
-  // ... existing code
+  if (data.state === 'ended' && hasResults()) {
+    return;
+  }
 
-  const currentState = getGameState();
-  const mergedState = { ...currentState as object, ...data };
-  setters.setGameState(mergedState);
+  // Dispatch to reducer
+  if (data.gameId) {
+    dispatch(gameStateReceived(data as GameStatePayload));
+  }
 
-  // ADD: Dispatch to reducer if we have full game state
-  if (dispatch && mergedState.gameId) {
-    dispatch(gameStateReceived(mergedState as GameStatePayload));
+  if (data.state === 'ended' && !hasResults()) {
+    wsProvider.send(JSON.stringify({ event: 'game-results', data: {} }));
+    notifications.openNotification({
+      title: 'Game Over!',
+      dark: true,
+      iconColor: 'blue',
+      footer: renderQuitButton(),
+    });
   }
 }
 ```
 
-**Validation:** Initial game load populates reducer state
+### 2.5 Update createWSMessageHandler
+
+Update the calls to handleGameUpdated and handleGameInfo:
+
+```typescript
+// Game updated
+if (event.event === 'game-updated') {
+  handleGameUpdated(
+    eventData,
+    deps.dispatch,  // Pass dispatch instead of setters
+    deps.notifications,
+    deps.router,
+    deps.uiActions
+  );
+}
+
+// Game info
+if (event.event === 'game-info') {
+  handleGameInfo(
+    eventData,
+    deps.dispatch,  // Pass dispatch instead of setters/getGameState
+    deps.wsProvider,
+    deps.notifications,
+    deps.renderQuitButton
+  );
+}
+```
+
+---
+
+## Step 3: Update GameBoard
+
+**File:** `components/GameBoard/index.tsx`
+
+### 3.1 Update imports and useGame destructuring
+
+```typescript
+const { state, dispatch, players, selectedCard } = useGame();
+
+// Derive what we need from reducer state
+const board = state.board;
+const isMyTurn = state.isMyTurn;
+const gameState = state.serverState;  // For allowedUserCardsPlacement access
+const pendingAnimation = state.pendingAnimation;
+```
+
+### 3.2 DELETE local state
+
+Remove:
+```typescript
+// DELETE: const [reducerState, dispatch] = useReducer(gameReducer, initialGameState);
+// DELETE: const [board, setBoard] = useState(() => generateBoard(7, 5));
+// DELETE: const [lastPlayedCard, setLastPlayedCard] = useState<NormalizedCard | null>(null);
+// DELETE: const animatingCardIdRef = useRef<string | null>(null);
+// DELETE: const lastProcessedServerCardRef = useRef<string | null>(null);
+```
+
+### 3.3 DELETE legacy functions
+
+Remove:
+```typescript
+// DELETE: function generateBoard(x, y) { ... }
+// DELETE: const startAnimation = useCallback(...)
+// DELETE: const addCardToBoard = useCallback(...)
+```
+
+### 3.4 DELETE sync useEffects
+
+Remove:
+```typescript
+// DELETE: useEffect for setGlobalSelectedCard
+// DELETE: useEffect for setGlobalState
+// DELETE: useEffect that dispatches gameStateReceived (now done in GameProvider)
+// DELETE: useEffect that syncs board from gameState (lines 295-361)
+```
+
+### 3.5 Update addCard function
+
+```typescript
+const addCard = useCallback(
+  (rowIndex: number, columnIndex: number, card = selectedCard) => () => {
+    if (!card || !gameState) {
+      return;
+    }
+
+    const allowedPlacement = gameState.allowedUserCardsPlacement?.additionalProperties?.[
+      `${columnIndex}-${rowIndex}`
+    ];
+
+    if (!allowedPlacement) {
+      // Show error feedback
+      setCardError([rowIndex, columnIndex]);
+      setTimeout(() => setCardError([]), 1000);
+      return;
+    }
+
+    // Validate card is allowed
+    const isAllowed = allowedPlacement.some(
+      (allowed: { suit: string; value: string }) =>
+        (allowed.value === 'joker' && card.value === 'joker') ||
+        (allowed.suit.toLowerCase() === card.suit.toLowerCase() &&
+         allowed.value === card.value)
+    );
+
+    if (!isAllowed) {
+      setCardError([rowIndex, columnIndex]);
+      setTimeout(() => setCardError([]), 1000);
+      return;
+    }
+
+    // Create normalized card
+    const normalizedCard: NormalizedCard = {
+      id: card.id || `${card.suit}-${card.value}-${gameState.turnForPlayer}`,
+      suit: card.suit.toLowerCase(),
+      value: String(card.value).toLowerCase(),
+      userId: gameState.turnForPlayer,
+      powerLevel: card.powerLevel,
+      scoringLevel: 0,
+      imageUrl: card.imageUrl || card.img,
+      videoUrl: card.videoUrl || card.video,
+      isNft: !!card.id && card.id !== '',
+    };
+
+    const position = { x: columnIndex, y: rowIndex };
+    const moveKey = generateMoveKey(normalizedCard, position);
+
+    // Dispatch to reducer (optimistic update)
+    dispatch(localMoveInitiated({
+      moveKey,
+      card: normalizedCard,
+      position,
+      playerId: gameState.turnForPlayer,
+      timestamp: Date.now(),
+      isLocal: true,
+      confirmed: false,
+    }));
+
+    // Send to server
+    WSProvider.send(JSON.stringify({
+      event: 'play-card',
+      data: {
+        action: 'move',
+        x: columnIndex,
+        y: rowIndex,
+        suit: card.suit,
+        value: card.value.toString(),
+        nftId: card.id || '',
+      },
+    }));
+  },
+  [WSProvider, selectedCard, gameState, dispatch]
+);
+```
+
+### 3.6 Update useAnimationQueue hook usage
+
+```typescript
+const { currentAnimation } = useAnimationQueue({
+  pendingAnimation: state.pendingAnimation,
+  dispatch,
+});
+```
+
+### 3.7 Update board rendering
+
+The board rendering loop should use `state.board` (already assigned to `board` variable).
+
+Keep `cardError` as local useState (it's UI feedback, not game state).
+
+---
+
+## Step 4: Update GameInventory
+
+**File:** `components/GameInventory/index.tsx`
+
+### 4.1 Update useGame destructuring
+
+```typescript
+const { state, selectedCard, setSelectedCard, players } = useGame();
+const { user } = useAuth();
+
+// Derive turn info from reducer state
+const isMyTurn = state.serverState.turnForPlayer === user.userId;
+```
+
+### 4.2 Replace gameState references
+
+Find/replace:
+- `gameState?.turnForPlayer` → `state.serverState?.turnForPlayer`
+- `gameState?.turnForPlayer === user.userId` → `isMyTurn`
+
+---
+
+## Step 5: Update pages/play
+
+**File:** `pages/play/index.tsx`
+
+### 5.1 Update useGame destructuring
+
+```typescript
+const { state, isBackendReady, isAlreadyConnected } = useGame();
+```
+
+### 5.2 Replace gameState references
+
+```typescript
+// Change:
+// const cards = gameState.gameUsersWithCards.filter(...)
+// To:
+const gameUsersWithCards = state.serverState?.gameUsersWithCards || [];
+const cards = gameUsersWithCards.filter(
+  (userCards: any) => userCards.userId === user.userId
+)[0]?.cards || [];
+```
+
+### 5.3 Update conditionals
+
+```typescript
+// Change: if (!gameState) return;
+// To: if (!state.serverState?.gameId) return;
+```
+
+---
+
+## Step 6: Delete utils/gameState.ts
+
+**File:** `utils/gameState.ts`
+
+Delete the entire file.
+
+Then find and remove all imports of it:
+```bash
+grep -r "from.*gameState" --include="*.tsx" --include="*.ts"
+```
+
+Remove these imports and any usage of:
+- `setGlobalSelectedCard`, `getGlobalSelectedCard`
+- `setGlobalState`, `getGlobalState`
+- `setGameStarted`, `isGameStarted` (keep only if used outside game board)
+- etc.
+
+**Note:** Some functions like `isGameStarted()`, `hasResults()` are used in wsEventHandlers. We may need to keep a minimal version or pass these as params.
+
+---
+
+## Step 7: Fix Remaining Imports/References
+
+Run TypeScript check:
+```bash
+yarn lint:tsc
+```
+
+Fix any remaining type errors from:
+- Missing imports
+- Changed function signatures
+- Removed properties from context
 
 ---
 
 ## Validation Checklist
 
-After completing all steps:
+After ALL changes are complete:
 
-- [ ] App loads without errors
-- [ ] Console shows `SET_CURRENT_PLAYER` when user authenticates
-- [ ] Console shows `GAME_STATE_RECEIVED` when joining/starting game
-- [ ] `state.serverState` contains game data (check React DevTools)
-- [ ] `state.board` is populated with cells
-- [ ] `state.isMyTurn` updates when turn changes
-- [ ] Existing game flow still works (backwards compat via legacy `gameState`)
-
----
-
-## Files Changed
-
-| File | Changes |
-|------|---------|
-| `components/GameProvider/index.tsx` | Add reducer, update context type, pass dispatch |
-| `utils/wsEventHandlers.ts` | Add dispatch param, call reducer actions |
-| `store/gameActions.ts` | Possibly export action types for handler |
+- [ ] `yarn lint:tsc` passes (no type errors)
+- [ ] `yarn test` passes (existing tests work)
+- [ ] `yarn dev` starts without errors
+- [ ] Open browser, login works
+- [ ] Create room works
+- [ ] Second player can join
+- [ ] Start game works
+- [ ] Board renders with initial card
+- [ ] Can place a card (dispatches to reducer)
+- [ ] Opponent sees the card
+- [ ] Animation plays
+- [ ] Turn changes
+- [ ] Game ends, results show
 
 ---
 
-## Rollback Plan
+## Commit
 
-If something breaks:
-1. Remove `dispatch` from handler dependencies
-2. Remove `state` and `dispatch` from context
-3. Remove reducer import and useReducer call
-4. Commit is isolated, easy to revert
+Only after ALL validation passes:
+
+```bash
+git add -A
+git commit -m "feat: Atomic migration to reducer-based game state
+
+BREAKING: Complete replacement of game state management
+
+- Add useReducer(gameReducer) to GameProvider
+- DELETE gameState/isMyTurn/playersGame useState
+- DELETE utils/gameState.ts global state module
+- Update wsEventHandlers to dispatch actions
+- Update GameBoard to read state.board
+- Update GameInventory to read state.serverState
+- Update pages/play to read state.serverState
+
+NO DUAL STATE - single source of truth via reducer.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+```
 
 ---
 
-## Next Phase Preview
+## If Something Breaks
 
-After Phase 1 is validated, Phase 2 will:
-1. Update GameBoard to read from `state.board` instead of local useState
-2. Update GameBoard to use `state.isMyTurn` instead of context `isMyTurn`
-3. Remove legacy `gameState` and `isMyTurn` from context
-4. Remove the duplicate useEffect that syncs to local board state
+```bash
+# Discard all changes, go back to clean state
+git checkout -- .
+
+# Or if already committed
+git reset --hard HEAD~1
+```
+
+The branch provides isolation. Main is untouched.
