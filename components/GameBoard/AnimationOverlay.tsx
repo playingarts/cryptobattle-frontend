@@ -97,7 +97,7 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
     return null;
   }
 
-  const { card, scoringLevel, moveKey } = animation;
+  const { card, moveKey } = animation;
 
   return (
     <div
@@ -138,26 +138,6 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
           }}
         />
-
-        {/* Score popup overlay */}
-        <div
-          className="game-latest-card__score"
-          css={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            color: '#fff',
-            fontSize: 100,
-            fontFamily: 'Aldrich, sans-serif',
-            fontWeight: 'bold',
-            textShadow: '2px 2px 8px rgba(0, 0, 0, 0.7)',
-            pointerEvents: 'none',
-            zIndex: 10,
-          }}
-        >
-          +{scoringLevel}
-        </div>
       </div>
     </div>
   );

@@ -359,27 +359,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
                   />
                 )}
 
-                {/* Animation overlay for last played card */}
-                {topCard &&
-                  lastPlayedCard?.value === topCard.value &&
-                  lastPlayedCard?.suit?.toLowerCase() === topCard.suit?.toLowerCase() &&
-                  (lastPlayedCard?.id || topCard.id
-                    ? lastPlayedCard?.id === topCard.id
-                    : true) && (
-                    <div
-                      key={currentAnimation?.moveKey || 'animation'}
-                      className="game-latest-card"
-                      css={{
-                        background: getColor(topCard.userId || '')(),
-                        outlineColor: getColor(topCard.userId || '')(),
-                        zIndex: 9999,
-                      }}
-                    >
-                      <div className="game-latest-card__score">
-                        +{lastPlayedCard?.scoringLevel || 0}
-                      </div>
-                    </div>
-                  )}
 
                 {/* Drop target cell (can place cards here) */}
                 {showDropTarget && (
