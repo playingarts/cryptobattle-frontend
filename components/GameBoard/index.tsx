@@ -14,7 +14,7 @@
  * - Move key-based animation deduplication
  */
 
-import { FC, useState, useEffect, useCallback, useRef, HTMLAttributes, useReducer } from "react";
+import { FC, useState, useEffect, useCallback, useRef, HTMLAttributes } from "react";
 import Card from "../../components/CardNew";
 import { getCard } from "../../components/Cards";
 import CardEmpty from "../../components/CardEmpty";
@@ -23,8 +23,7 @@ import { useWS } from "../WsProvider";
 import interact from "interactjs";
 import AnimationOverlay from "./AnimationOverlay";
 import { useAnimationQueue } from "../../hooks/useAnimationQueue";
-import { gameReducer, initialGameState } from "../../store/gameReducer";
-import { gameStateReceived, localMoveInitiated } from "../../store/gameActions";
+import { localMoveInitiated } from "../../store/gameActions";
 import { generateMoveKey } from "../../utils/moveUtils";
 import { NormalizedCard, GamePlayer } from "../../types/game";
 import { logAnimation, logGameState } from "../../utils/debug";
@@ -42,18 +41,20 @@ interface Props extends HTMLAttributes<HTMLElement> {
 
 const GameBoard: FC<Props> = ({ children, removeCard }) => {
   const WSProvider = useWS();
-  const { gameState, isMyTurn, players, selectedCard } = useGame();
+  // Use context state and dispatch from GameProvider
+  const { state, dispatch, players, selectedCard } = useGame();
 
-  // Use reducer for game state management
-  const [reducerState, dispatch] = useReducer(gameReducer, initialGameState);
+  // Derive values from context state
+  const gameState = state.serverState;
+  const isMyTurn = state.isMyTurn;
 
-  // Legacy board state for backwards compatibility during transition
+  // Legacy board state - TODO: migrate to state.board in future phase
   const [board, setBoard] = useState(() => generateBoard(7, 5));
   const [cardError, setCardError] = useState<number[]>([]);
 
-  // Animation queue management
+  // Animation queue management - uses context state
   const { currentAnimation } = useAnimationQueue({
-    pendingAnimation: reducerState.pendingAnimation,
+    pendingAnimation: state.pendingAnimation,
     dispatch,
   });
 
@@ -105,21 +106,18 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     setGlobalState(gameState);
   }, [gameState]);
 
-  // Dispatch game state to reducer when it changes
+  // Log game state changes (dispatch now handled by GameProvider)
   useEffect(() => {
-    if (!gameState) {
+    if (!gameState?.gameId) {
       return;
     }
 
-    logGameState("Received from provider", {
+    logGameState("State from context", {
       state: gameState.state,
       turnForPlayer: gameState.turnForPlayer,
       hasLastPlayedCard: !!gameState.lastPlayedCard,
     });
-
-    // Dispatch to reducer for new animation system
-    dispatch(gameStateReceived(gameState));
-  }, [gameState]);
+  }, [gameState?.gameId, gameState?.state, gameState?.turnForPlayer, gameState?.lastPlayedCard]);
 
   // Start animation for a card (legacy function - now wraps reducer)
   const startAnimation = useCallback((card: NormalizedCard, position: { x: number; y: number }, playSound = true) => {
@@ -293,19 +291,18 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
 
   // Process game state updates (legacy - sync board from server)
   useEffect(() => {
-    if (!gameState) {
+    if (!gameState?.gameId) {
       return;
     }
 
-    const tableCards = gameState.gameTableCards?.additionalProperties;
-    if (!tableCards) {
+    // Check if we have table cards
+    const hasTableCards = Object.keys(gameState.gameTableCards).length > 0;
+    if (!hasTableCards) {
       return;
     }
 
-    // Auto-pass if no valid placements
-    if (
-      Object.keys(gameState.allowedUserCardsPlacement?.additionalProperties || {}).length === 0
-    ) {
+    // Auto-pass if no valid placements (use normalized allowedPlacements from reducer)
+    if (Object.keys(gameState.allowedPlacements || {}).length === 0) {
       setTimeout(() => {
         WSProvider.send(
           JSON.stringify({
@@ -316,21 +313,23 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       }, 2000);
     }
 
-    // Sync board from server state
-    Object.keys(tableCards).forEach((key) => {
-      const cards = gameState.gameTableCards?.additionalProperties;
+    // Sync board from server state (using normalized gameTableCards from reducer)
+    const normalizedTableCards = gameState.gameTableCards;
+    Object.keys(normalizedTableCards).forEach((key) => {
       const indexes = key.split("-");
+      const cardsAtPosition = normalizedTableCards[key];
 
-      cards[key].forEach((card: NormalizedCard) => {
+      cardsAtPosition.forEach((card: NormalizedCard) => {
         const cardF = getCard(card.suit, card.value, card);
         addCardToBoard(Number(indexes[1]), Number(indexes[0]), cardF);
       });
     });
 
     // Handle opponent animations (legacy path)
-    if (gameState.lastPlayedCard) {
+    const lastPlayedCard = gameState.lastPlayedCard;
+    if (lastPlayedCard) {
       setGameStarted(true);
-      const serverCardId = `${gameState.lastPlayedCard.suit?.toLowerCase()}-${gameState.lastPlayedCard.value}`;
+      const serverCardId = `${lastPlayedCard.suit?.toLowerCase()}-${lastPlayedCard.value}`;
 
       // Only animate if this is a new card from server and we're not already animating it
       if (
@@ -338,18 +337,18 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         serverCardId !== animatingCardIdRef.current
       ) {
         const transformedCard = getCard(
-          gameState.lastPlayedCard.suit,
-          gameState.lastPlayedCard.value,
-          gameState.lastPlayedCard
+          lastPlayedCard.suit,
+          lastPlayedCard.value,
+          lastPlayedCard
         );
         // Find position of this card
         let cardPosition = { x: 0, y: 0 };
-        Object.keys(tableCards).forEach((key) => {
-          const cardsAtPos = tableCards[key];
+        Object.keys(normalizedTableCards).forEach((key) => {
+          const cardsAtPos = normalizedTableCards[key];
           const topCard = cardsAtPos[cardsAtPos.length - 1];
           if (topCard &&
-              topCard.suit?.toLowerCase() === gameState.lastPlayedCard.suit?.toLowerCase() &&
-              topCard.value === gameState.lastPlayedCard.value) {
+              topCard.suit?.toLowerCase() === lastPlayedCard.suit?.toLowerCase() &&
+              topCard.value === lastPlayedCard.value) {
             const [x, y] = key.split("-");
             cardPosition = { x: Number(x), y: Number(y) };
           }
@@ -358,7 +357,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       }
       lastProcessedServerCardRef.current = serverCardId;
     }
-  }, [gameState, startAnimation, addCardToBoard, WSProvider]);
+  }, [gameState?.gameTableCards, gameState?.lastPlayedCard, startAnimation, addCardToBoard, WSProvider]);
 
   // Set up drag and drop
   useEffect(() => {
