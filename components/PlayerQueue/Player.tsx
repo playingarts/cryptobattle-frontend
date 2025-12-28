@@ -60,9 +60,8 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
         return
       }
 
-      // If it's not this player's turn, show full
+      // If it's not this player's turn, freeze at current value (don't change progress)
       if (!isMyTurn) {
-        setProgress(100)
         prevCurrentPlayerRef.current = currentPlayerId
         return
       }
@@ -125,7 +124,8 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
               // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
               strokeLinecap: "butt",
               // Only animate countdown (progress decreasing), instant reset when increasing
-              transition: shouldAnimate ? "stroke-dashoffset linear 1000ms" : "none",
+              // Use 150ms transition for smooth updates with 100ms interval
+              transition: shouldAnimate ? "stroke-dashoffset linear 150ms" : "none",
               // Rotate the path
               transform: "rotate(0.25turn)",
               transformOrigin: "center center",
