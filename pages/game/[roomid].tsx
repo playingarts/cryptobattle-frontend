@@ -50,6 +50,7 @@ const JoinGame: NextPage = () => {
 
   const startGame = () => {
     const startGameEvent = () => {
+      setIsStartGameLoading(true);
       WSProvider.send(
         JSON.stringify({
           event: "start-game",
@@ -100,6 +101,7 @@ const JoinGame: NextPage = () => {
   const [allReady, setAllReady] = useState(false);
 
   const [startGameDisabled, setStartGameDisabled] = useState(true);
+  const [isStartGameLoading, setIsStartGameLoading] = useState(false);
 
   useEffect(() => {
     if (!userSocketIdle) {
@@ -354,7 +356,8 @@ const JoinGame: NextPage = () => {
 
   const startGameButton = (
     <Button
-      disabled={startGameDisabled}
+      disabled={startGameDisabled || isStartGameLoading}
+      loading={isStartGameLoading}
       css={() => ({
         background: "#7B61FF",
         color: "#fff",

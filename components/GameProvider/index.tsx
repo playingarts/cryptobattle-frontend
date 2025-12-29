@@ -7,6 +7,7 @@ import {
   useEffect,
   useCallback,
   useReducer,
+  useRef,
 } from "react";
 import { useNotifications } from "../NotificationProvider";
 import Text from "../Text/";
@@ -98,6 +99,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   const [userInfo, setUserInfo] = useState<any>([]);
 
   const [isBackendReady, setIsBackendReady] = useState(false);
+  const [isNewGameLoading, setIsNewGameLoading] = useState(false);
+
+  // Flag to prevent redirect after intentional exit (quit/newGame/playAgainQuit)
+  const hasIntentionallyLeftRef = useRef(false);
 
   // Use useWS(false) to not throw when there's no connection
   const WSProvider = useWS(false);
@@ -119,6 +124,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   };
 
   const quit = () => {
+    hasIntentionallyLeftRef.current = true;
     localStorage.setItem("chosen-nfts", "");
 
     setResults(null);
@@ -134,6 +140,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   };
 
   const newGame = () => {
+    setIsNewGameLoading(true);
+    hasIntentionallyLeftRef.current = true;
     setResults(null);
     localStorage.setItem("chosen-nfts", "");
 
@@ -145,6 +153,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   };
 
   const playAgainQuit = () => {
+    hasIntentionallyLeftRef.current = true;
     if (WSProvider) {
       WSProvider.send(
         JSON.stringify({
@@ -200,7 +209,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       asPath: actualPath,
     });
 
-    if (isAlreadyConnected || !user || isGameStarted()) {
+    if (isAlreadyConnected || !user || isGameStarted() || hasIntentionallyLeftRef.current) {
       console.log('[DEBUG GameProvider] Skipping redirect - early return conditions met');
       return;
     }
@@ -232,14 +241,13 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   useEffect(() => {
     return () => {
-      // Cleanup on unmount
+      // Cleanup on unmount - don't dispatch as component may be unmounting
       setPlayingAgain(false);
       localStorage.removeItem("play-again");
       localStorage.setItem("chosen-nfts", "");
       setGameStarted(false);
-      dispatch(resetGame());
     };
-  }, [dispatch]);
+  }, []);
 
   const playAgain = () => {
     setPlayingAgain(true);
@@ -337,11 +345,13 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           margin: "10px auto",
         })}
         onClick={newGame}
+        loading={isNewGameLoading}
+        disabled={isNewGameLoading}
       >
         New Game
       </Button>
     </div>
-  ), [newGame]);
+  ), [newGame, isNewGameLoading]);
   const renderDashboardButton = useCallback(() => (
     <div css={{ display: "flex" }}>
       <Button onClick={quit}>Quit</Button>
