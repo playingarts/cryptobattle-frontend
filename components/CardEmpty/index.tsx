@@ -16,9 +16,11 @@ interface Props extends HTMLAttributes<HTMLElement> {
 
 const Card: FC<Props> = ({
   size,
-  isPlaceholder: _isPlaceholder = false,
-  selectedCard: _selectedCard,
   containerStyles,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  isPlaceholder,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  selectedCard,
   ...props
 }) => {
   const width = size === "big" ? 37 : 21;
