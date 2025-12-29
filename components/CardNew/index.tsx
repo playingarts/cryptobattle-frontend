@@ -1,5 +1,6 @@
 import { FC, HTMLAttributes, useRef } from "react";
 import { useState } from "react";
+import { Interpolation, Theme } from "@emotion/react";
 import { theme } from "../../pages/_app";
 import Image from "next/image";
 import Loader from "../Loader";
@@ -21,6 +22,7 @@ interface Props extends HTMLAttributes<HTMLElement> {
   noShadow?: boolean;
   index?: number;
   selectedCard?: any;
+  css?: Interpolation<Theme>;
 }
 
 const Card: FC<Props> = ({
