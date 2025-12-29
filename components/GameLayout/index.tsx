@@ -63,19 +63,20 @@ const GameLayout: FC<
           ownerId: roomInfo?.ownderId,
         });
 
+        // Set flag to prevent redirect back to game (persists across navigation)
+        localStorage.setItem("intentional-leave", "true");
+
         // Clear local state first
         setPlayers(null);
         localStorage.setItem("chosen-nfts", "");
         setGameStarted(false);
 
-        // Send appropriate event based on ownership
-        // Owner sends close-room (ends game for all), non-owner sends quit-room
+        // Send quit-game event to clear server's inGameId
         if (WSProvider) {
-          const eventName = isOwner ? "close-room" : "quit-room";
-          console.log(`[DEBUG GameLayout leave] Sending ${eventName} event, isOwner: ${isOwner}`);
+          console.log('[DEBUG GameLayout leave] Sending quit-game event');
           WSProvider.send(
             JSON.stringify({
-              event: eventName,
+              event: "quit-game",
               data: {},
             })
           );
