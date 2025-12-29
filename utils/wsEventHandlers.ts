@@ -236,8 +236,22 @@ export function handleUserInfo(data: UserInfoEventData, deps: HandlerDeps): Hand
 export function handleCreateRoom(data: CreateRoomEventData, deps: HandlerDeps): HandlerResult {
   console.log('[DEBUG create-room] Response received:', data);
 
+  const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+  const isOnNewPage = currentPath === '/new';
+
   if (data.error) {
     console.log('[DEBUG create-room] ERROR:', data.error.message);
+    // If on /new page, retry after a delay (quit-game might still be processing)
+    if (isOnNewPage) {
+      console.log('[DEBUG create-room] On /new page, retrying in 500ms...');
+      setTimeout(() => {
+        deps.wsProvider.send(JSON.stringify({
+          event: 'create-room',
+          data: { type: 'private', maxPlayers: 10 },
+        }));
+      }, 500);
+      return CONTINUE;
+    }
     deps.router.push('/dashboard');
     return CONTINUE;
   }
@@ -247,7 +261,18 @@ export function handleCreateRoom(data: CreateRoomEventData, deps: HandlerDeps): 
     deps.stateSetters.setRoomId(data.roomId);
     deps.wsProvider.send(JSON.stringify({ event: 'room-info', data: {} }));
   } else {
-    console.log('[DEBUG create-room] WARNING: No roomId in response, redirecting to dashboard');
+    console.log('[DEBUG create-room] WARNING: No roomId in response');
+    // If on /new page, retry instead of redirecting
+    if (isOnNewPage) {
+      console.log('[DEBUG create-room] On /new page, retrying in 500ms...');
+      setTimeout(() => {
+        deps.wsProvider.send(JSON.stringify({
+          event: 'create-room',
+          data: { type: 'private', maxPlayers: 10 },
+        }));
+      }, 500);
+      return CONTINUE;
+    }
     deps.router.push('/dashboard');
   }
   return CONTINUE;
