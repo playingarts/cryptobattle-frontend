@@ -213,7 +213,7 @@ const JoinGame: NextPage = () => {
     const leave = () => {
       const sendLeaveEvent = () => {
         setPlayers(null);
-        localStorage.setItem("chosen-nft", JSON.stringify(null));
+        localStorage.setItem("chosen-nfts", "");
         WSProvider.send(
           JSON.stringify({
             event: isOwner ? "close-room" : "quit-room",

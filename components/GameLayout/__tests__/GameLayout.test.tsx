@@ -74,9 +74,9 @@ describe('GameLayout Leave Functionality', () => {
 
     it('should clear local storage when leaving', () => {
       // Simulate the leave function logic
-      localStorage.setItem('chosen-nft', JSON.stringify(null));
+      localStorage.setItem('chosen-nfts', '');
 
-      expect(localStorageMock.setItem).toHaveBeenCalledWith('chosen-nft', 'null');
+      expect(localStorageMock.setItem).toHaveBeenCalledWith('chosen-nfts', '');
     });
 
     it('should call setGameStarted(false) when leaving', () => {

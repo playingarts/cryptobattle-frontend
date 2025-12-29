@@ -65,7 +65,7 @@ const GameLayout: FC<
 
         // Clear local state first
         setPlayers(null);
-        localStorage.setItem("chosen-nft", JSON.stringify(null));
+        localStorage.setItem("chosen-nfts", "");
         setGameStarted(false);
 
         // Send appropriate event based on ownership

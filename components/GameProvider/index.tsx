@@ -25,7 +25,7 @@ import {
   setRoomId as setGlobalRoomId,
 } from "../../utils/gameState";
 import { gameReducer, initialGameState, GameReducerState } from "../../store/gameReducer";
-import { GameAction, gameStateReceived, setCurrentPlayer } from "../../store/gameActions";
+import { GameAction, gameStateReceived, setCurrentPlayer, resetGame } from "../../store/gameActions";
 import {
   createWSMessageHandler,
   createWSCloseHandler,
@@ -124,6 +124,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     setResults(null);
     closeNotification();
     setGameStarted(false);
+    setPlayersInfo([]);
+    dispatch(resetGame());
     router.push("/dashboard");
   };
 
@@ -137,6 +139,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
     closeNotification();
     setGameStarted(false);
+    setPlayersInfo([]);
+    dispatch(resetGame());
     router.push("/new");
   };
 
@@ -155,6 +159,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     localStorage.setItem("chosen-nfts", "");
 
     closeNotification();
+    setGameStarted(false);
+    setPlayersInfo([]);
+    dispatch(resetGame());
     router.push("/dashboard");
   };
 
@@ -225,10 +232,14 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   useEffect(() => {
     return () => {
+      // Cleanup on unmount
       setPlayingAgain(false);
       localStorage.removeItem("play-again");
+      localStorage.setItem("chosen-nfts", "");
+      setGameStarted(false);
+      dispatch(resetGame());
     };
-  }, []);
+  }, [dispatch]);
 
   const playAgain = () => {
     setPlayingAgain(true);
