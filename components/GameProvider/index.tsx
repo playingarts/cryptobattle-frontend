@@ -7,7 +7,6 @@ import {
   useEffect,
   useCallback,
   useReducer,
-  useRef,
 } from "react";
 import { useNotifications } from "../NotificationProvider";
 import Text from "../Text/";
@@ -101,9 +100,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   const [isBackendReady, setIsBackendReady] = useState(false);
   const [isNewGameLoading, setIsNewGameLoading] = useState(false);
 
-  // Flag to prevent redirect after intentional exit (quit/newGame/playAgainQuit)
-  const hasIntentionallyLeftRef = useRef(false);
-
   // Use useWS(false) to not throw when there's no connection
   const WSProvider = useWS(false);
 
@@ -124,8 +120,19 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   };
 
   const quit = () => {
-    hasIntentionallyLeftRef.current = true;
+    // Set flag to prevent redirect back to game (persists across navigation)
+    localStorage.setItem("intentional-leave", "true");
     localStorage.setItem("chosen-nfts", "");
+
+    // Send quit event to server
+    if (WSProvider) {
+      WSProvider.send(
+        JSON.stringify({
+          event: "quit-game",
+          data: {},
+        })
+      );
+    }
 
     setResults(null);
     closeNotification();
@@ -141,10 +148,21 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
   const newGame = () => {
     setIsNewGameLoading(true);
-    hasIntentionallyLeftRef.current = true;
-    setResults(null);
+    // Set flag to prevent redirect back to game (persists across navigation)
+    localStorage.setItem("intentional-leave", "true");
     localStorage.setItem("chosen-nfts", "");
 
+    // Send quit event to server
+    if (WSProvider) {
+      WSProvider.send(
+        JSON.stringify({
+          event: "quit-game",
+          data: {},
+        })
+      );
+    }
+
+    setResults(null);
     closeNotification();
     setGameStarted(false);
     setPlayersInfo([]);
@@ -153,7 +171,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   };
 
   const playAgainQuit = () => {
-    hasIntentionallyLeftRef.current = true;
+    // Set flag to prevent redirect back to game (persists across navigation)
+    localStorage.setItem("intentional-leave", "true");
+    localStorage.setItem("chosen-nfts", "");
+
     if (WSProvider) {
       WSProvider.send(
         JSON.stringify({
@@ -165,7 +186,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       );
     }
     setResults(null);
-    localStorage.setItem("chosen-nfts", "");
 
     closeNotification();
     setGameStarted(false);
@@ -201,15 +221,24 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     const currentPath = router.pathname;
     const actualPath = router.asPath;
 
+    // Check if user intentionally left (persists across navigation)
+    const intentionalLeave = localStorage.getItem("intentional-leave") === "true";
+
     console.log('[DEBUG GameProvider redirect check]', {
       isAlreadyConnected,
       user: user ? { userId: user.userId, inGameId: user.inGameId, inRoomId: user.inRoomId } : null,
       isGameStarted: isGameStarted(),
+      intentionalLeave,
       pathname: currentPath,
       asPath: actualPath,
     });
 
-    if (isAlreadyConnected || !user || isGameStarted() || hasIntentionallyLeftRef.current) {
+    // Clear the flag after checking (one-time use)
+    if (intentionalLeave) {
+      localStorage.removeItem("intentional-leave");
+    }
+
+    if (isAlreadyConnected || !user || isGameStarted() || intentionalLeave) {
       console.log('[DEBUG GameProvider] Skipping redirect - early return conditions met');
       return;
     }
