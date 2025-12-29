@@ -51,7 +51,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   });
 
   // The last played card - used to hide board card while animation overlay shows it
-  const lastPlayedCard = currentAnimation?.card || null;
+  // Use pendingAnimation (set immediately) not currentAnimation (set after scroll)
+  const lastPlayedCard = state.pendingAnimation?.card || currentAnimation?.card || null;
 
   // Refs to hold current values for interact.js callbacks (outside React lifecycle)
   const selectedCardRef = useRef(selectedCard);
