@@ -32,7 +32,9 @@ interface AnimationOverlayProps {
  * Get player color by userId
  */
 function getPlayerColor(players: GamePlayer[] | null, userId: string): string {
-  if (!players) return '#808080';
+  if (!players) {
+    return '#808080';
+  }
   const player = players.find((p) => p.userId === userId);
   return player?.color || '#808080';
 }

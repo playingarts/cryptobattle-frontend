@@ -54,7 +54,9 @@ function getPlayerColor(players: GamePlayer[] | null, userId: string): string {
   if (userId === 'system') {
     return '#2D3038';
   }
-  if (!players) return 'gray';
+  if (!players) {
+    return 'gray';
+  }
   const player = players.find((p) => p.userId === userId);
   return player?.color || 'gray';
 }

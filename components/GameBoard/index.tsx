@@ -223,13 +223,17 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       const card = selectedCardRef.current;
       const state = gameStateRef.current;
 
-      if (!card) return false;
+      if (!card) {
+        return false;
+      }
 
       const allowedPlacement = state.allowedUserCardsPlacement?.additionalProperties?.[
         `${columnIndex}-${rowIndex}`
       ];
 
-      if (!allowedPlacement) return false;
+      if (!allowedPlacement) {
+        return false;
+      }
 
       // Check if card is allowed at this position
       const isJokerMove = card.value === "joker" && allowedPlacement.some(
