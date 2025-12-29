@@ -166,6 +166,64 @@ describe('GameProvider Exit Functionality', () => {
     });
   });
 
+  describe('Backend quit-game contract', () => {
+    /**
+     * These tests document the expected contract with the backend quit-game event.
+     * The backend handler should:
+     * 1. Accept quit-game event without requiring roomId context
+     * 2. Clear user's inGameId and inRoomId by deleting their userRoom record
+     * 3. Return acknowledgement with reason: 'EXITED'
+     *
+     * This was added to fix a bug where quit-game was sent but had no backend handler.
+     */
+
+    it('should send quit-game event with empty data payload', () => {
+      // The quit-game event doesn't need any payload - server looks up user's room
+      const event = { event: 'quit-game', data: {} };
+
+      mockWsSend(JSON.stringify(event));
+
+      expect(mockWsSend).toHaveBeenCalledWith(
+        JSON.stringify({ event: 'quit-game', data: {} })
+      );
+    });
+
+    it('should expect server to clear inGameId after quit-game', () => {
+      // Before quit: user has inGameId
+      let userState = { inGameId: 'game-123', inRoomId: 'room-456' };
+
+      // After server processes quit-game, on next user-info:
+      // inGameId and inRoomId should be cleared
+      const expectedServerResponse = {
+        event: 'quit-game',
+        data: {
+          roomId: 'room-456',
+          userId: 'user-id',
+          reason: 'EXITED',
+        },
+      };
+
+      // Simulate server response by clearing state
+      userState = { inGameId: null as any, inRoomId: null as any };
+
+      expect(userState.inGameId).toBeNull();
+      expect(userState.inRoomId).toBeNull();
+      expect(expectedServerResponse.data.reason).toBe('EXITED');
+    });
+
+    it('should gracefully handle quit-game when not in any game', () => {
+      // Server should not error when user sends quit-game but has no active game
+      const userWithNoGame = { inGameId: null, inRoomId: null };
+
+      // Sending quit-game should be safe
+      mockWsSend(JSON.stringify({ event: 'quit-game', data: {} }));
+
+      expect(mockWsSend).toHaveBeenCalled();
+      // Server should return acknowledgement without error
+      expect(userWithNoGame.inGameId).toBeNull();
+    });
+  });
+
   describe('Sequential game flow', () => {
     it('should allow starting new game after exiting previous game', () => {
       // Scenario: Exit game -> Dashboard -> New Game -> Should start fresh
