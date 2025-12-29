@@ -43,13 +43,36 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
     // Check if this player has made a move (animation is pending for their card)
     const animationForThisPlayer = state.pendingAnimation?.playerId === player.userId
 
+    // Track when move was made for smooth reset animation
+    const moveStartTimeRef = useRef<number | null>(null)
+    const progressAtMoveRef = useRef<number>(100)
+    const RESET_DURATION = 300 // ms to animate back to 100%
+
     // Once a move is detected, remember it for this turn
     if (animationForThisPlayer && !moveMadeThisTurnRef.current) {
       moveMadeThisTurnRef.current = true
+      moveStartTimeRef.current = Date.now()
+      progressAtMoveRef.current = progress
     }
 
     // Animation loop using requestAnimationFrame for smooth 60fps
     const animate = useCallback(() => {
+      // If move was made, animate back to 100%
+      if (moveMadeThisTurnRef.current && moveStartTimeRef.current !== null) {
+        const elapsed = Date.now() - moveStartTimeRef.current
+        const resetProgress = Math.min(elapsed / RESET_DURATION, 1)
+        // Ease out
+        const eased = 1 - Math.pow(1 - resetProgress, 2)
+        const newProgress = progressAtMoveRef.current + (100 - progressAtMoveRef.current) * eased
+
+        setProgress(newProgress)
+
+        if (resetProgress < 1) {
+          rafRef.current = requestAnimationFrame(animate)
+        }
+        return
+      }
+
       if (turnStartTimeRef.current === null) {
         return;
       }
@@ -84,9 +107,10 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
         return
       }
 
-      // If this player made a move this turn, stay frozen
+      // If this player made a move this turn, animate back to 100%
       if (moveMadeThisTurnRef.current && isMyTurn) {
-        // Stay frozen at current value until turn changes
+        // Start reset animation
+        rafRef.current = requestAnimationFrame(animate)
         prevCurrentPlayerRef.current = currentPlayerId
         return
       }
@@ -95,6 +119,7 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
       if (!isMyTurn) {
         setProgress(100)
         moveMadeThisTurnRef.current = false
+        moveStartTimeRef.current = null
         prevCurrentPlayerRef.current = currentPlayerId
         return
       }
@@ -104,6 +129,7 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
         // New turn started - reset timer and clear move flag
         turnStartTimeRef.current = Date.now()
         moveMadeThisTurnRef.current = false
+        moveStartTimeRef.current = null
         setProgress(100)
       }
 

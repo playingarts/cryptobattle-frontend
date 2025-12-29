@@ -75,20 +75,57 @@ export function useAnimationQueue({
       position: pendingAnimation.position,
     });
 
-    // Start the new animation
-    setCurrentAnimation(pendingAnimation);
+    // Mark as animating
     setIsAnimating(true);
     dispatch({ type: 'ANIMATION_STARTED', payload: { moveKey: pendingAnimation.moveKey } });
 
-    // Scroll to center the played card
-    setTimeout(() => {
-      const latestCard = document.querySelector('.game-latest-card-wrapper');
-      if (latestCard) {
-        latestCard.scrollIntoView({ block: 'center', behavior: 'smooth' });
-      }
-    }, 50);
+    // Scroll to the card position first, then start card animation
+    const scrollContainer = document.querySelector('.scroll-container');
+    const boardCell = document.querySelector(`[id="${pendingAnimation.position.y}-${pendingAnimation.position.x}"]`);
 
-    // End animation after duration - but keep currentAnimation so overlay stays visible
+    const SCROLL_DURATION = 600;
+
+    const startCardAnimation = () => {
+      setCurrentAnimation(pendingAnimation);
+    };
+
+    if (boardCell && scrollContainer) {
+      const cardRect = boardCell.getBoundingClientRect();
+      const containerRect = scrollContainer.getBoundingClientRect();
+
+      // Calculate target scroll position to center the card
+      const targetLeft = scrollContainer.scrollLeft + cardRect.left - containerRect.left - (containerRect.width / 2) + (cardRect.width / 2);
+      const targetTop = scrollContainer.scrollTop + cardRect.top - containerRect.top - (containerRect.height / 2) + (cardRect.height / 2);
+
+      // Smooth scroll with custom duration
+      const startLeft = scrollContainer.scrollLeft;
+      const startTop = scrollContainer.scrollTop;
+      const startTime = performance.now();
+
+      const animateScroll = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / SCROLL_DURATION, 1);
+        // Ease out cubic
+        const eased = 1 - Math.pow(1 - progress, 3);
+
+        scrollContainer.scrollLeft = startLeft + (targetLeft - startLeft) * eased;
+        scrollContainer.scrollTop = startTop + (targetTop - startTop) * eased;
+
+        if (progress < 1) {
+          requestAnimationFrame(animateScroll);
+        } else {
+          // Scroll complete, start card animation
+          startCardAnimation();
+        }
+      };
+
+      requestAnimationFrame(animateScroll);
+    } else {
+      // No scroll needed, start animation immediately
+      startCardAnimation();
+    }
+
+    // End animation after scroll + card animation duration
     animationTimeoutRef.current = setTimeout(() => {
       logAnimation('ANIM_COMPLETE', {
         moveKey: pendingAnimation.moveKey,
@@ -97,7 +134,7 @@ export function useAnimationQueue({
       // Don't clear currentAnimation - let the overlay stay visible
       // It will be replaced when the next animation starts
       setIsAnimating(false);
-    }, ANIMATION_DURATION_MS);
+    }, SCROLL_DURATION + ANIMATION_DURATION_MS);
 
     // Cleanup on unmount
     return () => {
