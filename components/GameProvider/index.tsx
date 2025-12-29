@@ -217,6 +217,11 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   }, [WSProvider]);
 
   useEffect(() => {
+    // Wait for router to be ready
+    if (!router.isReady) {
+      return;
+    }
+
     // Use both pathname and asPath for more reliable path detection
     const currentPath = router.pathname;
     const actualPath = router.asPath;
@@ -266,7 +271,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       router.push(`/game/${user.inRoomId}`);
     }
     console.log(selectedCard);
-  }, [user, isAlreadyConnected]);
+  }, [user, isAlreadyConnected, router.isReady, router.pathname]);
 
   useEffect(() => {
     return () => {

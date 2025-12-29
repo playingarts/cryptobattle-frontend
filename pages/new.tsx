@@ -59,16 +59,31 @@ const NewGame: NextPage = () => {
   }, [isAlreadyConnected]);
 
   useEffect(() => {
-    console.log("[DEBUG /new page] Sending create-room event");
+    // First, ensure any existing game is properly quit
+    // This handles case where user navigates to /new while still in a game
+    console.log("[DEBUG /new page] Sending quit-game to clear any existing game");
     WSProvider.send(
       JSON.stringify({
-        event: "create-room",
-        data: {
-          type: "private",
-          maxPlayers: 10,
-        },
+        event: "quit-game",
+        data: {},
       })
     );
+
+    // Small delay to let server process quit before creating new room
+    const timer = setTimeout(() => {
+      console.log("[DEBUG /new page] Sending create-room event");
+      WSProvider.send(
+        JSON.stringify({
+          event: "create-room",
+          data: {
+            type: "private",
+            maxPlayers: 10,
+          },
+        })
+      );
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
