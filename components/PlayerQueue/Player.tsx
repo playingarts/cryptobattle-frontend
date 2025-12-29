@@ -118,6 +118,7 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
       // If it's not this player's turn, reset to 100% and clear move flag
       if (!isMyTurn) {
         setProgress(100)
+        turnStartTimeRef.current = null
         moveMadeThisTurnRef.current = false
         moveStartTimeRef.current = null
         prevCurrentPlayerRef.current = currentPlayerId

@@ -190,6 +190,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
             transform: "translate(-50%, -50%) scale(0.68, 0.68)",
             transformOrigin: "top",
             height: 70,
+            visibility: "hidden",
           })}
         >
           <GameInventory isOpponentsCards={true} cards={opponentsCards} />

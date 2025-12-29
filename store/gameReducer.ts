@@ -279,6 +279,7 @@ function getCardCountAtPosition(board: GameBoard, position: { x: number; y: numb
 
 /**
  * Add a card to the board (for optimistic updates)
+ * Also updates adjacent cells to show as potential drop targets
  */
 function addCardToBoard(
   board: GameBoard,
@@ -290,6 +291,27 @@ function addCardToBoard(
   if (newBoard[position.y] && newBoard[position.y][position.x]) {
     newBoard[position.y][position.x].cards.push(card);
     newBoard[position.y][position.x].isEmpty = false;
+
+    // Update adjacent cells to show as placeholders (potential drop targets)
+    const adjacentOffsets = [
+      { dx: 0, dy: -1 }, // up
+      { dx: 0, dy: 1 },  // down
+      { dx: -1, dy: 0 }, // left
+      { dx: 1, dy: 0 },  // right
+    ];
+
+    for (const { dx, dy } of adjacentOffsets) {
+      const adjY = position.y + dy;
+      const adjX = position.x + dx;
+      if (newBoard[adjY] && newBoard[adjY][adjX]) {
+        const adjCell = newBoard[adjY][adjX];
+        // If the adjacent cell is empty, mark it as a placeholder and drop target
+        if (adjCell.cards.length === 0) {
+          adjCell.isEmpty = true;
+          adjCell.isDropTarget = true;
+        }
+      }
+    }
   }
 
   return newBoard;
@@ -388,7 +410,13 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
       // Skip animation for system cards (initial center card) - they have no userId or userId is "system"
       const isSystemCard = !lastPlayedCard?.userId || lastPlayedCard.userId === 'system';
 
-      if (isNewMove && newMoveKey && lastPlayedCard && lastPlayedPosition && !isSystemCard) {
+      // Skip animation if game is not active (finished, ended, etc.)
+      const isGameActive = serverData.state === 'inGame' || serverData.state === 'started';
+
+      // Clear pending animation if game ended
+      if (!isGameActive) {
+        pendingAnimation = null;
+      } else if (isNewMove && newMoveKey && lastPlayedCard && lastPlayedPosition && !isSystemCard) {
         // Calculate stack index from server table cards (card is already in stack, so length - 1)
         const positionKey = `${lastPlayedPosition.x}-${lastPlayedPosition.y}`;
         const cardsAtPosition = gameTableCards[positionKey] || [];

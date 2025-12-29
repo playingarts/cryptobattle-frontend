@@ -26,6 +26,7 @@ interface BoardCellProps {
   isMyTurn: boolean;
   hasError: boolean;
   lastPlayedCard: NormalizedCard | null;
+  lastPlayedPosition: { x: number; y: number } | null;
   selectedCard: unknown;
   onCellClick: (x: number, y: number) => void;
 }
@@ -38,6 +39,7 @@ const BoardCell: FC<BoardCellProps> = ({
   isMyTurn,
   hasError,
   lastPlayedCard,
+  lastPlayedPosition,
   selectedCard,
   onCellClick,
 }) => {
@@ -91,18 +93,16 @@ const BoardCell: FC<BoardCellProps> = ({
           selectedCard={selectedCard}
           key={`drop-${columnIndex}-${rowIndex}`}
           containerStyles={{
-            border: hasError ? '3px solid #FA5252' : 0,
             '&::before': {
               transition: 'all 300ms',
               position: 'absolute',
               content: `' '`,
-              background: '#000',
+              background: hasError ? 'rgba(250, 82, 82, 0.1)' : 'transparent',
               zIndex: 99999,
-              borderRadius: 20,
-              backgroundImage: ERROR_ICON_SVG,
+              borderRadius: 12,
+              backgroundImage: hasError ? ERROR_ICON_SVG : 'none',
               backgroundPosition: 'center center',
               backgroundRepeat: 'no-repeat',
-              opacity: hasError ? 0.75 : 0,
               top: 0,
               bottom: 0,
               left: 0,
@@ -131,6 +131,7 @@ const BoardCell: FC<BoardCellProps> = ({
           isMyTurn={isMyTurn}
           hasError={hasError}
           lastPlayedCard={lastPlayedCard}
+          lastPlayedPosition={lastPlayedPosition}
           selectedCard={selectedCard}
           onCellClick={handleClick}
         />

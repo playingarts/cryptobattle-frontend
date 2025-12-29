@@ -14,6 +14,7 @@ interface BoardGridProps {
   players: GamePlayer[];
   isMyTurn: boolean;
   lastPlayedCard: NormalizedCard | null;
+  lastPlayedPosition: { x: number; y: number } | null;
   selectedCard: unknown;
   errorPosition: { x: number; y: number } | null;
   onCellClick: (x: number, y: number) => void;
@@ -24,6 +25,7 @@ const BoardGrid: FC<BoardGridProps> = ({
   players,
   isMyTurn,
   lastPlayedCard,
+  lastPlayedPosition,
   selectedCard,
   errorPosition,
   onCellClick,
@@ -55,6 +57,7 @@ const BoardGrid: FC<BoardGridProps> = ({
                 isMyTurn={isMyTurn}
                 hasError={hasError}
                 lastPlayedCard={lastPlayedCard}
+                lastPlayedPosition={lastPlayedPosition}
                 selectedCard={selectedCard}
                 onCellClick={onCellClick}
               />

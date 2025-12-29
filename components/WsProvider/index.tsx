@@ -24,7 +24,10 @@ function WSProvider({ children, url }: WSProviderProps): JSX.Element {
     const options = {
       connectionTimeout: 12000
     };
-    const wsUrl = `wss://${url}/api/socket?accesstoken=${accessToken}`;
+    // Use the URL directly if it already has a protocol (ws:// or wss://)
+    const wsUrl = url.startsWith('ws://') || url.startsWith('wss://')
+      ? `${url}/api/socket?accesstoken=${accessToken}`
+      : `wss://${url}/api/socket?accesstoken=${accessToken}`;
     return new ReconnectingWebSocket(wsUrl, [], options);
   }, [accessToken, url]);
 

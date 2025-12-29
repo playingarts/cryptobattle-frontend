@@ -18,34 +18,43 @@ interface CardStackProps {
   isMyTurn: boolean;
   hasError: boolean;
   lastPlayedCard: NormalizedCard | null;
+  lastPlayedPosition: { x: number; y: number } | null;
   selectedCard: unknown;
   onCellClick: () => void;
 }
 
 /**
- * Check if this card matches the last played card (hide it while animation shows)
+ * Check if this card matches the last played card AND is at the same position
+ * (hide it while animation shows to prevent duplicate visual)
  */
 function isLastPlayedPosition(
   card: NormalizedCard,
   lastPlayedCard: NormalizedCard | null,
+  lastPlayedPosition: { x: number; y: number } | null,
+  cellX: number,
+  cellY: number,
   isTopCard: boolean
 ): boolean {
-  if (!lastPlayedCard || !isTopCard) {
+  if (!lastPlayedCard || !lastPlayedPosition || !isTopCard) {
     return false;
   }
-  return (
+  // Must match BOTH the card (suit/value) AND the position
+  const positionMatches = lastPlayedPosition.x === cellX && lastPlayedPosition.y === cellY;
+  const cardMatches =
     lastPlayedCard.suit?.toLowerCase() === card.suit?.toLowerCase() &&
-    String(lastPlayedCard.value).toLowerCase() === String(card.value).toLowerCase()
-  );
+    String(lastPlayedCard.value).toLowerCase() === String(card.value).toLowerCase();
+
+  return positionMatches && cardMatches;
 }
 
 /**
  * Get player color by userId
  */
-function getPlayerColor(players: GamePlayer[], userId: string): string {
+function getPlayerColor(players: GamePlayer[] | null, userId: string): string {
   if (userId === 'system') {
     return '#2D3038';
   }
+  if (!players) return 'gray';
   const player = players.find((p) => p.userId === userId);
   return player?.color || 'gray';
 }
@@ -68,6 +77,7 @@ const CardStack: FC<CardStackProps> = ({
   isMyTurn,
   hasError,
   lastPlayedCard,
+  lastPlayedPosition,
   selectedCard,
   onCellClick,
 }) => {
@@ -77,7 +87,15 @@ const CardStack: FC<CardStackProps> = ({
         const isTopCard = index === cards.length - 1;
         const playerColor = getPlayerColor(players, card.userId || '');
         const rotation = getCardRotation(index);
-        const isHiddenByAnimation = isLastPlayedPosition(card, lastPlayedCard, isTopCard);
+        // columnIndex = x, rowIndex = y (column is horizontal, row is vertical)
+        const isHiddenByAnimation = isLastPlayedPosition(
+          card,
+          lastPlayedCard,
+          lastPlayedPosition,
+          columnIndex,
+          rowIndex,
+          isTopCard
+        );
 
         // Transform NormalizedCard to Card component's expected format
         const cardWithImage = getCard(card.suit, card.value, card);
@@ -108,15 +126,17 @@ const CardStack: FC<CardStackProps> = ({
                 : `3px solid ${playerColor}`,
               borderRadius: 16,
               position: 'relative',
+              // Hide during animation, show instantly when animation ends (no opacity transition)
               opacity: isHiddenByAnimation ? 0 : 1,
-              transition: 'all 150ms ease-out',
+              // Only transition transform/box-shadow for hover effects, NOT opacity
+              transition: 'transform 150ms ease-out, box-shadow 150ms ease-out',
               transform: rotation,
               // Hover effect when dragging a card over this card
               '&.drop-target': {
                 transform: `${rotation} scale(1.05)`,
                 boxShadow: `0 0 20px 8px ${playerColor}80`,
               },
-              // Error overlay
+              // Base error overlay (hidden by default)
               '&::before': {
                 transition: 'all 300ms',
                 position: 'absolute',
@@ -133,6 +153,10 @@ const CardStack: FC<CardStackProps> = ({
                 bottom: 0,
                 left: 0,
                 right: 0,
+              },
+              // Error when dragging over invalid position (must come AFTER &::before to override)
+              '&.drop-error::before': {
+                opacity: 1,
               },
               // NFT power level badge
               '&::after': {

@@ -18,8 +18,9 @@ const GuestLogin: FC<GuestLoginProps> = ({ roomId, ...props }) => {
   const handleGuestLogin = async () => {
     setLoading(true);
     try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://cryptobattle-backend-production.up.railway.app';
       const response = await axios.get(
-        "https://cryptobattle-backend-production.up.railway.app/auth/guest",
+        `${apiUrl}/auth/guest`,
         {
           headers: {
             "content-type": "application/json",

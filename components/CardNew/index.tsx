@@ -31,6 +31,7 @@ const Card: FC<Props> = ({
   size,
   noShadow,
   interactive,
+  css: cssProp,
   ...props
 }) => {
   const [hovered, setHover] = useState(false);
@@ -47,20 +48,23 @@ const Card: FC<Props> = ({
   return (
     <div
       {...props}
-      css={(theme) => ({
-        "&:hover": isGameBoard ? {} : {
-          color: "rgba(10, 10, 10, 0.7)",
-        },
-        transition: theme.transitions.fast("color"),
-        width: theme.spacing(width),
-        textAlign: "center",
-        color: theme.colors.text_subtitle_dark,
-        fontWeight: 500,
-        fontsize: 18,
-        lineheight: 21,
-        position: "relative",
-        background: "transparent",
-      })}
+      css={[
+        (theme) => ({
+          "&:hover": isGameBoard ? {} : {
+            color: "rgba(10, 10, 10, 0.7)",
+          },
+          transition: theme.transitions.fast("color"),
+          width: theme.spacing(width),
+          textAlign: "center",
+          color: theme.colors.text_subtitle_dark,
+          fontWeight: 500,
+          fontsize: 18,
+          lineheight: 21,
+          position: "relative",
+          background: "transparent",
+        }),
+        cssProp,
+      ]}
       onMouseEnter={() => !isGameBoard && setHover(true)}
       onMouseLeave={() => !isGameBoard && setHover(false)}
     >

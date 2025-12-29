@@ -53,6 +53,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   // The last played card - used to hide board card while animation overlay shows it
   // Use pendingAnimation (set immediately) not currentAnimation (set after scroll)
   const lastPlayedCard = state.pendingAnimation?.card || currentAnimation?.card || null;
+  const lastPlayedPosition = state.pendingAnimation?.position || currentAnimation?.position || null;
 
   // Refs to hold current values for interact.js callbacks (outside React lifecycle)
   const selectedCardRef = useRef(selectedCard);
@@ -216,8 +217,37 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     [addCard]
   );
 
+  // Check if placement is valid for the selected card at a given position
+  const isPlacementValid = useCallback(
+    (rowIndex: number, columnIndex: number): boolean => {
+      const card = selectedCardRef.current;
+      const state = gameStateRef.current;
+
+      if (!card) return false;
+
+      const allowedPlacement = state.allowedUserCardsPlacement?.additionalProperties?.[
+        `${columnIndex}-${rowIndex}`
+      ];
+
+      if (!allowedPlacement) return false;
+
+      // Check if card is allowed at this position
+      const isJokerMove = card.value === "joker" && allowedPlacement.some(
+        (allowedCard: { suit: string; value: string }) => allowedCard.value === "joker"
+      );
+      const isStandardMove = allowedPlacement.some(
+        (allowedCard: { suit: string; value: string }) =>
+          allowedCard.suit.toLowerCase() === card.suit.toLowerCase() &&
+          allowedCard.value === card.value
+      );
+
+      return isJokerMove || isStandardMove;
+    },
+    []
+  );
+
   // Set up drag and drop via hook
-  useDragAndDrop({ onDrop: handleDrop });
+  useDragAndDrop({ onDrop: handleDrop, isPlacementValid });
 
   // Calculate board position for animation overlay
   const boardRef = useRef<HTMLDivElement>(null);
@@ -253,6 +283,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
           players={players}
           isMyTurn={isMyTurn}
           lastPlayedCard={lastPlayedCard}
+          lastPlayedPosition={lastPlayedPosition}
           selectedCard={selectedCard}
           errorPosition={errorPosition}
           onCellClick={handleCellClick}

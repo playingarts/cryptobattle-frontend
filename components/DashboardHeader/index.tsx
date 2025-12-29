@@ -37,7 +37,9 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
 
   const getGreeting = () => {
     if (user.name) {
-      return `GM, ${user.name}!`;
+      // Simplify guest names: "Guest_mjqz71hl_jxkwp" -> "Guest"
+      const displayName = user.name.startsWith('Guest_') ? 'Guest' : user.name;
+      return `GM, ${displayName}!`;
     }
     return `GM!`;
   };

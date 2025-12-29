@@ -41,7 +41,6 @@ const Home: NextPage = () => {
           overflow: "hidden",
           paddingTop: theme.spacing(26),
           paddingBottom: "50px",
-          backgroundColor: "#0A0A0A",
           backgroundImage:
             "url(https://s3.amazonaws.com/img.playingarts.com/crypto/game/cards_bg.jpg)",
           backgroundSize: "2200px",

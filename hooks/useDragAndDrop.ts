@@ -14,6 +14,8 @@ import interact from 'interactjs';
 interface UseDragAndDropOptions {
   /** Called when a card is dropped on a cell. Receives (rowIndex, columnIndex) */
   onDrop: (rowIndex: number, columnIndex: number) => void;
+  /** Called when dragging over a cell. Returns true if placement is valid */
+  isPlacementValid?: (rowIndex: number, columnIndex: number) => boolean;
   /** Whether drag and drop is enabled */
   enabled?: boolean;
 }
@@ -21,14 +23,16 @@ interface UseDragAndDropOptions {
 /**
  * Hook to manage drag and drop for game board
  */
-export function useDragAndDrop({ onDrop, enabled = true }: UseDragAndDropOptions): void {
-  // Use ref to hold current onDrop callback (avoids stale closure issues)
+export function useDragAndDrop({ onDrop, isPlacementValid, enabled = true }: UseDragAndDropOptions): void {
+  // Use refs to hold current callbacks (avoids stale closure issues)
   const onDropRef = useRef(onDrop);
+  const isPlacementValidRef = useRef(isPlacementValid);
 
-  // Keep ref in sync
+  // Keep refs in sync
   useEffect(() => {
     onDropRef.current = onDrop;
-  }, [onDrop]);
+    isPlacementValidRef.current = isPlacementValid;
+  }, [onDrop, isPlacementValid]);
 
   // Set up interact.js
   useEffect(() => {
@@ -77,9 +81,26 @@ export function useDragAndDrop({ onDrop, enabled = true }: UseDragAndDropOptions
       overlap: 0.4,
       ondragenter(event) {
         event.target.classList.add('drop-target');
+
+        // Check if placement is valid and add error class if not
+        if (isPlacementValidRef.current) {
+          const targetId = event.target.id || '';
+          const parts = targetId.split('-');
+          if (parts.length === 2) {
+            const rowIndex = Number(parts[0]);
+            const columnIndex = Number(parts[1]);
+            const isValid = isPlacementValidRef.current(rowIndex, columnIndex);
+            console.log('[DragDrop] ondragenter:', { targetId, rowIndex, columnIndex, isValid, classes: event.target.className });
+            if (!isValid) {
+              event.target.classList.add('drop-error');
+              console.log('[DragDrop] Added drop-error class to:', targetId);
+            }
+          }
+        }
       },
       ondragleave(event) {
         event.target.classList.remove('drop-target');
+        event.target.classList.remove('drop-error');
       },
       ondrop(event) {
         // Parse cell coordinates from element id (format: "rowIndex-columnIndex")
@@ -95,6 +116,7 @@ export function useDragAndDrop({ onDrop, enabled = true }: UseDragAndDropOptions
       ondropdeactivate(event) {
         event.target.classList.remove('drop-active');
         event.target.classList.remove('drop-target');
+        event.target.classList.remove('drop-error');
       },
     });
 

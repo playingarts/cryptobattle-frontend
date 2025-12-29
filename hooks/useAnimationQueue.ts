@@ -49,8 +49,16 @@ export function useAnimationQueue({
 
   // Start a new animation when pendingAnimation changes
   useEffect(() => {
-    // If no pending animation, skip
+    // If no pending animation, clear current animation (game ended or animation cleared)
     if (!pendingAnimation) {
+      if (currentAnimationRef.current) {
+        setCurrentAnimation(null);
+        setIsAnimating(false);
+        if (animationTimeoutRef.current) {
+          clearTimeout(animationTimeoutRef.current);
+          animationTimeoutRef.current = null;
+        }
+      }
       return;
     }
 
@@ -131,8 +139,8 @@ export function useAnimationQueue({
         moveKey: pendingAnimation.moveKey,
       });
       dispatch({ type: 'ANIMATION_COMPLETED', payload: { moveKey: pendingAnimation.moveKey } });
-      // Don't clear currentAnimation - let the overlay stay visible
-      // It will be replaced when the next animation starts
+      // Clear currentAnimation so the board card becomes visible again
+      setCurrentAnimation(null);
       setIsAnimating(false);
     }, SCROLL_DURATION + ANIMATION_DURATION_MS);
 
