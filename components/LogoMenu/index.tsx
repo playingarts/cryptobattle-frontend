@@ -180,7 +180,7 @@ export default function LogoMenu({
                   background: "#181818",
                 }}
               >
-                <div style={{ marginRight: "35px", marginTop: "1px", }} className="hamburger">
+                <div className="hamburger">
                   <span className="line line-1"></span>
                   <span className="line line-2"></span>
                   <span className="line line-3"></span>
@@ -193,13 +193,10 @@ export default function LogoMenu({
                       color: "#7a7a7a",
                       fontSize: 25,
                       fontWeight: 400,
-                      letterSpacing: "-0.05em",
                       lineHeight: 1.2,
-                      fontFamily: "Aldrich, sans-serif",
                       textTransform: "uppercase",
                       // position: "absolute",
                       // marginLeft: 80,
-                      marginTop: 8,
                       cursor: "pointer",
                       transition: "color 500ms",
                       "&:hover": {
@@ -251,7 +248,6 @@ export default function LogoMenu({
                   variant="h5"
                   css={{
                     textTransform: "uppercase",
-                    paddingTop: 4,
                     cursor: "pointer",
                   }}
                 >
@@ -296,27 +292,6 @@ export default function LogoMenu({
                     </div>
                   )}
 
-                  {loggedIn && (
-                    <MenuItem
-                      fontWeight={400}
-                      to="https://playingarts.com/"
-                      text="Go to website"
-                    />
-                  )}
-                  {loggedIn && (
-                    <Button
-                      style={{
-                        marginRight: "15px",
-                        background: "#7B61FF",
-                        color: "#fff",
-                        marginBottom: 10,
-                      }}
-                      component={Link}
-                      href="/new"
-                    >
-                      New Game
-                    </Button>
-                  )}
 
                   {/* <li
                     onClick={purgeGames}

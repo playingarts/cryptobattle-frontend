@@ -10,42 +10,18 @@ import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 import { useAuth } from "../components/AuthProvider";
 import MetamaskLogin from "../components/MetamaskLogin/";
 import GuestLogin from "../components/GuestLogin/";
-import GameRules from "../components/GameRules";
 
 const Home: NextPage = () => {
   const { loggedIn } = useAuth();
 
-  const headerRight = (
-    <GameRules>
-      <Button
-        css={{
-          color: "#7a7a7a",
-          background: "rgba(255, 255, 255, 0.05)",
-          transition: "color 500ms",
-          "&:hover": {
-            color: "#fff",
-          },
-        }}
-      >
-        Game Rules
-      </Button>
-    </GameRules>
-  );
-
   return (
-    <ComposedGlobalLayout headerRight={headerRight}>
+    <ComposedGlobalLayout>
       <Layout
         css={(theme) => ({
-          background: theme.colors.dark_gray,
+          background: "transparent",
           color: theme.colors.text_title_light,
           overflow: "hidden",
-          paddingTop: theme.spacing(26),
-          paddingBottom: "50px",
-          backgroundImage:
-            "url(https://s3.amazonaws.com/img.playingarts.com/crypto/game/cards_bg.jpg)",
-          backgroundSize: "2200px",
-          backgroundPosition: "center 0px",
-          backgroundRepeat: "no-repeat",
+          paddingTop: 200,
         })}
       >
         <Grid css={{ marginBottom: 200 }}>
@@ -65,25 +41,11 @@ const Home: NextPage = () => {
 
             {!loggedIn ? (
               <div>
-                <Text
-                  variant="body2"
-                  css={{
-                    color: "#7a7a7a",
-                  }}
-                >
-                  Log in with
-                </Text>
                 <div style={{ display: "flex", justifyContent: "start", alignItems: "center" }}>
-                  <MetamaskLogin />
-                  <Text
-                    variant="body2"
-                    css={{
-                      color: "#7a7a7a",
-                      margin: "0 10px",
-                    }}
-                  >
-                    or
-                  </Text>
+                  {/* MetamaskLogin hidden but functionality preserved */}
+                  <div style={{ display: "none" }}>
+                    <MetamaskLogin />
+                  </div>
                   <GuestLogin />
                 </div>
               </div>

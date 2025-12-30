@@ -28,33 +28,16 @@ const GameInventory: FC<Props> = ({
   isOpponentsCards,
   cards,
 }) => {
-  // const [selectedCard, setSelectedCard] = useState<any>(null);
   const [cardsRegular, setCardsRegular] = useState<any>([]);
   const [cardsNft, setCardsNft] = useState<any>([]);
   const [loadingDelayed, setLoadingDelayed] = useState(true);
 
-  // Use reducer state for turn information
-  const { state, selectedCard, setSelectedCard, players } = useGame();
+  const { state, selectedCard, setSelectedCard } = useGame();
   const { user } = useAuth();
 
-  // Derive turn status from reducer state
   const isMyTurn = state.serverState.turnForPlayer === user?.userId;
 
   const WSProvider = useWS();
-
-  const getColor = useCallback(
-    (userId) => () => {
-      if (userId === "system") {
-        return "#2D3038";
-      }
-      const foundPlayer = players.find(
-        (player: any) => player.userId === userId
-      );
-
-      return foundPlayer ? foundPlayer.color : "gray";
-    },
-    [players]
-  );
 
   const skip = () => {
     WSProvider.send(
@@ -119,316 +102,122 @@ const GameInventory: FC<Props> = ({
     [setSelectedCard]
   );
 
+  // Combine all cards for display
+  const allCards = [...cardsRegular, ...cardsNft];
+
   return (
     <div
       className="game-inventory"
-      style={{
+      css={{
         position: "fixed",
-        bottom: -11,
+        bottom: 0,
         left: 0,
         width: "100%",
-        background: "transparent",
         zIndex: 999999,
         display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        opacity: loadingDelayed ? "0" : "1",
+        overflow: "visible",
+        opacity: loadingDelayed ? 0 : 1,
         transform: loadingDelayed
           ? isOpponentsCards
-            ? "translate(0,-200px)"
-            : "translate(0,200px)"
+            ? "translate(0, -200px)"
+            : "translate(0, 200px)"
           : "translate(0, 0)",
+        transition: "opacity 2s, transform 1s",
       }}
     >
+      {/* Hand container */}
       <div
-        style={{
-          background:
-            (isMyTurn && !isOpponentsCards) ||
-            (!isMyTurn && isOpponentsCards)
-              ? "#fff"
-              : "#181818",
-          borderRadius: isOpponentsCards ? 10 : 20,
-          height: "100%",
-          marginBottom: 20,
-          marginTop: 20,
-          position: "relative",
-          display: "flex",
-          justifyContent:
-            isMyTurn && isOpponentsCards
-              ? "space-between"
-              : "space-around",
-          zIndex: 999999,
+        css={{
+          background: isMyTurn ? "#f5f5f5" : "#3a3a3a",
+          borderRadius: 20,
+          padding: "13px 7px 13px 13px",
+          display: "inline-block",
+          margin: "0 auto 20px auto",
+          overflow: "visible",
+          transition: "background 0.3s ease, all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
-        {cardsRegular.length > 0 && (
-          <div
-            css={{
-              padding: isOpponentsCards ? 6 : 15,
-              minWidth: "auto",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            {cardsRegular.map((card: any, index: number) => {
-              return (
-                <div
-                  style={{
-                    width:
-                      isMyTurn &&
-                      !isOpponentsCards
-                        ? 72
-                        : 84,
-                    marginRight:
-                      isMyTurn &&
-                      !isOpponentsCards
-                        ? index + 1 === cardsRegular.length
-                          ? 0
-                          : 10
-                        : 0,
-                    height: 91,
-                  }}
-                  key={`${index}`}
-                >
-                  <CardSmall
-                    className={"draggable"}
-                    onMouseDown={selectCard(card)}
-                    key={`${index}`}
-                    isSelected={
-                      selectedCard ? selectedCard.uid === card.uid : false
-                    }
-                    background={
-                      isMyTurn &&
-                      isOpponentsCards
-                        ? "#181818"
-                        : isOpponentsCards
-                        ? "white"
-                        : "#0C0E11"
-                    }
-                    color={
-                      isMyTurn &&
-                      isOpponentsCards
-                        ? !isOpponentsCards
-                          ? "#0C0E11"
-                          : "white"
-                        : isOpponentsCards
-                        ? "#0C0E11"
-                        : "white"
-                    }
-                    css={{
-                      transition: "all 400ms",
-
-                      borderRight: !isOpponentsCards
-                        ? "none"
-                        : index + 1 === cardsRegular.length
-                        ? "none"
-                        : `1px solid ${
-                            isMyTurn
-                              ? "rgba(221, 221, 221, 0.2)"
-                              : "rgba(221, 221, 221, 0.8)"
-                          } `,
-                      padding:
-                        isMyTurn &&
-                        !isOpponentsCards
-                          ? "0 0"
-                          : isOpponentsCards
-                          ? "0 10px"
-                          : "0 6px",
-                      pointerEvents:
-                        !isOpponentsCards &&
-                        isMyTurn
-                          ? "auto"
-                          : "none",
-                    }}
-                    cardValue={card.value}
-                    {...card}
-                  />
-                </div>
-              );
-            })}{" "}
-          </div>
-        )}
-        {cardsNft.length > 0 && (
-          <div
-            css={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              borderTopRightRadius: isOpponentsCards ? 10 : 20,
-              borderBottomRightRadius: isOpponentsCards ? 10 : 20,
-              padding: isOpponentsCards ? 5 : "15px 10px 15px 15px",
-              background: isOpponentsCards
-                ? isMyTurn
-                  ? "#282828"
-                  : "#E5E5E5"
-                : isMyTurn
-                ? "linear-gradient(90.19deg, #8482F8 14%, #A6FBF6 86.07%)"
-                : "#282828",
-            }}
-          >
-            {cardsNft.map((card: any, index: number) => {
-              return (
-                <div
-                  style={{
-                    width:
-                      isMyTurn &&
-                      !isOpponentsCards
-                        ? 72
-                        : 84,
-                    marginRight:
-                      isMyTurn &&
-                      !isOpponentsCards
-                        ? index + 1 === cardsNft.length
-                          ? 0
-                          : 10
-                        : 0,
-                    height: 91,
-                  }}
-                  key={`${index + "nft"}`}
-                >
-                  <CardSmall
-                    className={"draggable"}
-                    onMouseDown={selectCard(card)}
-                    isSelected={
-                      selectedCard ? selectedCard.uid === card.uid : false
-                    }
-                    background={
-                      isMyTurn &&
-                      isOpponentsCards
-                        ? "#282828"
-                        : isOpponentsCards
-                        ? "E5E5E5"
-                        : isMyTurn
-                        ? "#0C0E11"
-                        : "#0C0E11"
-                    }
-                    color={
-                      isMyTurn &&
-                      isOpponentsCards
-                        ? "#fff"
-                        : isOpponentsCards
-                        ? "#0C0E11"
-                        : "#fff"
-                    }
-                    css={{
-                      marginRight:
-                        index + 1 === cardsNft.length && !isOpponentsCards
-                          ? 0
-                          : 10,
-                      pointerEvents:
-                        !isOpponentsCards &&
-                        isMyTurn
-                          ? "auto"
-                          : "none",
-                      borderRight:
-                        isMyTurn &&
-                        !isOpponentsCards &&
-                        index + 1 === cardsRegular.length
-                          ? "none"
-                          : "px solid rgba(221, 221, 221, 0.1)",
-                      "&::before": {
-                        opacity: 0,
-                        content: `"${card.powerLevel}"`,
-                        display: "flex",
-
-                        justifyContent: "center",
-                        alignItems: "center",
-                        transition: "all  400ms",
-                        color: "#fff",
-                        fontFamily: "Aldrich",
-                        background: getColor(user.userId)(),
-                        backgroundImage:
-                          'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTQiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAxNCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEzLjkxNzIgNy4zMTE4Mkw3LjU1MzU3IDE4Ljc2NjRDNy40MzkwMyAxOC45NyA3LjIyOTAzIDE5LjA5MDkgNi45OTk5NCAxOS4wOTA5QzYuOTQ5MDMgMTkuMDkwOSA2Ljg5MTc1IDE5LjA4NDUgNi44NDA4NCAxOS4wNzE4QzYuNTYwODQgMTguOTk1NCA2LjM2MzU3IDE4Ljc0NzMgNi4zNjM1NyAxOC40NTQ1VjExLjQ1NDVIMC42MzYzMDFDMC40MTk5MzggMTEuNDU0NSAwLjIyMjY2NSAxMS4zNDY0IDAuMTAxNzU2IDExLjE2ODJDLTAuMDEyNzg5NSAxMC45OSAtMC4wMzE4ODAzIDEwLjc2MDkgMC4wNTA4NDY5IDEwLjU2MzZMNC41MDUzOSAwLjM4MTgxOEM0LjYwNzIxIDAuMTUyNzI3IDQuODM2MyAwIDUuMDkwODUgMEg4LjkwOTAzQzkuMTE5MDMgMCA5LjMxNjMgMC4xMDE4MTggOS40MzcyMSAwLjI4QzkuNTUxNzUgMC40NTE4MTggOS41NzcyMSAwLjY3NDU0NSA5LjUwMDg0IDAuODcxODE4TDcuMzA1MzkgNi4zNjM2M0gxMy4zNjM2QzEzLjU4NjMgNi4zNjM2MyAxMy43OTYzIDYuNDg0NTQgMTMuOTEwOCA2LjY3NTQ1QzE0LjAyNTQgNi44NzI3MiAxNC4wMzE4IDcuMTE0NTQgMTMuOTE3MiA3LjMxMTgyWiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg==")',
-                        backgroundRepeat: "no-repeat",
-                        backgroundPosition: "12px 8px",
-
-                        position: "absolute",
-                        borderRadius: 20,
-                        fontSize: 28,
-                        zIndex: 9999,
-                        top: -72,
-                        left: "50%",
-                        transform: "translate(-50%, 0)",
-                        padding: "12px 0",
-                        paddingTop: 18,
-                        paddingLeft: 20,
-                        minWidth: 70,
-                        height: 36,
-                        pointerEvents: "none",
-                        textTransform: "uppercase",
-                      },
-                      "&:hover": {
-                        color: "#7B61FF",
-                        "&::before": {
-                          opacity: 1,
-                          pointerEvents: "none",
-                          transform: "translate(-50%, 8px)",
-                        },
-                      },
-                    }}
-                    cardValue={isOpponentsCards ? "unknown" : card.value}
-                    {...card}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        )}
-        {!isOpponentsCards && (
-          <Button
-            Icon={Skip}
-            onClick={skip}
-            css={{
-              marginLeft: 40,
-              position: "absolute",
-              borderRadius: 400,
-              right: -80,
-              top: 32,
-              background: "#181818",
-              color:
-                !isMyTurn ? "#282828" : "white",
-              height: 60,
-              width: 60,
-              transition: "all 400ms",
-              pointerEvents:
-                !isMyTurn ? "none" : "auto",
-
-              "&::before": {
-                opacity: 0,
-                content: `"skip"`,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                transition: "all 400ms",
-                color: "black",
-                fontFamily: "Aldrich",
-                position: "absolute",
-                background: "#ffff",
-                borderRadius: 6,
-                fontSize: 18,
-                zIndex: 9999,
-                top: -50,
-                left: "50%",
-                transform: "translate(-50%, 0)",
-                padding: "12px 14px",
-                paddingTop: 16,
-                minWidth: 70,
-                height: 30,
-                pointerEvents: "none",
-                textTransform: "uppercase",
-              },
-              "&:hover": {
-                color: "#7B61FF",
-                "&::before": {
-                  opacity: 1,
-                  pointerEvents: "none",
-                  transform: "translate(-50%, 8px)",
-                },
-              },
-            }}
-          ></Button>
-        )}{" "}
+        {/* Cards row */}
+        <div
+          css={{
+            display: "flex",
+            justifyContent: "center",
+            flexWrap: "nowrap",
+            overflow: "visible",
+            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+          }}
+        >
+          {allCards.map((card: any, index: number) => (
+            <CardSmall
+              {...card}
+              key={`${index}-${card.uid || card.value}`}
+              className={isMyTurn && !isOpponentsCards ? "draggable" : undefined}
+              onMouseDown={isMyTurn ? selectCard(card) : undefined}
+              isSelected={selectedCard ? selectedCard.uid === card.uid : false}
+              cardValue={isOpponentsCards && card.value === "unknown" ? "unknown" : card.value}
+              disableHover={!isMyTurn || isOpponentsCards}
+              css={{
+                pointerEvents: isOpponentsCards ? "none" : "auto",
+                cursor: !isOpponentsCards && isMyTurn ? "grab" : "default",
+              }}
+            />
+          ))}
+        </div>
       </div>
+
+      {!isOpponentsCards && (
+        <Button
+          Icon={Skip}
+          onClick={skip}
+          css={{
+            position: "fixed",
+            bottom: 40,
+            right: 40,
+            borderRadius: 400,
+            background: "#181818",
+            color: !isMyTurn ? "#282828" : "white",
+            height: 60,
+            width: 60,
+            transition: "all 400ms",
+            pointerEvents: !isMyTurn ? "none" : "auto",
+            "&::before": {
+              opacity: 0,
+              content: `"skip"`,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              transition: "all 400ms",
+              color: "black",
+              fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+              position: "absolute",
+              background: "#ffff",
+              borderRadius: 6,
+              fontSize: 18,
+              zIndex: 9999,
+              top: -50,
+              left: "50%",
+              transform: "translate(-50%, 0)",
+              padding: "12px 14px",
+              paddingTop: 16,
+              minWidth: 70,
+              height: 30,
+              pointerEvents: "none",
+              textTransform: "uppercase",
+            },
+            "&:hover": {
+              color: "#7B61FF",
+              "&::before": {
+                opacity: 1,
+                pointerEvents: "none",
+                transform: "translate(-50%, 8px)",
+              },
+            },
+          }}
+        />
+      )}
 
       {children}
     </div>

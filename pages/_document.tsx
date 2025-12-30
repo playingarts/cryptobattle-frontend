@@ -15,7 +15,7 @@ export const Links = () => (
         h6: theme.typography.h6,
         body: {
           background: "#1A1A1A",
-          fontFamily: "Work Sans, sans-serif",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         },
         svg: {
           verticalAlign: "top",
@@ -31,16 +31,6 @@ export const Links = () => (
       }}
     />
     <meta name="theme-color" content="#fff" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossOrigin="true"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Aldrich&family=Work+Sans:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
   </Fragment>
 );
 

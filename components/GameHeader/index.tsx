@@ -4,7 +4,6 @@ import { useAuth } from "../AuthProvider";
 import { useGame } from "../GameProvider";
 import { formatUsername } from "../../utils/helpers";
 
-import Text from "../Text";
 import LogoMenu from "../LogoMenu";
 import GameInventory from "../GameInventory";
 import { getCard } from "../../components/Cards";
@@ -132,51 +131,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
             headerTitle={
               currentPlayer ? formatUsername(currentPlayer.username) : ""
             }
-            logo={
-              <div
-                css={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  minWidth: 180,
-                  height: 70,
-                }}
-              >
-                <Text
-                  component="h3"
-                  css={{
-                    color: "#DDDDDD",
-                    fontSize: 25,
-                    fontWeight: 400,
-                    letterSpacing: "-0.05em",
-                    lineHeight: 1.2,
-                    fontFamily: "Aldrich, sans-serif",
-                    textTransform: "uppercase",
-                    // position: 'absolute',
-                    // marginLeft: 80,
-                    marginRight: 10,
-                    marginTop: 30,
-                  }}
-                >
-                  {currentPlayer ? formatUsername(currentPlayer.username) : ""}
-                </Text>
-                <svg
-                  css={{ marginRight: 30 }}
-                  width="16"
-                  height="14"
-                  viewBox="0 0 16 14"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M7.95645e-08 7.15C8.61504e-08 6.59772 0.447715 6.15 1 6.15L12.2357 6.15L8.29278 2.20709C7.90225 1.81657 7.90225 1.1834 8.29278 0.792878C8.6833 0.402354 9.31647 0.402353 9.70699 0.792878L15.3638 6.44973C15.5562 6.64205 15.6538 6.89321 15.6567 7.14525C15.6619 7.40781 15.5643 7.67204 15.364 7.8724L9.70712 13.5293C9.3166 13.9198 8.68343 13.9198 8.29291 13.5293C7.90239 13.1387 7.90239 12.5056 8.29291 12.115L12.2579 8.15L1 8.15C0.447715 8.15 7.29786e-08 7.70229 7.95645e-08 7.15Z"
-                    fill="#DDDDDD"
-                  />
-                </svg>
-              </div>
-            }
+            logo={null}
           ></LogoMenu>
         </div>
 

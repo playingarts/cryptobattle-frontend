@@ -49,7 +49,6 @@ const GuestLogin: FC<GuestLoginProps> = ({ roomId, ...props }) => {
       css={() => ({
         background: "#4a4a4a",
         color: "#fff",
-        marginLeft: "10px",
         "&:hover": {
           background: "#5a5a5a",
         },

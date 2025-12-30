@@ -53,7 +53,7 @@ export function useDragAndDrop({ onDrop, isPlacementValid, enabled = true }: Use
         margin: 70,
         speed: 1000,
       },
-      inertia: true,
+      inertia: false,
       max: 1,
       listeners: {
         start(event) {

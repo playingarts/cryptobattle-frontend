@@ -106,7 +106,6 @@ class ErrorBoundary extends Component<Props, State> {
                 fontSize: 28,
                 fontWeight: 600,
                 marginBottom: 16,
-                fontFamily: 'Aldrich, sans-serif',
               }}
             >
               Something went wrong

@@ -27,9 +27,9 @@ const formatUsername = (username: string) => {
   if (isEthAddress(username)) {
     return truncateMiddle(username);
   }
-  // Format guest usernames: "Guest_abc123_xyz456" -> "Guest"
+  // Format guest usernames: "Guest_abc123_xyz456" -> "You"
   if (username.startsWith("Guest_")) {
-    return "Guest";
+    return "You";
   }
   return username;
 };

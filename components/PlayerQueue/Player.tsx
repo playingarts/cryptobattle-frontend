@@ -1,5 +1,4 @@
 import { forwardRef, useState, useEffect, useRef, useCallback } from "react";
-import UserAvatar from "../UserAvatar";
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
@@ -34,8 +33,8 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
 
     const { results, state } = useGame()
 
-    // Detect if player is a bot
-    const isBot = player.username?.toLowerCase().includes('bot')
+    // Read points directly from reducer state for immediate updates
+    const currentPoints = state.serverState?.playersCurrentPoints?.[player.userId] ?? player.points ?? 0
 
     // Track when current player changes (new turn starts)
     const prevCurrentPlayerRef = useRef<string | null>(null)
@@ -177,13 +176,9 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
             },
             // Customize the circle behind the path, i.e. the "total progress"
             trail: {
-              // Trail color
-              stroke: "#0A0A0A",
-              // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
-              strokeLinecap: "butt",
-              // Rotate the trail
-              transform: "rotate(0.25turn)",
-              transformOrigin: "center center",
+              // Trail color - transparent to remove black border
+              stroke: "none",
+              strokeWidth: 0,
             },
             // Customize the text
             text: {
@@ -202,90 +197,46 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
         >
           <div
             css={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
               borderRadius: 9999,
-              cursor: "default",
+              width: 62,
+              height: 62,
+              background: inactive ? '#4c4c4c' : '#1A1A1A',
               filter: inactive ? 'grayscale(100%)' : 'none',
               opacity: loadingDelayed ? "0" : "1",
               transform: loadingDelayed
                 ? "translate(1500px, 0)"
                 : "translate(0, 0)",
-              "&::after": {
-                opacity: 0,
-                content: `'${player.points}'`,
-                display: "flex",
-                lineHeight: 3,
-                transition: "all 400ms",
-                borderRadius: 9999,
-                zIndex: 999999,
-                paddingTop: 10,
-                // outline: "6px solid" + player.color,
-                justifyContent: "center",
-                alignItems: "center",
-                fontSize: 60,
-                fontFamily: "Aldrich",
-                position: "absolute",
-                color: "#fff",
-                background: player.color,
-                bottom: 0,
-                top: 0,
-                left: 0,
-                right: 0,
-                pointerEvents: "none",
-              },
-              "&::before": {
-                opacity: 0,
-                content: `'${formatUsername(player.username)}'`,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                transition: "all 400ms",
-                color: "black",
-                fontFamily: "Aldrich",
-                position: "absolute",
-                background: "#ffff",
-                borderRadius: 6,
-                lineHeight: 3,
-                fontSize: 18,
-                zIndex: 9999,
-                bottom: -40,
-                left: "50%",
-                transform: "translate(-50%, 0)",
-                padding: "12px 14px",
-                paddingTop: 16,
-                minWidth: 70,
-                height: 30,
-                pointerEvents: "none",
-                textTransform: "uppercase",
-              },
-              "&:hover": {
-                "&::after": {
-                  opacity: 1,
-                  fontSize: 42,
-                  pointerEvents: "none",
-                  paddingTop: 10,
-                },
-                "&::before": {
-                  opacity: 1,
-                  pointerEvents: "none",
-                  transform: "translate(-50%, 8px)",
-                },
-              },
             }}
           >
-            <UserAvatar
+            <div
               css={{
-                // outline: "6px solid" + player.color,
-                zIndex: 0,
-                "&:hover": {
-                  background: player.color,
-                },
-                transform: 'scale(0.84,0.84)'
+                fontSize: 32,
+                color: "#fff",
+                lineHeight: 1,
+                marginTop: 2,
               }}
-              profilePictureUrl={
-                player.profilePictureUrl || player.profileImageUrl || ''
-              }
-              avatarBgColor={isBot ? '#4c4c4c' : undefined}
-            />
+            >
+              {currentPoints}
+            </div>
+          </div>
+          <div
+            css={{
+              position: "absolute",
+              bottom: -24,
+              left: "50%",
+              transform: "translateX(-50%)",
+              fontSize: 11,
+              fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+              color: "#fff",
+              whiteSpace: "nowrap",
+              textTransform: "uppercase",
+            }}
+          >
+            {formatUsername(player.username)}
           </div>
         </CircularProgressbarWithChildren>
       </div>

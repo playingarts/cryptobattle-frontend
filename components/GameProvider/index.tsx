@@ -512,7 +512,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
               marginTop: 40,
               fontSize: 35,
               lineHeight: "45.5px",
-              letterSpacing: "-5%",
               marginBottom: 30,
             }}
           >

@@ -1,7 +1,5 @@
 import { NextPage } from "next";
 import Layout from "../components/Layout";
-import Button from "../components/Button";
-import GameRules from "../components/GameRules/";
 
 import NFTInventory from "../components/NFTInventory";
 
@@ -14,22 +12,7 @@ import DashboardHeader from "../components/DashboardHeader";
 const Home: NextPage = () => {
   const { user } = useAuth();
 
-  const headerRight = (
-    <GameRules>
-      <Button
-        css={{
-          color: "#7a7a7a",
-          background: "rgba(255, 255, 255, 0.05)",
-          transition: "color 500ms",
-          "&:hover": {
-            color: "#fff",
-          },
-        }}
-      >
-        Game Rules
-      </Button>
-    </GameRules>
-  );
+  const headerRight = null;
 
   const headerMiddle = <NavProfile user={user} />;
 
@@ -119,29 +102,32 @@ const Home: NextPage = () => {
               })}
             ></LeaderboardDashboard>
           </Grid> */}
-          {!user.isGuest ? (
-            <NFTInventory></NFTInventory>
-          ) : (
-            <div
-              css={{
-                backgroundColor: "#181818",
-                color: "rgba(255, 255, 255, 0.5)",
-                maxWidth: 1040,
-                margin: "30px auto 0",
-                padding: "40px 70px",
-                fontSize: "16px",
-                borderRadius: "10px",
-                textAlign: "center",
-              }}
-            >
-              <p css={{ margin: 0, marginBottom: 10 }}>
-                You are playing as a guest. Stats and NFT cards are not available.
-              </p>
-              <p css={{ margin: 0, color: "rgba(255, 255, 255, 0.3)" }}>
-                Connect with Metamask to track your progress and use NFT cards.
-              </p>
-            </div>
-          )}
+          {/* NFT section hidden - functionality preserved */}
+          <div css={{ display: 'none' }}>
+            {!user.isGuest ? (
+              <NFTInventory></NFTInventory>
+            ) : (
+              <div
+                css={{
+                  backgroundColor: "#181818",
+                  color: "rgba(255, 255, 255, 0.5)",
+                  maxWidth: 1040,
+                  margin: "30px auto 0",
+                  padding: "40px 70px",
+                  fontSize: "16px",
+                  borderRadius: "10px",
+                  textAlign: "center",
+                }}
+              >
+                <p css={{ margin: 0, marginBottom: 10 }}>
+                  You are playing as a guest. Stats and NFT cards are not available.
+                </p>
+                <p css={{ margin: 0, color: "rgba(255, 255, 255, 0.3)" }}>
+                  Connect with Metamask to track your progress and use NFT cards.
+                </p>
+              </div>
+            )}
+          </div>
           {/* <PlayingArtsinfo></PlayingArtsinfo> */}
         </div>
       </Layout>

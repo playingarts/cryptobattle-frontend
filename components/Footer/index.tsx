@@ -31,7 +31,7 @@ const Footer: FC<HTMLAttributes<HTMLDivElement>> = (props) => (
         color: theme.colors.text_subtitle_light,
       })}
     >
-      <Text variant="h6" component="h2" css={{ margin: "0 0 10px 0" }}>
+      <Text variant="h6" component="h2" css={{ margin: "0 0 10px 0", textAlign: "left" }}>
         {commitRef} @ {commitShort}
       </Text>
       {/* <Text variant="body0">

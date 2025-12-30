@@ -8,11 +8,9 @@ import {
   useCallback,
 } from "react";
 import { useRouter } from "next/router";
-import axios from "axios";
 import Link from "../../components/Link";
 
 import { api } from "../../api";
-import { logError } from "../../utils/errorHandler";
 import { useNotifications } from "../NotificationProvider";
 import { setUser as setGlobalUser } from "../../utils/gameState";
 
@@ -203,29 +201,14 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   }
 
   const logout = () => {
-    axios
-      .get(
-        "https://cryptobattle-backend-production.up.railway.app/auth/logout?accesstoken=" +
-          localStorage.getItem("accessToken"),
-        {
-          headers: {
-            accesstoken: localStorage.getItem("accessToken"),
-            "content-type": "application/json",
-          },
-        }
-      )
-      .then(() => {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("signature");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("accessTokenExpire");
-        setTimeout(() => {
-          router.push("/");
-        }, 0);
-      })
-      .catch((err) => {
-        logError(err, 'AuthProvider');
-      });
+    // Clear local storage first
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("signature");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("accessTokenExpire");
+
+    // Redirect immediately
+    router.push("/");
 
     // localStorage.removeItem("accessToken");
     // localStorage.removeItem("signature");

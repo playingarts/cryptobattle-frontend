@@ -137,7 +137,6 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(({ color, player, isAdmin
                   alignItems: "center",
                   transition: "all  400ms",
                   color: "#404040",
-                  fontFamily: "Aldrich",
                   position: "absolute",
                   borderRadius: 20,
                   fontSize: 14,

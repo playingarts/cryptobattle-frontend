@@ -24,7 +24,6 @@ body {
   background: red;
   position: absolute;
   display: flex;
-  font-family: Aldrich;
   justify-content: center;
   align-items: center;
   color: #fff !important;
@@ -172,6 +171,7 @@ body {
   cursor: pointer;
   display: block;
   min-width: 40px;
+  margin-right: 10px;
 }
 .line {
   display: block;
@@ -266,8 +266,7 @@ body {
   /* padding: 4%; */
   touch-action: none;
   user-select: none;
-  pointer-events: none;
-  transition: none !important;
+  /* pointer-events and transition are set via Emotion in CardSmall */
 }
 
 #outer-dropzone {
@@ -470,3 +469,4 @@ html {
 .animation-overlay-container {
   will-change: transform, opacity;
 }
+

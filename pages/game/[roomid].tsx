@@ -8,7 +8,6 @@ import Warning from "../../components/Icons/Warning";
 import ComposedGlobalLayout from "../../components/_composed/GlobalLayout";
 
 import Button from "../../components/Button";
-import GameRules from "../../components/GameRules/";
 
 import { useEffect, useState, useRef } from "react";
 
@@ -20,7 +19,6 @@ import { useNotifications } from "../../components/NotificationProvider";
 import { useAuth } from "../../components/AuthProvider";
 import { setGameStarted } from "../../utils/gameState";
 import NavProfile from "../../components/NavProfile";
-import LobbyUrl from "../../components/LobbyUrl";
 
 const JoinGame: NextPage = () => {
   const WSProvider = useWS();
@@ -358,7 +356,7 @@ const JoinGame: NextPage = () => {
       css={() => ({
         background: "#7B61FF",
         color: "#fff",
-        margin: "20px auto 0",
+        margin: "0 auto",
       })}
       onClick={startGame}
     >
@@ -380,23 +378,7 @@ const JoinGame: NextPage = () => {
     </Button>
   );
 
-  const headerRight = (
-    <GameRules>
-      <Button
-        id="rules-button"
-        css={{
-          color: "#7a7a7a",
-          background: "rgba(255, 255, 255, 0.05)",
-          transition: "color 500ms",
-          "&:hover": {
-            color: "#fff",
-          },
-        }}
-      >
-        Game Rules
-      </Button>
-    </GameRules>
-  );
+  const headerRight = null;
 
   if (!loaded) {
     return <div>loading</div>;
@@ -423,20 +405,25 @@ const JoinGame: NextPage = () => {
       >
         <div>
           {isOwner && (
-            <LobbyUrl
-              isOwner={isOwner}
-              startGame={startGameButton}
-              roomid={roomid}
-            />
+            <div css={{
+              display: "flex",
+              justifyContent: "center",
+              background: "#181818",
+              borderRadius: 10,
+              padding: "50px 40px",
+            }}>
+              {startGameButton}
+            </div>
           )}
 
           {!isOwner && <Ready readyButton={readyButton} />}
 
-          <Lobby isAdmin={isOwner} players={players} />
+          <Lobby isAdmin={isOwner} players={players} roomid={roomid} />
 
-          <NFTChoose />
-
-          {!isOwner && <LobbyUrl isOwner={isOwner} roomid={roomid} />}
+          {/* NFT section hidden - functionality preserved */}
+          <div css={{ display: 'none' }}>
+            <NFTChoose />
+          </div>
         </div>
       </Layout>
     </ComposedGlobalLayout>

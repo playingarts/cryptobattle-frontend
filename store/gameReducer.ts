@@ -342,12 +342,12 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
     case 'GAME_STATE_RECEIVED': {
       const serverData = action.payload;
 
-      // Clear processedMoveKeys when starting a different game or when game ends
+      // Clear processedMoveKeys when starting a different game
       // This prevents unbounded memory growth across multiple games
       // Only clear on game change if we had a previous game (not on initial load)
+      // Don't clear on game ending - we need to keep tracking the last move to prevent double animation
       const isNewGame = state.serverState.gameId !== null && serverData.gameId !== state.serverState.gameId;
-      const isGameEnding = serverData.state === 'ended' || serverData.state === 'results';
-      const shouldClearProcessedKeys = isNewGame || isGameEnding;
+      const shouldClearProcessedKeys = isNewGame;
 
       // Normalize server state
       const gameTableCards = normalizeTableCards(serverData.gameTableCards);
@@ -410,13 +410,9 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
       // Skip animation for system cards (initial center card) - they have no userId or userId is "system"
       const isSystemCard = !lastPlayedCard?.userId || lastPlayedCard.userId === 'system';
 
-      // Skip animation if game is not active (finished, ended, etc.)
-      const isGameActive = serverData.state === 'inGame' || serverData.state === 'started';
-
-      // Clear pending animation if game ended
-      if (!isGameActive) {
-        pendingAnimation = null;
-      } else if (isNewMove && newMoveKey && lastPlayedCard && lastPlayedPosition && !isSystemCard) {
+      // Check if game is active (but don't block animation for game-ending moves)
+      // We want to animate the last card even if the game transitions to 'results'
+      if (isNewMove && newMoveKey && lastPlayedCard && lastPlayedPosition && !isSystemCard) {
         // Calculate stack index from server table cards (card is already in stack, so length - 1)
         const positionKey = `${lastPlayedPosition.x}-${lastPlayedPosition.y}`;
         const cardsAtPosition = gameTableCards[positionKey] || [];
