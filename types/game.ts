@@ -8,10 +8,19 @@
 
 // Player types
 export interface Player {
+  odlPlayer?: boolean;
+  odlOld?: boolean;
+  odlNew?: boolean;
+  odlIdx?: number;
+  odlMovedPlayer?: boolean;
+  odlMovedIdx?: number;
+  odlQueue?: boolean;
+  odlOrdered?: number;
   userId: string;
   username: string;
   state?: 'ready' | 'waiting' | 'playing';
   avatarUrl?: string;
+  color?: string;
 }
 
 export interface PlayerWithPoints extends Player {
@@ -21,8 +30,9 @@ export interface PlayerWithPoints extends Player {
 // Room types
 export interface RoomInfo {
   roomId: string;
-  roomUsers: Player[];
+  roomUsers?: Player[];
   ownerId?: string;
+  ownderId?: string;  // Note: typo in backend, kept for compatibility
   maxPlayers?: number;
   gameMode?: string;
 }
@@ -38,10 +48,16 @@ export interface GameState {
 
 // Card types
 export interface Card {
-  cardId: string;
+  cardId?: string;
+  uid?: string;
+  suit?: string;
+  value?: string;
   name?: string;
   imageUrl?: string;
   attributes?: Record<string, number>;
+  isNft?: boolean;
+  power?: number;
+  scoring?: number;
 }
 
 // Game results types

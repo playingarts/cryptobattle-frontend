@@ -31,7 +31,9 @@ import {
   createWSCloseHandler,
   createWSErrorHandler,
   HandlerDependencies,
+  UserSocketIdleEventData,
 } from "../../utils/wsEventHandlers";
+import { Player, RoomInfo, Card, GameResults, UserInfo, GamePlayer, PlayerWithPoints } from "../../types/game";
 
 type GameProviderProps = { children: ReactNode };
 
@@ -41,33 +43,33 @@ export type IGameProviderContext = {
   dispatch: React.Dispatch<GameAction>;
 
   // KEEP: Room/lobby state (separate concern, will be migrated later)
-  players: any;
-  roomId: any;
-  roomInfo: any;
-  setRoomId: any;
-  setPlayers: any;
+  players: Player[];
+  roomId: string;
+  roomInfo: RoomInfo | null;
+  setRoomId: (roomId: string) => void;
+  setPlayers: (players: Player[]) => void;
 
   // KEEP: UI state
-  selectedCard: any;
-  setSelectedCard: any;
+  selectedCard: Card | null;
+  setSelectedCard: (card: Card | null) => void;
   timer: number;
   totalSeconds: number;
 
   // KEEP: Results flow
-  results: any;
+  results: GameResults | null;
 
   // KEEP: Connection state
-  userInfo: any;
+  userInfo: UserInfo[];
   isBackendReady: boolean;
   isAlreadyConnected: boolean;
-  userSocketIdle: any;
-  setUserSocketIdle: any;
+  userSocketIdle: UserSocketIdleEventData | null;
+  setUserSocketIdle: (data: UserSocketIdleEventData | null) => void;
 
   // DEPRECATED: These are derived from state.serverState - kept temporarily for consumers
   // Will be removed when consumers are migrated
-  gameState: any;
-  isMyTurn: any;
-  playersGame: any;
+  gameState: GameReducerState['serverState'];
+  isMyTurn: boolean;
+  playersGame: GamePlayer[];
 };
 
 const getUser = async (playerId: string) => {
@@ -82,20 +84,20 @@ const GameProviderContext = createContext<IGameProviderContext | null>(null);
 function GameProvider({ children }: GameProviderProps): JSX.Element {
   const { openNotification, closeNotification } = useNotifications();
 
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<GameResults | null>(null);
 
-  const [players, setPlayers] = useState<any>([]);
-  const [playersInfo, setPlayersInfo] = useState<any>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [playersInfo, setPlayersInfo] = useState<UserInfo[]>([]);
   // DELETED: playersGame - now derived from state.serverState.allGamePlayers
   // const [playersGame, setPlayersGame] = useState<any>([]);
 
-  const [playingAgain, setPlayingAgain] = useState<any>(false);
+  const [playingAgain, setPlayingAgain] = useState<boolean | null>(false);
 
   const [timer, setTimer] = useState<number>(0);
   const [totalSeconds, setTotalSeconds] = useState<number>(0);
   const [isAlreadyConnected, setIsAlreadyConnected] = useState<boolean>(false);
 
-  const [userInfo, setUserInfo] = useState<any>([]);
+  const [userInfo, setUserInfo] = useState<UserInfo[]>([]);
 
   const [isBackendReady, setIsBackendReady] = useState(false);
   const [isNewGameLoading, setIsNewGameLoading] = useState(false);
@@ -108,10 +110,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   // SINGLE SOURCE OF TRUTH for game state
   const [state, dispatch] = useReducer(gameReducer, initialGameState);
 
-  const [roomInfo, setRoomInfo] = useState<any>([]);
-  const [selectedCard, setSelectedCard] = useState<any>(null);
+  const [roomInfo, setRoomInfo] = useState<RoomInfo | null>(null);
+  const [selectedCard, setSelectedCard] = useState<Card | null>(null);
 
-  const [roomId, setRoomId] = useState<any>("");
+  const [roomId, setRoomId] = useState<string>("");
 
   const router = useRouter();
 
@@ -279,7 +281,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   // DELETED: gameState, isMyTurn - now derived from reducer state
   // const [gameState, setGameState] = useState<any>(null);
   // const [isMyTurn, setIsMyTurn] = useState<any>(null);
-  const [userSocketIdle, setUserSocketIdle] = useState<any>(null);
+  const [userSocketIdle, setUserSocketIdle] = useState<UserSocketIdleEventData | null>(null);
 
   // Set current player in reducer when user is authenticated
   useEffect(() => {
@@ -293,11 +295,11 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       return;
     }
 
-    players.forEach((player: any) => {
+    players.forEach((player: Player) => {
       if (
         !player.username ||
         !playersInfo.find(
-          (playerInfo: any) => player.userId === playerInfo.userId
+          (playerInfo: UserInfo) => player.userId === playerInfo.userId
         )
       ) {
         getUser(player.userId)
@@ -305,7 +307,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
             if (!data) {
               return;
             }
-            // const playersFiltered = players.map((player: any) => {
+            // const playersFiltered = players.map((player: Player) => {
             //   if (player.userId === data.userId) {
             //     return { ...player, ...data };
             //   }
@@ -408,14 +410,14 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       stateSetters: {
         setTimer,
         setTotalSeconds,
-        setUserSocketIdle,
-        setUserInfo,
+        setUserSocketIdle: (data: unknown) => setUserSocketIdle(data as UserSocketIdleEventData | null),
+        setUserInfo: (info: unknown) => setUserInfo(info as UserInfo[]),
         setIsBackendReady,
-        setRoomId,
-        setResults,
-        setRoomInfo,
-        setPlayers,
-        setPlayingAgain,
+        setRoomId: (id: unknown) => setRoomId(id as string),
+        setResults: (results: unknown) => setResults(results as GameResults | null),
+        setRoomInfo: (info: unknown) => setRoomInfo(info as RoomInfo | null),
+        setPlayers: (players: unknown) => setPlayers(players as Player[]),
+        setPlayingAgain: (playing: unknown) => setPlayingAgain(playing as boolean | null),
         setIsAlreadyConnected,
         setGameState,
       },
@@ -462,9 +464,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
         return "You Win!";
       }
 
-      const winners = results.winnerPlayersUserIds.map((winnerId: any) =>
+      const winners = results.winnerPlayersUserIds.map((winnerId: string) =>
         formatUsername(
-          playersGame.find((player: any) => player.userId === winnerId)?.username || ''
+          playersGame.find((player: GamePlayer) => player.userId === winnerId)?.username || ''
         )
       );
 
@@ -472,9 +474,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     };
 
     const playerResults = playersGame
-      .map((player: any) => {
+      .map((player: GamePlayer) => {
         const resultsPlayer = results.playersPoints.find(
-          (playerR: any) => player.userId === playerR.userId
+          (playerR: PlayerWithPoints) => player.userId === playerR.userId
         );
 
         return {
@@ -482,7 +484,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           ...player,
         };
       })
-      .sort((a: any, b: any) => b.points - a.points);
+      .sort((a: GamePlayer & { points: number }, b: GamePlayer & { points: number }) => b.points - a.points);
 
     // const playerResults = results.playersPoints
     //   .map((player: any) => {
@@ -525,9 +527,9 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
               width: 390,
             }}
           >
-            {playerResults.map((player: any, index: number) => {
+            {playerResults.map((player: GamePlayer & { points: number }, index: number) => {
               // const points = results.playersPoints.find(
-              //   (playersWithPoints: any) =>
+              //   (playersWithPoints: PlayerWithPoints) =>
               //     playersWithPoints.userId === player.userId
               // );
               return (
@@ -546,7 +548,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
                 >
                   <div>
                     {index + 1 + ". "}
-                    {formatUsername(player.username)}{" "}
+                    {formatUsername(player.username || '')}{" "}
                   </div>
                   <div>
                     {player.points ? player.points : 0}

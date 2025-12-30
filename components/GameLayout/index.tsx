@@ -60,7 +60,7 @@ const GameLayout: FC<
         localStorage.setItem("intentional-leave", "true");
 
         // Clear local state first
-        setPlayers(null);
+        setPlayers([]);
         localStorage.setItem("chosen-nfts", "");
         setGameStarted(false);
 

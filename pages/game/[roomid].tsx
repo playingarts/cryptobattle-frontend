@@ -213,7 +213,7 @@ const JoinGame: NextPage = () => {
 
     const leave = () => {
       const sendLeaveEvent = () => {
-        setPlayers(null);
+        setPlayers([]);
         localStorage.setItem("chosen-nfts", "");
         WSProvider.send(
           JSON.stringify({

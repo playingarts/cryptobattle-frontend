@@ -105,7 +105,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       );
       const isStandardMove = allowedPlacement.some(
         (allowedCard: { suit: string; value: string }) =>
-          allowedCard.suit.toLowerCase() === card.suit.toLowerCase() &&
+          allowedCard.suit.toLowerCase() === card.suit?.toLowerCase() &&
           allowedCard.value === card.value
       );
 
@@ -240,7 +240,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
       );
       const isStandardMove = allowedPlacement.some(
         (allowedCard: { suit: string; value: string }) =>
-          allowedCard.suit.toLowerCase() === card.suit.toLowerCase() &&
+          allowedCard.suit.toLowerCase() === card.suit?.toLowerCase() &&
           allowedCard.value === card.value
       );
 

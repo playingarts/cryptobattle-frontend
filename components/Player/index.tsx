@@ -16,8 +16,8 @@ import UserAvatar from "../../components/UserAvatar";
 export type Props = HTMLAttributes<HTMLDivElement>;
 
 interface PlayerProps extends Props {
-  player: { userId: string; state: string };
-  color: string;
+  player: { userId: string; state?: string };
+  color?: string;
   isAdmin: boolean;
 }
 

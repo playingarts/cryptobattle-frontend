@@ -120,6 +120,7 @@ export interface TimerEventData {
 
 export interface UserSocketIdleEventData {
   userId: string;
+  isIdle?: boolean;
 }
 
 export interface UserInfoEventData {

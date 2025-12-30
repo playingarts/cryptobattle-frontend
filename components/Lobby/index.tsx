@@ -9,8 +9,8 @@ interface Stats extends Props {
 
 interface PlayerType {
   userId: string;
-  state: string;
-  color: string;
+  state?: string;
+  color?: string;
 }
 
 import Player from "../Player";

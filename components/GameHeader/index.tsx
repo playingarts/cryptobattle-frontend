@@ -80,7 +80,11 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
     if (gameState.allGamePlayers.length === 2) {
       const cardsOpponents = gameState.gameUsersWithCards.filter(
         (userCards: any) => userCards.userId !== user.userId
-      )[0].cards;
+      )[0]?.cards;
+
+      if (!cardsOpponents) {
+        return;
+      }
 
       const cardsOpponentsFormatted = cardsOpponents.map((card: any) => {
         if (!card.suit) {
