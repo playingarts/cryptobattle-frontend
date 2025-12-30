@@ -6,15 +6,18 @@
  * - Uses moveKey for idempotency
  * - Handles both local and remote moves uniformly
  * - Auto-clears animation after duration
+ * - Uses centralized animation config
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { PendingAnimation } from '../types/game';
 import { GameAction } from '../store/gameActions';
 import { logAnimation } from '../utils/debug';
-
-// Animation duration matches CSS (400ms) + buffer for smoothness
-const ANIMATION_DURATION_MS = 500;
+import {
+  ANIMATION_CONFIG,
+  smoothScrollTo,
+  calculateScrollTarget,
+} from '../config/animation';
 
 interface UseAnimationQueueOptions {
   pendingAnimation: PendingAnimation | null;
@@ -36,6 +39,7 @@ export function useAnimationQueue({
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentAnimation, setCurrentAnimation] = useState<PendingAnimation | null>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollCancelRef = useRef<(() => void) | null>(null);
 
   // Use refs to track state inside useEffect without re-running on every state change
   const isAnimatingRef = useRef(isAnimating);
@@ -91,47 +95,34 @@ export function useAnimationQueue({
     const scrollContainer = document.querySelector('.scroll-container');
     const boardCell = document.querySelector(`[id="${pendingAnimation.position.y}-${pendingAnimation.position.x}"]`);
 
-    const SCROLL_DURATION = 600;
-
     const startCardAnimation = () => {
       setCurrentAnimation(pendingAnimation);
     };
 
+    // Store cancel function for scroll animation cleanup
+    let cancelScroll: (() => void) | null = null;
+
     if (boardCell && scrollContainer) {
-      const cardRect = boardCell.getBoundingClientRect();
-      const containerRect = scrollContainer.getBoundingClientRect();
+      const { left: targetLeft, top: targetTop } = calculateScrollTarget(boardCell, scrollContainer);
 
-      // Calculate target scroll position to center the card
-      const targetLeft = scrollContainer.scrollLeft + cardRect.left - containerRect.left - (containerRect.width / 2) + (cardRect.width / 2);
-      const targetTop = scrollContainer.scrollTop + cardRect.top - containerRect.top - (containerRect.height / 2) + (cardRect.height / 2);
-
-      // Smooth scroll with custom duration
-      const startLeft = scrollContainer.scrollLeft;
-      const startTop = scrollContainer.scrollTop;
-      const startTime = performance.now();
-
-      const animateScroll = (currentTime: number) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / SCROLL_DURATION, 1);
-        // Ease out cubic
-        const eased = 1 - Math.pow(1 - progress, 3);
-
-        scrollContainer.scrollLeft = startLeft + (targetLeft - startLeft) * eased;
-        scrollContainer.scrollTop = startTop + (targetTop - startTop) * eased;
-
-        if (progress < 1) {
-          requestAnimationFrame(animateScroll);
-        } else {
-          // Scroll complete, start card animation
-          startCardAnimation();
-        }
-      };
-
-      requestAnimationFrame(animateScroll);
+      // Use optimized smooth scroll with cleanup
+      cancelScroll = smoothScrollTo(
+        scrollContainer,
+        targetLeft,
+        targetTop,
+        ANIMATION_CONFIG.SCROLL_DURATION,
+        startCardAnimation
+      );
     } else {
       // No scroll needed, start animation immediately
       startCardAnimation();
     }
+
+    // Calculate total animation duration
+    const totalDuration =
+      ANIMATION_CONFIG.SCROLL_DURATION +
+      ANIMATION_CONFIG.CARD_FLY_IN_DURATION +
+      ANIMATION_CONFIG.ANIMATION_BUFFER;
 
     // End animation after scroll + card animation duration
     animationTimeoutRef.current = setTimeout(() => {
@@ -142,12 +133,18 @@ export function useAnimationQueue({
       // Clear currentAnimation so the board card becomes visible again
       setCurrentAnimation(null);
       setIsAnimating(false);
-    }, SCROLL_DURATION + ANIMATION_DURATION_MS);
+    }, totalDuration);
 
-    // Cleanup on unmount
+    // Store cancel function for cleanup
+    scrollCancelRef.current = cancelScroll;
+
+    // Cleanup on unmount or when animation changes
     return () => {
       if (animationTimeoutRef.current) {
         clearTimeout(animationTimeoutRef.current);
+      }
+      if (scrollCancelRef.current) {
+        scrollCancelRef.current();
       }
     };
   }, [pendingAnimation, dispatch]);
@@ -157,6 +154,9 @@ export function useAnimationQueue({
     return () => {
       if (animationTimeoutRef.current) {
         clearTimeout(animationTimeoutRef.current);
+      }
+      if (scrollCancelRef.current) {
+        scrollCancelRef.current();
       }
     };
   }, []);

@@ -9,12 +9,14 @@
  * - Shows score popup (+N) after card lands
  * - Uses player color for outline
  * - Auto-positions based on cell location
+ * - GPU-accelerated with will-change hints
  */
 
-import { FC, useMemo } from 'react';
+import { FC, useMemo, memo } from 'react';
 import Card from '../CardNew';
 import { PendingAnimation, GamePlayer } from '../../types/game';
 import { getCardImageUrl, getCardVideoUrl } from '../../utils/moveUtils';
+import { ANIMATION_CONFIG } from '../../config/animation';
 
 // Cell dimensions (must match GameBoard cell sizing)
 const CELL_WIDTH = 210;
@@ -58,7 +60,7 @@ function calculateAnimationPosition(
   };
 }
 
-export const AnimationOverlay: FC<AnimationOverlayProps> = ({
+const AnimationOverlayComponent: FC<AnimationOverlayProps> = ({
   animation,
   players,
   boardOffsetX = 0,
@@ -103,7 +105,7 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
   const { card, moveKey, stackIndex, position } = animation;
 
   // Calculate target rotation based on stack index (same as CardStack)
-  const targetRotation = stackIndex > 0 ? stackIndex * 4 : 0;
+  const targetRotation = stackIndex > 0 ? stackIndex * ANIMATION_CONFIG.CARD_STACK_ROTATION : 0;
 
   return (
     <div
@@ -147,9 +149,10 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
             width: '100%',
             height: '100%',
             animationName: 'cardFlyIn',
-            animationDuration: '400ms',
+            animationDuration: `${ANIMATION_CONFIG.CARD_FLY_IN_DURATION}ms`,
             animationTimingFunction: 'ease-out',
             animationFillMode: 'forwards',
+            willChange: 'transform, opacity',
           }}
         >
           {/* The actual card component */}
@@ -170,5 +173,8 @@ export const AnimationOverlay: FC<AnimationOverlayProps> = ({
     </div>
   );
 };
+
+// Memoize to prevent unnecessary re-renders
+export const AnimationOverlay = memo(AnimationOverlayComponent);
 
 export default AnimationOverlay;
