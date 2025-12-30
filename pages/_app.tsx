@@ -6,6 +6,7 @@ import "modern-normalize/modern-normalize.css";
 import { CSSInterpolation } from "@emotion/serialize";
 import smoothscroll from "smoothscroll-polyfill";
 import { AppProviders } from "../components/AppProviders";
+import ErrorBoundary from "../components/ErrorBoundary";
 import "../css/style.css";
 import { isConnectionClosed, setConnectionClosed } from "../utils/gameState";
 declare module "@emotion/react" {
@@ -218,9 +219,11 @@ const App = ({ Component, pageProps }: AppProps) => {
         />
         <title>Card Battle - Playing Arts</title>
       </Head>
-      <AppProviders theme={theme}>
-        <Component {...pageProps} />
-      </AppProviders>
+      <ErrorBoundary>
+        <AppProviders theme={theme}>
+          <Component {...pageProps} />
+        </AppProviders>
+      </ErrorBoundary>
     </Fragment>
   );
 };
