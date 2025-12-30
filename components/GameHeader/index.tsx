@@ -37,10 +37,6 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
   }, [loading]);
 
   useEffect(() => {
-    console.log(currentPlayer);
-  }, [currentPlayer]);
-
-  useEffect(() => {
     if (!gameState || !playersGame) {
       return;
     }

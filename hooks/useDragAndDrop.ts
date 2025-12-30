@@ -90,10 +90,8 @@ export function useDragAndDrop({ onDrop, isPlacementValid, enabled = true }: Use
             const rowIndex = Number(parts[0]);
             const columnIndex = Number(parts[1]);
             const isValid = isPlacementValidRef.current(rowIndex, columnIndex);
-            console.log('[DragDrop] ondragenter:', { targetId, rowIndex, columnIndex, isValid, classes: event.target.className });
             if (!isValid) {
               event.target.classList.add('drop-error');
-              console.log('[DragDrop] Added drop-error class to:', targetId);
             }
           }
         }

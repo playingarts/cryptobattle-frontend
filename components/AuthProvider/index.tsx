@@ -70,7 +70,6 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
   const { accesstoken } = router.query;
 
   const setToken = useCallback((token: any) => {
-    console.log(token, "token");
     localStorage.setItem("accessToken", token as string);
     getUser().then((data: any) => {
       const user = formatUserData(data);
@@ -84,7 +83,6 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       setGlobalUser(JSON.stringify(user))
       const roomid = localStorage.getItem("roomid");
       if (!localStorage.getItem("adding-metamask")) {
-        console.log('/dashboard redirect here.')
         setTimeout(() => {
           roomid
             ? router.push(`/game/${roomid}?join=true`)
@@ -106,8 +104,6 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
 
     if (isLoggedInCookie()) {
       getUser().then((data: any) => {
-        console.log(data);
-
         if (data.refreshToken) {
           localStorage.setItem("refreshToken", data.refreshToken);
           localStorage.setItem("accessTokenExpire", data.accessTokenExpire);

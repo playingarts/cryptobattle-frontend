@@ -54,7 +54,6 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(({ color, player, isAdmin
   );
 
   useEffect(() => {
-    console.log("player", playerInfo);
     const userId = player?.userId;
     if (!playerInfo.username && userId) {
       getUser(userId)

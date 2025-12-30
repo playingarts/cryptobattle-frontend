@@ -56,13 +56,6 @@ const GameLayout: FC<
         closeNotification();
       };
       const leave = () => {
-        console.log('[DEBUG GameLayout leave] Starting leave process', {
-          isOwner,
-          roomId: roomInfo?.roomId,
-          userId: user?.userId,
-          ownerId: roomInfo?.ownderId,
-        });
-
         // Set flag to prevent redirect back to game (persists across navigation)
         localStorage.setItem("intentional-leave", "true");
 
@@ -73,15 +66,12 @@ const GameLayout: FC<
 
         // Send quit-game event to clear server's inGameId
         if (WSProvider) {
-          console.log('[DEBUG GameLayout leave] Sending quit-game event');
           WSProvider.send(
             JSON.stringify({
               event: "quit-game",
               data: {},
             })
           );
-        } else {
-          console.log('[DEBUG GameLayout leave] WARNING: WSProvider is null, cannot send leave event');
         }
 
         setIsConfirmedLeave(true);
@@ -93,17 +83,13 @@ const GameLayout: FC<
         }
 
         // Give time for WebSocket message to be sent and processed
-        console.log('[DEBUG GameLayout leave] Scheduling redirect in 500ms');
         setTimeout(() => {
-          console.log('[DEBUG GameLayout leave] Redirecting to /dashboard now');
           // Use router.push for smoother navigation, with window.location as fallback
           router.push("/dashboard").catch(() => {
             window.location.href = "/dashboard";
           });
         }, 500);
       };
-
-      console.log("handleRouteChange", url);
 
       if (
         !hasResults() &&

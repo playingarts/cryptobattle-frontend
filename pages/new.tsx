@@ -24,14 +24,10 @@ const NewGame: NextPage = () => {
   const { roomId, setRoomId, isAlreadyConnected } = useGame();
   const router = useRouter();
   useEffect(() => {
-    console.log("[DEBUG /new page] roomId changed:", roomId);
-
     if (!roomId) {
-      console.log("[DEBUG /new page] No roomId yet, waiting for create-room response");
       return;
     }
 
-    console.log("[DEBUG /new page] Got roomId, redirecting to /game/", roomId);
     router.push(`/game/${roomId}`);
 
     return () => setRoomId(null);
@@ -61,7 +57,6 @@ const NewGame: NextPage = () => {
   useEffect(() => {
     // First, ensure any existing game is properly quit
     // This handles case where user navigates to /new while still in a game
-    console.log("[DEBUG /new page] Sending quit-game to clear any existing game");
     WSProvider.send(
       JSON.stringify({
         event: "quit-game",
@@ -71,7 +66,6 @@ const NewGame: NextPage = () => {
 
     // Small delay to let server process quit before creating new room
     const timer = setTimeout(() => {
-      console.log("[DEBUG /new page] Sending create-room event");
       WSProvider.send(
         JSON.stringify({
           event: "create-room",

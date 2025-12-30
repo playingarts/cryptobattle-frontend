@@ -39,7 +39,6 @@ const Home: any = () => {
     setLoading(true);
     getRoomInfo(roomid)
       .then((data: any) => {
-        console.log(data);
         setRoomInfo(data);
         setLoading(false);
         setLoaded(true);

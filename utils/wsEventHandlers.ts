@@ -218,12 +218,6 @@ export function handleUserSocketIdle(data: UserSocketIdleEventData, deps: Handle
  * Handle user info event
  */
 export function handleUserInfo(data: UserInfoEventData, deps: HandlerDeps): HandlerResult {
-  console.log('[DEBUG user-info] Received:', {
-    userId: data.userId,
-    inRoomId: data.inRoomId,
-    inGameId: data.inGameId,
-    currentPath: typeof window !== 'undefined' ? window.location.pathname : 'SSR',
-  });
   deps.stateSetters.setUserInfo(data);
   setGlobalUserId(data.userId);
   deps.stateSetters.setIsBackendReady(true);
@@ -234,16 +228,12 @@ export function handleUserInfo(data: UserInfoEventData, deps: HandlerDeps): Hand
  * Handle create room event
  */
 export function handleCreateRoom(data: CreateRoomEventData, deps: HandlerDeps): HandlerResult {
-  console.log('[DEBUG create-room] Response received:', data);
-
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
   const isOnNewPage = currentPath === '/new';
 
   if (data.error) {
-    console.log('[DEBUG create-room] ERROR:', data.error.message);
     // If on /new page, retry after a delay (quit-game might still be processing)
     if (isOnNewPage) {
-      console.log('[DEBUG create-room] On /new page, retrying in 500ms...');
       setTimeout(() => {
         deps.wsProvider.send(JSON.stringify({
           event: 'create-room',
@@ -257,14 +247,11 @@ export function handleCreateRoom(data: CreateRoomEventData, deps: HandlerDeps): 
   }
 
   if (data.roomId) {
-    console.log('[DEBUG create-room] Setting roomId to:', data.roomId);
     deps.stateSetters.setRoomId(data.roomId);
     deps.wsProvider.send(JSON.stringify({ event: 'room-info', data: {} }));
   } else {
-    console.log('[DEBUG create-room] WARNING: No roomId in response');
     // If on /new page, retry instead of redirecting
     if (isOnNewPage) {
-      console.log('[DEBUG create-room] On /new page, retrying in 500ms...');
       setTimeout(() => {
         deps.wsProvider.send(JSON.stringify({
           event: 'create-room',
@@ -321,7 +308,6 @@ export function handleRoomUpdated(data: RoomEventData, deps: HandlerDeps): Handl
   // Normal update
   deps.stateSetters.setRoomInfo(data);
   if (data.roomUsers) {
-    console.log('Room updated: ', data);
     deps.stateSetters.setPlayers(data.roomUsers);
   }
   return CONTINUE;
@@ -333,7 +319,6 @@ export function handleRoomUpdated(data: RoomEventData, deps: HandlerDeps): Handl
 export function handleRoomInfo(data: RoomEventData, deps: HandlerDeps): HandlerResult {
   deps.stateSetters.setRoomInfo(data);
   if (data.roomUsers) {
-    console.log('Room info: ', data);
     deps.stateSetters.setPlayers(data.roomUsers);
   }
   return CONTINUE;
@@ -388,7 +373,6 @@ export function handleQuitRoom(data: QuitRoomEventData, deps: HandlerDeps): Hand
  * Handle game results event
  */
 export function handleGameResults(data: GameResultsEventData, deps: HandlerDeps): HandlerResult {
-  console.log('game-results', data);
   deps.stateSetters.setResults(data);
   setGlobalResults(true);
   return CONTINUE;
@@ -415,7 +399,6 @@ export function handleGameInfo(data: GameEventData, deps: HandlerDeps): HandlerR
     });
   }
 
-  console.log('game-info": ', data);
   return CONTINUE;
 }
 
@@ -438,7 +421,6 @@ export function handleGameUpdated(data: GameEventData, deps: HandlerDeps): Handl
     }
   }, 0);
 
-  console.log('game-updated": ', data);
   return CONTINUE;
 }
 
@@ -446,7 +428,6 @@ export function handleGameUpdated(data: GameEventData, deps: HandlerDeps): Handl
  * Handle next game event
  */
 export function handleNextGame(data: unknown, deps: HandlerDeps): HandlerResult {
-  console.log('next-game', data);
   return CONTINUE;
 }
 
@@ -454,7 +435,6 @@ export function handleNextGame(data: unknown, deps: HandlerDeps): HandlerResult 
  * Handle choose NFT cards event
  */
 export function handleChooseNftCards(data: unknown, deps: HandlerDeps): HandlerResult {
-  console.log('choose-nft-cards sub: ', data);
   return CONTINUE;
 }
 
@@ -462,8 +442,6 @@ export function handleChooseNftCards(data: unknown, deps: HandlerDeps): HandlerR
  * Handle WebSocket close event
  */
 export function handleWSClose(data: WSCloseEventData, deps: HandlerDeps): HandlerResult {
-  console.log('on close: ' + data.code);
-
   // Don't reconnect if there's already a connection opened in the backend
   if (data.code === 4000) {
     if (!localStorage.getItem('adding-metamask')) {
@@ -564,11 +542,6 @@ export function createWSMessageHandler(legacyDeps: HandlerDependencies): (event:
       return;
     }
 
-    // Log non-timer events
-    if (event.event !== 'timer') {
-      console.log('Game Provider WS event:', event);
-    }
-
     const eventData = event.data;
 
     // Check for global errors first
@@ -629,7 +602,7 @@ export function createWSMessageHandler(legacyDeps: HandlerDependencies): (event:
         result = handleChooseNftCards(eventData, deps);
         break;
       default:
-        console.log('Unhandled WS event:', event.event);
+        break;
     }
 
     // Result is used for future extension (e.g., middleware chain)
@@ -668,6 +641,6 @@ export function createWSCloseHandler(legacyDeps: HandlerDependencies): (event: R
  */
 export function createWSErrorHandler(): (event: RWSErrorEvent) => void {
   return function handleError(event: RWSErrorEvent) {
-    console.log('WebSocket error: ', event);
+    // WebSocket error occurred
   };
 }

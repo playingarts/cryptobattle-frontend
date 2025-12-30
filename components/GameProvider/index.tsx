@@ -195,10 +195,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   };
 
   useEffect(() => {
-    console.log(selectedCard);
-  }, [selectedCard]);
-
-  useEffect(() => {
     if (!WSProvider) {
       return;
     }
@@ -229,15 +225,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     // Check if user intentionally left (persists across navigation)
     const intentionalLeave = localStorage.getItem("intentional-leave") === "true";
 
-    console.log('[DEBUG GameProvider redirect check]', {
-      isAlreadyConnected,
-      user: user ? { userId: user.userId, inGameId: user.inGameId, inRoomId: user.inRoomId } : null,
-      isGameStarted: isGameStarted(),
-      intentionalLeave,
-      pathname: currentPath,
-      asPath: actualPath,
-    });
-
     // Clear the flag after checking (one-time use)
     if (intentionalLeave) {
       localStorage.removeItem("intentional-leave");
@@ -255,22 +242,13 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       currentPath.startsWith(path) || actualPath.startsWith(path)
     );
 
-    console.log('[DEBUG GameProvider redirect decision]', {
-      shouldSkipRedirect,
-      willRedirectToPlay: user.inGameId && !shouldSkipRedirect,
-      willRedirectToRoom: user.inRoomId && !currentPath.startsWith("/join") && !actualPath.startsWith("/join") && !shouldSkipRedirect,
-    });
-
     if (user.inGameId && !shouldSkipRedirect) {
-      console.log('[DEBUG GameProvider] Redirecting to /play due to inGameId:', user.inGameId);
       router.push(`/play`);
       return;
     }
     if (user.inRoomId && !currentPath.startsWith("/join") && !actualPath.startsWith("/join") && !shouldSkipRedirect) {
-      console.log('[DEBUG GameProvider] Redirecting to /game/ due to inRoomId:', user.inRoomId);
       router.push(`/game/${user.inRoomId}`);
     }
-    console.log(selectedCard);
   }, [user, isAlreadyConnected, router.isReady, router.pathname]);
 
   useEffect(() => {
@@ -334,7 +312,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
             //   return player;
             // });
 
-            console.log();
             setPlayersInfo([...playersInfo, data]);
           })
           .catch((err) => {

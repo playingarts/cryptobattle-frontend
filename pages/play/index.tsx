@@ -79,8 +79,6 @@ const Play: NextPage = () => {
       setLoading(false);
     }, 1000);
 
-    console.log("Game users with cards: ", gameState.gameUsersWithCards);
-
     // Find current user's cards from gameUsersWithCards array
     const userWithCards = gameState.gameUsersWithCards?.find(
       (userCards: any) => userCards.userId === user.userId

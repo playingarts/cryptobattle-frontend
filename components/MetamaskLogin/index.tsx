@@ -77,7 +77,6 @@ const router = useRouter();
               roomIdValue ? router.push(`/game/${roomIdValue}?join=true`)
                 : router.push("/dashboard");
             }, 1000);
-            console.log(result.data.accesstoken);
           })
           .catch((err) => {
             logError(err, 'MetamaskLogin');
@@ -88,9 +87,7 @@ const router = useRouter();
 
   const requestSignature = async () => {
     setSignature((prev) => ({ ...prev, signing: true }));
-    console.log('requestSignature')
     const address: string = (await ethereum.request({ method: 'eth_requestAccounts' }))[0];
-    console.log(address)
     connect();
 
 

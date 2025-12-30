@@ -28,9 +28,6 @@ const LeaderboardDashboard: FC<Props> = ({ ...props }) => {
 
   useEffect(() => {
     getLeaderboard()
-      .then((data: any) => {
-        console.log(data);
-      })
       .catch((err: any) => {
         logError(err, 'LeaderboardDashboard');
       });

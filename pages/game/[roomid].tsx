@@ -135,7 +135,6 @@ const JoinGame: NextPage = () => {
 
   const toggleReady = () => {
     const ready = isReady ? false : true;
-    console.log("Setting Ready: ", ready);
     WSProvider.send(
       JSON.stringify({
         event: "player-ready",
@@ -246,8 +245,6 @@ const JoinGame: NextPage = () => {
     };
 
     const handleRouteChange = (url: string) => {
-      console.log("handleRouteChange", url);
-
       if (
         url !== "/play" &&
         !url.startsWith("/game/") &&

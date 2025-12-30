@@ -79,8 +79,6 @@ const NFTInventory: FC<Props> = ({ ...props }) => {
       return;
     }
 
-    console.log(NFTCards);
-
     const cardsOnSale = NFTCards.filter((card) => card.onSale);
 
     const topCards = NFTCards.filter((card) => card.xp).sort(

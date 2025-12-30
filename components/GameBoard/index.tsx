@@ -197,7 +197,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
     const placementsCount = placements ? Object.keys(placements).length : -1;
 
     if (isMyTurn && placements && placementsCount === 0 && hasCards) {
-      console.log('[GameBoard] Auto-pass: no valid placements');
       setTimeout(() => {
         WSProvider.send(
           JSON.stringify({

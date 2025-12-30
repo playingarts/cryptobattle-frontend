@@ -41,7 +41,6 @@ const Stats: FC<Props> = ({ ...props }) => {
     }
     getUserStats(user.userId)
       .then((data : any) => {
-        console.log("User Stats: ", data);
         setUserStats(data);
       })
       .catch((err : any) => {
