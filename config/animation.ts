@@ -112,26 +112,49 @@ export function smoothScrollTo(
 
 /**
  * Calculate scroll target to center an element in its container
+ * Returns null if scrolling would be minimal (element near edge)
  */
 export function calculateScrollTarget(
   element: Element,
   container: Element
-): { left: number; top: number } {
+): { left: number; top: number } | null {
   const elementRect = element.getBoundingClientRect();
   const containerRect = container.getBoundingClientRect();
 
+  // Calculate ideal center position
+  const idealLeft =
+    container.scrollLeft +
+    elementRect.left -
+    containerRect.left -
+    containerRect.width / 2 +
+    elementRect.width / 2;
+  const idealTop =
+    container.scrollTop +
+    elementRect.top -
+    containerRect.top -
+    containerRect.height / 2 +
+    elementRect.height / 2;
+
+  // Calculate max scroll values
+  const maxScrollLeft = container.scrollWidth - containerRect.width;
+  const maxScrollTop = container.scrollHeight - containerRect.height;
+
+  // Clamp to valid scroll range
+  const clampedLeft = Math.max(0, Math.min(idealLeft, maxScrollLeft));
+  const clampedTop = Math.max(0, Math.min(idealTop, maxScrollTop));
+
+  // Check if scroll distance is minimal (less than 50px in both directions)
+  // This prevents glitchy small scrolls at board edges
+  const scrollDistanceX = Math.abs(clampedLeft - container.scrollLeft);
+  const scrollDistanceY = Math.abs(clampedTop - container.scrollTop);
+  const minScrollThreshold = 50;
+
+  if (scrollDistanceX < minScrollThreshold && scrollDistanceY < minScrollThreshold) {
+    return null; // Skip scrolling for minimal distances
+  }
+
   return {
-    left:
-      container.scrollLeft +
-      elementRect.left -
-      containerRect.left -
-      containerRect.width / 2 +
-      elementRect.width / 2,
-    top:
-      container.scrollTop +
-      elementRect.top -
-      containerRect.top -
-      containerRect.height / 2 +
-      elementRect.height / 2,
+    left: clampedLeft,
+    top: clampedTop,
   };
 }

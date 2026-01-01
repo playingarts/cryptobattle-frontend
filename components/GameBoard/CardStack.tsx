@@ -134,7 +134,7 @@ const CardStack: FC<CardStackProps> = ({
               // Hide during animation, show instantly when animation ends (no opacity transition)
               opacity: isHiddenByAnimation ? 0 : 1,
               // Only transition transform/box-shadow for hover effects, NOT opacity
-              transition: 'transform 150ms ease-out, box-shadow 150ms ease-out',
+              transition: 'transform 75ms ease-out, box-shadow 75ms ease-out',
               transform: rotation,
               // Hover effect when dragging a card over this card (valid placement)
               '&.drop-target:not(.drop-error)': {

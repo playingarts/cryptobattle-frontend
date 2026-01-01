@@ -76,7 +76,7 @@ const Card: FC<Props> = ({
               borderRadius: theme.spacing(1.5),
               border: 0,
               background: "rgba(0, 0, 0, 0.2)",
-              transition: 'background 300ms ease-out, box-shadow 300ms ease-out',
+              transition: 'background 150ms ease-out, box-shadow 150ms ease-out',
               boxShadow: '0 0 0 0px transparent',
               ...containerStyles,
               // Always render the ::before element but invisible, so we can animate it
@@ -93,7 +93,7 @@ const Card: FC<Props> = ({
                 borderRadius: 15,
                 zIndex: 99999,
                 opacity: 0,
-                transition: 'all 300ms ease-out',
+                transition: 'all 150ms ease-out',
               },
               // Respond to drop-error class on ancestor (added by interact.js during drag)
               '.drop-error &::before': {

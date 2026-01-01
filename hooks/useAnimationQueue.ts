@@ -103,16 +103,22 @@ export function useAnimationQueue({
     let cancelScroll: (() => void) | null = null;
 
     if (boardCell && scrollContainer) {
-      const { left: targetLeft, top: targetTop } = calculateScrollTarget(boardCell, scrollContainer);
+      const scrollTarget = calculateScrollTarget(boardCell, scrollContainer);
 
-      // Use optimized smooth scroll with cleanup
-      cancelScroll = smoothScrollTo(
-        scrollContainer,
-        targetLeft,
-        targetTop,
-        ANIMATION_CONFIG.SCROLL_DURATION,
-        startCardAnimation
-      );
+      // Only scroll if target is valid (not at edge with minimal distance)
+      if (scrollTarget) {
+        // Use optimized smooth scroll with cleanup
+        cancelScroll = smoothScrollTo(
+          scrollContainer,
+          scrollTarget.left,
+          scrollTarget.top,
+          ANIMATION_CONFIG.SCROLL_DURATION,
+          startCardAnimation
+        );
+      } else {
+        // Card is near edge, skip scrolling to avoid glitch
+        startCardAnimation();
+      }
     } else {
       // No scroll needed, start animation immediately
       startCardAnimation();

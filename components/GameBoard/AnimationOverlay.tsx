@@ -132,7 +132,7 @@ const AnimationOverlayComponent: FC<AnimationOverlayProps> = ({
           height: '100%',
           pointerEvents: 'auto',
           borderRadius: 15,
-          transition: 'transform 150ms ease-out, box-shadow 150ms ease-out',
+          transition: 'transform 75ms ease-out, box-shadow 75ms ease-out',
           transform: `rotate(${targetRotation}deg)`,
           // Hover effect when dragging a card over this card
           '&.drop-target': {

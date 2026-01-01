@@ -80,7 +80,7 @@ const StyledContent = styled(PopoverPrimitive.Content, {
   width: 380,
   backgroundColor: "white",
   marginTop: -70,
-  marginLeft: -5,
+  marginLeft: -15,
   paddingBottom: 40,
   // minHeight: 550,
   zIndex: 10000000,
@@ -268,27 +268,6 @@ export default function LogoMenu({
                     />
                   )}
 
-                  {loggedIn && (
-                    <div>
-                      <GameRules>
-                        <div
-                          css={{
-                            color: "rgba(0, 0, 0, 0.5)",
-                            cursor: "pointer",
-                            paddingBottom: 20,
-                            fontWeight: 400,
-                            transition: "all 300ms",
-                            listStyle: "none",
-                            "&:hover": {
-                              opacity: "0.6",
-                            },
-                          }}
-                        >
-                          Game Rules
-                        </div>
-                      </GameRules>
-                    </div>
-                  )}
 
 
                   {/* <li
@@ -333,12 +312,6 @@ export default function LogoMenu({
                   )} */}
 
                   {/* <MenuItem to="/" text="Buy NFT on LooksRare" fontSize={16} /> */}
-
-                  {loggedIn && (
-                    <div css={{ paddingBottom: 10, marginTop: 10 }}>
-                      <Line spacing={2}></Line>
-                    </div>
-                  )}
 
                   {loggedIn && (
                     <li
