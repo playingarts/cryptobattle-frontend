@@ -237,3 +237,25 @@ export interface GamePlayer {
   username?: string;
   color?: string;
 }
+
+/**
+ * Zone outline info for a board cell
+ * Used to draw merged borders around adjacent zones with the same top-card player
+ */
+export interface ZoneOutlineInfo {
+  color: string;
+  showTop: boolean;
+  showBottom: boolean;
+  showLeft: boolean;
+  showRight: boolean;
+  // Outer corners (edge of group)
+  topLeftRadius: boolean;
+  topRightRadius: boolean;
+  bottomLeftRadius: boolean;
+  bottomRightRadius: boolean;
+  // Inner corners (L-shaped merges)
+  innerTopLeftRadius: boolean;
+  innerTopRightRadius: boolean;
+  innerBottomLeftRadius: boolean;
+  innerBottomRightRadius: boolean;
+}

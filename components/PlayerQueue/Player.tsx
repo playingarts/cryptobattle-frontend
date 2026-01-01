@@ -2,7 +2,6 @@ import { forwardRef, useState, useEffect, useRef, useCallback } from "react";
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
-import { formatUsername } from "../../utils/helpers";
 import { useGame } from "../GameProvider";
 
 // Fixed display duration for all players (30 seconds)
@@ -165,7 +164,7 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
             // Customize the path, i.e. the "completed progress"
             path: {
               // Path color
-              stroke: inactive ? 'gray' : player.color,
+              stroke: inactive ? '#3a3a3a' : player.color,
               // Whether to use rounded or flat corners on the ends - can use 'butt' or 'round'
               strokeLinecap: "butt",
               // No CSS transition - we use requestAnimationFrame for smooth 60fps updates
@@ -204,7 +203,7 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
               borderRadius: 9999,
               width: 62,
               height: 62,
-              background: inactive ? '#4c4c4c' : '#1A1A1A',
+              background: inactive ? '#2a2a2a' : '#1A1A1A',
               filter: inactive ? 'grayscale(100%)' : 'none',
               opacity: loadingDelayed ? "0" : "1",
               transform: loadingDelayed
@@ -222,21 +221,6 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
             >
               {currentPoints}
             </div>
-          </div>
-          <div
-            css={{
-              position: "absolute",
-              bottom: -24,
-              left: "50%",
-              transform: "translateX(-50%)",
-              fontSize: 11,
-              fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-              color: "#fff",
-              whiteSpace: "nowrap",
-              textTransform: "uppercase",
-            }}
-          >
-            {formatUsername(player.username)}
           </div>
         </CircularProgressbarWithChildren>
       </div>

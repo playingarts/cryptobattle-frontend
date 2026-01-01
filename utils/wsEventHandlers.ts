@@ -230,7 +230,9 @@ export function handleUserInfo(data: UserInfoEventData, deps: HandlerDeps): Hand
  */
 export function handleCreateRoom(data: CreateRoomEventData, deps: HandlerDeps): HandlerResult {
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+  const currentSearch = typeof window !== 'undefined' ? window.location.search : '';
   const isOnNewPage = currentPath === '/new';
+  const isQuickstart = currentSearch.includes('quickstart=true');
 
   if (data.error) {
     // If on /new page, retry after a delay (quit-game might still be processing)
@@ -250,6 +252,16 @@ export function handleCreateRoom(data: CreateRoomEventData, deps: HandlerDeps): 
   if (data.roomId) {
     deps.stateSetters.setRoomId(data.roomId);
     deps.wsProvider.send(JSON.stringify({ event: 'room-info', data: {} }));
+
+    // If quickstart mode, auto-start the game and go directly to /play
+    if (isQuickstart) {
+      deps.wsProvider.send(JSON.stringify({
+        event: 'start-game',
+        data: {},
+      }));
+      // Go directly to /play - it will show its loader while game initializes
+      deps.router.push('/play');
+    }
   } else {
     // If on /new page, retry instead of redirecting
     if (isOnNewPage) {
@@ -416,7 +428,13 @@ export function handleGameUpdated(data: GameEventData, deps: HandlerDeps): Handl
         deps.uiActions.playStartGameSound();
         setGameStarted(true);
       }
-      if (!window.location.pathname.split('?')[0].endsWith('/dashboard')) {
+      const currentPath = window.location.pathname.split('?')[0];
+      // Redirect to /play from lobby pages only
+      // Skip dashboard and /new (quickstart handles its own redirect via handleCreateRoom)
+      // Also skip if already on /play
+      if (!currentPath.endsWith('/dashboard') &&
+          !currentPath.endsWith('/new') &&
+          !currentPath.endsWith('/play')) {
         deps.router.push('/play');
       }
     }

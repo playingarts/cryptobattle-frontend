@@ -83,7 +83,7 @@ const StyledContent = styled(PopoverPrimitive.Content, {
   marginLeft: -5,
   paddingBottom: 40,
   // minHeight: 550,
-  zIndex: 4000,
+  zIndex: 10000000,
   // paddingLeft: 40,
   boxShadow:
     "hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px",

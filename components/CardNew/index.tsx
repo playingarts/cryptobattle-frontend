@@ -42,10 +42,17 @@ const Card: FC<Props> = ({
   const height = size === "big" ? 52 : 29.4;
   const wrapper = useRef<HTMLDivElement>(null);
   const [{ x, y }, setSkew] = useState({ x: 0, y: 0 });
-  const [loaded, setLoaded] = useState(false);
-  const hideLoader = () => setLoaded(true);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const hideImageLoader = () => setImageLoaded(true);
+  const hideVideoLoader = () => setVideoLoaded(true);
 
-  animated = !card.img || (animated && !!card.video);
+  // Show video if animated and has video URL
+  const showVideo = animated && !!card.video;
+  // Always show image first as fallback/placeholder (even for animated cards)
+  const showImage = !!card.img;
+  // Content is loaded when: image loaded (for static), or video loaded (for animated)
+  const loaded = showVideo ? videoLoaded : imageLoaded;
 
   return (
     <div
@@ -192,11 +199,14 @@ const Card: FC<Props> = ({
             undefined
           }
         >
-          {!animated && (
+          {/* Image layer - shows immediately, fades out when video loads (for animated) */}
+          {showImage && (
             <div
               style={{
                 position: "absolute",
-                opacity: loaded ? 1 : 0,
+                // For animated cards: show image until video loads, then hide
+                // For static cards: show image when loaded
+                opacity: showVideo ? (videoLoaded ? 0 : (imageLoaded ? 1 : 0)) : (imageLoaded ? 1 : 0),
                 transition: theme.transitions.slow("opacity"),
                 zIndex: hovered ? -1 : 1,
               }}
@@ -208,30 +218,36 @@ const Card: FC<Props> = ({
                 src={card.img}
                 alt={card.info}
                 css={(theme) => ({ borderRadius: theme.spacing(1.5) })}
-                onLoadingComplete={hideLoader}
+                onLoadingComplete={hideImageLoader}
                 unoptimized={true}
               />
             </div>
           )}
-          {card.video && (
+          {/* Video layer - loads in background, fades in when ready */}
+          {showVideo && card.video && (
             <video
               loop
               muted
               playsInline
+              autoPlay
               ref={video}
               css={(theme) => ({
-                opacity: loaded ? 1 : 0,
+                position: "absolute",
+                top: 0,
+                left: 0,
+                opacity: videoLoaded ? 1 : 0,
                 transition: theme.transitions.slow("opacity"),
                 width: theme.spacing(width),
                 height: theme.spacing(height),
+                zIndex: 2,
               })}
-              onLoadedData={hideLoader}
-              {...(animated ? { autoPlay: true } : { preload: "none" })}
+              onLoadedData={hideVideoLoader}
             >
               <source src={card.video} type="video/mp4" />
             </video>
           )}
-          {!loaded && (
+          {/* Loader - show only when nothing is visible yet */}
+          {!imageLoaded && !videoLoaded && (
             <Loader
               css={(theme) => ({
                 color: theme.colors.light_gray,

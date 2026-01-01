@@ -71,7 +71,7 @@ const GameInventory: FC<Props> = ({
   const sortCards = (cards: any) => {
     cards.sort(
       (a: any, b: any) =>
-        cardPriority[a.value] - cardPriority[b.value] ||
+        cardPriority[b.value] - cardPriority[a.value] ||
         suitPriority[a.suit] - suitPriority[b.suit]
     );
 
@@ -137,7 +137,7 @@ const GameInventory: FC<Props> = ({
           display: "inline-block",
           margin: "0 auto 20px auto",
           overflow: "visible",
-          transition: "background 0.3s ease, all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+          transition: "background 0.3s ease",
         }}
       >
         {/* Cards row */}
@@ -147,7 +147,6 @@ const GameInventory: FC<Props> = ({
             justifyContent: "center",
             flexWrap: "nowrap",
             overflow: "visible",
-            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
           }}
         >
           {allCards.map((card: any, index: number) => (

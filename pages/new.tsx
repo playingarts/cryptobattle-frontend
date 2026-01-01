@@ -5,7 +5,7 @@ import { useWS } from "../components/WsProvider/index";
 
 import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 // import { useAuth } from "../components/AuthProvider";
 import { useGame } from "../components/GameProvider";
 import Loader from "../components/Loader";
@@ -23,13 +23,30 @@ const NewGame: NextPage = () => {
 
   const { roomId, setRoomId, isAlreadyConnected } = useGame();
   const router = useRouter();
+
+  // Check quickstart from URL immediately on mount (not from router.query which hydrates later)
+  const [isQuickstart, setIsQuickstart] = useState(true); // Default to true to show simple loader initially
+
+  useEffect(() => {
+    // Set quickstart state immediately on client side
+    setIsQuickstart(window.location.search.includes('quickstart=true'));
+  }, []);
+
   useEffect(() => {
     if (!roomId) {
       return;
     }
 
-    router.push(`/game/${roomId}`);
+    // For quickstart, handleCreateRoom in wsEventHandlers redirects directly to /play
+    // Check window.location.search directly to avoid any React state timing issues
+    const isQuickstartUrl = window.location.search.includes('quickstart=true');
+    if (isQuickstartUrl) {
+      // Don't redirect here - handleCreateRoom already pushed to /play
+      return;
+    }
 
+    // Non-quickstart: go to lobby
+    router.push(`/game/${roomId}`);
     return () => setRoomId('');
   }, [roomId]);
 
@@ -64,21 +81,45 @@ const NewGame: NextPage = () => {
       })
     );
 
-    // Small delay to let server process quit before creating new room
-    const timer = setTimeout(() => {
-      WSProvider.send(
-        JSON.stringify({
-          event: "create-room",
-          data: {
-            type: "private",
-            maxPlayers: 10,
-          },
-        })
-      );
-    }, 100);
-
-    return () => clearTimeout(timer);
+    // Send create-room immediately after quit-game
+    // The backend handles the sequence properly
+    WSProvider.send(
+      JSON.stringify({
+        event: "create-room",
+        data: {
+          type: "private",
+          maxPlayers: 10,
+        },
+      })
+    );
   }, []);
+
+  // For quickstart, show same loader style as /play page for seamless transition
+  if (isQuickstart) {
+    return (
+      <div
+        css={{
+          height: "100vh",
+          background: "#181818",
+          width: "100vw",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Loader
+          css={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%) scale(2)",
+            lineHeight: 1,
+            color: "#fff",
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <ComposedGlobalLayout headerTitle="NEW GAME" headerMiddle={headerMiddle}>

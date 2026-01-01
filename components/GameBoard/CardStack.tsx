@@ -107,12 +107,16 @@ const CardStack: FC<CardStackProps> = ({
           video: card.videoUrl,
         };
 
+        // System cards (first default card) and NFT cards should be animated (show video)
+        const isSystemCard = card.userId === 'system';
+        const shouldAnimate = card.isNft === true || isSystemCard;
+
         return (
           <Card
             selectedCard={selectedCard}
             key={`${card.value}-${card.suit}-${index}`}
             onClick={onCellClick}
-            animated={card.isNft === true}
+            animated={shouldAnimate}
             card={cardForComponent}
             index={index}
             className={isTopCard && !isHiddenByAnimation ? 'dropzone' : ''}
@@ -123,10 +127,9 @@ const CardStack: FC<CardStackProps> = ({
             css={{
               pointerEvents: isMyTurn ? 'unset' : 'none',
               zIndex: 10 + index,
-              outline: isTopCard && hasError
-                ? '#FA5252 3px solid'
-                : `3px solid ${playerColor}`,
-              borderRadius: 16,
+              // Dark gray outline on all cards
+              outline: '1px solid #3D4048',
+              borderRadius: 15,
               position: 'relative',
               // Hide during animation, show instantly when animation ends (no opacity transition)
               opacity: isHiddenByAnimation ? 0 : 1,
@@ -135,8 +138,7 @@ const CardStack: FC<CardStackProps> = ({
               transform: rotation,
               // Hover effect when dragging a card over this card
               '&.drop-target': {
-                transform: `${rotation} scale(1.05)`,
-                boxShadow: `0 0 20px 8px ${playerColor}80`,
+                transform: `${rotation} scale(1.10)`,
               },
               // Base error overlay (hidden by default)
               '&::before': {

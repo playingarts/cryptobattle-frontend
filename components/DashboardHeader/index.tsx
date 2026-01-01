@@ -131,9 +131,21 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
           color: "#fff",
         }}
         component={Link}
+        href="/play"
+      >
+        Play Now
+      </Button>
+      <Button
+        style={{
+          marginTop: "10px",
+          marginRight: "15px",
+          background: "#333",
+          color: "#fff",
+        }}
+        component={Link}
         href="/new"
       >
-        New Game
+        Multiplayer
       </Button>
     </StatBlock>
   );

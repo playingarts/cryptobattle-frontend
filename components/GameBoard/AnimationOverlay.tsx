@@ -20,8 +20,8 @@ import { ANIMATION_CONFIG } from '../../config/animation';
 
 // Cell dimensions (must match GameBoard cell sizing)
 const CELL_WIDTH = 210;
-const CELL_HEIGHT = 300;
-const CELL_MARGIN = 20;
+const CELL_HEIGHT = 294;
+const CELL_MARGIN = 15;
 
 interface AnimationOverlayProps {
   animation: PendingAnimation | null;
@@ -88,7 +88,7 @@ const AnimationOverlayComponent: FC<AnimationOverlayProps> = ({
         cardData: {
           img: getCardImageUrl(animation.card),
           video: getCardVideoUrl(animation.card),
-          background: color,
+          // No colored background - zone outlines are used instead
           info: `${animation.card.value} of ${animation.card.suit}`,
         },
         playerColor: color,
@@ -131,13 +131,12 @@ const AnimationOverlayComponent: FC<AnimationOverlayProps> = ({
           width: '100%',
           height: '100%',
           pointerEvents: 'auto',
-          borderRadius: 16,
+          borderRadius: 15,
           transition: 'transform 150ms ease-out, box-shadow 150ms ease-out',
           transform: `rotate(${targetRotation}deg)`,
           // Hover effect when dragging a card over this card
           '&.drop-target': {
-            transform: `rotate(${targetRotation}deg) scale(1.05)`,
-            boxShadow: `0 0 20px 8px ${playerColor}80`,
+            transform: `rotate(${targetRotation}deg) scale(1.10)`,
           },
         }}
       >
@@ -163,8 +162,8 @@ const AnimationOverlayComponent: FC<AnimationOverlayProps> = ({
             isGameBoard={true}
             noShadow={false}
             css={{
-              outline: `3px solid ${playerColor}`,
-              borderRadius: 16,
+              outline: '1px solid #3D4048',
+              borderRadius: 15,
               boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
             }}
           />

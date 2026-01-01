@@ -172,7 +172,7 @@ const GameLayout: FC<
   }, []);
 
   return (
-    <div style={{ background: "#1A1A1A", minHeight: "100vh" }}>
+    <div style={{ background: "#151515", minHeight: "100vh" }}>
       <ScrollContainer
         className="scroll-container"
         ignoreElements=".draggable"
