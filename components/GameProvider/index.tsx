@@ -7,6 +7,7 @@ import {
   useEffect,
   useCallback,
   useReducer,
+  useRef,
 } from "react";
 import { useNotifications } from "../NotificationProvider";
 import Text from "../Text/";
@@ -604,6 +605,32 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     });
   }, [results, openNotification, timer, router, state.serverState.allGamePlayers]);
 
+  // Debounce isMyTurn to prevent double-flash on rapid state updates
+  // When backend sends game-info followed by game-updated quickly,
+  // we may see isMyTurn toggle rapidly. Debounce prevents visual flicker.
+  const [debouncedIsMyTurn, setDebouncedIsMyTurn] = useState(state.isMyTurn);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Clear any pending debounce
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Debounce the isMyTurn update by 50ms to coalesce rapid changes
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedIsMyTurn(state.isMyTurn);
+    }, 50);
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [state.isMyTurn]);
+
+  const isMyTurn = debouncedIsMyTurn;
+
   const memoedValue = useMemo(
     () => ({
       // NEW: Reducer state and dispatch
@@ -636,7 +663,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       // DEPRECATED: Derived from reducer state for backwards compatibility
       // These will be removed when all consumers are migrated
       gameState: state.serverState,
-      isMyTurn: state.isMyTurn,
+      isMyTurn,
       playersGame: state.serverState.allGamePlayers,
     }),
     [
@@ -652,6 +679,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       isBackendReady,
       isAlreadyConnected,
       userSocketIdle,
+      isMyTurn,
     ]
   );
 

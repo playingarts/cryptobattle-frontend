@@ -5,7 +5,6 @@ import Button from "../../components/Button";
 import Skip from "../../components/Icons/Skip";
 import { useWS } from "../WsProvider";
 import { useGame } from "../GameProvider";
-import { useAuth } from "../AuthProvider";
 
 interface Card {
   id?: string;
@@ -32,10 +31,7 @@ const GameInventory: FC<Props> = ({
   const [cardsNft, setCardsNft] = useState<any>([]);
   const [loadingDelayed, setLoadingDelayed] = useState(true);
 
-  const { state, selectedCard, setSelectedCard } = useGame();
-  const { user } = useAuth();
-
-  const isMyTurn = state.serverState.turnForPlayer === user?.userId;
+  const { isMyTurn, selectedCard, setSelectedCard } = useGame();
 
   const WSProvider = useWS();
 
@@ -137,7 +133,6 @@ const GameInventory: FC<Props> = ({
           display: "inline-block",
           margin: "0 auto 20px auto",
           overflow: "visible",
-          transition: "background 0.3s ease",
         }}
       >
         {/* Cards row */}

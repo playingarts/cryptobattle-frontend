@@ -1,6 +1,10 @@
 import { FC, HTMLAttributes } from "react";
 import { CardSuits } from "../../source/enums";
 import QuestionMark from "../Icons/QuestionMark";
+import Spades from "../Icons/Spades";
+import Hearts from "../Icons/Hearts";
+import Clubs from "../Icons/Clubs";
+import Diamonds from "../Icons/Diamonds";
 import { keyframes, Interpolation, Theme } from "@emotion/react";
 
 interface Props extends HTMLAttributes<HTMLElement> {
@@ -16,26 +20,26 @@ interface Props extends HTMLAttributes<HTMLElement> {
   css?: Interpolation<Theme>;
 }
 
-// Get Unicode suit symbol
-const getSuitSymbol = (suit?: CardSuits | string): string => {
+// Get SVG suit icon component
+const getSuitIcon = (suit?: CardSuits | string): FC<HTMLAttributes<SVGElement>> | null => {
   if (!suit) {
-    return "";
+    return null;
   }
   switch (suit) {
     case "spades":
     case CardSuits.s:
-      return "♠";
+      return Spades;
     case "hearts":
     case CardSuits.h:
-      return "♥";
+      return Hearts;
     case "clubs":
     case CardSuits.c:
-      return "♣";
+      return Clubs;
     case "diamonds":
     case CardSuits.d:
-      return "♦";
+      return Diamonds;
     default:
-      return "";
+      return null;
   }
 };
 
@@ -107,7 +111,7 @@ const CardSmall: FC<Props> = ({
   const displayValue = getDisplayValue(cardValue);
   const isJoker = cardValue === "joker";
   const isUnknown = cardValue === "unknown";
-  const suitSymbol = getSuitSymbol(suit);
+  const SuitIcon = getSuitIcon(suit);
 
   return (
     <div
@@ -168,18 +172,15 @@ const CardSmall: FC<Props> = ({
           >
             {displayValue}
           </span>
-          {!isJoker && suitSymbol && (
-            <span
+          {!isJoker && SuitIcon && (
+            <SuitIcon
               css={{
-                fontSize: 25,
+                width: 22,
+                height: 20,
                 color: "white",
                 marginTop: 5,
-                lineHeight: 1,
-                textAlign: "center",
               }}
-            >
-              {suitSymbol}
-            </span>
+            />
           )}
         </>
       )}
