@@ -169,7 +169,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     setGameStarted(false);
     setPlayersInfo([]);
     dispatch(resetGame());
-    router.push("/new");
+    // Go to quickstart to immediately start a new game (not lobby)
+    router.push("/quickstart");
   };
 
   const playAgainQuit = () => {
@@ -239,7 +240,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
 
     // Skip redirect if already on game-related pages or dashboard
     // Check both pathname and asPath for reliability
-    const skipRedirectPaths = ['/new', '/game/', '/play', '/dashboard'];
+    const skipRedirectPaths = ['/new', '/game/', '/play', '/dashboard', '/quickstart'];
     const shouldSkipRedirect = skipRedirectPaths.some(path =>
       currentPath.startsWith(path) || actualPath.startsWith(path)
     );

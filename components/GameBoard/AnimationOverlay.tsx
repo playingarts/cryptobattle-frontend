@@ -78,7 +78,7 @@ const AnimationOverlayComponent: FC<AnimationOverlayProps> = ({
   );
 
   // Build card object for the Card component (always called)
-  const { cardData, playerColor } = useMemo(
+  const { cardData } = useMemo(
     () => {
       if (!animation) {
         return { cardData: { img: '', video: undefined, background: '', info: '' }, playerColor: '' };

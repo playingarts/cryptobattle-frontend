@@ -230,13 +230,12 @@ export function handleUserInfo(data: UserInfoEventData, deps: HandlerDeps): Hand
  */
 export function handleCreateRoom(data: CreateRoomEventData, deps: HandlerDeps): HandlerResult {
   const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
-  const currentSearch = typeof window !== 'undefined' ? window.location.search : '';
   const isOnNewPage = currentPath === '/new';
-  const isQuickstart = currentSearch.includes('quickstart=true');
+  const isOnQuickstartPage = currentPath === '/quickstart';
 
   if (data.error) {
-    // If on /new page, retry after a delay (quit-game might still be processing)
-    if (isOnNewPage) {
+    // If on /new or /quickstart page, retry after a delay (quit-game might still be processing)
+    if (isOnNewPage || isOnQuickstartPage) {
       setTimeout(() => {
         deps.wsProvider.send(JSON.stringify({
           event: 'create-room',
@@ -253,18 +252,17 @@ export function handleCreateRoom(data: CreateRoomEventData, deps: HandlerDeps): 
     deps.stateSetters.setRoomId(data.roomId);
     deps.wsProvider.send(JSON.stringify({ event: 'room-info', data: {} }));
 
-    // If quickstart mode, auto-start the game and go directly to /play
-    if (isQuickstart) {
+    // If on quickstart page, auto-start the game
+    // The quickstart page will redirect to /play when game state becomes 'started'
+    if (isOnQuickstartPage) {
       deps.wsProvider.send(JSON.stringify({
         event: 'start-game',
         data: {},
       }));
-      // Go directly to /play - it will show its loader while game initializes
-      deps.router.push('/play');
     }
   } else {
-    // If on /new page, retry instead of redirecting
-    if (isOnNewPage) {
+    // If on /new or /quickstart page, retry instead of redirecting
+    if (isOnNewPage || isOnQuickstartPage) {
       setTimeout(() => {
         deps.wsProvider.send(JSON.stringify({
           event: 'create-room',
@@ -430,11 +428,11 @@ export function handleGameUpdated(data: GameEventData, deps: HandlerDeps): Handl
       }
       const currentPath = window.location.pathname.split('?')[0];
       // Redirect to /play from lobby pages only
-      // Skip dashboard and /new (quickstart handles its own redirect via handleCreateRoom)
-      // Also skip if already on /play
+      // Skip: dashboard, /play (already there), /new (goes to lobby), /quickstart (handles its own redirect)
       if (!currentPath.endsWith('/dashboard') &&
+          !currentPath.endsWith('/play') &&
           !currentPath.endsWith('/new') &&
-          !currentPath.endsWith('/play')) {
+          !currentPath.endsWith('/quickstart')) {
         deps.router.push('/play');
       }
     }

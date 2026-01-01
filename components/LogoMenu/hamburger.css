@@ -1,7 +1,6 @@
 .hamburger {
     cursor: pointer;
     display: block;
-    min-width: 40px;
     margin-right: 15px;
   }
   .line {

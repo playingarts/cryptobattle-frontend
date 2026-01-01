@@ -34,6 +34,7 @@ const Card: FC<Props> = ({
   noShadow,
   interactive,
   css: cssProp,
+  onClick,
   ...props
 }) => {
   const [hovered, setHover] = useState(false);
@@ -41,6 +42,7 @@ const Card: FC<Props> = ({
   const width = size === "big" ? 37 : 21;
   const height = size === "big" ? 52 : 29.4;
   const wrapper = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [{ x, y }, setSkew] = useState({ x: 0, y: 0 });
   const [imageLoaded, setImageLoaded] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
@@ -52,11 +54,28 @@ const Card: FC<Props> = ({
   // Always show image first as fallback/placeholder (even for animated cards)
   const showImage = !!card.img;
   // Content is loaded when: image loaded (for static), or video loaded (for animated)
-  const loaded = showVideo ? videoLoaded : imageLoaded;
+  // Note: loaded state is tracked but currently unused - keeping for future loading indicators
+  void (showVideo ? videoLoaded : imageLoaded);
+
+  // Handle click with scroll-to-center for game board cards
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isGameBoard && cardRef.current) {
+      cardRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'center',
+      });
+    }
+    if (onClick) {
+      onClick(e);
+    }
+  };
 
   return (
     <div
       {...props}
+      ref={cardRef}
+      onClick={handleClick}
       css={[
         (theme) => ({
           "&:hover": isGameBoard ? {} : {

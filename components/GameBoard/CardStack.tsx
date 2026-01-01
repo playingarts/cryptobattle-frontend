@@ -136,8 +136,13 @@ const CardStack: FC<CardStackProps> = ({
               // Only transition transform/box-shadow for hover effects, NOT opacity
               transition: 'transform 150ms ease-out, box-shadow 150ms ease-out',
               transform: rotation,
-              // Hover effect when dragging a card over this card
-              '&.drop-target': {
+              // Hover effect when dragging a card over this card (valid placement)
+              '&.drop-target:not(.drop-error)': {
+                transform: `${rotation} scale(1.10)`,
+                boxShadow: '0 0 0 3px #7B61FF',
+              },
+              // Hover effect when dragging a card over this card (invalid placement)
+              '&.drop-target.drop-error': {
                 transform: `${rotation} scale(1.10)`,
               },
               // Base error overlay (hidden by default)

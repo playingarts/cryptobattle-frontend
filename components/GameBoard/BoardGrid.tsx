@@ -25,7 +25,9 @@ interface BoardGridProps {
  * Get the top card's userId from a cell
  */
 function getTopCardUserId(cell: BoardCellType): string | null {
-  if (cell.cards.length === 0) return null;
+  if (cell.cards.length === 0) {
+    return null;
+  }
   return cell.cards[cell.cards.length - 1].userId || null;
 }
 
@@ -33,7 +35,9 @@ function getTopCardUserId(cell: BoardCellType): string | null {
  * Get player color by userId
  */
 function getPlayerColor(players: GamePlayer[], userId: string | null): string {
-  if (!userId || userId === 'system') return '#2D3038';
+  if (!userId || userId === 'system') {
+    return '#2D3038';
+  }
   const player = players.find((p) => p.userId === userId);
   return player?.color || 'gray';
 }
@@ -52,10 +56,14 @@ function calculateRowOutlines(
     const topUserId = getTopCardUserId(cell);
 
     // No cards = no outline
-    if (!topUserId) return null;
+    if (!topUserId) {
+      return null;
+    }
 
     // System/default cards = no outline
-    if (topUserId === 'system') return null;
+    if (topUserId === 'system') {
+      return null;
+    }
 
     const color = getPlayerColor(players, topUserId);
 

@@ -2,7 +2,6 @@ import { FC, HTMLAttributes, useEffect, useState } from "react";
 
 import { useAuth } from "../AuthProvider";
 import { useGame } from "../GameProvider";
-import { formatUsername } from "../../utils/helpers";
 
 import LogoMenu from "../LogoMenu";
 import GameInventory from "../GameInventory";
@@ -22,7 +21,6 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
   const { user } = useAuth();
   const { gameState, playersGame } = useGame();
   const [playersWithPoints, setPlayersWithPoints] = useState<Array<any>>([]);
-  const [currentPlayer, setCurrentPlayer] = useState<any>("");
   const [currentPlayerWithPoints, setCurrentPlayerWithPoints] =
     useState<any>("");
 
@@ -43,14 +41,6 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
       return;
     }
 
-    const currentPlayer = playersGame.find(
-      (player: any) => player.userId === gameState.turnForPlayer
-    );
-
-    // const shiftArray = (arr: any, target: any) => {
-    //   return arr.concat(arr.splice(0, arr.indexOf(target)));
-    // };
-
     const playersWithPoints = [...playersGame].map((player: any) => {
       player.points = gameState?.playersCurrentPoints[player.userId]
         ? gameState.playersCurrentPoints[player.userId]
@@ -63,11 +53,8 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
       (player: any) => player.userId === gameState.turnForPlayer
     );
 
-    // const playersSorted = shiftArray(playersWithPoints, currentPlayerWithPoints)
     setCurrentPlayerWithPoints(currentPlayerWithPoints);
-
     setPlayersWithPoints(playersWithPoints);
-    setCurrentPlayer(currentPlayer);
   }, [gameState, playersGame]);
 
   useEffect(() => {
@@ -127,12 +114,7 @@ const GameHeader: FC<Props> = ({ palette, loading, ...props }) => {
             height: 70,
           }}
         >
-          <LogoMenu
-            headerTitle={
-              currentPlayer ? formatUsername(currentPlayer.username) : ""
-            }
-            logo={null}
-          ></LogoMenu>
+          <LogoMenu logo={null} />
         </div>
 
         <div

@@ -69,7 +69,9 @@ const BoardCell: FC<BoardCellProps> = ({
 
   // Render zone outline as a single overlay div with proper rounded corners
   const renderZoneOutline = () => {
-    if (!zoneOutline) return null;
+    if (!zoneOutline) {
+      return null;
+    }
 
     const { color, showTop, showBottom, showLeft, showRight } = zoneOutline;
     const { topLeftRadius, topRightRadius, bottomLeftRadius, bottomRightRadius } = zoneOutline;
@@ -209,8 +211,9 @@ const BoardCell: FC<BoardCellProps> = ({
         <CardEmpty
           key={`placeholder-${columnIndex}-${rowIndex}`}
           isPlaceholder={true}
+          id={`${rowIndex}-${columnIndex}`}
           css={{
-            pointerEvents: 'none',
+            pointerEvents: isMyTurn ? 'unset' : 'none',
           }}
         />
       )}
@@ -225,9 +228,8 @@ const BoardCell: FC<BoardCellProps> = ({
               transition: 'all 300ms',
               position: 'absolute',
               content: `' '`,
-              background: hasError ? 'rgba(250, 82, 82, 0.1)' : 'transparent',
               zIndex: 99999,
-              borderRadius: 12,
+              borderRadius: 15,
               backgroundImage: hasError ? ERROR_ICON_SVG : 'none',
               backgroundPosition: 'center center',
               backgroundRepeat: 'no-repeat',

@@ -13,7 +13,7 @@
  * - CardStack: Renders a stack of cards at a position
  */
 
-import { FC, useState, useEffect, useCallback, useRef, HTMLAttributes } from "react";
+import { FC, useEffect, useCallback, useRef, HTMLAttributes } from "react";
 import { useGame } from "../GameProvider";
 import { useWS } from "../WsProvider";
 import AnimationOverlay from "./AnimationOverlay";
@@ -41,8 +41,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   // USE REDUCER STATE for board - single source of truth
   const board = state.board;
 
-  // UI state (not game state - stays local)
-  const [cardError, setCardError] = useState<number[]>([]);
 
   // Animation queue management - uses context state
   const { currentAnimation } = useAnimationQueue({
@@ -84,6 +82,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   // Handle card placement
   const addCard = useCallback(
     (rowIndex: number, columnIndex: number, card = selectedCard, state = gameState) => () => {
+      // If no card is selected, just ignore (scroll-to-center handled in CardNew/CardEmpty)
       if (!card) {
         return;
       }
@@ -92,9 +91,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
         `${columnIndex}-${rowIndex}`
       ];
 
-      if (!card || !allowedPlacement) {
-        setCardError([rowIndex, columnIndex]);
-        setTimeout(() => setCardError([]), 1000);
+      // If placement not allowed, silently ignore (no error overlay)
+      if (!allowedPlacement) {
         return;
       }
 
@@ -109,9 +107,8 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
           allowedCard.value === card.value
       );
 
+      // If card doesn't match, silently ignore (no error overlay)
       if (!isJokerMove && !isStandardMove) {
-        setCardError([rowIndex, columnIndex]);
-        setTimeout(() => setCardError([]), 1000);
         return;
       }
 
@@ -255,11 +252,6 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
   // Calculate board position for animation overlay
   const boardRef = useRef<HTMLDivElement>(null);
 
-  // Convert cardError array to position object for BoardGrid
-  const errorPosition = cardError.length === 2
-    ? { x: cardError[1], y: cardError[0] }
-    : null;
-
   return (
     <div
       css={() => ({
@@ -288,7 +280,7 @@ const GameBoard: FC<Props> = ({ children, removeCard }) => {
           lastPlayedCard={lastPlayedCard}
           lastPlayedPosition={lastPlayedPosition}
           selectedCard={selectedCard}
-          errorPosition={errorPosition}
+          errorPosition={null}
           onCellClick={handleCellClick}
         />
       </div>

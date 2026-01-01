@@ -124,7 +124,7 @@ export default function LogoMenu({
   headerTitle,
 }: {
   logo: any;
-  headerTitle: string;
+  headerTitle?: string;
 }) {
   const [open, setOpen] = useState(false);
   const { loggedIn, logout } = useAuth();
@@ -185,7 +185,7 @@ export default function LogoMenu({
                   <span className="line line-2"></span>
                   <span className="line line-3"></span>
                 </div>
-                {!logo && (
+                {!logo && headerTitle && (
                   <Text
                     component="div"
                     variant="h5"
@@ -195,8 +195,6 @@ export default function LogoMenu({
                       fontWeight: 400,
                       lineHeight: 1.2,
                       textTransform: "uppercase",
-                      // position: "absolute",
-                      // marginLeft: 80,
                       cursor: "pointer",
                       transition: "color 500ms",
                       "&:hover": {
@@ -204,7 +202,7 @@ export default function LogoMenu({
                       },
                     }}
                   >
-                    {headerTitle ? headerTitle : "CARD BATTLE"}
+                    {headerTitle}
                   </Text>
                 )}
                 {logo && logo}

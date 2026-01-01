@@ -10,67 +10,33 @@ import { useGame } from "../../components/GameProvider";
 import { useWS } from "../../components/WsProvider";
 import { useAuth } from "../../components/AuthProvider";
 import { useNotifications } from "../../components/NotificationProvider";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Warning from "../../components/Icons/Warning";
 const Play: NextPage = () => {
   const WSProvider = useWS();
   const { user } = useAuth();
   const [minWidth, setMinWidth] = useState(1400);
   const [loading, setLoading] = useState(true);
-  const gameCreationStarted = useRef(false);
 
   const [myCards, setMyCards] = useState<Array<any>>([]);
   const { openNotification } = useNotifications();
 
   // Use reducer state for game data
-  const { state, isBackendReady, isAlreadyConnected, roomId } = useGame();
+  const { state, isBackendReady, isAlreadyConnected } = useGame();
   const gameState = state.serverState; // Derive gameState from reducer
 
-  // If no game exists, create one and start it (quickstart from dashboard)
+  // Request game info when backend is ready and game exists
+  // Note: Room/game creation is handled by /new?quickstart=true flow
+  // This page should only be reached after game is started
   useEffect(() => {
-    if (!isBackendReady || gameCreationStarted.current) {
+    if (!isBackendReady) {
       return;
     }
 
-    // If there's already a game, just request info
-    if (gameState?.gameId) {
-      WSProvider.send(JSON.stringify({ event: "game-info", data: {} }));
-      WSProvider.send(JSON.stringify({ event: "room-info", data: {} }));
-      return;
-    }
-
-    // No game exists - create room and start game
-    gameCreationStarted.current = true;
-
-    // First quit any existing game/room
-    WSProvider.send(JSON.stringify({ event: "quit-game", data: {} }));
-
-    // Create room (this will trigger handleCreateRoom which sets roomId)
-    WSProvider.send(JSON.stringify({
-      event: "create-room",
-      data: { type: "private", maxPlayers: 10 },
-    }));
-  }, [isBackendReady, gameState?.gameId]);
-
-  // When room is created, start the game
-  useEffect(() => {
-    if (!roomId || !gameCreationStarted.current) {
-      return;
-    }
-
-    // Room created, now start the game
-    WSProvider.send(JSON.stringify({ event: "start-game", data: {} }));
-  }, [roomId]);
-
-  // Request game info when game becomes available
-  useEffect(() => {
-    if (!isBackendReady || !gameState?.gameId) {
-      return;
-    }
-
+    // Request game and room info
     WSProvider.send(JSON.stringify({ event: "game-info", data: {} }));
     WSProvider.send(JSON.stringify({ event: "room-info", data: {} }));
-  }, [isBackendReady, gameState?.gameId]);
+  }, [isBackendReady]);
 
   useEffect(() => {
     if (!gameState?.gameId) {

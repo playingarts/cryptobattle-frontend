@@ -57,10 +57,18 @@ export function useDragAndDrop({ onDrop, isPlacementValid, enabled = true }: Use
       max: 1,
       listeners: {
         start(event) {
+          // Safety check - ensure element still exists
+          if (!event.target || !document.body.contains(event.target)) {
+            return;
+          }
           // Reset transform on drag start
           event.target.style.transform = 'translate(0px, 0px)';
         },
         move(event) {
+          // Safety check - ensure element still exists
+          if (!event.target || !document.body.contains(event.target)) {
+            return;
+          }
           // Update position during drag
           position.x += event.dx;
           position.y += event.dy;
@@ -70,6 +78,10 @@ export function useDragAndDrop({ onDrop, isPlacementValid, enabled = true }: Use
           // Reset position on drag end
           position.x = 0;
           position.y = 0;
+          // Safety check - ensure element still exists
+          if (!event.target || !document.body.contains(event.target)) {
+            return;
+          }
           event.target.style.transform = 'translate(0px, 0px)';
         },
       },
@@ -80,6 +92,10 @@ export function useDragAndDrop({ onDrop, isPlacementValid, enabled = true }: Use
       accept: '.draggable',
       overlap: 0.4,
       ondragenter(event) {
+        // Safety check - ensure element still exists
+        if (!event.target || !document.body.contains(event.target)) {
+          return;
+        }
         event.target.classList.add('drop-target');
 
         // Check if placement is valid and add error class if not
@@ -97,10 +113,18 @@ export function useDragAndDrop({ onDrop, isPlacementValid, enabled = true }: Use
         }
       },
       ondragleave(event) {
+        // Safety check - ensure element still exists
+        if (!event.target || !document.body.contains(event.target)) {
+          return;
+        }
         event.target.classList.remove('drop-target');
         event.target.classList.remove('drop-error');
       },
       ondrop(event) {
+        // Safety check - ensure element still exists
+        if (!event.currentTarget || !document.body.contains(event.currentTarget)) {
+          return;
+        }
         // Parse cell coordinates from element id (format: "rowIndex-columnIndex")
         const target = event.currentTarget.id.split('-');
         const rowIndex = Number(target[0]);
@@ -112,6 +136,10 @@ export function useDragAndDrop({ onDrop, isPlacementValid, enabled = true }: Use
         event.stopImmediatePropagation();
       },
       ondropdeactivate(event) {
+        // Safety check - ensure element still exists
+        if (!event.target || !document.body.contains(event.target)) {
+          return;
+        }
         event.target.classList.remove('drop-active');
         event.target.classList.remove('drop-target');
         event.target.classList.remove('drop-error');

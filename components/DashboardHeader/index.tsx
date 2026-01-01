@@ -44,6 +44,9 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
     return `GM!`;
   };
 
+  // Check if user is a guest
+  const isGuest = user.name?.startsWith('Guest_') || user.username?.startsWith('Guest_');
+
   useEffect(() => {
     if (!user.userId) {
       return;
@@ -73,7 +76,7 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
       })}
     >
       <div css={{ display: "flex", justifyContent: "space-between" }}>
-        
+
         <Text
           component="h1"
           css={{
@@ -84,18 +87,20 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
         >
           {getGreeting()}
         </Text>
-        <Text
-          component="h1"
-          css={{
-            margin: "0",
-            fontSize: "55px",
-            verticalAlign: "bottom",
-            width: "90px",
-            textAlign: "center",
-          }}
-        >
-          {userStats.skill}
-        </Text>
+        {!isGuest && (
+          <Text
+            component="h1"
+            css={{
+              margin: "0",
+              fontSize: "55px",
+              verticalAlign: "bottom",
+              width: "90px",
+              textAlign: "center",
+            }}
+          >
+            {userStats.skill}
+          </Text>
+        )}
       </div>
 
       <div css={{ display: "flex", justifyContent: "space-between" }}>
@@ -109,17 +114,19 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
           {" "}
           {getUsername()}
         </Text>
-        <Text
-          css={{
-            color: "rgba(255, 255, 255, 0.3)",
-            width: "90px",
-            textAlign: "center",
-            fontSize: "18px",
-            margin: "15px 0 10px",
-          }}
-        >
-          Your Skill
-        </Text>
+        {!isGuest && (
+          <Text
+            css={{
+              color: "rgba(255, 255, 255, 0.3)",
+              width: "90px",
+              textAlign: "center",
+              fontSize: "18px",
+              margin: "15px 0 10px",
+            }}
+          >
+            Your Skill
+          </Text>
+        )}
       </div>
 
       <Line spacing={2} />
@@ -131,7 +138,7 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
           color: "#fff",
         }}
         component={Link}
-        href="/play"
+        href="/quickstart"
       >
         Play Now
       </Button>
