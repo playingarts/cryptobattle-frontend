@@ -6,6 +6,7 @@ import Loader from "../components/Loader";
 import { useRouter } from "next/router";
 import { useNotifications } from "../components/NotificationProvider";
 import Warning from "../components/Icons/Warning";
+import { setNavigationLocked } from "../utils/gameState";
 
 /**
  * Quickstart page - creates a room, starts the game, and redirects to /play
@@ -22,6 +23,17 @@ const Quickstart: NextPage = () => {
 
   // Get game state from reducer
   const gameState = state.serverState;
+
+  // Lock navigation on mount to prevent GameProvider from redirecting during quickstart
+  // This is the FIRST effect - runs synchronously on mount before any other effects
+  useEffect(() => {
+    console.log('[quickstart] Mounting - setting navigation lock');
+    setNavigationLocked(true);
+    return () => {
+      console.log('[quickstart] Unmounting - clearing navigation lock');
+      setNavigationLocked(false);
+    };
+  }, []);
 
   // Handle already connected warning
   useEffect(() => {
@@ -62,6 +74,7 @@ const Quickstart: NextPage = () => {
   // When game state changes to 'started', redirect to /play
   useEffect(() => {
     if (gameState?.state === 'started' && gameState?.gameId) {
+      console.log('[quickstart] Game started, navigating to /play');
       router.replace('/play');
     }
   }, [gameState?.state, gameState?.gameId, router]);

@@ -21,6 +21,7 @@ interface GlobalGameState {
   selectedCard: SelectedCardType | null;
   state: GameStateType | null;
   user: string | null; // JSON string of user object
+  navigationLocked: boolean; // Prevents GameProvider auto-redirect when true
 }
 
 const initialState: GlobalGameState = {
@@ -32,6 +33,7 @@ const initialState: GlobalGameState = {
   selectedCard: null,
   state: null,
   user: null,
+  navigationLocked: false,
 };
 
 // Internal state object
@@ -99,4 +101,10 @@ export const setState = (state: GameStateType | null): void => {
 
 export const setUser = (user: string | null): void => {
   gameState.user = user;
+};
+
+// Navigation lock - prevents GameProvider auto-redirect when a page handles its own navigation
+export const isNavigationLocked = (): boolean => gameState.navigationLocked;
+export const setNavigationLocked = (locked: boolean): void => {
+  gameState.navigationLocked = locked;
 };

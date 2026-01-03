@@ -1,4 +1,5 @@
 import { FC, HTMLAttributes, useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 export type Props = HTMLAttributes<HTMLDivElement>;
 import Link from "../Link";
@@ -9,6 +10,7 @@ import StatBlock from "../../components/StatBlock";
 import { api } from "../../api";
 import { useAuth } from "../AuthProvider";
 import { logError } from "../../utils/errorHandler";
+import { setNavigationLocked } from "../../utils/gameState";
 // import Progress from '../../components/Progress';
 import Button from "../Button/";
 
@@ -18,6 +20,13 @@ const getUserStats = (userId: string) => {
 
 const DashboardHeader: FC<Props> = ({ ...props }) => {
   const { user } = useAuth();
+  const router = useRouter();
+
+  // Handle Play Now click - set navigation lock BEFORE navigation to prevent race conditions
+  const handlePlayNowClick = () => {
+    setNavigationLocked(true);
+    router.push("/quickstart");
+  };
 
   const [userStats, setUserStats] = useState({
     gamesPlayed: 0,
@@ -51,14 +60,20 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
     if (!user.userId) {
       return;
     }
+    let mounted = true;
     getUserStats(user.userId)
       .then((data: any) => {
-        setUserStats(data);
+        if (mounted) {
+          setUserStats(data);
+        }
       })
       .catch((err: any) => {
         logError(err, 'DashboardHeader');
       });
 
+    return () => {
+      mounted = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.userId]);
 
@@ -137,8 +152,7 @@ const DashboardHeader: FC<Props> = ({ ...props }) => {
           background: "#7B61FF",
           color: "#fff",
         }}
-        component={Link}
-        href="/quickstart"
+        onClick={handlePlayNowClick}
       >
         Play Now
       </Button>

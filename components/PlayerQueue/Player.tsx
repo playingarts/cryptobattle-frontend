@@ -6,6 +6,7 @@ import { useGame } from "../GameProvider";
 
 // Fixed display duration for all players (30 seconds)
 const DISPLAY_DURATION_MS = 30000;
+const SCORE_ANIMATION_DURATION = 400; // ms for score count animation
 
 interface PlayerType {
   userId: string;
@@ -32,8 +33,63 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
 
     const { results, state } = useGame()
 
-    // Read points directly from reducer state for immediate updates
-    const currentPoints = state.serverState?.playersCurrentPoints?.[player.userId] ?? player.points ?? 0
+    // Use optimistic points (calculated instantly on card drop) if available,
+    // otherwise fall back to server-confirmed points.
+    // When optimisticPoints exists, use it for ALL players (including opponents whose points may decrease).
+    // If a player isn't in optimisticPoints, they have 0 (all their cells were stolen).
+    const targetPoints = state.optimisticPoints !== null
+      ? (state.optimisticPoints[player.userId] ?? 0)
+      : (state.serverState?.playersCurrentPoints?.[player.userId] ?? player.points ?? 0)
+
+    // Animated score state
+    const [displayedPoints, setDisplayedPoints] = useState(targetPoints)
+    const [isAnimating, setIsAnimating] = useState(false)
+    const [scoreDirection, setScoreDirection] = useState<'up' | 'down' | null>(null)
+    const scoreAnimationRef = useRef<number | null>(null)
+    const prevTargetRef = useRef(targetPoints)
+
+    // Animate score changes
+    useEffect(() => {
+      if (targetPoints === prevTargetRef.current) return
+
+      const startValue = prevTargetRef.current
+      const endValue = targetPoints
+      const startTime = Date.now()
+      const direction = endValue > startValue ? 'up' : 'down'
+
+      setIsAnimating(true)
+      setScoreDirection(direction)
+      prevTargetRef.current = targetPoints
+
+      const animateScore = () => {
+        const elapsed = Date.now() - startTime
+        const progress = Math.min(elapsed / SCORE_ANIMATION_DURATION, 1)
+        // Ease out cubic for smooth deceleration
+        const eased = 1 - Math.pow(1 - progress, 3)
+        const currentValue = Math.round(startValue + (endValue - startValue) * eased)
+
+        setDisplayedPoints(currentValue)
+
+        if (progress < 1) {
+          scoreAnimationRef.current = requestAnimationFrame(animateScore)
+        } else {
+          setDisplayedPoints(endValue)
+          // Keep the animation state briefly for the bounce to complete
+          setTimeout(() => {
+            setIsAnimating(false)
+            setScoreDirection(null)
+          }, 150)
+        }
+      }
+
+      scoreAnimationRef.current = requestAnimationFrame(animateScore)
+
+      return () => {
+        if (scoreAnimationRef.current) {
+          cancelAnimationFrame(scoreAnimationRef.current)
+        }
+      }
+    }, [targetPoints])
 
     // Track when current player changes (new turn starts)
     const prevCurrentPlayerRef = useRef<string | null>(null)
@@ -219,7 +275,7 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
                 marginTop: 2,
               }}
             >
-              {currentPoints}
+              {displayedPoints}
             </div>
           </div>
         </CircularProgressbarWithChildren>

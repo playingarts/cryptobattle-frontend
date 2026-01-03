@@ -24,6 +24,8 @@ import {
   isGameStarted,
   setGameStarted,
   setRoomId as setGlobalRoomId,
+  isNavigationLocked,
+  setNavigationLocked,
 } from "../../utils/gameState";
 import { gameReducer, initialGameState, GameReducerState } from "../../store/gameReducer";
 import { GameAction, gameStateReceived, setCurrentPlayer, resetGame } from "../../store/gameActions";
@@ -171,6 +173,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     setPlayersInfo([]);
     dispatch(resetGame());
     // Go to quickstart to immediately start a new game (not lobby)
+    // Set navigation lock BEFORE navigation to prevent redirect race
+    setNavigationLocked(true);
     router.push("/quickstart");
   };
 
@@ -222,35 +226,44 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       return;
     }
 
-    // Use both pathname and asPath for more reliable path detection
-    const currentPath = router.pathname;
-    const actualPath = router.asPath;
+    // CRITICAL: Check navigation lock FIRST
+    if (isNavigationLocked()) {
+      console.log('[GameProvider] Skipping redirect - navigation locked');
+      return;
+    }
 
     // Check if user intentionally left (persists across navigation)
     const intentionalLeave = localStorage.getItem("intentional-leave") === "true";
-
-    // Clear the flag after checking (one-time use)
     if (intentionalLeave) {
       localStorage.removeItem("intentional-leave");
-    }
-
-    if (isAlreadyConnected || !user || isGameStarted() || intentionalLeave) {
-      console.log('[DEBUG GameProvider] Skipping redirect - early return conditions met');
       return;
     }
 
-    // Skip redirect if already on game-related pages or dashboard
-    // Check both pathname and asPath for reliability
-    const skipRedirectPaths = ['/new', '/game/', '/play', '/dashboard', '/quickstart'];
-    const shouldSkipRedirect = skipRedirectPaths.some(path =>
-      currentPath.startsWith(path) || actualPath.startsWith(path)
-    );
+    if (isAlreadyConnected || !user || isGameStarted()) {
+      return;
+    }
+
+    // CRITICAL: Use window.location as the ONLY reliable source during navigation
+    // React router state can lag behind during route transitions
+    const browserPath = typeof window !== 'undefined' ? window.location.pathname : '';
+
+    // NEVER redirect if we're on quickstart - it handles its own navigation
+    if (browserPath === '/quickstart' || browserPath.startsWith('/quickstart')) {
+      console.log('[GameProvider] Skipping redirect - on quickstart page');
+      return;
+    }
+
+    // Skip redirect for other self-navigating pages
+    const skipRedirectPaths = ['/new', '/game/', '/play', '/dashboard'];
+    const shouldSkipRedirect = skipRedirectPaths.some(path => browserPath.startsWith(path));
 
     if (user.inGameId && !shouldSkipRedirect) {
+      console.log('[GameProvider] Redirecting to /play because user.inGameId:', user.inGameId, 'browserPath:', browserPath);
       router.push(`/play`);
       return;
     }
-    if (user.inRoomId && !currentPath.startsWith("/join") && !actualPath.startsWith("/join") && !shouldSkipRedirect) {
+    if (user.inRoomId && !shouldSkipRedirect && !browserPath.startsWith("/join")) {
+      console.log('[GameProvider] Redirecting to lobby because user.inRoomId:', user.inRoomId, 'browserPath:', browserPath);
       router.push(`/game/${user.inRoomId}`);
     }
   }, [user, isAlreadyConnected, router.isReady, router.pathname]);
@@ -403,7 +416,8 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     // Wrapper: dispatch to reducer when game state is received
     const setGameState = (data: unknown) => {
       if (data && typeof data === 'object' && 'gameId' in data) {
-        dispatch(gameStateReceived(data as Parameters<typeof gameStateReceived>[0]));
+        const typedData = data as Parameters<typeof gameStateReceived>[0];
+        dispatch(gameStateReceived(typedData));
       }
     };
 

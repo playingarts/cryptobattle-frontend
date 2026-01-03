@@ -19,6 +19,7 @@ import {
 import { GameAction, GameStatePayload, ServerTableCard, ServerLastPlayedCard, GameUserWithCardsInfo, AllowedUserCardsPlacement } from './gameActions';
 import { generateMoveKey, normalizeCard, findCardPosition, findCardOnBoard } from '../utils/moveUtils';
 import { logAnimation, logGameState } from '../utils/debug';
+import { calculateOptimisticScores } from '../utils/scoring';
 
 // ============================================================
 // STATE SHAPE
@@ -56,6 +57,7 @@ export interface GameReducerState {
 
   // Optimistic state
   optimisticMoves: GameMove[];
+  optimisticPoints: Record<string, number> | null;  // Points calculated locally before backend confirms
 
   // Meta
   isLoading: boolean;
@@ -89,6 +91,7 @@ export const initialGameState: GameReducerState = {
   pendingAnimation: null,
   processedMoveKeys: new Set(),
   optimisticMoves: [],
+  optimisticPoints: null,
   isLoading: false,
   error: null,
 };
@@ -464,6 +467,8 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
         optimisticMoves: state.optimisticMoves.filter(
           (m) => !isMatchingMove(m, lastPlayedCard)
         ),
+        // Clear optimistic points - server has authoritative score
+        optimisticPoints: null,
       };
     }
 
@@ -479,6 +484,13 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
       // Pre-register the move key so we don't animate again on server confirm
       const newProcessedKeys = new Set(state.processedMoveKeys);
       newProcessedKeys.add(move.moveKey);
+
+      // Calculate optimistic scores immediately
+      const optimisticPoints = calculateOptimisticScores(
+        state.board,
+        move.card,
+        move.position,
+      );
 
       return {
         ...state,
@@ -497,6 +509,8 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
         },
         // Optimistically update board
         board: addCardToBoard(state.board, move.position, move.card),
+        // Optimistically update scores
+        optimisticPoints,
       };
     }
 
@@ -517,6 +531,8 @@ export function gameReducer(state: GameReducerState, action: GameAction): GameRe
         optimisticMoves: state.optimisticMoves.filter(
           (m) => m.moveKey !== action.payload.moveKey
         ),
+        // Clear optimistic points since move was rejected
+        optimisticPoints: null,
         error: action.payload.error,
       };
     }

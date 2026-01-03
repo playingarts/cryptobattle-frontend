@@ -162,11 +162,13 @@ const GameInventory: FC<Props> = ({
         </div>
       </div>
 
+      {/* Skip button hidden but functionality preserved */}
       {!isOpponentsCards && (
         <Button
           Icon={Skip}
           onClick={skip}
           css={{
+            display: "none", // Hidden for now
             position: "fixed",
             bottom: 40,
             right: 40,

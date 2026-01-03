@@ -249,16 +249,17 @@ export function handleCreateRoom(data: CreateRoomEventData, deps: HandlerDeps): 
   }
 
   if (data.roomId) {
-    deps.stateSetters.setRoomId(data.roomId);
-    deps.wsProvider.send(JSON.stringify({ event: 'room-info', data: {} }));
-
-    // If on quickstart page, auto-start the game
-    // The quickstart page will redirect to /play when game state becomes 'started'
+    // For quickstart: don't set roomId or request room-info to avoid any lobby-related state changes
+    // Just start the game immediately - quickstart.tsx will redirect to /play when game starts
     if (isOnQuickstartPage) {
       deps.wsProvider.send(JSON.stringify({
         event: 'start-game',
         data: {},
       }));
+    } else {
+      // Normal flow: set roomId and request room info
+      deps.stateSetters.setRoomId(data.roomId);
+      deps.wsProvider.send(JSON.stringify({ event: 'room-info', data: {} }));
     }
   } else {
     // If on /new or /quickstart page, retry instead of redirecting
@@ -419,13 +420,18 @@ export function handleGameInfo(data: GameEventData, deps: HandlerDeps): HandlerR
 export function handleGameUpdated(data: GameEventData, deps: HandlerDeps): HandlerResult {
   deps.stateSetters.setGameState({ ...data });
 
+  // Set game started flag IMMEDIATELY (synchronously) to prevent race conditions
+  // This blocks GameProvider's redirect effect before any async code runs
+  if (data.state === 'started' && !isGameStarted() && !hasResults()) {
+    setGameStarted(true);
+    console.log('[wsEventHandlers] Game started - setGameStarted(true)');
+  }
+
   setTimeout(() => {
     if (data.state === 'started') {
       deps.notifications.closeNotification();
-      if (!isGameStarted() && !hasResults()) {
-        deps.uiActions.playStartGameSound();
-        setGameStarted(true);
-      }
+      deps.uiActions.playStartGameSound();
+
       const currentPath = window.location.pathname.split('?')[0];
       // Redirect to /play from lobby pages only
       // Skip: dashboard, /play (already there), /new (goes to lobby), /quickstart (handles its own redirect)
@@ -433,6 +439,7 @@ export function handleGameUpdated(data: GameEventData, deps: HandlerDeps): Handl
           !currentPath.endsWith('/play') &&
           !currentPath.endsWith('/new') &&
           !currentPath.endsWith('/quickstart')) {
+        console.log('[wsEventHandlers] Redirecting to /play from:', currentPath);
         deps.router.push('/play');
       }
     }

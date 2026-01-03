@@ -16,8 +16,9 @@ const GameRulesPoints: FC<Props> = ({ ...props }) => {
           color: "#000",
         }}
       >
-        For every card placed, a player receives game points. The amount of
-        points awarded depends on how the card is played.
+        Points are calculated based on connected clusters of cards you control.
+        Score = Multiplier x Total cards in cluster. Larger clusters earn higher multipliers:
+        1 cell = x1, 2-3 cells = x2, 4-5 cells = x3, 6-7 cells = x4, 8+ cells = x5.
       </Text>
 
       <Line></Line>
@@ -195,11 +196,12 @@ const GameRulesPoints: FC<Props> = ({ ...props }) => {
         }}
       >
         <div css={{ marginLeft: 0, width: 250 }}>
-          Place a card on an empty field: receive 1 point (+1p).
+          Place a card on an empty field adjacent to your cluster to expand it
+          and increase your multiplier.
         </div>
         <div css={{ marginLeft: 167, width: 300 }}>
-          Place a card on top of your opponents regular card: you will receive
-          +1p. Opponent: -1p.
+          Stack on opponent's card to steal that cell. This can break their
+          cluster and reduce their score significantly.
         </div>
       </div>
 
@@ -295,7 +297,8 @@ const GameRulesPoints: FC<Props> = ({ ...props }) => {
         }}
       >
         <div css={{ marginLeft: 0, width: 250 }}>
-          Place a card on top of your own card: no extra points gained.
+          Stack on your own card to add to your cluster's total cards,
+          increasing your score with the current multiplier.
         </div>
       </div>
 
