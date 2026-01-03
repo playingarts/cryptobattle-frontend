@@ -94,7 +94,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
   // DELETED: playersGame - now derived from state.serverState.allGamePlayers
   // const [playersGame, setPlayersGame] = useState<any>([]);
 
-  const [playingAgain, setPlayingAgain] = useState<boolean | null>(false);
+  const [, setPlayingAgain] = useState<boolean | null>(false);
 
   const [timer, setTimer] = useState<number>(0);
   const [totalSeconds, setTotalSeconds] = useState<number>(0);
@@ -277,21 +277,6 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
       setGameStarted(false);
     };
   }, []);
-
-  const playAgain = () => {
-    setPlayingAgain(true);
-    localStorage.setItem("play-again", "true");
-    if (WSProvider) {
-      WSProvider.send(
-        JSON.stringify({
-          event: "next-game",
-          data: {
-            wantNextGame: true,
-          },
-        })
-      );
-    }
-  };
 
   // DELETED: gameState, isMyTurn - now derived from reducer state
   // const [gameState, setGameState] = useState<any>(null);
@@ -553,10 +538,10 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
                     padding: 14,
                     display: "flex",
                     justifyContent: "space-between",
-                    borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
                     borderTop:
                       index === 0
-                        ? "1px solid rgba(255, 255, 255, 0.1)"
+                        ? "1px solid rgba(0, 0, 0, 0.1)"
                         : "none",
                   }}
                   key={player.userId}
@@ -575,7 +560,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           </Text>
         </div>
       ),
-      dark: true,
+      dark: false,
       isWinner:
         results.winnerPlayersUserIds.includes(user.userId) &&
         results.winnerPlayersUserIds.length !== playersGame.length,
@@ -585,30 +570,26 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
           css={{
             display: "flex",
             alignItems: "center",
-            flexDirection: "column",
+            flexDirection: "row",
+            gap: 16,
             marginBottom: 40,
           }}
         >
-          {results.areAllPlayersActive && (
-            <Button
-              css={(theme) => ({
-                color: "#fff",
-                background: "#7B61FF",
-                marginBottom: theme.spacing(2),
-              })}
-              Icon={Refresh}
-              onClick={playAgain}
-              disabled={!!(playingAgain || localStorage.getItem("play-again"))}
-            >
-              {playingAgain || localStorage.getItem("play-again")
-                ? "Waiting"
-                : "Play again " + "(" + timer / 1000 + ")"}
-            </Button>
-          )}
           <Button
             css={() => ({
               color: "#fff",
-              background: "rgba(255, 255, 255, 0.05)",
+              background: "#7B61FF",
+            })}
+            Icon={Refresh}
+            onClick={newGame}
+            disabled={isNewGameLoading}
+          >
+            {isNewGameLoading ? "Starting..." : "Play Again"}
+          </Button>
+          <Button
+            css={() => ({
+              color: "#333",
+              background: "rgba(0, 0, 0, 0.05)",
             })}
             onClick={playAgainQuit}
           >

@@ -74,11 +74,7 @@ function NotificationProvider({
               right: 0,
               bottom: 0,
               pointerEvents: "auto",
-              background: notification.dark
-                ? notification.isWinner
-                  ? "rgba(255, 255, 255, .3)"
-                  : "rgba(255, 255, 255, .3)"
-                : "rgba(0, 0, 0, .9)",
+              background: "rgba(0, 0, 0, 0.7)",
               zIndex: 99900009,
               display: "flex",
               justifyContent: "center",
@@ -90,7 +86,7 @@ function NotificationProvider({
                 borderRadius: 20,
                 boxShadow: "0px 2px 3px rgba(0, 0, 0, 0.1)",
                 opacity: 1,
-                zIndex: 99900009,
+                zIndex: 99900011,
                 display: "flex",
                 justifyContent: "center",
                 flexDirection: "column",
@@ -149,12 +145,12 @@ function NotificationProvider({
           width={width}
           height={height}
           css={{
-            zIndex: "9990009!important",
-            background: "rgba(255, 255, 255, .1)",
+            zIndex: "99900010!important",
           }}
-          numberOfPieces={150}
+          numberOfPieces={300}
           recycle={false}
-          confettiSource={{ x: 100, y: 100, w: width, h: height }}
+          colors={['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500']}
+          gravity={0.3}
         />
       )}
     </NotificationProviderContext.Provider>

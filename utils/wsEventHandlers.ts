@@ -283,6 +283,10 @@ export function handleCreateRoom(data: CreateRoomEventData, deps: HandlerDeps): 
 export function handleCloseRoom(data: CloseRoomEventData, deps: HandlerDeps): HandlerResult {
   // Handle timeout or vote failed
   if (data.reason === 'TIMEOUT' || data.reason === 'NEXT_GAME_VOTE_FAILED') {
+    // If results are showing, don't auto-redirect - let the user click a button
+    if (hasResults()) {
+      return STOP;
+    }
     deps.uiActions.quit();
     return STOP;
   }

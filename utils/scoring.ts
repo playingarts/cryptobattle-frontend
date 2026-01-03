@@ -95,7 +95,7 @@ export function findPlayerClusters(
     if (!cell || cell.cards.length <= 1) return false;
     // Check if any card (except top) belongs to a different user
     for (let i = 0; i < cell.cards.length - 1; i++) {
-      if (cell.cards[i].userId !== ownerId && cell.cards[i].userId !== 'system') {
+      if (cell.cards[i].userId !== ownerId) {
         return true;
       }
     }
@@ -154,19 +154,19 @@ export function findPlayerClusters(
 /**
  * Calculate score for a single cluster
  * - Own cells (not stolen): count as 1
- * - Stolen cells (has opponent cards underneath): count full stack height
- * Score = multiplier × (own cells + stolen cell stack heights)
+ * - Stolen cells (has opponent cards underneath): count as 2 (fixed bonus)
+ * Score = multiplier × (own cells + stolen cell bonuses)
  */
 export function calculateClusterScore(
   cluster: Array<ClusterCellInfo>,
 ): number {
   const clusterSize = cluster.length;
 
-  // Calculate effective points: own cells = 1, stolen cells = stack height
+  // Calculate effective points: own cells = 1, stolen cells = 2 (fixed bonus)
   let effectivePoints = 0;
   for (const cell of cluster) {
     if (cell.isStolen) {
-      effectivePoints += cell.stackHeight;
+      effectivePoints += 2; // Fixed bonus instead of stack height to prevent snowballing
     } else {
       effectivePoints += 1;
     }
