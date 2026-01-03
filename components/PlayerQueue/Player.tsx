@@ -43,22 +43,19 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
 
     // Animated score state
     const [displayedPoints, setDisplayedPoints] = useState(targetPoints)
-    const [isAnimating, setIsAnimating] = useState(false)
-    const [scoreDirection, setScoreDirection] = useState<'up' | 'down' | null>(null)
     const scoreAnimationRef = useRef<number | null>(null)
     const prevTargetRef = useRef(targetPoints)
 
     // Animate score changes
     useEffect(() => {
-      if (targetPoints === prevTargetRef.current) return
+      if (targetPoints === prevTargetRef.current) {
+        return
+      }
 
       const startValue = prevTargetRef.current
       const endValue = targetPoints
       const startTime = Date.now()
-      const direction = endValue > startValue ? 'up' : 'down'
 
-      setIsAnimating(true)
-      setScoreDirection(direction)
       prevTargetRef.current = targetPoints
 
       const animateScore = () => {
@@ -74,11 +71,6 @@ const Player = forwardRef<HTMLDivElement, PlayerProps>(
           scoreAnimationRef.current = requestAnimationFrame(animateScore)
         } else {
           setDisplayedPoints(endValue)
-          // Keep the animation state briefly for the bounce to complete
-          setTimeout(() => {
-            setIsAnimating(false)
-            setScoreDirection(null)
-          }, 150)
         }
       }
 

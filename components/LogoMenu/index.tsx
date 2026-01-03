@@ -2,7 +2,6 @@ import Link from "../Link";
 import Line from "../Line";
 import Text from "../Text";
 
-import GameRules from "../GameRules";
 // import { useWS } from "../WsProvider";
 import { useAuth } from "../AuthProvider";
 

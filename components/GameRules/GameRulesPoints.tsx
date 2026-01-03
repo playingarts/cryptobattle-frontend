@@ -200,7 +200,7 @@ const GameRulesPoints: FC<Props> = ({ ...props }) => {
           and increase your multiplier.
         </div>
         <div css={{ marginLeft: 167, width: 300 }}>
-          Stack on opponent's card to steal that cell. This can break their
+          Stack on opponent&apos;s card to steal that cell. This can break their
           cluster and reduce their score significantly.
         </div>
       </div>
@@ -297,7 +297,7 @@ const GameRulesPoints: FC<Props> = ({ ...props }) => {
         }}
       >
         <div css={{ marginLeft: 0, width: 250 }}>
-          Stack on your own card to add to your cluster's total cards,
+          Stack on your own card to add to your cluster&apos;s total cards,
           increasing your score with the current multiplier.
         </div>
       </div>
