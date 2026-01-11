@@ -85,7 +85,7 @@ const Header: FC<Props> = ({
               transform: "translate(-50%, -50%)",
             })}
           >
-            <Link href="/dashboard">
+            <Link href="/">
               <LogoIcon
                 css={(theme) => [
                   palette !== "gradient" && {

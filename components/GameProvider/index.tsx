@@ -144,7 +144,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     setGameStarted(false);
     setPlayersInfo([]);
     dispatch(resetGame());
-    router.push("/dashboard");
+    router.push("/");
   };
 
   const reload = () => {
@@ -199,7 +199,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     setGameStarted(false);
     setPlayersInfo([]);
     dispatch(resetGame());
-    router.push("/dashboard");
+    router.push("/");
   };
 
   useEffect(() => {
@@ -254,7 +254,7 @@ function GameProvider({ children }: GameProviderProps): JSX.Element {
     }
 
     // Skip redirect for other self-navigating pages
-    const skipRedirectPaths = ['/new', '/game/', '/play', '/dashboard'];
+    const skipRedirectPaths = ['/new', '/game/', '/play', '/'];
     const shouldSkipRedirect = skipRedirectPaths.some(path => browserPath.startsWith(path));
 
     if (user.inGameId && !shouldSkipRedirect) {

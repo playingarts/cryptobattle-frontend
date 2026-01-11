@@ -84,8 +84,8 @@ const GameLayout: FC<
         // Give time for WebSocket message to be sent and processed
         setTimeout(() => {
           // Use router.push for smoother navigation, with window.location as fallback
-          router.push("/dashboard").catch(() => {
-            window.location.href = "/dashboard";
+          router.push("/").catch(() => {
+            window.location.href = "/";
           });
         }, 500);
       };

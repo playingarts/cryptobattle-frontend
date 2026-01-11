@@ -84,7 +84,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
         setTimeout(() => {
           roomid
             ? router.push(`/game/${roomid}?join=true`)
-            : router.push("/dashboard");
+            : router.push("/");
         }, 1000);
       } else {
         // localStorage.removeItem("adding-metamask");
@@ -142,7 +142,7 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
     const isLoggedInCookie = () =>
       localStorage.getItem("accessToken") !== null ? true : false;
 
-    const publicPaths = ["/", "/401", "/join/login", "/join", "/play"];
+    const publicPaths = ["/", "/401", "/join/login", "/join", "/play", "/dashboard"];
     const path = url.split("?")[0];
 
     setLoggedIn(isLoggedInCookie());

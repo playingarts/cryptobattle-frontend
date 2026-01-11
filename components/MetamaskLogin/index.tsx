@@ -75,7 +75,7 @@ const router = useRouter();
             setTimeout(() => {
               const roomIdValue = Array.isArray(roomId) ? roomId[0] : roomId;
               roomIdValue ? router.push(`/game/${roomIdValue}?join=true`)
-                : router.push("/dashboard");
+                : router.push("/");
             }, 1000);
           })
           .catch((err) => {

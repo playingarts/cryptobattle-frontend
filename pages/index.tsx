@@ -1,73 +1,125 @@
 import { NextPage } from "next";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Layout from "../components/Layout";
-import Grid from "../components/Grid";
-import Text from "../components/Text";
-import Link from "../components/Link";
-import Button from "../components/Button";
-
-import Line from "../components/Line";
-import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
+import NFTInventory from "../components/NFTInventory";
 import { useAuth } from "../components/AuthProvider";
-import MetamaskLogin from "../components/MetamaskLogin/";
-import GuestLogin from "../components/GuestLogin/";
+import NavProfile from "../components/NavProfile";
+import ComposedGlobalLayout from "../components/_composed/GlobalLayout";
+import DashboardHeader from "../components/DashboardHeader";
+import Loader from "../components/Loader";
+import { logError } from "../utils/errorHandler";
 
-const Home: NextPage = () => {
-  const { loggedIn } = useAuth();
+const Dashboard: NextPage = () => {
+  const { user, loggedIn, setToken } = useAuth();
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+
+  // Auto-authenticate as guest if no token exists
+  useEffect(() => {
+    const hasToken = localStorage.getItem("accessToken") !== null;
+
+    if (!hasToken && !loggedIn && !isAuthenticating) {
+      setIsAuthenticating(true);
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://cryptobattle-backend-production.up.railway.app';
+      axios.get(`${apiUrl}/auth/guest`, {
+        headers: { "content-type": "application/json" },
+      })
+        .then((response) => {
+          setToken(response.data.accesstoken);
+        })
+        .catch((err) => {
+          logError(err, 'Dashboard auto-guest-auth');
+          setIsAuthenticating(false);
+        });
+    }
+  }, [loggedIn, isAuthenticating, setToken]);
+
+  // Show loader while authenticating
+  if (!loggedIn || isAuthenticating) {
+    return (
+      <div
+        css={{
+          height: "100vh",
+          background: "#181818",
+          width: "100vw",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Loader
+          css={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%) scale(2)",
+            lineHeight: 1,
+            color: "#fff",
+          }}
+        />
+      </div>
+    );
+  }
+
+  const headerRight = null;
+  const headerMiddle = <NavProfile user={user} />;
 
   return (
-    <ComposedGlobalLayout>
+    <ComposedGlobalLayout
+      headerTitle="DASHBOARD"
+      headerMiddle={headerMiddle}
+      headerRight={headerRight}
+    >
       <Layout
         css={(theme) => ({
-          background: "transparent",
+          background: "theme.colors.dark_gray",
           color: theme.colors.text_title_light,
           overflow: "hidden",
-          paddingTop: 200,
+          paddingTop: theme.spacing(10),
+          paddingBottom: theme.spacing(6.5),
+          backgroundSize: "cover",
         })}
       >
-        <Grid css={{ marginBottom: 200 }}>
-          {/* <div css={{ gridColumn: "0 / span 5" }}>
-            <div css={{ width: "400px", height: "400px" }}></div>
-          </div> */}
-
-          <div css={{ gridColumn: "2 / span 6" }}>
-            <Text
-              component="h1"
-              css={{ margin: "1px", fontSize: "50px", lineHeight: "65px" }}
-            >
-              Go head to head with opponents in turn-based card battle
-            </Text>
-
-            <Line spacing={2} />
-
-            {!loggedIn ? (
-              <div>
-                <div style={{ display: "flex", justifyContent: "start", alignItems: "center" }}>
-                  {/* MetamaskLogin hidden but functionality preserved */}
-                  <div style={{ display: "none" }}>
-                    <MetamaskLogin />
-                  </div>
-                  <GuestLogin />
-                </div>
-              </div>
+        <div>
+          <div
+            css={{
+              padding: "0",
+              marginTop: 40,
+            }}
+          >
+            <DashboardHeader />
+          </div>
+          {/* NFT section hidden - functionality preserved */}
+          <div css={{ display: 'none' }}>
+            {!user.isGuest ? (
+              <NFTInventory></NFTInventory>
             ) : (
-              <Button
+              <div
                 css={{
-                  marginTop: "10px",
-                  backgroundColor: "rgb(123, 97, 255)",
-                  color: "#fff",
+                  backgroundColor: "#181818",
+                  color: "rgba(255, 255, 255, 0.5)",
+                  maxWidth: 1040,
+                  margin: "30px auto 0",
+                  padding: "40px 70px",
+                  fontSize: "16px",
+                  borderRadius: "10px",
+                  textAlign: "center",
                 }}
-                component={Link}
-                href="/dashboard"
               >
-                Start playing
-              </Button>
+                <p css={{ margin: 0, marginBottom: 10 }}>
+                  You are playing as a guest. Stats and NFT cards are not available.
+                </p>
+                <p css={{ margin: 0, color: "rgba(255, 255, 255, 0.3)" }}>
+                  Connect with Metamask to track your progress and use NFT cards.
+                </p>
+              </div>
             )}
           </div>
-        </Grid>
-        {/* <PromoSection /> */}
+        </div>
       </Layout>
     </ComposedGlobalLayout>
   );
 };
 
-export default Home;
+export default Dashboard;

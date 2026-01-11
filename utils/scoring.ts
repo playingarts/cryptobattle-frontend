@@ -26,14 +26,11 @@ export interface ClusterCellInfo {
 }
 
 /**
- * Get stepped multiplier based on cluster size
- * 1 cell = ×1, 2-3 cells = ×2, 4-5 cells = ×3, 6+ cells = ×4 (capped)
+ * Get cluster bonus based on cluster size
+ * Bonus = cluster size - 1 (connecting cells rewards you)
  */
-export function getClusterMultiplier(clusterSize: number): number {
-  if (clusterSize <= 1) return 1;
-  if (clusterSize <= 3) return 2;
-  if (clusterSize <= 5) return 3;
-  return 4; // Capped at ×4
+export function getClusterBonus(clusterSize: number): number {
+  return Math.max(0, clusterSize - 1);
 }
 
 /**
@@ -153,27 +150,24 @@ export function findPlayerClusters(
 
 /**
  * Calculate score for a single cluster
- * - Own cells (not stolen): count as 1
- * - Stolen cells (has opponent cards underneath): count as 2 (fixed bonus)
- * Score = multiplier × (own cells + stolen cell bonuses)
+ * - Each card in the stack adds 1 point
+ * - Cluster bonus = cluster size - 1 (reward for connecting cells)
+ * - Score = total cards + cluster bonus
  */
 export function calculateClusterScore(
   cluster: Array<ClusterCellInfo>,
 ): number {
   const clusterSize = cluster.length;
 
-  // Calculate effective points: own cells = 1, stolen cells = 2 (fixed bonus)
-  let effectivePoints = 0;
+  // Stack height scoring: every card in the stack adds 1 point
+  let totalCards = 0;
   for (const cell of cluster) {
-    if (cell.isStolen) {
-      effectivePoints += 2; // Fixed bonus instead of stack height to prevent snowballing
-    } else {
-      effectivePoints += 1;
-    }
+    totalCards += cell.stackHeight;
   }
 
-  const multiplier = getClusterMultiplier(clusterSize);
-  return multiplier * effectivePoints;
+  // Additive bonus for cluster size
+  const clusterBonus = getClusterBonus(clusterSize);
+  return totalCards + clusterBonus;
 }
 
 /**

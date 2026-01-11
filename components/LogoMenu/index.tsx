@@ -262,7 +262,7 @@ export default function LogoMenu({
                   {loggedIn && (
                     <MenuItem
                       fontWeight={400}
-                      to="/dashboard"
+                      to="/"
                       text="Dashboard"
                     />
                   )}

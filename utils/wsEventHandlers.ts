@@ -244,7 +244,7 @@ export function handleCreateRoom(data: CreateRoomEventData, deps: HandlerDeps): 
       }, 500);
       return CONTINUE;
     }
-    deps.router.push('/dashboard');
+    deps.router.push('/');
     return CONTINUE;
   }
 
@@ -272,7 +272,7 @@ export function handleCreateRoom(data: CreateRoomEventData, deps: HandlerDeps): 
       }, 500);
       return CONTINUE;
     }
-    deps.router.push('/dashboard');
+    deps.router.push('/');
   }
   return CONTINUE;
 }
@@ -355,7 +355,7 @@ export function handleJoinRoom(data: RoomEventData, deps: HandlerDeps): HandlerR
       iconColor: '#FF6F41',
       footer: deps.render.renderNewGameButton(),
     });
-    deps.router.push('/dashboard');
+    deps.router.push('/');
   }
   deps.wsProvider.send(JSON.stringify({ event: 'room-info', data: {} }));
   return CONTINUE;
@@ -439,7 +439,7 @@ export function handleGameUpdated(data: GameEventData, deps: HandlerDeps): Handl
       const currentPath = window.location.pathname.split('?')[0];
       // Redirect to /play from lobby pages only
       // Skip: dashboard, /play (already there), /new (goes to lobby), /quickstart (handles its own redirect)
-      if (!currentPath.endsWith('/dashboard') &&
+      if (currentPath !== '/' &&
           !currentPath.endsWith('/play') &&
           !currentPath.endsWith('/new') &&
           !currentPath.endsWith('/quickstart')) {
@@ -503,7 +503,7 @@ export function handleWSClose(data: WSCloseEventData, deps: HandlerDeps): Handle
  */
 function checkPlayerNotInRoomError(data: GameEventData, deps: HandlerDeps): boolean {
   if (data.error?.message === 'Player must be in a room') {
-    deps.router.push('/dashboard');
+    deps.router.push('/');
     return true;
   }
   return false;

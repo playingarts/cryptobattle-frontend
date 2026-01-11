@@ -238,7 +238,7 @@ const JoinGame: NextPage = () => {
       }
       // Use window.location for full page reload to reset WebSocket and user state
       setTimeout(() => {
-        window.location.href = "/dashboard";
+        window.location.href = "/";
       }, 200);
     };
 

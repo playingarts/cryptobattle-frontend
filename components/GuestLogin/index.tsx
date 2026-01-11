@@ -33,7 +33,7 @@ const GuestLogin: FC<GuestLoginProps> = ({ roomId, ...props }) => {
         const roomIdValue = Array.isArray(roomId) ? roomId[0] : roomId;
         roomIdValue
           ? router.push(`/game/${roomIdValue}?join=true`)
-          : router.push("/dashboard");
+          : router.push("/");
       }, 1000);
     } catch (err) {
       logError(err, 'GuestLogin');
