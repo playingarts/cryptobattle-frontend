@@ -78,21 +78,23 @@ function AuthProvider({ children }: AuthProviderProps): JSX.Element {
       }
 
       setUser(user);
-      setGlobalUser(JSON.stringify(user))
+      setGlobalUser(JSON.stringify(user));
+      setLoggedIn(true); // Update loggedIn immediately after successful auth
+
       const roomid = localStorage.getItem("roomid");
       if (!localStorage.getItem("adding-metamask")) {
-        setTimeout(() => {
-          roomid
-            ? router.push(`/game/${roomid}?join=true`)
-            : router.push("/");
-        }, 1000);
-      } else {
-        // localStorage.removeItem("adding-metamask");
+        // Only redirect if we need to go somewhere else
+        if (roomid) {
+          setTimeout(() => {
+            router.push(`/game/${roomid}?join=true`);
+          }, 500);
+        }
+        // No redirect needed if already on dashboard - state update handles it
       }
 
       localStorage.removeItem("roomid");
     });
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const isLoggedInCookie = () =>

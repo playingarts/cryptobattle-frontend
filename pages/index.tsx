@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import axios from "axios";
 import Layout from "../components/Layout";
 import NFTInventory from "../components/NFTInventory";
@@ -12,14 +12,19 @@ import { logError } from "../utils/errorHandler";
 
 const Dashboard: NextPage = () => {
   const { user, loggedIn, setToken } = useAuth();
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const authAttempted = useRef(false);
 
   // Auto-authenticate as guest if no token exists
   useEffect(() => {
+    // Only attempt auth once per mount
+    if (authAttempted.current) {
+      return;
+    }
+
     const hasToken = localStorage.getItem("accessToken") !== null;
 
-    if (!hasToken && !loggedIn && !isAuthenticating) {
-      setIsAuthenticating(true);
+    if (!hasToken && !loggedIn) {
+      authAttempted.current = true;
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://cryptobattle-backend-production.up.railway.app';
       axios.get(`${apiUrl}/auth/guest`, {
@@ -30,13 +35,12 @@ const Dashboard: NextPage = () => {
         })
         .catch((err) => {
           logError(err, 'Dashboard auto-guest-auth');
-          setIsAuthenticating(false);
         });
     }
-  }, [loggedIn, isAuthenticating, setToken]);
+  }, [loggedIn, setToken]);
 
-  // Show loader while authenticating
-  if (!loggedIn || isAuthenticating) {
+  // Show loader while not logged in
+  if (!loggedIn) {
     return (
       <div
         css={{

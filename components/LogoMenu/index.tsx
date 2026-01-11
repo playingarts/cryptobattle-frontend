@@ -126,7 +126,7 @@ export default function LogoMenu({
   headerTitle?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const { loggedIn, logout } = useAuth();
+  const { loggedIn, logout, user } = useAuth();
 
   // const WSProvider = useWS();
   // const router = useRouter();
@@ -312,7 +312,7 @@ export default function LogoMenu({
 
                   {/* <MenuItem to="/" text="Buy NFT on LooksRare" fontSize={16} /> */}
 
-                  {loggedIn && (
+                  {loggedIn && !user?.isGuest && (
                     <li
                       onClick={logout}
                       css={{
